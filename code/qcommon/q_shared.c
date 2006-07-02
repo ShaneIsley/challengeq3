@@ -560,6 +560,19 @@ void COM_MatchToken( char **buf_p, char *match ) {
 	}
 }
 
+//Returns the index in g_color_table[] corresponding to the colour code.
+int ColorIndex( char ccode ) {
+
+	if ( ccode >= '0' && ccode <= '9' ) {
+		return (ccode - '0');
+	} else if ( ccode >= 'a' && ccode <= 'z' ) {
+		return (2 * (ccode - 'a') + 10);
+	} else if ( ccode >= 'A' && ccode <= 'Z' ) {
+		return (2 * (ccode - 'A') + 11);
+	} else {
+		return 7;
+	}
+}
 
 /*
 =================
