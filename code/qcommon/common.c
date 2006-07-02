@@ -3068,6 +3068,7 @@ static void Field_CompleteCommand( char *cmd,
 	if( completionArgument > 1 )
 	{
 		const char *baseCmd = Cmd_Argv( 0 );
+		const char *secondCmd = Cmd_Argv( 1 );
 
 #ifndef DEDICATED
 		// If the very first token does not have a leading \ or /,
@@ -3090,7 +3091,13 @@ static void Field_CompleteCommand( char *cmd,
 		{
 			// FIXME: all this junk should really be associated with the respective
 			// commands, instead of being hard coded here
-			if( ( !Q_stricmp( baseCmd, "map" ) ||
+			if( ( !Q_stricmp( baseCmd, "callvote" )) &&
+						!Q_stricmp( secondCmd, "map" ) &&
+						completionArgument == 3 )
+			{
+				Field_CompleteFilename( "maps", "bsp", qtrue );
+			}
+			else if( ( !Q_stricmp( baseCmd, "map" ) ||
 						!Q_stricmp( baseCmd, "devmap" ) ||
 						!Q_stricmp( baseCmd, "spmap" ) ||
 						!Q_stricmp( baseCmd, "spdevmap" ) ) &&
