@@ -1,0 +1,33 @@
+
+
+30 Jun 06 - initial build from ioq3 svn v810
+
+mode 8 corrected to 1280x960
+
+undefined USE_OPENAL
+
+removed GetUserName call
+
+removed retarded r_dlightbacks
+
+created dlight texture correctly
+
+fixed the dlight code
+
+removed the explicit and incorrect "vertexlight==1 == disable dlights" test
+
+removed redundant r_ext_texture_filter_anisotropic
+
+removed retarded cl_consoleHistory
+
+removed redundant cl_autoRecordDemo
+
+shader spew made developer 1
+
+gl extensions spew made developer 1
+
+pak list made fs_debug 1
+
+removed the TA cvars that some idiot hacked into the engine
+
+reordered demo_protocols to reduce spew
