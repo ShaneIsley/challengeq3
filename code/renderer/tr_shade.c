@@ -713,16 +713,11 @@ static void ProjectDlightTexture_scalar()
 		qglEnableClientState( GL_COLOR_ARRAY );
 		qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, colorArray );
 
-		// KHB 060701  bleh, multiplicative blending for dlights is just SO wrong, but so's additive  :(
-
 		GL_Bind( tr.dlightImage );
+
+		// KHB 060701  bleh, multiplicative blending for dlights is just SO wrong, but so's additive  :(
 		// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light where they aren't rendered
-		if ( dl->additive ) {
-			GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
-		}
-		else {
-			GL_State( GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
-		}
+		GL_State( (dl->additive ? GLS_SRCBLEND_ONE :GLS_SRCBLEND_DST_COLOR) | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
 
 		R_DrawElements( numIndexes, hitIndexes );
 		backEnd.pc.c_totalIndexes += numIndexes;
