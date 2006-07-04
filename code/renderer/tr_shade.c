@@ -566,7 +566,56 @@ static void ProjectDlightTexture_altivec( void ) {
 #endif
 
 
-static void ProjectDlightTexture_scalar( void ) {
+static const vec3_t axes[3] = {
+	{ 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 1.0f, 0.0f },
+	{ 0.0f, 0.0f, 1.0f }
+};
+
+// create the right and up vectors for a normal, courtesy of nate miller
+
+static void CalcRU( const vec3_t normal, vec3_t right, vec3_t up )
+{
+	vec3_t v;
+	int major = 0;
+
+	VectorSet( v, fabs(normal[0]), fabs(normal[1]), fabs(normal[2]) );
+
+	if (v[1] > v[major])
+		major = 1;
+	if (v[2] > v[major])
+		major = 2;
+
+	if (v[0] == 1 || v[1] == 1 || v[2] == 1) {
+		// just build it by hand
+		if (major == 0)
+			VectorSet( right, 0.0f, 0.0f, ((normal[0] > 0.0f) ? -1.0f : 1.0f) );
+		else if (major == 1 || (major == 2 && normal[2] > 0.0f))
+			VectorSet( right, 1.0f, 0.0f, 0.0f );
+		else if (major == 2 && normal[2] < 0.0f)
+			VectorSet( right, -1.0f, 0.0f, 0.0f );
+		else
+			assert(0);
+		CrossProduct( normal, right, up );
+	} else {
+		CrossProduct( axes[major], normal, right );
+		CrossProduct( normal, right, up );
+		VectorNormalize( right );
+		VectorNormalize( up );
+	}
+}
+
+
+static void __inline ProjectOntoPlane( const vec3_t vPoint, const vec3_t vPlaneP, const vec3_t vPlaneN, vec3_t vProjected )
+{
+	vec3_t v;
+	VectorSubtract( vPoint, vPlaneP, v );
+	VectorMA( vPoint, -DotProduct( vPlaneN, v ) / DotProduct( vPlaneN, vPlaneN ), vPlaneN, vProjected );
+}
+
+
+static void ProjectDlightTexture_scalar()
+{
 	int		i, l;
 	vec3_t	origin;
 	float	*texCoords;
@@ -586,7 +635,7 @@ static void ProjectDlightTexture_scalar( void ) {
 	}
 
 	for ( l = 0 ; l < backEnd.refdef.num_dlights ; l++ ) {
-		dlight_t	*dl;
+		const dlight_t* dl;
 
 		if ( !( tess.dlightBits & ( 1 << l ) ) ) {
 			continue;	// this surface definately doesn't have any of this light
@@ -603,52 +652,39 @@ static void ProjectDlightTexture_scalar( void ) {
 		floatColor[1] = dl->color[1] * 255.0f;
 		floatColor[2] = dl->color[2] * 255.0f;
 		for ( i = 0 ; i < tess.numVertexes ; i++, texCoords += 2, colors += 4 ) {
-			int		clip = 0;
-			vec3_t	dist;
-			
+			int clip = 63;
+			vec3_t dist;
+
 			VectorSubtract( origin, tess.xyz[i], dist );
+
+			if (DotProduct( dist, tess.normal[i] ) > 0.0f){
+				float dL2, r2;
+				vec3_t v, vS, vT, vL, nearpt;
+
+				ProjectOntoPlane( origin, tess.xyz[i], tess.normal[i], nearpt );
+
+				VectorSubtract( origin, nearpt, vL );
+				dL2 = VectorLengthSquared(vL);
+
+				if (VectorLengthSquared(vL) < Square(radius)) {
+					float d = VectorLength(vL);
+
+					clip = 0;
+					scale = 1.0f / ((2 * radius) - d);
+					modulate = 1.0f - (d / radius);
+
+					// hrm - i think i like this one better
+					scale = 1.0f / (radius - d);
+
+					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
+					VectorSubtract( tess.xyz[i], nearpt, v );
+					texCoords[0] = DotProduct(v, vS) * scale + 0.5f;
+					texCoords[1] = DotProduct(v, vT) * scale + 0.5f;
+				}
+			}
 
 			backEnd.pc.c_dlightVertexes++;
 
-			texCoords[0] = 0.5f + dist[0] * scale;
-			texCoords[1] = 0.5f + dist[1] * scale;
-
-			if( !r_dlightBacks->integer &&
-					// dist . tess.normal[i]
-					( dist[0] * tess.normal[i][0] +
-					dist[1] * tess.normal[i][1] +
-					dist[2] * tess.normal[i][2] ) < 0.0f ) {
-				clip = 63;
-			} else {
-				if ( texCoords[0] < 0.0f ) {
-					clip |= 1;
-				} else if ( texCoords[0] > 1.0f ) {
-					clip |= 2;
-				}
-				if ( texCoords[1] < 0.0f ) {
-					clip |= 4;
-				} else if ( texCoords[1] > 1.0f ) {
-					clip |= 8;
-				}
-				texCoords[0] = texCoords[0];
-				texCoords[1] = texCoords[1];
-
-				// modulate the strength based on the height and color
-				if ( dist[2] > radius ) {
-					clip |= 16;
-					modulate = 0.0f;
-				} else if ( dist[2] < -radius ) {
-					clip |= 32;
-					modulate = 0.0f;
-				} else {
-					dist[2] = Q_fabs(dist[2]);
-					if ( dist[2] < radius * 0.5f ) {
-						modulate = 1.0f;
-					} else {
-						modulate = 2.0f * (radius - dist[2]) * scale;
-					}
-				}
-			}
 			clipBits[i] = clip;
 			colors[0] = myftol(floatColor[0] * modulate);
 			colors[1] = myftol(floatColor[1] * modulate);
@@ -683,20 +719,23 @@ static void ProjectDlightTexture_scalar( void ) {
 		qglEnableClientState( GL_COLOR_ARRAY );
 		qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, colorArray );
 
+		// KHB 060701  bleh, multiplicative blending for dlights is just SO wrong, but so's additive  :(
+
 		GL_Bind( tr.dlightImage );
-		// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light
-		// where they aren't rendered
+		// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light where they aren't rendered
 		if ( dl->additive ) {
 			GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
 		}
 		else {
 			GL_State( GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
 		}
+
 		R_DrawElements( numIndexes, hitIndexes );
 		backEnd.pc.c_totalIndexes += numIndexes;
 		backEnd.pc.c_dlightIndexes += numIndexes;
 	}
 }
+
 
 static void ProjectDlightTexture( void ) {
 #if idppc_altivec
