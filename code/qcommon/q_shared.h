@@ -26,10 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define Q3_VERSION            "ioQ3 1.34-rc1"
-#define CLIENT_WINDOW_TITLE   "icculus.org/quake3"
+#define Q3_VERSION            "CNQ3 1.33"
+#define CLIENT_WINDOW_TITLE   "Quake3"
 #define CLIENT_WINDOW_ICON    "ioq3"
-#define CONSOLE_WINDOW_TITLE  "icculus.org/quake3 console"
+#define CONSOLE_WINDOW_TITLE  "Quake3 Console"
 #define CONSOLE_WINDOW_ICON   "ioq3 console"
 // 1.32 released 7-10-2002
 
@@ -61,8 +61,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #pragma warning(disable : 4711)		// selected for automatic inline expansion
 #pragma warning(disable : 4220)		// varargs matches remaining parameters
 //#pragma intrinsic( memset, memcpy )
-#pragma warning(disable : 4996)		//shane strncpy should replace with strncpy_s
+
+#if (_MSC_VER >= 1400)
+#define _CRT_SECURE_NO_DEPRECATE 1
 #endif
+
+#endif // _MSC_VER
+
 
 //Ignore __attribute__ on non-gcc platforms
 #ifndef __GNUC__
