@@ -2026,37 +2026,28 @@ image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmi
 }
 
 
-/*
-================
-R_CreateDlightImage
-================
-*/
-#define	DLIGHT_SIZE	16
-static void R_CreateDlightImage( void ) {
-	int		x,y;
+#define DLIGHT_SIZE 64
+#define DLIGHT_FULLBRIGHT (DLIGHT_SIZE * DLIGHT_SIZE)
+
+static void R_CreateDlightImage( void )
+{
+	int		x, y;
 	byte	data[DLIGHT_SIZE][DLIGHT_SIZE][4];
-	int		b;
 
-	// make a centered inverse-square falloff blob for dynamic lighting
-	for (x=0 ; x<DLIGHT_SIZE ; x++) {
-		for (y=0 ; y<DLIGHT_SIZE ; y++) {
-			float	d;
-
-			d = ( DLIGHT_SIZE/2 - 0.5f - x ) * ( DLIGHT_SIZE/2 - 0.5f - x ) +
-				( DLIGHT_SIZE/2 - 0.5f - y ) * ( DLIGHT_SIZE/2 - 0.5f - y );
-			b = 4000 / d;
-			if (b > 255) {
-				b = 255;
-			} else if ( b < 75 ) {
-				b = 0;
-			}
-			data[y][x][0] = 
-			data[y][x][1] = 
-			data[y][x][2] = b;
-			data[y][x][3] = 255;			
+	// KHB 060701  how about we use the RIGHT math for this
+	for (x = 0; x < DLIGHT_SIZE; ++x) {
+		for (y = 0; y < DLIGHT_SIZE; ++y) {
+			float dx = (DLIGHT_SIZE/2 - x + 0.5) / (DLIGHT_SIZE/2);
+			float dy = (DLIGHT_SIZE/2 - y + 0.5) / (DLIGHT_SIZE/2);
+			float r = cos(M_PI / 2.0 * sqrt(dx * dx + dy * dy));
+			byte b = 255 * ((r <= 0) ? 0 : r*r);
+			data[y][x][0] = data[y][x][1] = data[y][x][2] = b;
+			data[y][x][3] = 255;
 		}
 	}
-	tr.dlightImage = R_CreateImage("*dlight", (byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, qfalse, qfalse, GL_CLAMP );
+
+	// this is a large enough image now that it should be mipmapped
+	tr.dlightImage = R_CreateImage("*dlight", (const byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, qtrue, qfalse, GL_CLAMP );
 }
 
 
