@@ -43,7 +43,6 @@ cvar_t	*cl_freezeDemo;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
-cvar_t	*cl_autoRecordDemo;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
@@ -2039,44 +2038,6 @@ void CL_Frame ( int msec ) {
 		}
 	}
 	
-	if( cl_autoRecordDemo->integer ) {
-		if( cls.state == CA_ACTIVE && !clc.demorecording && !clc.demoplaying ) {
-			// If not recording a demo, and we should be, start one
-			qtime_t	now;
-			char		*nowString;
-			char		*p;
-			char		mapName[ MAX_QPATH ];
-			char		serverName[ MAX_OSPATH ];
-
-			Com_RealTime( &now );
-			nowString = va( "%04d%02d%02d%02d%02d%02d",
-					1900 + now.tm_year,
-					1 + now.tm_mon,
-					now.tm_mday,
-					now.tm_hour,
-					now.tm_min,
-					now.tm_sec );
-
-			Q_strncpyz( serverName, cls.servername, MAX_OSPATH );
-			// Replace the ":" in the address as it is not a valid
-			// file name character
-			p = strstr( serverName, ":" );
-			if( p ) {
-				*p = '.';
-			}
-
-			Q_strncpyz( mapName, COM_SkipPath( cl.mapname ), sizeof( cl.mapname ) );
-			COM_StripExtension(mapName, mapName, sizeof(mapName));
-
-			Cbuf_ExecuteText( EXEC_NOW,
-					va( "record %s-%s-%s", nowString, serverName, mapName ) );
-		}
-		else if( cls.state != CA_ACTIVE && clc.demorecording ) {
-			// Recording, but not CA_ACTIVE, so stop recording
-			CL_StopRecord_f( );
-		}
-	}
-
 	// save the msec before checking pause
 	cls.realFrametime = msec;
 
@@ -2238,7 +2199,7 @@ void CL_InitRef( void ) {
 	refimport_t	ri;
 	refexport_t	*ret;
 
-	Com_Printf( "----- Initializing Renderer ----\n" );
+	//Com_Printf( "----- Initializing Renderer ----\n" );
 
 	ri.Cmd_AddCommand = Cmd_AddCommand;
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
@@ -2282,7 +2243,7 @@ void CL_InitRef( void ) {
 	hA3Dg_ExportRenderGeom (ret);
 #endif
 
-	Com_Printf( "-------------------------------\n");
+	//Com_Printf( "-------------------------------\n");
 
 	if ( !ret ) {
 		Com_Error (ERR_FATAL, "Couldn't initialize refresh" );
@@ -2385,7 +2346,7 @@ static void CL_GenerateQKey(void)
 
 	len = FS_ReadFile(QKEY_FILE, NULL);
 	if(len >= (int)sizeof(buff)) {
-		Com_Printf("QKEY found.\n");
+		//Com_Printf("QKEY found.\n");
 		return;
 	}
 	else {
@@ -2406,9 +2367,9 @@ CL_Init
 ====================
 */
 void CL_Init( void ) {
-	Com_Printf( "----- Client Initialization -----\n" );
+	//Com_Printf( "----- Client Initialization -----\n" );
 
-	Con_Init ();	
+	Con_Init ();
 
 	CL_ClearState ();
 
@@ -2435,7 +2396,6 @@ void CL_Init( void ) {
 	cl_activeAction = Cvar_Get( "activeAction", "", CVAR_TEMP );
 
 	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
-	cl_autoRecordDemo = Cvar_Get ("cl_autoRecordDemo", "0", CVAR_ARCHIVE);
 	cl_aviFrameRate = Cvar_Get ("cl_aviFrameRate", "25", CVAR_ARCHIVE);
 	cl_aviMotionJpeg = Cvar_Get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
 	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
@@ -2494,15 +2454,9 @@ void CL_Init( void ) {
 	Cvar_Get ("rate", "3000", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 
@@ -2548,10 +2502,10 @@ void CL_Init( void ) {
 
 	Cvar_Set( "cl_running", "1" );
 
-	CL_GenerateQKey();	
+	CL_GenerateQKey();
 	Cvar_Get("cl_guid", Com_MD5File(QKEY_FILE, 0), CVAR_USERINFO | CVAR_ROM);
 
-	Com_Printf( "----- Client Initialization Complete -----\n" );
+	//Com_Printf( "----- Client Initialization Complete -----\n" );
 }
 
 
