@@ -620,15 +620,13 @@ static void ProjectDlightTexture_scalar()
 	vec3_t	origin;
 	float	*texCoords;
 	byte	*colors;
-	byte	clipBits[SHADER_MAX_VERTEXES];
+	byte	afIsLit[SHADER_MAX_VERTEXES];
 	float	texCoordsArray[SHADER_MAX_VERTEXES][2];
 	byte	colorArray[SHADER_MAX_VERTEXES][4];
 	unsigned	hitIndexes[SHADER_MAX_INDEXES];
 	int		numIndexes;
-	float	scale;
 	float	radius;
 	vec3_t	floatColor;
-	float	modulate = 0.0f;
 
 	if ( !backEnd.refdef.num_dlights ) {
 		return;
@@ -646,19 +644,19 @@ static void ProjectDlightTexture_scalar()
 		dl = &backEnd.refdef.dlights[l];
 		VectorCopy( dl->transformed, origin );
 		radius = dl->radius;
-		scale = 1.0f / radius;
 
 		floatColor[0] = dl->color[0] * 255.0f;
 		floatColor[1] = dl->color[1] * 255.0f;
 		floatColor[2] = dl->color[2] * 255.0f;
-		for ( i = 0 ; i < tess.numVertexes ; i++, texCoords += 2, colors += 4 ) {
-			int clip = 63;
-			vec3_t dist;
 
+		for (i = 0; i < tess.numVertexes; i++, texCoords += 2, colors += 4) {
+			vec3_t dist;
 			VectorSubtract( origin, tess.xyz[i], dist );
 
+			afIsLit[i] = qfalse;
+
 			if (DotProduct( dist, tess.normal[i] ) > 0.0f){
-				float dL2, r2;
+				float dL2, scale, modulate;
 				vec3_t v, vS, vT, vL, nearpt;
 
 				ProjectOntoPlane( origin, tess.xyz[i], tess.normal[i], nearpt );
@@ -666,47 +664,43 @@ static void ProjectDlightTexture_scalar()
 				VectorSubtract( origin, nearpt, vL );
 				dL2 = VectorLengthSquared(vL);
 
-				if (VectorLengthSquared(vL) < Square(radius)) {
-					float d = VectorLength(vL);
+				if (dL2 < Square(radius)) {
+					float d = sqrt(dL2);
 
-					clip = 0;
-					scale = 1.0f / ((2 * radius) - d);
-					modulate = 1.0f - (d / radius);
-
+					//scale = 1.0f / ((2 * radius) - d);
 					// hrm - i think i like this one better
 					scale = 1.0f / (radius - d);
+
+					modulate = 1.0f - (d / radius);
 
 					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
 					VectorSubtract( tess.xyz[i], nearpt, v );
 					texCoords[0] = DotProduct(v, vS) * scale + 0.5f;
 					texCoords[1] = DotProduct(v, vT) * scale + 0.5f;
+
+					colors[0] = myftol(floatColor[0] * modulate);
+					colors[1] = myftol(floatColor[1] * modulate);
+					colors[2] = myftol(floatColor[2] * modulate);
+					colors[3] = 255;
+
+					afIsLit[i] = qtrue;
+					backEnd.pc.c_dlightVertexes++;
 				}
 			}
-
-			backEnd.pc.c_dlightVertexes++;
-
-			clipBits[i] = clip;
-			colors[0] = myftol(floatColor[0] * modulate);
-			colors[1] = myftol(floatColor[1] * modulate);
-			colors[2] = myftol(floatColor[2] * modulate);
-			colors[3] = 255;
 		}
 
 		// build a list of triangles that need light
 		numIndexes = 0;
-		for ( i = 0 ; i < tess.numIndexes ; i += 3 ) {
-			int		a, b, c;
-
-			a = tess.indexes[i];
-			b = tess.indexes[i+1];
-			c = tess.indexes[i+2];
-			if ( clipBits[a] & clipBits[b] & clipBits[c] ) {
-				continue;	// not lighted
+		for (i = 0; i < tess.numIndexes; i += 3) {
+			int a = tess.indexes[i];
+			int b = tess.indexes[i+1];
+			int c = tess.indexes[i+2];
+			if (afIsLit[a] && afIsLit[b] && afIsLit[c]) {
+				hitIndexes[numIndexes] = a;
+				hitIndexes[numIndexes+1] = b;
+				hitIndexes[numIndexes+2] = c;
+				numIndexes += 3;
 			}
-			hitIndexes[numIndexes] = a;
-			hitIndexes[numIndexes+1] = b;
-			hitIndexes[numIndexes+2] = c;
-			numIndexes += 3;
 		}
 
 		if ( !numIndexes ) {
