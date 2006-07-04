@@ -656,7 +656,7 @@ static void ProjectDlightTexture_scalar()
 			afIsLit[i] = qfalse;
 
 			if (DotProduct( dist, tess.normal[i] ) > 0.0f){
-				float dL2, scale, modulate;
+				float dL2;
 				vec3_t v, vS, vT, vL, nearpt;
 
 				ProjectOntoPlane( origin, tess.xyz[i], tess.normal[i], nearpt );
@@ -666,12 +666,8 @@ static void ProjectDlightTexture_scalar()
 
 				if (dL2 < Square(radius)) {
 					float d = sqrt(dL2);
-
-					//scale = 1.0f / ((2 * radius) - d);
-					// hrm - i think i like this one better
-					scale = 1.0f / (radius - d);
-
-					modulate = 1.0f - (d / radius);
+					float scale = 1.0f / ((2 * radius) - d);
+					float modulate = 1.0f - (d / radius);
 
 					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
 					VectorSubtract( tess.xyz[i], nearpt, v );
