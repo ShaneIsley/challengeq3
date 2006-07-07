@@ -1,4 +1,13 @@
 
+6 Jul 06 
+
+update various cvar defaults
+r_stencilbits: 0
+r_picmip: 0
+r_roundImagesDown: 0
+
+default fs_game to cpma
+
 
 30 Jun 06 - initial build from ioq3 svn v810
 
