@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 glconfig_t	glConfig;
 qboolean	textureFilterAnisotropic = qfalse;
 int		maxAnisotropy = 0;
-                
+//qboolean fEXT_GL_SGIS_generate_mipmap = qfalse;
+
 glstate_t	glState;
 
 static void GfxInfo_f( void );

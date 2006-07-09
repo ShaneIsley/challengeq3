@@ -400,6 +400,25 @@ static void R_MipMap2( unsigned *in, int inWidth, int inHeight ) {
 	ri.Hunk_FreeTempMemory( temp );
 }
 
+
+/* KHB 060708  bleh - dark as hell unless we call GammaCorrect, and still marginal even then  :(
+static qboolean R_MipMapSGI( byte* tex, int w, int h, GLenum internalFormat )
+{
+	if (!fEXT_GL_SGIS_generate_mipmap || r_simpleMipMaps->integer)
+		return qfalse;
+
+	R_GammaCorrect( tex, w * h * 4 );
+	qglHint( GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST );
+	qglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
+	qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	qglTexImage2D( GL_TEXTURE_2D, 0, internalFormat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex );
+	qglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE );
+
+	return qtrue;
+}
+*/
+
+
 /*
 ================
 R_MipMap
@@ -633,6 +652,7 @@ static void Upload32( unsigned *data,
 	} else {
 		internalFormat = 3;
 	}
+
 	// copy or resample data as appropriate for first MIP level
 	if ( ( scaled_width == width ) && 
 		( scaled_height == height ) ) {
@@ -647,6 +667,10 @@ static void Upload32( unsigned *data,
 		}
 		Com_Memcpy (scaledBuffer, data, width*height*4);
 	}
+	/* KHB  if the card can take care of mipmaps for us, we can skip all this  :)
+	if (R_MipMapSGI( (byte *)data, width, height, internalFormat )) {
+		goto done;
+	}*/
 	else
 	{
 		// use the normal mip-mapping function to go down from here

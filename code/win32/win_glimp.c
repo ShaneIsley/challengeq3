@@ -1130,6 +1130,12 @@ static void GLW_InitExtensions( void )
 	{
 		ri.Printf( PRINT_DEVELOPER, "...GL_EXT_texture_filter_anisotropic not found\n" );
 	}
+
+	/*fEXT_GL_SGIS_generate_mipmap = qfalse;
+	if (strstr(glConfig.extensions_string, "GL_SGIS_generate_mipmap")) {
+		fEXT_GL_SGIS_generate_mipmap = qtrue;
+		ri.Printf( PRINT_DEVELOPER, "...found GL_SGIS_generate_mipmap\n" );
+	}*/
 }
 
 /*

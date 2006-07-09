@@ -117,6 +117,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT       0x84FE
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT   0x84FF
 
+// KHB  !!! this, and the aniso stuff, need to use glext.h instead of being hacked in like this
+#ifndef GL_SGIS_generate_mipmap
+#define GL_SGIS_generate_mipmap 1
+#define GL_GENERATE_MIPMAP_SGIS           0x8191
+#define GL_GENERATE_MIPMAP_HINT_SGIS      0x8192
+#endif
+
 // define for skyboxes without black seams on non SDL-versions.
 #if !defined(GL_VERSION_1_2) && !defined(GL_CLAMP_TO_EDGE)
    #define GL_CLAMP_TO_EDGE                  0x812F

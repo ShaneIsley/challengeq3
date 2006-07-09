@@ -975,7 +975,8 @@ extern glstate_t	glState;		// outside of TR since it shouldn't be cleared during
 // the glconfig_t struct.
 extern qboolean		textureFilterAnisotropic;
 extern int		maxAnisotropy;
-                
+//extern qboolean fEXT_GL_SGIS_generate_mipmap;
+
 
 //
 // cvars
