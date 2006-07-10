@@ -113,7 +113,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="\quake3"
+			OutputDirectory="..\..\..\..\..\"
 			IntermediateDirectory=".\build\quake3_debug"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
