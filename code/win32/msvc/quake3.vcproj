@@ -311,7 +311,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="\quake3"
+			OutputDirectory="..\..\..\..\..\"
 			IntermediateDirectory=".\build\quake3_release"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
