@@ -625,7 +625,7 @@ static void ProjectDlightTexture_scalar()
 	byte	colorArray[SHADER_MAX_VERTEXES][4];
 	unsigned	hitIndexes[SHADER_MAX_INDEXES];
 	int		numIndexes;
-	float	radius;
+	float	r2;
 	vec3_t	floatColor;
 
 	if ( !backEnd.refdef.num_dlights ) {
@@ -643,7 +643,7 @@ static void ProjectDlightTexture_scalar()
 
 		dl = &backEnd.refdef.dlights[l];
 		VectorCopy( dl->transformed, origin );
-		radius = dl->radius;
+		r2 = Square(dl->radius);
 
 		floatColor[0] = dl->color[0] * 255.0f;
 		floatColor[1] = dl->color[1] * 255.0f;
@@ -655,19 +655,17 @@ static void ProjectDlightTexture_scalar()
 
 			afIsLit[i] = qfalse;
 
-			if (DotProduct( dist, tess.normal[i] ) > 0.0f){
+			if (DotProduct( dist, tess.normal[i] ) > 0.0f) {
 				float dL2;
 				vec3_t v, vS, vT, vL, nearpt;
 
 				ProjectOntoPlane( origin, tess.xyz[i], tess.normal[i], nearpt );
-
 				VectorSubtract( origin, nearpt, vL );
 				dL2 = VectorLengthSquared(vL);
 
-				if (dL2 < Square(radius)) {
-					float d = sqrt(dL2);
-					float scale = 1.0f / ((2 * radius) - d);
-					float modulate = 1.0f - (d / radius);
+				if (dL2 < r2) {
+					float scale = 1.0f / ((2 * r2) - dL2);
+					float modulate = 1.0f - (dL2 / r2);
 
 					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
 					VectorSubtract( tess.xyz[i], nearpt, v );
@@ -1214,7 +1212,7 @@ void RB_StageIteratorGeneric( void )
 	// now do any dynamic lighting needed
 	//
 	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE
-		&& !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
+			&& !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
 		ProjectDlightTexture();
 	}
 
@@ -1302,7 +1300,8 @@ void RB_StageIteratorVertexLitTexture( void )
 	// 
 	// now do any dynamic lighting needed
 	//
-	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE ) {
+	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE
+			&& !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
 		ProjectDlightTexture();
 	}
 
@@ -1407,7 +1406,8 @@ void RB_StageIteratorLightmappedMultitexture( void ) {
 	// 
 	// now do any dynamic lighting needed
 	//
-	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE ) {
+	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE
+			&& !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
 		ProjectDlightTexture();
 	}
 
