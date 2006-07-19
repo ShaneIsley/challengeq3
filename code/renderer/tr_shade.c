@@ -664,8 +664,9 @@ static void ProjectDlightTexture_scalar()
 				dL2 = VectorLengthSquared(vL);
 
 				if (dL2 < r2) {
-					float scale = 1.0f / ((2 * r2) - dL2);
-					float modulate = 1.0f - (dL2 / r2);
+					float d = sqrt(dL2);
+					float scale = 1.0f / ((2 * dl->radius) - d);
+					float modulate = 1.0f - (d / dl->radius);
 
 					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
 					VectorSubtract( tess.xyz[i], nearpt, v );
