@@ -33,25 +33,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <io.h>
 #include <conio.h>
 
-/*
-================
-Sys_Milliseconds
-================
-*/
-int			sys_timeBase;
-int Sys_Milliseconds (void)
+
+int Sys_Milliseconds(void)
 {
-	int			sys_curtime;
-	static qboolean	initialized = qfalse;
+	static int sys_timeBase = 0;
 
-	if (!initialized) {
+	if (!sys_timeBase)
 		sys_timeBase = timeGetTime();
-		initialized = qtrue;
-	}
-	sys_curtime = timeGetTime() - sys_timeBase;
 
-	return sys_curtime;
+	return (timeGetTime() - sys_timeBase);
 }
+
 
 #ifndef __GNUC__ //see snapvectora.s
 /*
