@@ -486,7 +486,7 @@ void Console_Key (int key) {
 		// if not in the game explicitly prepend a slash if needed
 		if ( cls.state != CA_ACTIVE && g_consoleField.buffer[0] != '\\' 
 			&& g_consoleField.buffer[0] != '/' ) {
-			char	temp[MAX_EDIT_LINE-1];
+			char	temp[MAX_STRING_CHARS];
 
 			Q_strncpyz( temp, g_consoleField.buffer, sizeof( temp ) );
 			Com_sprintf( g_consoleField.buffer, sizeof( g_consoleField.buffer ), "\\%s", temp );

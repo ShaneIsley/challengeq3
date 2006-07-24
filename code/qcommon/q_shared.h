@@ -714,9 +714,6 @@ void	Swap_Init (void);
 */
 char	* QDECL va(char *format, ...);
 
-#define TRUNCATE_LENGTH	64
-void Com_TruncateLongString( char *buffer, const char *s );
-
 //=============================================
 
 //

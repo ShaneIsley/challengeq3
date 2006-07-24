@@ -2980,11 +2980,9 @@ PrintCvarMatches
 ===============
 */
 static void PrintCvarMatches( const char *s ) {
-	char value[ TRUNCATE_LENGTH ];
 
 	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
-		Com_TruncateLongString( value, Cvar_VariableString( s ) );
-		Com_Printf( "    %s = \"%s\"\n", s, value );
+		Com_Printf( "    %s = \"%s\"\n", s, Cvar_VariableString( s ) );
 	}
 }
 
