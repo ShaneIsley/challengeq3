@@ -1,11 +1,12 @@
 
-6 Jul 06 
+18 Jul 06
 
 update various cvar defaults
 r_stencilbits: 0
 r_picmip: 0
 r_roundImagesDown: 0
 r_simpleMipMaps: 0
+s_useOpenAL: 0
 
 default fs_game to cpma
 
