@@ -572,7 +572,7 @@ static const vec3_t axes[3] = {
 	{ 0.0f, 0.0f, 1.0f }
 };
 
-// create the right and up vectors for a normal, courtesy of nate miller
+// create the right and up vectors for a normal
 
 static void CalcRU( const vec3_t normal, vec3_t right, vec3_t up )
 {
@@ -587,7 +587,7 @@ static void CalcRU( const vec3_t normal, vec3_t right, vec3_t up )
 		major = 2;
 
 	if (v[0] == 1 || v[1] == 1 || v[2] == 1) {
-		// just build it by hand
+		// just build it by hand: optmisation courtesy of nate miller
 		if (major == 0)
 			VectorSet( right, 0.0f, 0.0f, ((normal[0] > 0.0f) ? -1.0f : 1.0f) );
 		else if (major == 1 || (major == 2 && normal[2] > 0.0f))
@@ -645,9 +645,10 @@ static void ProjectDlightTexture_scalar()
 		VectorCopy( dl->transformed, origin );
 		r2 = Square(dl->radius);
 
-		floatColor[0] = dl->color[0] * 255.0f;
-		floatColor[1] = dl->color[1] * 255.0f;
-		floatColor[2] = dl->color[2] * 255.0f;
+		// dlights are given to us at full intensity, so scale them down as if the surface was only 50% reflective
+		floatColor[0] = dl->color[0] * 128.0f;
+		floatColor[1] = dl->color[1] * 128.0f;
+		floatColor[2] = dl->color[2] * 128.0f;
 
 		for (i = 0; i < tess.numVertexes; i++, texCoords += 2, colors += 4) {
 			vec3_t dist;
