@@ -2598,6 +2598,7 @@ void Com_WriteConfiguration( void ) {
 
 	Com_WriteConfigToFile( "q3config.cfg" );
 
+/* KHB 15 Oct 06  this is SO horribly wrong
 	// bk001119 - tentative "not needed for dedicated"
 #ifndef DEDICATED
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
@@ -2607,6 +2608,7 @@ void Com_WriteConfiguration( void ) {
 		Com_WriteCDKey( BASEGAME, cl_cdkey );
 	}
 #endif
+*/
 }
 
 
