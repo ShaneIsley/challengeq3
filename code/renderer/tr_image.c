@@ -2050,6 +2050,8 @@ image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmi
 }
 
 
+#if 1
+
 #define DLIGHT_SIZE 64
 #define DLIGHT_FULLBRIGHT (DLIGHT_SIZE * DLIGHT_SIZE)
 
@@ -2073,6 +2075,20 @@ static void R_CreateDlightImage( void )
 	// this is a large enough image now that it should be mipmapped
 	tr.dlightImage = R_CreateImage("*dlight", (const byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, qtrue, qfalse, GL_CLAMP );
 }
+
+#else
+
+static void R_CreateDlightImage( void )
+{
+	int w, h;
+	byte* p;
+
+	R_LoadImage( "lights/round.tga", &p, &w, &h );
+	tr.dlightImage = R_CreateImage( "*dlight", p, w, h, qtrue, qfalse, GL_CLAMP );
+	ri.Free( p );
+}
+
+#endif
 
 
 /*
