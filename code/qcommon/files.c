@@ -2419,19 +2419,15 @@ void FS_Path_f( void ) {
 	Com_Printf ("Current search path:\n");
 	for (s = fs_searchpaths; s; s = s->next) {
 		if (s->pack) {
-			Com_Printf ("%s (%i files)\n", s->pack->pakFilename, s->pack->numfiles);
-			if ( fs_numServerPaks ) {
-				if ( !FS_PakIsPure(s->pack) ) {
-					Com_Printf( "    not on the pure list\n" );
-				} else {
-					Com_Printf( "    on the pure list\n" );
-				}
+			if (!fs_numServerPaks || FS_PakIsPure(s->pack)) {
+				Com_Printf( "OK: %s (%i files)\n", s->pack->pakFilename, s->pack->numfiles);
+			} else {
+				Com_DPrintf( "IMPURE: %s (%i files)\n", s->pack->pakFilename, s->pack->numfiles);
 			}
 		} else {
-			Com_Printf ("%s/%s\n", s->dir->path, s->dir->gamedir );
+			Com_Printf( "%s/%s\n", s->dir->path, s->dir->gamedir );
 		}
 	}
-
 
 	Com_Printf( "\n" );
 	for ( i = 1 ; i < MAX_FILE_HANDLES ; i++ ) {
