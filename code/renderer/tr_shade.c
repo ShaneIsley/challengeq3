@@ -645,10 +645,11 @@ static void ProjectDlightTexture_scalar()
 		VectorCopy( dl->transformed, origin );
 		r2 = Square(dl->radius);
 
-		// dlights are given to us at full intensity, so scale them down as if the surface was only 50% reflective
-		floatColor[0] = dl->color[0] * 128.0f;
-		floatColor[1] = dl->color[1] * 128.0f;
-		floatColor[2] = dl->color[2] * 128.0f;
+		// dlights are given to us at full intensity, and since they're additive they can saturate VERY quickly
+		// so scale them down as if the surface was only 25% reflective
+		floatColor[0] = dl->color[0] * 64.0f;
+		floatColor[1] = dl->color[1] * 64.0f;
+		floatColor[2] = dl->color[2] * 64.0f;
 
 		for (i = 0; i < tess.numVertexes; i++, texCoords += 2, colors += 4) {
 			vec3_t dist;
