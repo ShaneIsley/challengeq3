@@ -584,7 +584,7 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 
 		memset( &wc, 0, sizeof( wc ) );
 
-		wc.style         = 0;
+		wc.style         = CS_OWNDC;
 		wc.lpfnWndProc   = (WNDPROC) glw_state.wndproc;
 		wc.cbClsExtra    = 0;
 		wc.cbWndExtra    = 0;
