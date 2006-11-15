@@ -2266,7 +2266,6 @@ void CL_SetModel_f( void ) {
 	arg = Cmd_Argv( 1 );
 	if (arg[0]) {
 		Cvar_Set( "model", arg );
-		Cvar_Set( "headmodel", arg );
 	} else {
 		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
 		Com_Printf("model is set to %s\n", name);
@@ -2455,7 +2454,6 @@ void CL_Init( void ) {
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("color",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
