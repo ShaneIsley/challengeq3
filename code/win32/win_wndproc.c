@@ -44,7 +44,7 @@ static qboolean s_alttab_disabled;
 
 static void WIN_DisableAltTab( void )
 {
-	if ( s_alttab_disabled )
+	//if ( s_alttab_disabled )
 		return;
 
 	if ( !Q_stricmp( Cvar_VariableString( "arch" ), "winnt" ) )
@@ -86,6 +86,9 @@ VID_AppActivate
 */
 static void VID_AppActivate(BOOL fActive, BOOL minimize)
 {
+	if (r_fullscreen->integer)
+		SetWindowPos( g_wv.hWnd, fActive ? HWND_TOPMOST : HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+
 	g_wv.isMinimized = minimize;
 
 	Com_DPrintf("VID_AppActivate: %i\n", fActive );

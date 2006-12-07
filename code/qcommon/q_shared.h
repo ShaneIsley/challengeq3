@@ -28,9 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define Q3_VERSION				"CNQ3 1.33"
 #define CLIENT_WINDOW_TITLE		"Quake3"
-#define CLIENT_WINDOW_ICON		"ioq3"
 #define CONSOLE_WINDOW_TITLE	"Quake3 Console"
-#define CONSOLE_WINDOW_ICON		"ioq3 console"
 // 1.32 released 7-10-2002
 
 #define BASEGAME			"baseq3"
