@@ -782,6 +782,8 @@ static void GLW_AttemptFSAA()
 		g_wv.hWnd = NULL;
 	}
 
+	ri.Printf( PRINT_ALL, "...enabling FSAA\n" );
+
 	glw_state.nPendingPF = iPFD;
 	glw_state.pixelFormatSet = qfalse;
 	GLW_CreateWindow( "FSAA", glConfig.vidWidth, glConfig.vidHeight, glConfig.colorBits, glw_state.cdsFullscreen );
