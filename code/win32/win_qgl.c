@@ -40,6 +40,7 @@ BOOL  ( WINAPI * qwglGetDeviceGammaRamp3DFX)( HDC, LPVOID );
 BOOL  ( WINAPI * qwglSetDeviceGammaRamp3DFX)( HDC, LPVOID );
 
 int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
+int   ( WINAPI * qwglChoosePixelFormatARB )(HDC, const int*, const FLOAT*, UINT, int*, UINT*);
 int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
 int   ( WINAPI * qwglGetPixelFormat)(HDC);
 BOOL  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);
@@ -3178,6 +3179,7 @@ void QGL_Shutdown( void )
 	qwglUseFontOutlines          = NULL;
 
 	qwglChoosePixelFormat        = NULL;
+	qwglChoosePixelFormatARB     = NULL;
 	qwglDescribePixelFormat      = NULL;
 	qwglGetPixelFormat           = NULL;
 	qwglSetPixelFormat           = NULL;
@@ -3647,6 +3649,9 @@ qboolean QGL_Init( const char *dllname )
 	qglUnlockArraysEXT = 0;
 	qwglGetDeviceGammaRamp3DFX = NULL;
 	qwglSetDeviceGammaRamp3DFX = NULL;
+
+	// POS nvidia drivers return NULL for a wglGPA on this until there's already an active context ffs
+	qwglChoosePixelFormatARB = 0;
 
 	// check logging
 	QGL_EnableLogging( r_logFile->integer );

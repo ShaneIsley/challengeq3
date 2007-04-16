@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "resource.h"
 #include "glw_win.h"
+#include "wglext.h"
 #include "win_local.h"
 
 extern void WG_CheckHardwareGamma( void );
@@ -360,7 +361,7 @@ static void GLW_CreatePFD( PIXELFORMATDESCRIPTOR *pPFD, int colorbits, int depth
 }
 
 /*
-** GLW_MakeContext
+** glw_makecontext
 */
 static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD )
 {
@@ -377,6 +378,9 @@ static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD )
 		// using a minidriver then we need to bypass the GDI functions,
 		// otherwise use the GDI functions.
 		//
+		if (glw_state.nPendingPF)
+			pixelformat = glw_state.nPendingPF;
+		else
 		if ( ( pixelformat = GLW_ChoosePFD( glw_state.hDC, pPFD ) ) == 0 )
 		{
 			ri.Printf( PRINT_ALL, "...GLW_ChoosePFD failed\n");
@@ -434,7 +438,7 @@ static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD )
 
 
 /*
-** GLW_InitDriver
+** glw_initdriver
 **
 ** - get a DC if one doesn't exist
 ** - create an HGLRC if one doesn't exist
@@ -728,6 +732,64 @@ static void PrintCDSError( int value )
 	}
 }
 
+
+// GL_multisample is SUCH a fucking mess  >:(
+
+static void GLW_AttemptFSAA()
+{
+	static const float ar[] = { 0, 0 };
+	static const int aiAttributes[] = {
+		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+		WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
+		WGL_COLOR_BITS_ARB, 32,
+		WGL_ALPHA_BITS_ARB, 8,
+		WGL_DEPTH_BITS_ARB, 16,
+		WGL_STENCIL_BITS_ARB, 0,
+		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+		WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+		WGL_SAMPLES_ARB, 4,
+		0, 0
+	};
+
+	UINT iPFD, cPFD;
+
+	qwglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)qwglGetProcAddress( "wglChoosePixelFormatARB" );
+	if (!qwglChoosePixelFormatARB)
+		return;
+
+	if (!qwglChoosePixelFormatARB(glw_state.hDC, aiAttributes, ar, 1, &iPFD, &cPFD) || !cPFD)
+		return;
+
+	// now bounce the ENTIRE fucking subsytem thanks to WGL+ARB stupidity
+	// we can't use GLimp_Shutdown() for this, because that does CDS and logfile poking that we don't want
+	assert( glw_state.hGLRC && glw_state.hDC && g_wv.hWnd );
+
+	qwglMakeCurrent( glw_state.hDC, NULL );
+
+	if ( glw_state.hGLRC ) {
+		qwglDeleteContext( glw_state.hGLRC );
+		glw_state.hGLRC = NULL;
+	}
+
+	if ( glw_state.hDC ) {
+		ReleaseDC( g_wv.hWnd, glw_state.hDC );
+		glw_state.hDC = NULL;
+	}
+
+	if ( g_wv.hWnd ) {
+		DestroyWindow( g_wv.hWnd );
+		g_wv.hWnd = NULL;
+	}
+
+	glw_state.nPendingPF = iPFD;
+	glw_state.pixelFormatSet = qfalse;
+	GLW_CreateWindow( "FSAA", glConfig.vidWidth, glConfig.vidHeight, glConfig.colorBits, glw_state.cdsFullscreen );
+
+	glEnable(GL_MULTISAMPLE_ARB);
+}
+
+
 /*
 ** GLW_SetMode
 */
@@ -943,6 +1005,8 @@ static rserr_t GLW_SetMode( const char *drivername,
 
 	// NOTE: this is overridden later on standalone 3Dfx drivers
 	glConfig.isFullscreen = cdsFullscreen;
+
+	GLW_AttemptFSAA();
 
 	return RSERR_OK;
 }

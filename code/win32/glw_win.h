@@ -37,6 +37,7 @@ typedef struct
 
 	qboolean allowdisplaydepthchange;
 	qboolean pixelFormatSet;
+	int nPendingPF;
 
 	int		 desktopBitsPixel;
 	int		 desktopWidth, desktopHeight;
