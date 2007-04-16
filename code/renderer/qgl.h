@@ -39,10 +39,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #pragma warning (disable: 4032)
 #pragma warning (disable: 4201)
 #pragma warning (disable: 4214)
+#pragma warning (disable: 4996)
 #endif
 
 #include <windows.h>
 #include <GL/gl.h>
+#include <GL/glext.h>
 
 #elif defined(MACOS_X)
 
@@ -112,17 +114,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GL_MAX_ACTIVE_TEXTURES_ARB          0x84E2
 
 #endif /* defined(__sun) */
-
-// anisotropic filtering constants
-#define GL_TEXTURE_MAX_ANISOTROPY_EXT       0x84FE
-#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT   0x84FF
-
-// KHB  !!! this, and the aniso stuff, need to use glext.h instead of being hacked in like this
-#ifndef GL_SGIS_generate_mipmap
-#define GL_SGIS_generate_mipmap 1
-#define GL_GENERATE_MIPMAP_SGIS           0x8191
-#define GL_GENERATE_MIPMAP_HINT_SGIS      0x8192
-#endif
 
 // define for skyboxes without black seams on non SDL-versions.
 #if !defined(GL_VERSION_1_2) && !defined(GL_CLAMP_TO_EDGE)
@@ -550,6 +541,7 @@ extern  void ( APIENTRY * qglViewport )(GLint x, GLint y, GLsizei width, GLsizei
 #if defined( _WIN32 )
 
 extern  int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
+extern  int   ( WINAPI * qwglChoosePixelFormatARB )(HDC, const int*, const FLOAT*, UINT, int*, UINT*);
 extern  int   ( WINAPI * qwglDescribePixelFormat) (HDC, int, UINT, LPPIXELFORMATDESCRIPTOR);
 extern  int   ( WINAPI * qwglGetPixelFormat)(HDC);
 extern  BOOL  ( WINAPI * qwglSetPixelFormat)(HDC, int, CONST PIXELFORMATDESCRIPTOR *);

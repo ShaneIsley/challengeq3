@@ -977,7 +977,6 @@ extern qboolean		textureFilterAnisotropic;
 extern int		maxAnisotropy;
 //extern qboolean fEXT_GL_SGIS_generate_mipmap;
 
-
 //
 // cvars
 //
