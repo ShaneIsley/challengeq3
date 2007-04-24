@@ -85,6 +85,7 @@ cvar_t	*r_ext_multitexture;
 cvar_t	*r_ext_compiled_vertex_array;
 cvar_t	*r_ext_texture_env_add;
 cvar_t	*r_ext_max_anisotropy;
+cvar_t	*r_ext_multisample;
 
 cvar_t	*r_ignoreGLErrors;
 cvar_t	*r_logFile;
@@ -911,7 +912,8 @@ void R_Register( void )
 	r_ext_texture_env_add = ri.Cvar_Get( "r_ext_texture_env_add", "1", CVAR_ARCHIVE | CVAR_LATCH);
 #endif
 
-	r_ext_max_anisotropy = ri.Cvar_Get( "r_ext_max_anisotropy", "2", CVAR_ARCHIVE | CVAR_LATCH );
+	r_ext_max_anisotropy = ri.Cvar_Get( "r_ext_max_anisotropy", "4", CVAR_ARCHIVE | CVAR_LATCH );
+	r_ext_multisample = ri.Cvar_Get( "r_ext_multisample", "4", CVAR_ARCHIVE | CVAR_LATCH );
 
 	r_picmip = ri.Cvar_Get ("r_picmip", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_roundImagesDown = ri.Cvar_Get ("r_roundImagesDown", "0", CVAR_ARCHIVE | CVAR_LATCH );

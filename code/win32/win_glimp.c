@@ -738,15 +738,16 @@ static void PrintCDSError( int value )
 static void GLW_AttemptFSAA()
 {
 	static const float ar[] = { 0, 0 };
-	static const int aiAttributes[] = {
+	// ignore r_xyzbits vars - FSAA requires 32-bit color, and anyone using it is implicitly on decent HW
+	static int anAttributes[] = {
 		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
 		WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-		WGL_COLOR_BITS_ARB, 32,
-		WGL_ALPHA_BITS_ARB, 8,
-		WGL_DEPTH_BITS_ARB, 16,
-		WGL_STENCIL_BITS_ARB, 0,
 		WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+		WGL_COLOR_BITS_ARB, 32,
+		WGL_ALPHA_BITS_ARB, 0,
+		WGL_DEPTH_BITS_ARB, 24,
+		WGL_STENCIL_BITS_ARB, 8,
 		WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
 		WGL_SAMPLES_ARB, 4,
 		0, 0
@@ -755,10 +756,13 @@ static void GLW_AttemptFSAA()
 	UINT iPFD, cPFD;
 
 	qwglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)qwglGetProcAddress( "wglChoosePixelFormatARB" );
-	if (!qwglChoosePixelFormatARB)
+	if (!r_ext_multisample->integer || !qwglChoosePixelFormatARB) {
+		glDisable(GL_MULTISAMPLE_ARB);
 		return;
+	}
 
-	if (!qwglChoosePixelFormatARB(glw_state.hDC, aiAttributes, ar, 1, &iPFD, &cPFD) || !cPFD)
+	anAttributes[19] = r_ext_multisample->integer;	// !!! UGH
+	if (!qwglChoosePixelFormatARB(glw_state.hDC, anAttributes, ar, 1, &iPFD, &cPFD) || !cPFD)
 		return;
 
 	// now bounce the ENTIRE fucking subsytem thanks to WGL+ARB stupidity
@@ -787,6 +791,7 @@ static void GLW_AttemptFSAA()
 	glw_state.nPendingPF = iPFD;
 	glw_state.pixelFormatSet = qfalse;
 	GLW_CreateWindow( "FSAA", glConfig.vidWidth, glConfig.vidHeight, glConfig.colorBits, glw_state.cdsFullscreen );
+	glw_state.nPendingPF = 0;
 
 	glEnable(GL_MULTISAMPLE_ARB);
 }
