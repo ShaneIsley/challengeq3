@@ -4262,7 +4262,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ui\keycodes.h"
+				RelativePath="..\..\client\keycodes.h"
 				>
 			</File>
 			<File
