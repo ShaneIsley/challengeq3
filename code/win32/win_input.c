@@ -431,33 +431,22 @@ void IN_DIMouse( int *mx, int *my ) {
 
 		switch (od.dwOfs) {
 		case DIMOFS_BUTTON0:
-			if (od.dwData & 0x80)
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE1, qtrue, 0, NULL );
-			else
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE1, qfalse, 0, NULL );
+			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE1, (od.dwData & 0x80), 0, NULL );
 			break;
 
 		case DIMOFS_BUTTON1:
-			if (od.dwData & 0x80)
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE2, qtrue, 0, NULL );
-			else
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE2, qfalse, 0, NULL );
+			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE2, (od.dwData & 0x80), 0, NULL );
 			break;
 			
 		case DIMOFS_BUTTON2:
-			if (od.dwData & 0x80)
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE3, qtrue, 0, NULL );
-			else
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE3, qfalse, 0, NULL );
+			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE3, (od.dwData & 0x80), 0, NULL );
 			break;
 
 		case DIMOFS_BUTTON3:
-			if (od.dwData & 0x80)
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE4, qtrue, 0, NULL );
-			else
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE4, qfalse, 0, NULL );
-			break;      
-    // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
+			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE4, (od.dwData & 0x80), 0, NULL );
+			break;
+
+		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
 		case DIMOFS_Z:
 			value = od.dwData;
 			if (value == 0) {
