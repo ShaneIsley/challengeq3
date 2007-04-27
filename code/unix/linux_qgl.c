@@ -2672,8 +2672,8 @@ void QGL_Shutdown( void )
 		// placing a short delay before libGL is unloaded works around the problem.
 		// This delay is changable via the r_GLlibCoolDownMsec cvar (nice name
 		// huh?), and it defaults to 0. For me, 500 seems to work.
-		if( r_GLlibCoolDownMsec->integer )
-			usleep( r_GLlibCoolDownMsec->integer * 1000 );
+		//if( r_GLlibCoolDownMsec->integer )
+			usleep( 500 * 1000 );
 
 		#if USE_SDL_VIDEO
 		SDL_QuitSubSystem(SDL_INIT_VIDEO);
