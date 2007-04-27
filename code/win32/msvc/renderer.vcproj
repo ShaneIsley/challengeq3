@@ -1811,7 +1811,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\cgame\tr_types.h"
+				RelativePath="..\..\renderer\tr_types.h"
 				>
 			</File>
 			<File
