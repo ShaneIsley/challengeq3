@@ -660,7 +660,7 @@ static int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen )
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, tstencilbits );
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-    SDL_WM_SetCaption(CLIENT_WINDOW_TITLE, CLIENT_WINDOW_ICON);
+    //SDL_WM_SetCaption(CLIENT_WINDOW_TITLE, CLIENT_WINDOW_ICON);
     SDL_ShowCursor(0);
     SDL_EnableUNICODE(1);
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -830,7 +830,7 @@ static void GLW_InitExtensions( void )
   textureFilterAnisotropic = qfalse;
   if ( strstr( glConfig.extensions_string, "GL_EXT_texture_filter_anisotropic" ) )
   {
-    if ( r_ext_texture_filter_anisotropic->integer ) {
+    if ( r_ext_max_anisotropy->integer >= 1 ) {
       qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy );
       if ( maxAnisotropy <= 0 ) {
         ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not properly supported!\n" );
