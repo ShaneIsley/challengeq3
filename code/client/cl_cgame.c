@@ -954,8 +954,8 @@ void CL_SetCGameTime( void ) {
 
 	// get our current view of time
 
-	if ( clc.demoplaying && cl_freezeDemo->integer ) {
-		// cl_freezeDemo is used to lock a demo in place for single frame advances
+	if (clc.demoplaying && (com_timescale->value == 0)) {
+		cl.serverTimeDelta -= cls.frametime;
 
 	} else {
 		// cl_timeNudge is a user adjustable cvar that allows more
