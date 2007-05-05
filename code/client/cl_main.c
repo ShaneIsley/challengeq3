@@ -1950,13 +1950,14 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	}
 }
 
-/*
-==================
-CL_CheckTimeout
 
-==================
-*/
-void CL_CheckTimeout( void ) {
+void CL_CheckTimeout( void )
+{
+	if (clc.demoplaying && (com_timescale->value == 0)) {
+		cl.timeoutcount = 0;
+		return;
+	}
+
 	//
 	// check timeout
 	//
