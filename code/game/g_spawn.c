@@ -327,12 +327,21 @@ char *G_NewString( const char *string ) {
 	// turn \n into a real linefeed
 	for ( i=0 ; i< l ; i++ ) {
 		if (string[i] == '\\' && i < l-1) {
+			//Fixed issue with entity spawn keys containing a backslash (\) skipping the next letter after it.
+	         if (string[i+1] == 'n') { 
+	            *new_p++ = '\n'; 
+	            i++; 
+	         } else { 
+	            *new_p++ = '\\'; 
+	         }
+         	/*
 			i++;
 			if (string[i] == 'n') {
 				*new_p++ = '\n';
 			} else {
 				*new_p++ = '\\';
 			}
+			*/
 		} else {
 			*new_p++ = string[i];
 		}
