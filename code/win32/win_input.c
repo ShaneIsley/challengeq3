@@ -430,7 +430,7 @@ void IN_DIMouse( int *mx, int *my ) {
 		int i;
 		dwElements = DX_MOUSE_BUFFER_SIZE;
 
-		hr = IDirectInputDevice_GetDeviceData(g_pMouse,sizeof(od), (LPDIDEVICEOBJECTDATA)&od, &dwElements, 0);
+		hr = IDirectInputDevice_GetDeviceData(g_pMouse, sizeof(DIDEVICEOBJECTDATA), (LPDIDEVICEOBJECTDATA)&od, &dwElements, 0);
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED)) {
 			IDirectInputDevice_Acquire(g_pMouse);
 			return;
@@ -460,7 +460,7 @@ void IN_DIMouse( int *mx, int *my ) {
 				break;
 				// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
 			case DIMOFS_Z:
-				value = od[i].dwData;
+				value = (int)od[i].dwData;
 				if (value == 0) {
 
 				} else if (value < 0) {
@@ -477,7 +477,7 @@ void IN_DIMouse( int *mx, int *my ) {
 
 	// read the raw delta counter and ignore
 	// the individual sample time / values
-	hr = IDirectInputDevice_GetDeviceState(g_pMouse, sizeof(od), &state);
+	hr = IDirectInputDevice_GetDeviceState(g_pMouse, sizeof(state), &state);
 	if ( FAILED(hr) ) {
 		*mx = *my = 0;
 		return;
