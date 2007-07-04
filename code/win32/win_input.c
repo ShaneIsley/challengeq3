@@ -36,7 +36,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define DIMOFS_BUTTON7 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 7)
 #endif
 
-#pragma comment( lib, "dinput" )
+#pragma comment( lib, "dinput8" )
+#pragma comment( lib, "dxguid" )
 
 
 typedef struct {
@@ -204,7 +205,7 @@ DIRECT INPUT MOUSE CONTROL
 
 ============================================================
 */
-
+/*
 #undef DEFINE_GUID
 
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
@@ -215,7 +216,8 @@ DEFINE_GUID(GUID_SysMouse,   0x6F1D2B60,0xD5A0,0x11CF,0xBF,0xC7,0x44,0x45,0x53,0
 DEFINE_GUID(GUID_XAxis,   0xA36D02E0,0xC9F3,0x11CF,0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00);
 DEFINE_GUID(GUID_YAxis,   0xA36D02E1,0xC9F3,0x11CF,0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00);
 DEFINE_GUID(GUID_ZAxis,   0xA36D02E2,0xC9F3,0x11CF,0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00);
-
+DEFINE_GUID(GUID_Button,  0xA36D02F0,0xC9F3,0x11CF,0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00);
+*/
 
 #define DINPUT_BUFFERSIZE           16
 #define iDirectInputCreate(a,b,c,d)	pDirectInputCreate(a,b,c,d)
@@ -224,7 +226,7 @@ HRESULT (WINAPI *pDirectInputCreate)(HINSTANCE hinst, DWORD dwVersion,
 	LPDIRECTINPUT * lplpDirectInput, LPUNKNOWN punkOuter);
 
 static HINSTANCE hInstDI;
-
+/*
 typedef struct MYDATA {
 	LONG  lX;                   // X axis goes here
 	LONG  lY;                   // Y axis goes here
@@ -247,6 +249,7 @@ static DIOBJECTDATAFORMAT rgodf[] = {
 
 #define NUM_OBJECTS (sizeof(rgodf) / sizeof(rgodf[0]))
 
+
 // NOTE TTimo: would be easier using c_dfDIMouse or c_dfDIMouse2 
 static DIDATAFORMAT	df = {
 	sizeof(DIDATAFORMAT),       // this structure
@@ -256,6 +259,33 @@ static DIDATAFORMAT	df = {
 	NUM_OBJECTS,                // number of objects
 	rgodf,                      // and here they are
 };
+*/
+
+/*
+DIOBJECTDATAFORMAT dfDIMouse2[] = {
+	  { &GUID_XAxis,  DIMOFS_X, DIDFT_ANYINSTANCE | DIDFT_AXIS, 0 },
+	  { &GUID_YAxis,  DIMOFS_Y, DIDFT_ANYINSTANCE | DIDFT_AXIS, 0 },
+	  { &GUID_ZAxis,  DIMOFS_Z, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_AXIS, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON0, DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0	},
+	  { &GUID_Button, DIMOFS_BUTTON1, DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0	},
+	  { &GUID_Button, DIMOFS_BUTTON2, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON3, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON4, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON5, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON6, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 },
+	  { &GUID_Button, DIMOFS_BUTTON7, DIDFT_OPTIONAL | DIDFT_ANYINSTANCE | DIDFT_BUTTON, 0 }
+	};
+	
+#define NUM_OBJECTS (sizeof(dfDIMouse2) / sizeof(dfDIMouse2[0]))
+
+const DIDATAFORMAT c_dfDIMouse2 = {
+	    sizeof(DIDATAFORMAT),
+	    sizeof(DIOBJECTDATAFORMAT),
+	    DIDF_RELAXIS,
+	    sizeof(DIMOUSESTATE2),
+	    NUM_OBJECTS,
+	    dfDIMouse2
+};*/
 
 static LPDIRECTINPUT		g_pdi;
 static LPDIRECTINPUTDEVICE	g_pMouse;
@@ -301,8 +331,9 @@ qboolean IN_InitDIMouse( void ) {
 		}
 	}
 
+	hr = DirectInput8Create( g_wv.hInstance, DIRECTINPUT_VERSION, (const GUID *)&IID_IDirectInput8, &g_pdi, NULL);
 	// register with DirectInput and get an IDirectInput to play with.
-	hr = iDirectInputCreate( g_wv.hInstance, DIRECTINPUT_VERSION, &g_pdi, NULL);
+	//hr = iDirectInputCreate( g_wv.hInstance, DIRECTINPUT_VERSION, &g_pdi, NULL);
 
 	if (FAILED(hr)) {
 		Com_Printf ("iDirectInputCreate failed\n");
@@ -428,9 +459,10 @@ void IN_DIMouse( int *mx, int *my ) {
 	for (;;)
 	{
 		int i;
+
 		dwElements = DX_MOUSE_BUFFER_SIZE;
 
-		hr = IDirectInputDevice_GetDeviceData(g_pMouse, sizeof(DIDEVICEOBJECTDATA), (LPDIDEVICEOBJECTDATA)&od, &dwElements, 0);
+		hr = IDirectInputDevice_GetDeviceData(g_pMouse, sizeof(DIDEVICEOBJECTDATA), od, &dwElements, 0);
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED)) {
 			IDirectInputDevice_Acquire(g_pMouse);
 			return;
@@ -482,8 +514,21 @@ void IN_DIMouse( int *mx, int *my ) {
 		*mx = *my = 0;
 		return;
 	}
+
 	*mx = state.lX;
 	*my = state.lY;
+
+	//dwl: check wheel state 
+	if (state.lZ > 0)
+	{
+		Sys_QueEvent( 0, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
+		Sys_QueEvent( 0, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
+	}
+	else if (state.lZ < 0)
+	{
+		Sys_QueEvent( 0, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
+		Sys_QueEvent( 0, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
+	}
 }
 
 /*

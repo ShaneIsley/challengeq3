@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #pragma warning( pop )
 #endif
 
+#define DIRECTINPUT_VERSION 0x0800
+
 #include <dinput.h>
 #include <dsound.h>
 #include <winsock.h>
