@@ -25,6 +25,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/client.h"
 #include "win_local.h"
 
+//dwl: buffered input - for big dpi mouses
+#define	DX_MOUSE_BUFFER_SIZE	64
+#define MAX_MOUSE_BUTTONS 8
+
+#ifndef DIMOFS_BUTTON4
+#define DIMOFS_BUTTON4 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 4)
+#define DIMOFS_BUTTON5 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 5)
+#define DIMOFS_BUTTON6 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 6)
+#define DIMOFS_BUTTON7 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 7)
+#endif
+
+#pragma comment( lib, "dinput" )
+
 
 typedef struct {
 	int			oldButtonState;
@@ -264,7 +277,7 @@ qboolean IN_InitDIMouse( void ) {
 			0,                          // diph.dwObj
 			DIPH_DEVICE,                // diph.dwHow
 		},
-		DINPUT_BUFFERSIZE,              // dwData
+		DX_MOUSE_BUFFER_SIZE,           // dwData
 	};
 
 	Com_Printf( "Initializing DirectInput...\n");
@@ -305,7 +318,9 @@ qboolean IN_InitDIMouse( void ) {
 	}
 
 	// set the data format to "mouse format".
-	hr = IDirectInputDevice_SetDataFormat(g_pMouse, &df);
+	//dwl: as Ttimo say - would be easier using c_dfDIMouse or c_dfDIMouse2 
+	//dwl: DIMOUSESTATE2(8 mouse buttons) structure to IDirectInputDevice::GetDeviceState.
+	hr = IDirectInputDevice_SetDataFormat(g_pMouse, &c_dfDIMouse2 );
 
 	if (FAILED(hr)) 	{
 		Com_Printf ("Couldn't set DI mouse format\n");
@@ -398,8 +413,9 @@ IN_DIMouse
 ===================
 */
 void IN_DIMouse( int *mx, int *my ) {
-	DIDEVICEOBJECTDATA	od;
-	DIMOUSESTATE		state;
+	DIDEVICEOBJECTDATA od[ DX_MOUSE_BUFFER_SIZE ];  // Receives buffered data  
+	DIMOUSESTATE2		state;
+	//DIMOUSESTATE		state;
 	DWORD				dwElements;
 	HRESULT				hr;
   int value;
@@ -411,10 +427,10 @@ void IN_DIMouse( int *mx, int *my ) {
 	// fetch new events
 	for (;;)
 	{
-		dwElements = 1;
+		int i;
+		dwElements = DX_MOUSE_BUFFER_SIZE;
 
-		hr = IDirectInputDevice_GetDeviceData(g_pMouse,
-				sizeof(DIDEVICEOBJECTDATA), &od, &dwElements, 0);
+		hr = IDirectInputDevice_GetDeviceData(g_pMouse,sizeof(od), (LPDIDEVICEOBJECTDATA)&od, &dwElements, 0);
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED)) {
 			IDirectInputDevice_Acquire(g_pMouse);
 			return;
@@ -429,43 +445,39 @@ void IN_DIMouse( int *mx, int *my ) {
 			break;
 		}
 
-		switch (od.dwOfs) {
-		case DIMOFS_BUTTON0:
-			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE1, (od.dwData & 0x80), 0, NULL );
-			break;
+		for( i = 0; i < dwElements; i++ ) 
+		{
+			switch (od[i].dwOfs) {
+			case DIMOFS_BUTTON0:
+			case DIMOFS_BUTTON1:
+			case DIMOFS_BUTTON2:
+			case DIMOFS_BUTTON3:
+			case DIMOFS_BUTTON4:
+			case DIMOFS_BUTTON5:
+			case DIMOFS_BUTTON6:
+			case DIMOFS_BUTTON7:
+				Sys_QueEvent( od[i].dwTimeStamp, SE_KEY, K_MOUSE1 + od[i].dwOfs - DIMOFS_BUTTON0, (od[i].dwData & 0x80), 0, NULL );
+				break;
+				// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
+			case DIMOFS_Z:
+				value = od[i].dwData;
+				if (value == 0) {
 
-		case DIMOFS_BUTTON1:
-			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE2, (od.dwData & 0x80), 0, NULL );
-			break;
-			
-		case DIMOFS_BUTTON2:
-			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE3, (od.dwData & 0x80), 0, NULL );
-			break;
-
-		case DIMOFS_BUTTON3:
-			Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE4, (od.dwData & 0x80), 0, NULL );
-			break;
-
-		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
-		case DIMOFS_Z:
-			value = od.dwData;
-			if (value == 0) {
-
-			} else if (value < 0) {
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
-			} else {
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
-				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
+				} else if (value < 0) {
+					Sys_QueEvent( od[i].dwTimeStamp, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
+					Sys_QueEvent( od[i].dwTimeStamp, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
+				} else {
+					Sys_QueEvent( od[i].dwTimeStamp, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
+					Sys_QueEvent( od[i].dwTimeStamp, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
+				}
+				break;
 			}
-			break;
 		}
 	}
 
 	// read the raw delta counter and ignore
 	// the individual sample time / values
-	hr = IDirectInputDevice_GetDeviceState(g_pMouse,
-			sizeof(DIDEVICEOBJECTDATA), &state);
+	hr = IDirectInputDevice_GetDeviceState(g_pMouse, sizeof(od), &state);
 	if ( FAILED(hr) ) {
 		*mx = *my = 0;
 		return;
@@ -590,7 +602,7 @@ void IN_MouseEvent (int mstate)
 		return;
 
 // perform button actions
-	for  (i = 0 ; i < 3 ; i++ )
+	for  (i = 0 ; i < MAX_MOUSE_BUTTONS ; i++ )
 	{
 		if ( (mstate & (1<<i)) &&
 			!(s_wmv.oldButtonState & (1<<i)) )

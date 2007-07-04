@@ -53,7 +53,7 @@ int fh = 0;
 
 void Spk_Open(char *name)
 {
-  fh = open( name, O_TRUNC | O_CREAT | O_WRONLY, S_IREAD | S_IWRITE );
+  fh = _open( name, O_TRUNC | O_CREAT | O_WRONLY, S_IREAD | S_IWRITE );
 };
 
 void Spk_Close(void)
@@ -61,7 +61,7 @@ void Spk_Close(void)
   if (!fh)
     return;
 
-  close( fh );
+  _close( fh );
   fh = 0;
 }
 
@@ -75,7 +75,7 @@ void Spk_Printf (const char *text, ...)
 
   va_start (argptr,text);
   vsprintf (buf, text, argptr);
-  write(fh, buf, strlen(buf));
+  _write(fh, buf, strlen(buf));
   _commit(fh);
   va_end (argptr);
 
@@ -890,7 +890,7 @@ EVENT LOOP
 ========================================================================
 */
 
-#define	MAX_QUED_EVENTS		256
+#define	MAX_QUED_EVENTS		512
 #define	MASK_QUED_EVENTS	( MAX_QUED_EVENTS - 1 )
 
 sysEvent_t	eventQue[MAX_QUED_EVENTS];

@@ -68,7 +68,7 @@ void Log_Open(char *filename)
 		botimport.Print(PRT_ERROR, "log file %s is already opened\n", logfile.filename);
 		return;
 	} //end if
-	logfile.fp = fopen(filename, "wb");
+	fopen_s( &logfile.fp, filename, "wb");
 	if (!logfile.fp)
 	{
 		botimport.Print(PRT_ERROR, "can't open the log file %s\n", filename);

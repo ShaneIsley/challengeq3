@@ -360,7 +360,8 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		int err = WSAGetLastError();
 
 		// wouldblock is silent
-		if( err == WSAEWOULDBLOCK ) {
+		// dwl: WSAEINTR - too since some weird shit makes that fail
+		if( err == WSAEWOULDBLOCK || err == WSAEINTR ) {
 			return;
 		}
 
