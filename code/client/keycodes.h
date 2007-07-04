@@ -97,10 +97,6 @@ typedef enum {
 	K_MOUSE3,
 	K_MOUSE4,
 	K_MOUSE5,
-	K_MOUSE6,
-	K_MOUSE7,
-	K_MOUSE8,
-	K_MOUSE9,
 
 	K_MWHEELDOWN,
 	K_MWHEELUP,
@@ -154,6 +150,11 @@ typedef enum {
 	K_AUX14,
 	K_AUX15,
 	K_AUX16,
+
+	K_MOUSE6,
+	K_MOUSE7,
+	K_MOUSE8,
+	K_MOUSE9,
 
 	K_LAST_KEY		// this had better be <256!
 } keyNum_t;
