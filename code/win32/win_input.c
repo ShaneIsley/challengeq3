@@ -449,7 +449,7 @@ void IN_DIMouse( int *mx, int *my ) {
 	//DIMOUSESTATE		state;
 	DWORD				dwElements;
 	HRESULT				hr;
-  int value;
+	int value;
 
 	if ( !g_pMouse ) {
 		return;
@@ -522,18 +522,6 @@ void IN_DIMouse( int *mx, int *my ) {
 
 	*mx = state.lX;
 	*my = state.lY;
-
-	//dwl: check wheel state 
-	if (state.lZ > 0)
-	{
-		Sys_QueEvent( 0, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
-		Sys_QueEvent( 0, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
-	}
-	else if (state.lZ < 0)
-	{
-		Sys_QueEvent( 0, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
-		Sys_QueEvent( 0, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
-	}
 }
 
 /*
