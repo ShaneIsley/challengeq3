@@ -63,6 +63,7 @@ cvar_t	*cl_activeAction;
 cvar_t	*cl_motdString;
 
 cvar_t	*cl_allowDownload;
+cvar_t  *cl_dlURL;
 cvar_t	*cl_conXOffset;
 cvar_t	*cl_inGameVideo;
 
