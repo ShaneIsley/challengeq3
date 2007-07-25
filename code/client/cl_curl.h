@@ -37,11 +37,7 @@ extern cvar_t *cl_cURLLib;
 #define DEFAULT_CURL_LIB "libcurl.so.3"
 #endif
 
-#if USE_LOCAL_HEADERS
-  #include "../libcurl/curl/curl.h"
-#else
-  #include <curl/curl.h>
-#endif
+#include "../libcurl/curl/curl.h"
 
 
 #if USE_CURL_DLOPEN
