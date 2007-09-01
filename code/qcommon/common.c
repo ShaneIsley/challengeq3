@@ -2581,10 +2581,8 @@ Com_WriteConfiguration
 Writes key bindings and archived cvars to config file if modified
 ===============
 */
-void Com_WriteConfiguration( void ) {
-#ifndef DEDICATED // bk001204
-	cvar_t	*fs;
-#endif
+void Com_WriteConfiguration( void )
+{
 	// if we are quiting without fully initializing, make sure
 	// we don't write out anything
 	if ( !com_fullyInitialized ) {
@@ -2601,7 +2599,7 @@ void Com_WriteConfiguration( void ) {
 /* KHB 15 Oct 06  this is SO horribly wrong
 	// bk001119 - tentative "not needed for dedicated"
 #ifndef DEDICATED
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	const cvar_t* fs = Cvar_Get( "fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
 		Com_WriteCDKey( fs->string, &cl_cdkey[16] );
 	} else {
