@@ -1,4 +1,24 @@
 
+Sep 07
+
+released as 1.34, since it was about time we did  :P
+
+
+Aug 07
+
+fixed a bug in the skybox code that tried to use a 0-length CVA
+which makes recent nvidia drivers go into spaz mode 
+
+changed r_ext_multisample default to 0 to stop ix nagging  :P
+
+
+July 07
+
+added support for curl
+
+improved some network stuff (buffer sizes and TOS)
+
+
 1 May 07
 
 remove broken useless cl_freezeDemo and make demo pausing work
@@ -8,6 +28,9 @@ remove broken useless cl_freezeDemo and make demo pausing work
 
 ripped out all support for legacy substandard hw/drivers (ie Voodoo etc)
 and r_maskMinidriver
+
+uncorrected mode 8 back to 1280x1024
+
 
 
 18 Jul 06
