@@ -386,12 +386,14 @@ void S_Init( void )
 		Cmd_AddCommand( "s_stop", S_StopAllSounds );
 		Cmd_AddCommand( "s_info", S_SoundInfo );
 
+#if defined(USE_OPEN_AL)
 		cv = Cvar_Get( "s_useOpenAL", "0", CVAR_ARCHIVE );
 		if( cv->integer ) {
 			//OpenAL
 			started = S_AL_Init( &si );
 			Cvar_Set( "s_backend", "OpenAL" );
 		}
+#endif
 
 		if( !started ) {
 			started = S_Base_Init( &si );
