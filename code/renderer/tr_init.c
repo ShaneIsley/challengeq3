@@ -1190,14 +1190,9 @@ void RE_EndRegistration( void ) {
 }
 
 
-/*
-@@@@@@@@@@@@@@@@@@@@@
-GetRefAPI
-
-@@@@@@@@@@@@@@@@@@@@@
-*/
-refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
-	static refexport_t	re;
+const refexport_t* GetRefAPI ( int apiVersion, refimport_t *rimp )
+{
+	static refexport_t re;
 
 	ri = *rimp;
 

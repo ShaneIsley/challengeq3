@@ -524,7 +524,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	qboolean		depthRange, oldDepthRange;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int				oldSort;
+	unsigned int oldSort = (unsigned int)-1;
 	float			originalTime;
 
 	// save original time for entity shader offsets
@@ -540,7 +540,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldFogNum = -1;
 	oldDepthRange = qfalse;
 	oldDlighted = qfalse;
-	oldSort = -1;
 	depthRange = qfalse;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;

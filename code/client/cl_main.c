@@ -2267,9 +2267,10 @@ int CL_ScaledMilliseconds(void) {
 CL_InitRef
 ============
 */
-void CL_InitRef( void ) {
-	refimport_t	ri;
-	refexport_t	*ret;
+void CL_InitRef( void )
+{
+	refimport_t ri;
+	const refexport_t* ret;
 
 	//Com_Printf( "----- Initializing Renderer ----\n" );
 
