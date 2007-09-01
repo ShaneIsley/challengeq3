@@ -37,62 +37,45 @@ static unsigned short s_oldHardwareGamma[3][256];
 */
 void WG_CheckHardwareGamma( void )
 {
-	HDC			hDC;
+	HDC hDC;
+
+	if (r_ignorehwgamma->integer)
+		return;
 
 	glConfig.deviceSupportsGamma = qfalse;
 
-	if ( qwglSetDeviceGammaRamp3DFX )
+	hDC = GetDC( GetDesktopWindow() );
+	glConfig.deviceSupportsGamma = GetDeviceGammaRamp( hDC, s_oldHardwareGamma );
+	ReleaseDC( GetDesktopWindow(), hDC );
+
+	if ( glConfig.deviceSupportsGamma )
 	{
-		glConfig.deviceSupportsGamma = qtrue;
-
-		hDC = GetDC( GetDesktopWindow() );
-		glConfig.deviceSupportsGamma = qwglGetDeviceGammaRamp3DFX( hDC, s_oldHardwareGamma );
-		ReleaseDC( GetDesktopWindow(), hDC );
-
-		return;
-	}
-
-	// non-3Dfx standalone drivers don't support gamma changes, period
-	if ( glConfig.driverType == GLDRV_STANDALONE )
-	{
-		return;
-	}
-
-	if ( !r_ignorehwgamma->integer )
-	{
-		hDC = GetDC( GetDesktopWindow() );
-		glConfig.deviceSupportsGamma = GetDeviceGammaRamp( hDC, s_oldHardwareGamma );
-		ReleaseDC( GetDesktopWindow(), hDC );
-
-		if ( glConfig.deviceSupportsGamma )
+		//
+		// do a sanity check on the gamma values
+		//
+		if ( ( HIBYTE( s_oldHardwareGamma[0][255] ) <= HIBYTE( s_oldHardwareGamma[0][0] ) ) ||
+			 ( HIBYTE( s_oldHardwareGamma[1][255] ) <= HIBYTE( s_oldHardwareGamma[1][0] ) ) ||
+			 ( HIBYTE( s_oldHardwareGamma[2][255] ) <= HIBYTE( s_oldHardwareGamma[2][0] ) ) )
 		{
-			//
-			// do a sanity check on the gamma values
-			//
-			if ( ( HIBYTE( s_oldHardwareGamma[0][255] ) <= HIBYTE( s_oldHardwareGamma[0][0] ) ) ||
-				 ( HIBYTE( s_oldHardwareGamma[1][255] ) <= HIBYTE( s_oldHardwareGamma[1][0] ) ) ||
-				 ( HIBYTE( s_oldHardwareGamma[2][255] ) <= HIBYTE( s_oldHardwareGamma[2][0] ) ) )
+			glConfig.deviceSupportsGamma = qfalse;
+			ri.Printf( PRINT_WARNING, "WARNING: device has broken gamma support, generated gamma.dat\n" );
+		}
+
+		//
+		// make sure that we didn't have a prior crash in the game, and if so we need to
+		// restore the gamma values to at least a linear value
+		//
+		if ( ( HIBYTE( s_oldHardwareGamma[0][181] ) == 255 ) )
+		{
+			int g;
+
+			ri.Printf( PRINT_WARNING, "WARNING: suspicious gamma tables, using linear ramp for restoration\n" );
+
+			for ( g = 0; g < 255; g++ )
 			{
-				glConfig.deviceSupportsGamma = qfalse;
-				ri.Printf( PRINT_WARNING, "WARNING: device has broken gamma support, generated gamma.dat\n" );
-			}
-
-			//
-			// make sure that we didn't have a prior crash in the game, and if so we need to
-			// restore the gamma values to at least a linear value
-			//
-			if ( ( HIBYTE( s_oldHardwareGamma[0][181] ) == 255 ) )
-			{
-				int g;
-
-				ri.Printf( PRINT_WARNING, "WARNING: suspicious gamma tables, using linear ramp for restoration\n" );
-
-				for ( g = 0; g < 255; g++ )
-				{
-					s_oldHardwareGamma[0][g] = g << 8;
-					s_oldHardwareGamma[1][g] = g << 8;
-					s_oldHardwareGamma[2][g] = g << 8;
-				}
+				s_oldHardwareGamma[0][g] = g << 8;
+				s_oldHardwareGamma[1][g] = g << 8;
+				s_oldHardwareGamma[2][g] = g << 8;
 			}
 		}
 	}
@@ -177,16 +160,9 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 	}
 
 
-	if ( qwglSetDeviceGammaRamp3DFX )
-	{
-		qwglSetDeviceGammaRamp3DFX( glw_state.hDC, table );
-	}
-	else
-	{
-		ret = SetDeviceGammaRamp( glw_state.hDC, table );
-		if ( !ret ) {
-			Com_Printf( "SetDeviceGammaRamp failed.\n" );
-		}
+	ret = SetDeviceGammaRamp( glw_state.hDC, table );
+	if ( !ret ) {
+		Com_Printf( "SetDeviceGammaRamp failed.\n" );
 	}
 }
 
@@ -197,18 +173,8 @@ void WG_RestoreGamma( void )
 {
 	if ( glConfig.deviceSupportsGamma )
 	{
-		if ( qwglSetDeviceGammaRamp3DFX )
-		{
-			qwglSetDeviceGammaRamp3DFX( glw_state.hDC, s_oldHardwareGamma );
-		}
-		else
-		{
-			HDC hDC;
-			
-			hDC = GetDC( GetDesktopWindow() );
-			SetDeviceGammaRamp( hDC, s_oldHardwareGamma );
-			ReleaseDC( GetDesktopWindow(), hDC );
-		}
+		HDC hDC = GetDC( GetDesktopWindow() );
+		SetDeviceGammaRamp( hDC, s_oldHardwareGamma );
+		ReleaseDC( GetDesktopWindow(), hDC );
 	}
 }
-

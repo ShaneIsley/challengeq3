@@ -36,8 +36,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 void QGL_EnableLogging( qboolean enable );
 
 int ( WINAPI * qwglSwapIntervalEXT)( int interval );
-BOOL  ( WINAPI * qwglGetDeviceGammaRamp3DFX)( HDC, LPVOID );
-BOOL  ( WINAPI * qwglSetDeviceGammaRamp3DFX)( HDC, LPVOID );
 
 int   ( WINAPI * qwglChoosePixelFormat )(HDC, CONST PIXELFORMATDESCRIPTOR *);
 int   ( WINAPI * qwglChoosePixelFormatARB )(HDC, const int*, const FLOAT*, UINT, int*, UINT*);
@@ -3255,16 +3253,6 @@ qboolean QGL_Init( const char *dllname )
 
 	ri.Printf( PRINT_ALL, "...initializing QGL\n" );
 
-	// NOTE: this assumes that 'dllname' is lower case (and it should be)!
-	if ( strstr( dllname, _3DFX_DRIVER_NAME ) )
-	{
-		if ( !GlideIsValid() )
-		{
-			ri.Printf( PRINT_ALL, "...WARNING: missing Glide installation, assuming no 3Dfx available\n" );
-			return qfalse;
-		}
-	}
-
 	if ( dllname[0] != '!' )
 	{
 		Com_sprintf( libName, sizeof( libName ), "%s\\%s", systemDir, dllname );
@@ -3647,8 +3635,6 @@ qboolean QGL_Init( const char *dllname )
 	qglMultiTexCoord2fARB = 0;
 	qglLockArraysEXT = 0;
 	qglUnlockArraysEXT = 0;
-	qwglGetDeviceGammaRamp3DFX = NULL;
-	qwglSetDeviceGammaRamp3DFX = NULL;
 
 	// POS nvidia drivers return NULL for a wglGPA on this until there's already an active context ffs
 	qwglChoosePixelFormatARB = 0;

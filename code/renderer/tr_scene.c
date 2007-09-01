@@ -151,13 +151,6 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		
 		Com_Memcpy( poly->verts, &verts[numVerts*j], numVerts * sizeof( *verts ) );
 
-		if ( glConfig.hardwareType == GLHW_RAGEPRO ) {
-			poly->verts->modulate[0] = 255;
-			poly->verts->modulate[1] = 255;
-			poly->verts->modulate[2] = 255;
-			poly->verts->modulate[3] = 255;
-		}
-		// done.
 		r_numpolys++;
 		r_numpolyverts += numVerts;
 
@@ -241,10 +234,7 @@ void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, floa
 	if ( intensity <= 0 ) {
 		return;
 	}
-	// these cards don't have the correct blend mode
-	if ( glConfig.hardwareType == GLHW_RIVA128 || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
-		return;
-	}
+
 	dl = &backEndData[tr.smpFrame]->dlights[r_numdlights++];
 	VectorCopy (org, dl->origin);
 	dl->radius = intensity;
@@ -359,7 +349,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 	tr.refdef.polys = &backEndData[tr.smpFrame]->polys[r_firstScenePoly];
 
 	// turn off dynamic lighting globally by clearing all the dlights if it needs to be disabled
-	if (!r_dynamiclight->integer || (glConfig.hardwareType == GLHW_PERMEDIA2)) {
+	if (!r_dynamiclight->integer) {
 		tr.refdef.num_dlights = 0;
 	}
 

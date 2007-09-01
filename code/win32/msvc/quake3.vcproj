@@ -75,7 +75,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(OutDir)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ProgramDatabaseFile="$(IntDir)\quake3.pdb"
@@ -174,7 +174,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="\Program Files\IDSoft\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
@@ -274,7 +274,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(OutDir)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -370,7 +370,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
@@ -469,7 +469,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(OutDir)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -567,7 +567,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(OutDir)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -664,7 +664,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(OutDir)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"

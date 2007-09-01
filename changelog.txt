@@ -1,4 +1,15 @@
 
+1 May 07
+
+remove broken useless cl_freezeDemo and make demo pausing work
+
+
+27 Apr 07
+
+ripped out all support for legacy substandard hw/drivers (ie Voodoo etc)
+and r_maskMinidriver
+
+
 18 Jul 06
 
 update various cvar defaults

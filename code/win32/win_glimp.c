@@ -79,8 +79,6 @@ void     QGL_Shutdown( void );
 glwstate_t glw_state;
 
 cvar_t	*r_allowSoftwareGL;		// don't abort out if the pixelformat claims software
-cvar_t	*r_maskMinidriver;		// allow a different dll name to be treated as if it were opengl32.dll
-
 
 
 /*
@@ -125,15 +123,7 @@ static int GLW_ChoosePFD( HDC hDC, PIXELFORMATDESCRIPTOR *pPFD )
 
 	ri.Printf( PRINT_DEVELOPER, "...GLW_ChoosePFD( %d, %d, %d )\n", ( int ) pPFD->cColorBits, ( int ) pPFD->cDepthBits, ( int ) pPFD->cStencilBits );
 
-	// count number of PFDs
-	if ( glConfig.driverType > GLDRV_ICD )
-	{
-		maxPFD = qwglDescribePixelFormat( hDC, 1, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[0] );
-	}
-	else
-	{
-		maxPFD = DescribePixelFormat( hDC, 1, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[0] );
-	}
+	maxPFD = DescribePixelFormat( hDC, 1, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[0] );
 	if ( maxPFD > MAX_PFDS )
 	{
 		ri.Printf( PRINT_WARNING, "...numPFDs > MAX_PFDS (%d > %d)\n", maxPFD, MAX_PFDS );
@@ -145,14 +135,7 @@ static int GLW_ChoosePFD( HDC hDC, PIXELFORMATDESCRIPTOR *pPFD )
 	// grab information
 	for ( i = 1; i <= maxPFD; i++ )
 	{
-		if ( glConfig.driverType > GLDRV_ICD )
-		{
-			qwglDescribePixelFormat( hDC, i, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[i] );
-		}
-		else
-		{
-			DescribePixelFormat( hDC, i, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[i] );
-		}
+		DescribePixelFormat( hDC, i, sizeof( PIXELFORMATDESCRIPTOR ), &pfds[i] );
 	}
 
 	// look for a best match
@@ -388,24 +371,12 @@ static int GLW_MakeContext( PIXELFORMATDESCRIPTOR *pPFD )
 		}
 		ri.Printf( PRINT_DEVELOPER, "...PIXELFORMAT %d selected\n", pixelformat );
 
-		if ( glConfig.driverType > GLDRV_ICD )
-		{
-			qwglDescribePixelFormat( glw_state.hDC, pixelformat, sizeof( *pPFD ), pPFD );
-			if ( qwglSetPixelFormat( glw_state.hDC, pixelformat, pPFD ) == FALSE )
-			{
-				ri.Printf ( PRINT_ALL, "...qwglSetPixelFormat failed\n");
-				return TRY_PFD_FAIL_SOFT;
-			}
-		}
-		else
-		{
-			DescribePixelFormat( glw_state.hDC, pixelformat, sizeof( *pPFD ), pPFD );
+		DescribePixelFormat( glw_state.hDC, pixelformat, sizeof( *pPFD ), pPFD );
 
-			if ( SetPixelFormat( glw_state.hDC, pixelformat, pPFD ) == FALSE )
-			{
-				ri.Printf (PRINT_ALL, "...SetPixelFormat failed\n", glw_state.hDC );
-				return TRY_PFD_FAIL_SOFT;
-			}
+		if ( SetPixelFormat( glw_state.hDC, pixelformat, pPFD ) == FALSE )
+		{
+			ri.Printf (PRINT_ALL, "...SetPixelFormat failed\n", glw_state.hDC );
+			return TRY_PFD_FAIL_SOFT;
 		}
 
 		glw_state.pixelFormatSet = qtrue;
@@ -620,7 +591,7 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 		r.right  = width;
 		r.bottom = height;
 
-		if ( cdsFullscreen || !Q_stricmp( _3DFX_DRIVER_NAME, drivername ) )
+		if ( cdsFullscreen )
 		{
 			exstyle = WS_EX_TOPMOST;
 			stylebits = WS_POPUP|WS_VISIBLE|WS_SYSMENU;
@@ -635,7 +606,7 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 		w = r.right - r.left;
 		h = r.bottom - r.top;
 
-		if ( cdsFullscreen || !Q_stricmp( _3DFX_DRIVER_NAME, drivername ) )
+		if ( cdsFullscreen )
 		{
 			x = 0;
 			y = 0;
@@ -829,28 +800,23 @@ static rserr_t GLW_SetMode( const char *drivername,
 	glw_state.desktopHeight = GetDeviceCaps( hDC, VERTRES );
 	ReleaseDC( GetDesktopWindow(), hDC );
 
-	//
 	// verify desktop bit depth
-	//
-	if ( glConfig.driverType != GLDRV_VOODOO )
+	if ( glw_state.desktopBitsPixel < 15 || glw_state.desktopBitsPixel == 24 )
 	{
-		if ( glw_state.desktopBitsPixel < 15 || glw_state.desktopBitsPixel == 24 )
+		if ( colorbits == 0 || ( !cdsFullscreen && colorbits >= 15 ) )
 		{
-			if ( colorbits == 0 || ( !cdsFullscreen && colorbits >= 15 ) )
+			if ( MessageBox( NULL,
+						"It is highly unlikely that a correct\n"
+						"windowed display can be initialized with\n"
+						"the current desktop display depth.  Select\n"
+						"'OK' to try anyway.  Press 'Cancel' if you\n"
+						"have a 3Dfx Voodoo, Voodoo-2, or Voodoo Rush\n"
+						"3D accelerator installed, or if you otherwise\n"
+						"wish to quit.",
+						"Low Desktop Color Depth",
+						MB_OKCANCEL | MB_ICONEXCLAMATION ) != IDOK )
 			{
-				if ( MessageBox( NULL,
-							"It is highly unlikely that a correct\n"
-							"windowed display can be initialized with\n"
-							"the current desktop display depth.  Select\n"
-							"'OK' to try anyway.  Press 'Cancel' if you\n"
-							"have a 3Dfx Voodoo, Voodoo-2, or Voodoo Rush\n"
-							"3D accelerator installed, or if you otherwise\n"
-							"wish to quit.",
-							"Low Desktop Color Depth",
-							MB_OKCANCEL | MB_ICONEXCLAMATION ) != IDOK )
-				{
-					return RSERR_INVALID_MODE;
-				}
+				return RSERR_INVALID_MODE;
 			}
 		}
 	}
@@ -1018,9 +984,17 @@ static rserr_t GLW_SetMode( const char *drivername,
 	return RSERR_OK;
 }
 
-/*
-** GLW_InitExtensions
-*/
+
+static void APIENTRY debugLockArrays( int i, int c )
+{
+	static void (APIENTRY *pfn)( int, int ) = 0;
+	if (!pfn)
+		pfn = (void (APIENTRY *)( int, int ) )qwglGetProcAddress( "glLockArraysEXT" );
+	assert( c );
+	pfn( i, c );
+}
+
+
 static void GLW_InitExtensions( void )
 {
 	if ( !r_allowExtensions->integer )
@@ -1125,12 +1099,13 @@ static void GLW_InitExtensions( void )
 	// GL_EXT_compiled_vertex_array
 	qglLockArraysEXT = NULL;
 	qglUnlockArraysEXT = NULL;
-	if ( strstr( glConfig.extensions_string, "GL_EXT_compiled_vertex_array" ) && ( glConfig.hardwareType != GLHW_RIVA128 ) )
+	if ( strstr( glConfig.extensions_string, "GL_EXT_compiled_vertex_array" ) )
 	{
 		if ( r_ext_compiled_vertex_array->integer )
 		{
 			ri.Printf( PRINT_DEVELOPER, "...using GL_EXT_compiled_vertex_array\n" );
 			qglLockArraysEXT = ( void ( APIENTRY * )( int, int ) ) qwglGetProcAddress( "glLockArraysEXT" );
+			//qglLockArraysEXT = debugLockArrays;
 			qglUnlockArraysEXT = ( void ( APIENTRY * )( void ) ) qwglGetProcAddress( "glUnlockArraysEXT" );
 			if (!qglLockArraysEXT || !qglUnlockArraysEXT) {
 				ri.Error (ERR_FATAL, "bad getprocaddress");
@@ -1144,37 +1119,6 @@ static void GLW_InitExtensions( void )
 	else
 	{
 		ri.Printf( PRINT_DEVELOPER, "...GL_EXT_compiled_vertex_array not found\n" );
-	}
-
-	// WGL_3DFX_gamma_control
-	qwglGetDeviceGammaRamp3DFX = NULL;
-	qwglSetDeviceGammaRamp3DFX = NULL;
-
-	if ( strstr( glConfig.extensions_string, "WGL_3DFX_gamma_control" ) )
-	{
-		if ( !r_ignorehwgamma->integer && r_ext_gamma_control->integer )
-		{
-			qwglGetDeviceGammaRamp3DFX = ( BOOL ( WINAPI * )( HDC, LPVOID ) ) qwglGetProcAddress( "wglGetDeviceGammaRamp3DFX" );
-			qwglSetDeviceGammaRamp3DFX = ( BOOL ( WINAPI * )( HDC, LPVOID ) ) qwglGetProcAddress( "wglSetDeviceGammaRamp3DFX" );
-
-			if ( qwglGetDeviceGammaRamp3DFX && qwglSetDeviceGammaRamp3DFX )
-			{
-				ri.Printf( PRINT_DEVELOPER, "...using WGL_3DFX_gamma_control\n" );
-			}
-			else
-			{
-				qwglGetDeviceGammaRamp3DFX = NULL;
-				qwglSetDeviceGammaRamp3DFX = NULL;
-			}
-		}
-		else
-		{
-			ri.Printf( PRINT_DEVELOPER, "...ignoring WGL_3DFX_gamma_control\n" );
-		}
-	}
-	else
-	{
-		ri.Printf( PRINT_DEVELOPER, "...WGL_3DFX_gamma_control not found\n" );
 	}
 
 	textureFilterAnisotropic = qfalse;
@@ -1266,27 +1210,12 @@ static qboolean GLW_LoadOpenGL( const char *drivername )
 	Q_strncpyz( buffer, drivername, sizeof(buffer) );
 	Q_strlwr(buffer);
 
-	//
-	// determine if we're on a standalone driver
-	//
-	if ( strstr( buffer, "opengl32" ) != 0 || r_maskMinidriver->integer )
-	{
-		glConfig.driverType = GLDRV_ICD;
-	}
-	else
-	{
-		glConfig.driverType = GLDRV_STANDALONE;
+	// only real drivers are acceptable
+	if (!strstr( buffer, "opengl32" ))
+		return qfalse;
 
-		ri.Printf( PRINT_ALL, "...assuming '%s' is a standalone driver\n", drivername );
-
-		if ( strstr( buffer, _3DFX_DRIVER_NAME ) )
-		{
-			glConfig.driverType = GLDRV_VOODOO;
-		}
-	}
-
-	// disable the 3Dfx splash screen
-	_putenv("FX_GLIDE_NO_SPLASH=0");
+	glConfig.driverType = GLDRV_ICD;
+	glConfig.hardwareType = GLHW_GENERIC;
 
 	//
 	// load the driver and bind our function pointers to it
@@ -1316,11 +1245,6 @@ static qboolean GLW_LoadOpenGL( const char *drivername )
 			{
 				goto fail;
 			}
-		}
-
-		if ( glConfig.driverType == GLDRV_VOODOO )
-		{
-			glConfig.isFullscreen = qtrue;
 		}
 
 		return qtrue;
@@ -1354,17 +1278,7 @@ void GLimp_EndFrame (void)
 	// don't flip if drawing to front buffer
 	if ( Q_stricmp( r_drawBuffer->string, "GL_FRONT" ) != 0 )
 	{
-		if ( glConfig.driverType > GLDRV_ICD )
-		{
-			if ( !qwglSwapBuffers( glw_state.hDC ) )
-			{
-				ri.Error( ERR_FATAL, "GLimp_EndFrame() - SwapBuffers() failed!\n" );
-			}
-		}
-		else
-		{
-			SwapBuffers( glw_state.hDC );
-		}
+		SwapBuffers( glw_state.hDC );
 	}
 
 	// check logging
@@ -1374,7 +1288,6 @@ void GLimp_EndFrame (void)
 static void GLW_StartOpenGL( void )
 {
 	qboolean attemptedOpenGL32 = qfalse;
-	qboolean attempted3Dfx = qfalse;
 
 	//
 	// load and initialize the specific OpenGL driver
@@ -1385,37 +1298,8 @@ static void GLW_StartOpenGL( void )
 		{
 			attemptedOpenGL32 = qtrue;
 		}
-		else if ( !Q_stricmp( r_glDriver->string, _3DFX_DRIVER_NAME ) )
-		{
-			attempted3Dfx = qtrue;
-		}
 
-		if ( !attempted3Dfx )
-		{
-			attempted3Dfx = qtrue;
-			if ( GLW_LoadOpenGL( _3DFX_DRIVER_NAME ) )
-			{
-				ri.Cvar_Set( "r_glDriver", _3DFX_DRIVER_NAME );
-				r_glDriver->modified = qfalse;
-			}
-			else
-			{
-				if ( !attemptedOpenGL32 )
-				{
-					if ( !GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
-					{
-						ri.Error( ERR_FATAL, "GLW_StartOpenGL() - could not load OpenGL subsystem\n" );
-					}
-					ri.Cvar_Set( "r_glDriver", OPENGL_DRIVER_NAME );
-					r_glDriver->modified = qfalse;
-				}
-				else
-				{
-					ri.Error( ERR_FATAL, "GLW_StartOpenGL() - could not load OpenGL subsystem\n" );
-				}
-			}
-		}
-		else if ( !attemptedOpenGL32 )
+		if ( !attemptedOpenGL32 )
 		{
 			attemptedOpenGL32 = qtrue;
 			if ( GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
@@ -1465,7 +1349,6 @@ void GLimp_Init( void )
 	sscanf( cv->string, "%i", (int *)&glw_state.wndproc );
 
 	r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
-	r_maskMinidriver = ri.Cvar_Get( "r_maskMinidriver", "0", CVAR_LATCH );
 
 	// load appropriate DLL and initialize subsystem
 	GLW_StartOpenGL();
@@ -1489,65 +1372,14 @@ void GLimp_Init( void )
 	//
 	if ( Q_stricmp( lastValidRenderer->string, glConfig.renderer_string ) )
 	{
-		glConfig.hardwareType = GLHW_GENERIC;
-
 		ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
-
-		// VOODOO GRAPHICS w/ 2MB
-		if ( strstr( buf, "voodoo graphics/1 tmu/2 mb" ) )
-		{
-			ri.Cvar_Set( "r_picmip", "2" );
-			ri.Cvar_Get( "r_picmip", "1", CVAR_ARCHIVE | CVAR_LATCH );
-		}
-		else
-		{
-			ri.Cvar_Set( "r_picmip", "1" );
-
-			if ( strstr( buf, "rage 128" ) || strstr( buf, "rage128" ) )
-			{
-				ri.Cvar_Set( "r_finish", "0" );
-			}
-			// Savage3D and Savage4 should always have trilinear enabled
-			else if ( strstr( buf, "savage3d" ) || strstr( buf, "s3 savage4" ) )
-			{
-				ri.Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
-			}
-		}
+		ri.Cvar_Set( "r_picmip", "1" );
 	}
 	
 	//
 	// this is where hardware specific workarounds that should be
 	// detected/initialized every startup should go.
 	//
-	if ( strstr( buf, "banshee" ) || strstr( buf, "voodoo3" ) )
-	{
-		glConfig.hardwareType = GLHW_3DFX_2D3D;
-	}
-	// VOODOO GRAPHICS w/ 2MB
-	else if ( strstr( buf, "voodoo graphics/1 tmu/2 mb" ) )
-	{
-	}
-	else if ( strstr( buf, "glzicd" ) )
-	{
-	}
-	else if ( strstr( buf, "rage pro" ) || strstr( buf, "Rage Pro" ) || strstr( buf, "ragepro" ) )
-	{
-		glConfig.hardwareType = GLHW_RAGEPRO;
-	}
-	else if ( strstr( buf, "rage 128" ) )
-	{
-	}
-	else if ( strstr( buf, "permedia2" ) )
-	{
-		glConfig.hardwareType = GLHW_PERMEDIA2;
-	}
-	else if ( strstr( buf, "riva 128" ) )
-	{
-		glConfig.hardwareType = GLHW_RIVA128;
-	}
-	else if ( strstr( buf, "riva tnt " ) )
-	{
-	}
 
 	ri.Cvar_Set( "r_lastValidRenderer", glConfig.renderer_string );
 

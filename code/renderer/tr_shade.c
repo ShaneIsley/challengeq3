@@ -1108,7 +1108,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			//
 			// set state
 			//
-			if ( pStage->bundle[0].vertexLightmap && ( (r_vertexLight->integer && !r_uiFullScreen->integer) || glConfig.hardwareType == GLHW_PERMEDIA2 ) && r_lightmap->integer )
+			if ( pStage->bundle[0].vertexLightmap && r_vertexLight->integer && !r_uiFullScreen->integer && r_lightmap->integer )
 			{
 				GL_Bind( tr.whiteImage );
 			}
@@ -1131,20 +1131,12 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 }
 
 
-/*
-** RB_StageIteratorGeneric
-*/
 void RB_StageIteratorGeneric( void )
 {
-	shaderCommands_t *input;
-
-	input = &tess;
+	shaderCommands_t* input = &tess;
 
 	RB_DeformTessGeometry();
 
-	//
-	// log this call
-	//
 	if ( r_logFile->integer ) 
 	{
 		// don't just call LogComment, or we will get
@@ -1152,19 +1144,14 @@ void RB_StageIteratorGeneric( void )
 		GLimp_LogComment( va("--- RB_StageIteratorGeneric( %s ) ---\n", tess.shader->name) );
 	}
 
-	//
-	// set face culling appropriately
-	//
 	GL_Cull( input->shader->cullType );
 
-	// set polygon offset if necessary
 	if ( input->shader->polygonOffset )
 	{
 		qglEnable( GL_POLYGON_OFFSET_FILL );
 		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
 	}
 
-	//
 	// if there is only a single pass then we can enable color
 	// and texture arrays before we compile, otherwise we need
 	// to avoid compiling those arrays since they will change

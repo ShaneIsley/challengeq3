@@ -827,14 +827,14 @@ void RB_StageIteratorSky( void ) {
 		qglPopMatrix();
 	}
 
-	// generate the vertexes for all the clouds, which will be drawn
-	// by the generic shader routine
+	// generate the vertexes for all the clouds (if any)
+	// which will be drawn by the generic shader routine
 	R_BuildCloudData( &tess );
-
-	RB_StageIteratorGeneric();
+	if (tess.numVertexes)
+		RB_StageIteratorGeneric();
 
 	// draw the inner skybox
-
+	// or not...  :P
 
 	// back to normal depth range
 	qglDepthRange( 0.0, 1.0 );

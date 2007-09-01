@@ -1207,16 +1207,12 @@ static void ParseDeform( char **text ) {
 }
 
 
-/*
-===============
-ParseSkyParms
+// skyParms <outerbox> <cloudheight> <innerbox>
 
-skyParms <outerbox> <cloudheight> <innerbox>
-===============
-*/
-static void ParseSkyParms( char **text ) {
-	char		*token;
-	static char	*suf[6] = {"rt", "bk", "lf", "ft", "up", "dn"};
+static void ParseSkyParms( char **text )
+{
+	static const char* suf[6] = {"rt", "bk", "lf", "ft", "up", "dn"};
+	const char* token;
 	char		pathname[MAX_QPATH];
 	int			i;
 
@@ -1228,8 +1224,7 @@ static void ParseSkyParms( char **text ) {
 	}
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
-			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga"
-				, token, suf[i] );
+			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 #ifdef GL_CLAMP_TO_EDGE
 			shader.sky.outerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
 #else
@@ -1262,8 +1257,7 @@ static void ParseSkyParms( char **text ) {
 	}
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
-			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga"
-				, token, suf[i] );
+			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 			shader.sky.innerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_REPEAT );
 			if ( !shader.sky.innerbox[i] ) {
 				shader.sky.innerbox[i] = tr.defaultImage;
@@ -1770,14 +1764,6 @@ static qboolean CollapseMultitexture( void ) {
 		return qfalse;
 	}
 
-	// on voodoo2, don't combine different tmus
-	if ( glConfig.driverType == GLDRV_VOODOO ) {
-		if ( stages[0].bundle[0].image[0]->TMU ==
-			 stages[1].bundle[0].image[0]->TMU ) {
-			return qfalse;
-		}
-	}
-
 	abits = stages[0].stateBits;
 	bbits = stages[1].stateBits;
 
@@ -2253,7 +2239,7 @@ static shader_t *FinishShader( void ) {
 	//
 	// if we are in r_vertexLight mode, never use a lightmap texture
 	//
-	if ( stage > 1 && ( (r_vertexLight->integer && !r_uiFullScreen->integer) || glConfig.hardwareType == GLHW_PERMEDIA2 ) ) {
+	if ( stage > 1 && r_vertexLight->integer && !r_uiFullScreen->integer ) {
 		VertexLightingCollapse();
 		stage = 1;
 		hasLightmapStage = qfalse;
