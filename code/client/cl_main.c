@@ -606,9 +606,9 @@ void CL_NextDemo( void ) {
 CL_ShutdownAll
 =====================
 */
-void CL_ShutdownAll(void) {
-
-#if USE_CURL
+void CL_ShutdownAll(void)
+{
+#if defined(USE_CURL)
 	CL_cURL_Shutdown();
 #endif
 	// clear sounds
@@ -1334,7 +1334,7 @@ Called when all downloading has been completed
 */
 void CL_DownloadsComplete( void ) {
 
-#if USE_CURL
+#if defined(USE_CURL)
 	// if we downloaded using cURL
 	if( clc.cURLUsed ) {
 		clc.cURLUsed = qfalse;
@@ -1438,7 +1438,10 @@ A download completed or failed
 void CL_NextDownload(void) {
 	char *s;
 	char *remoteName, *localName;
+#if defined(USE_CURL)
 	char *dlURL;
+#endif
+
 	qboolean  useCURL = qfalse;
 	// We are looking to start a download here
 	if (*clc.downloadList) {
@@ -1462,10 +1465,11 @@ void CL_NextDownload(void) {
 			*s++ = 0;
 		else
 			s = localName + strlen(localName); // point at the nul byte
-#if USE_CURL
+
+#if defined(USE_CURL)
 		dlURL = clc.sv_dlURL;
 		if( !*dlURL || ( cl_allowDownload->integer == 2 )) {
-				dlURL = Cvar_VariableString( "cl_dlURL" );
+			dlURL = Cvar_VariableString( "cl_dlURL" );
 		}
 
 		if(!*dlURL) {
@@ -1485,6 +1489,7 @@ void CL_NextDownload(void) {
 			useCURL = qtrue;
 		}
 #endif
+
 		if( !useCURL ) {
 			if( !cl_allowDownload->integer ) {
 				Com_Error(ERR_DROP, "UDP Downloads are "
@@ -2066,7 +2071,7 @@ void CL_Frame ( int msec ) {
 		return;
 	}
 
-#if USE_CURL
+#if defined(USE_CURL)
 	if( clc.downloadCURLM ) {
 		CL_cURL_PerformDownload();
 		// we can't process frames normally when in disconnected
@@ -2488,14 +2493,14 @@ void CL_Init( void ) {
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
-#if USE_CURL
-	cl_dlURL = Cvar_Get( "cl_dlURL", "", CVAR_ARCHIVE);
-	cl_cURLLib = Cvar_Get( "cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE );
+#if defined(USE_CURL)
+	cl_dlURL = Cvar_Get( "cl_dlURL", "", 0 );
+	cl_cURLLib = Cvar_Get( "cl_cURLLib", DEFAULT_CURL_LIB, 0 );
 #endif
 
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 #ifdef MACOS_X
-        // In game video is REALLY slow in Mac OS X right now due to driver slowness
+	// In game video is REALLY slow in Mac OS X right now due to driver slowness
 	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "0", CVAR_ARCHIVE);
 #else
 	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "1", CVAR_ARCHIVE);
@@ -2508,7 +2513,7 @@ void CL_Init( void ) {
 	m_forward = Cvar_Get ("m_forward", "0.25", CVAR_ARCHIVE);
 	m_side = Cvar_Get ("m_side", "0.25", CVAR_ARCHIVE);
 #ifdef MACOS_X
-        // Input is jittery on OS X w/o this
+	// Input is jittery on OS X w/o this
 	m_filter = Cvar_Get ("m_filter", "1", CVAR_ARCHIVE);
 #else
 	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);

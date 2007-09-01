@@ -40,7 +40,7 @@ extern cvar_t *cl_cURLLib;
 #include "../libcurl/curl/curl.h"
 
 
-#if USE_CURL_DLOPEN
+#if defined(USE_CURL_DLOPEN)
 extern char* (*qcurl_version)(void);
 
 extern CURL* (*qcurl_easy_init)(void);
