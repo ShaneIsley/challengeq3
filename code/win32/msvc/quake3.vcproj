@@ -379,7 +379,7 @@
 				GenerateMapFile="true"
 				MapFileName="$(IntDir)\quake3.map"
 				SubSystem="2"
-				StackReserveSize="8388608"
+				EnableCOMDATFolding="2"
 				TargetMachine="1"
 			/>
 			<Tool

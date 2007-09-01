@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #if defined(USE_CURL_DLOPEN)
 
-cvar_t *cl_cURLLib;
+cvar_t* cl_cURLLib;
 
 #if USE_SDL_VIDEO
 #include "SDL.h"

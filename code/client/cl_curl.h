@@ -24,8 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __QCURL_H__
 #define __QCURL_H__
 
-extern cvar_t *cl_cURLLib;
-
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 
@@ -33,8 +31,10 @@ extern cvar_t *cl_cURLLib;
 
 #if defined(USE_CURL_DLOPEN)
 
+extern cvar_t* cl_cURLLib;
+
 #ifdef WIN32
-#define DEFAULT_CURL_LIB "libcurl-4.dll"
+#define DEFAULT_CURL_LIB "libcurl.dll"
 #elif defined(MACOS_X)
 #define DEFAULT_CURL_LIB "libcurl.dylib"
 #else
