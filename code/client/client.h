@@ -31,7 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/bg_public.h"
 
 #define USE_CURL
-// note: we REALLY don't want to use a dll for curl, but the .lib is SO bloated  :/
+// note: we REALLY don't want to use a dll for curl, but the .lib is SO bloated  >:(
+//#define CURL_STATICLIB
 #define USE_CURL_DLOPEN
 #include "cl_curl.h"
 
