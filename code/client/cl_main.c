@@ -2495,7 +2495,9 @@ void CL_Init( void ) {
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 #if defined(USE_CURL)
 	cl_dlURL = Cvar_Get( "cl_dlURL", "", 0 );
+#if defined(USE_CURL_DLOPEN)
 	cl_cURLLib = Cvar_Get( "cl_cURLLib", DEFAULT_CURL_LIB, 0 );
+#endif
 #endif
 
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);

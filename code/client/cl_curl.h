@@ -29,6 +29,10 @@ extern cvar_t *cl_cURLLib;
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 
+#include "../libcurl/curl/curl.h"
+
+#if defined(USE_CURL_DLOPEN)
+
 #ifdef WIN32
 #define DEFAULT_CURL_LIB "libcurl-4.dll"
 #elif defined(MACOS_X)
@@ -37,10 +41,6 @@ extern cvar_t *cl_cURLLib;
 #define DEFAULT_CURL_LIB "libcurl.so.3"
 #endif
 
-#include "../libcurl/curl/curl.h"
-
-
-#if defined(USE_CURL_DLOPEN)
 extern char* (*qcurl_version)(void);
 
 extern CURL* (*qcurl_easy_init)(void);
