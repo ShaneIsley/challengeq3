@@ -2257,7 +2257,7 @@ static shader_t *FinishShader( void ) {
 			ri.Printf( PRINT_DEVELOPER, "WARNING: shader '%s' has VERTEX forced lightmap!\n", shader.name );
 		} else {
 			ri.Printf( PRINT_DEVELOPER, "WARNING: shader '%s' has lightmap but no lightmap stage!\n", shader.name );
-  			shader.lightmapIndex = LIGHTMAP_NONE;
+			shader.lightmapIndex = LIGHTMAP_NONE;
 		}
 	}
 
