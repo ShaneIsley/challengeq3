@@ -18,6 +18,8 @@ added support for curl
 
 improved some network stuff (buffer sizes and TOS)
 
+added support for mouse5-mouse8
+
 
 1 May 07
 
