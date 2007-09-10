@@ -241,22 +241,20 @@ RE_SetColor
 Passing NULL will set the color to white
 =============
 */
-void	RE_SetColor( const float *rgba ) {
-	setColorCommand_t	*cmd;
+void RE_SetColor( const float* rgba )
+{
+	setColorCommand_t* cmd;
 
-  if ( !tr.registered ) {
-    return;
-  }
+	if ( !tr.registered )
+		return;
+
 	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
 	if ( !cmd ) {
 		return;
 	}
 	cmd->commandId = RC_SET_COLOR;
-	if ( !rgba ) {
-		static float colorWhite[4] = { 1, 1, 1, 1 };
-
+	if ( !rgba )
 		rgba = colorWhite;
-	}
 
 	cmd->color[0] = rgba[0];
 	cmd->color[1] = rgba[1];
