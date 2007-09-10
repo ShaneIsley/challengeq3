@@ -1,6 +1,8 @@
 
 Sep 07
 
+increased default MAX_POLYS to 8K and MAX_POLYVERTS to 32K
+
 released as 1.34, since it was about time we did  :P
 
 
