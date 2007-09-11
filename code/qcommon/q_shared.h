@@ -323,17 +323,14 @@ extern	vec3_t	bytedirs[NUMVERTEXNORMALS];
 #define	GIANTCHAR_WIDTH		32
 #define	GIANTCHAR_HEIGHT	48
 
-extern	vec4_t		colorBlack;
-extern	vec4_t		colorRed;
-extern	vec4_t		colorGreen;
-extern	vec4_t		colorBlue;
-extern	vec4_t		colorYellow;
-extern	vec4_t		colorMagenta;
-extern	vec4_t		colorCyan;
-extern	vec4_t		colorWhite;
-extern	vec4_t		colorLtGrey;
-extern	vec4_t		colorMdGrey;
-extern	vec4_t		colorDkGrey;
+extern const vec4_t colorBlack;
+extern const vec4_t colorRed;
+extern const vec4_t colorGreen;
+extern const vec4_t colorYellow;
+extern const vec4_t colorBlue;
+extern const vec4_t colorPink;
+extern const vec4_t colorCyan;
+extern const vec4_t colorWhite;
 
 #define Q_COLOR_ESCAPE	'^'
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE )
@@ -369,8 +366,8 @@ extern const vec4_t	g_color_table[MAX_CCODES];
 
 struct cplane_s;
 
-extern	vec3_t	vec3_origin;
-extern	vec3_t	axisDefault[3];
+extern const vec3_t vec3_origin;
+extern const vec3_t axisDefault[3];
 
 #define	nanmask (255<<23)
 
@@ -1159,7 +1156,6 @@ typedef enum {
 	CA_CINEMATIC		// playing a cinematic or a static pic, not connected to a server
 } connstate_t;
 
-// font support 
 
 #define GLYPH_START 0
 #define GLYPH_END 255

@@ -31,32 +31,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "q_shared.h"
 
-vec3_t	vec3_origin = {0,0,0};
-vec3_t	axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+const vec3_t vec3_origin = { 0, 0, 0 };
+const vec3_t axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
 
-vec4_t		colorBlack	= {0, 0, 0, 1};
-vec4_t		colorRed	= {1, 0, 0, 1};
-vec4_t		colorGreen	= {0, 1, 0, 1};
-vec4_t		colorBlue	= {0, 0, 1, 1};
-vec4_t		colorYellow	= {1, 1, 0, 1};
-vec4_t		colorMagenta= {1, 0, 1, 1};
-vec4_t		colorCyan	= {0, 1, 1, 1};
-vec4_t		colorWhite	= {1, 1, 1, 1};
-vec4_t		colorLtGrey	= {0.75, 0.75, 0.75, 1};
-vec4_t		colorMdGrey	= {0.5, 0.5, 0.5, 1};
-vec4_t		colorDkGrey	= {0.25, 0.25, 0.25, 1};
+const vec4_t colorBlack  = { 0, 0, 0, 1 };
+const vec4_t colorRed    = { 1, 0, 0, 1 };
+const vec4_t colorGreen  = { 0, 1, 0, 1 };
+const vec4_t colorYellow = { 1, 1, 0, 1 };
+const vec4_t colorBlue   = { 0.2f, 0.2f, 1, 1 }; // blue is impure because its intensity is so poor otherwise
+const vec4_t colorPink   = { 1, 0, 1, 1 };
+const vec4_t colorCyan   = { 0, 1, 1, 1 };
+const vec4_t colorWhite  = { 1, 1, 1, 1 };
 
-const vec4_t g_color_table[MAX_CCODES] = 
+const vec4_t g_color_table[MAX_CCODES] =
 {
-	{0.00000f, 0.00000f, 0.00000f, 1.00000f},	// 0 iD colours
-	{1.00000f, 0.00000f, 0.00000f, 1.00000f},	// 1 |
-	{0.00000f, 1.00000f, 0.00000f, 1.00000f},	// 2 v
-	{1.00000f, 1.00000f, 0.00000f, 1.00000f},	// 3
-	{0.00000f, 0.00000f, 1.00000f, 1.00000f},	// 4
-	{0.00000f, 1.00000f, 1.00000f, 1.00000f},	// 5
-	{1.00000f, 0.00000f, 1.00000f, 1.00000f},	// 6 ^
-	{1.00000f, 1.00000f, 1.00000f, 1.00000f},	// 7 |
+	{ 0, 0, 0, 1 },
+	{ 1, 0, 0, 1 },
+	{ 0, 1, 0, 1 },
+	{ 1, 1, 0, 1 },
+	{ 0.2f, 0.2f, 1, 1 },
+	{ 1, 0, 1, 1 },
+	{ 0, 1, 1, 1 },
+	{ 1, 1, 1, 1 },
 	{1.00000f, 0.50000f, 0.00000f, 1.00000f},	// 8
 	{0.60000f, 0.60000f, 1.00000f, 1.00000f},	// 9
 
