@@ -24,6 +24,7 @@ added support for mouse5-mouse8
 1 May 07
 
 remove broken useless cl_freezeDemo and make demo pausing work
+just use timescale 0
 
 
 27 Apr 07
