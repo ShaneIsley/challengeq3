@@ -468,7 +468,7 @@ SV_ClipToEntity
 void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, int capsule ) {
 	sharedEntity_t	*touch;
 	clipHandle_t	clipHandle;
-	float			*origin, *angles;
+	const float		*origin, *angles;
 
 	touch = SV_GentityNum( entityNum );
 
@@ -514,7 +514,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 	int			passOwnerNum;
 	trace_t		trace;
 	clipHandle_t	clipHandle;
-	float		*origin, *angles;
+	const float		*origin, *angles;
 
 	num = SV_AreaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
 
@@ -597,7 +597,7 @@ Moves the given mins/maxs volume through the world from start to end.
 passEntityNum and entities owned by passEntityNum are explicitly not checked.
 ==================
 */
-void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule ) {
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule ) {
 	moveclip_t	clip;
 	int			i;
 
@@ -660,7 +660,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 	int			i, num;
 	int			contents, c2;
 	clipHandle_t	clipHandle;
-	float		*angles;
+	const float		*angles;
 
 	// get base contents from world
 	contents = CM_PointContents( p, 0 );
