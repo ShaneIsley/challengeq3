@@ -26,27 +26,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __GLW_WIN_H__
 #define __GLW_WIN_H__
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 typedef struct
 {
-	WNDPROC		wndproc;
-
 	HDC     hDC;			// handle to device context
 	HGLRC   hGLRC;			// handle to GL rendering context
-
 	HINSTANCE hinstOpenGL;	// HINSTANCE for the OpenGL library
 
-	qboolean allowdisplaydepthchange;
-	qboolean pixelFormatSet;
+	int desktopWidth, desktopHeight, desktopBPP;
+
+	qbool cdsFullscreen;
+	qbool pixelFormatSet;
 	int nPendingPF;
 
-	int		 desktopBitsPixel;
-	int		 desktopWidth, desktopHeight;
-
-	qboolean	cdsFullscreen;
-
-	FILE *log_fp;
+	FILE* log_fp;
 } glwstate_t;
 
 extern glwstate_t glw_state;
+
+extern void WG_CheckHardwareGamma();
+extern void WG_RestoreGamma();
+
+#if defined(__cplusplus)
+};
+#endif
 
 #endif
