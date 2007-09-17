@@ -900,7 +900,7 @@ void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( const netadr_t& from, msg_t* msg );
-qbool SV_GameCommand( void );
+qbool SV_GameCommand();
 
 
 //
