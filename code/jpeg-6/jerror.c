@@ -19,8 +19,6 @@
 #include "jversion.h"
 #include "jerror.h"
 
-#include "../renderer/tr_local.h"
-
 #ifndef EXIT_FAILURE		/* define exit() codes if not provided */
 #define EXIT_FAILURE  1
 #endif
@@ -44,53 +42,6 @@ const char * const jpeg_std_message_table[] = {
 #include "jerror.h"
   NULL
 };
-
-
-/*
- * Error exit handler: must not return to caller.
- *
- * Applications may override this if they want to get control back after
- * an error.  Typically one would longjmp somewhere instead of exiting.
- * The setjmp buffer can be made a private field within an expanded error
- * handler object.  Note that the info needed to generate an error message
- * is stored in the error object, so you can generate the message now or
- * later, at your convenience.
- * You should make sure that the JPEG object is cleaned up (with jpeg_abort
- * or jpeg_destroy) at some point.
- */
-
-METHODDEF void
-error_exit (j_common_ptr cinfo)
-{
-  char buffer[JMSG_LENGTH_MAX];
-
-  /* Create the message */
-  (*cinfo->err->format_message) (cinfo, buffer);
-
-  /* Let the memory manager delete any temp files before we die */
-  jpeg_destroy(cinfo);
-
-  ri.Error( ERR_FATAL, "%s\n", buffer );
-}
-
-
-/*
- * Actual output of an error or trace message.
- * Applications may override this method to send JPEG messages somewhere
- * other than stderr.
- */
-
-METHODDEF void
-output_message (j_common_ptr cinfo)
-{
-  char buffer[JMSG_LENGTH_MAX];
-
-  /* Create the message */
-  (*cinfo->err->format_message) (cinfo, buffer);
-
-  /* Send it to stderr, adding a newline */
-  ri.Printf(PRINT_ALL, "%s\n", buffer);
-}
 
 
 /*
@@ -195,6 +146,9 @@ reset_error_mgr (j_common_ptr cinfo)
   /* trace_level is not reset since it is an application-supplied parameter */
   cinfo->err->msg_code = 0;	/* may be useful as a flag for "no error" */
 }
+
+extern void error_exit( j_common_ptr cinfo );
+extern void output_message( j_common_ptr cinfo );
 
 
 /*

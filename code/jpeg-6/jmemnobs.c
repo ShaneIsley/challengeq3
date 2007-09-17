@@ -20,45 +20,6 @@
 #include "jpeglib.h"
 #include "jmemsys.h"		/* import the system-dependent declarations */
 
-#include "../renderer/tr_local.h"
-
-/*
- * Memory allocation and ri.Freeing are controlled by the regular library
- * routines ri.Malloc() and ri.Free().
- */
-
-GLOBAL void *
-jpeg_get_small (j_common_ptr cinfo, size_t sizeofobject)
-{
-  return (void *) ri.Malloc(sizeofobject);
-}
-
-GLOBAL void
-jpeg_free_small (j_common_ptr cinfo, void * object, size_t sizeofobject)
-{
-  ri.Free(object);
-}
-
-
-/*
- * "Large" objects are treated the same as "small" ones.
- * NB: although we include FAR keywords in the routine declarations,
- * this file won't actually work in 80x86 small/medium model; at least,
- * you probably won't be able to process useful-size images in only 64KB.
- */
-
-GLOBAL void FAR *
-jpeg_get_large (j_common_ptr cinfo, size_t sizeofobject)
-{
-  return (void FAR *) ri.Malloc(sizeofobject);
-}
-
-GLOBAL void
-jpeg_free_large (j_common_ptr cinfo, void FAR * object, size_t sizeofobject)
-{
-  ri.Free(object);
-}
-
 
 /*
  * This routine computes the total memory space available for allocation.
