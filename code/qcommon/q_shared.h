@@ -49,6 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 typedef int qbool;
 const qbool qfalse = 0;
 const qbool qtrue = !0;
+typedef qbool qboolean;
 
 
 #ifdef _MSC_VER
