@@ -47,9 +47,9 @@ int AAS_LoadMap(const char *mapname);
 int AAS_StartFrame(float time);
 #endif //AASINTERN
 
-//returns true if AAS is initialized
+//returns qtrue if AAS is initialized
 int AAS_Initialized(void);
-//returns true if the AAS file is loaded
+//returns qtrue if the AAS file is loaded
 int AAS_Loaded(void);
 //returns the model name from the given index
 char *AAS_ModelFromIndex(int index);

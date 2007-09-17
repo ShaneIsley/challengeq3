@@ -42,9 +42,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdarg.h>
 #include "l_memory.h"
 #include "l_script.h"
-
-typedef enum {qfalse, qtrue}	qboolean;
-
 #endif //SCREWUP
 
 #ifdef BOTLIB
@@ -64,9 +61,6 @@ typedef enum {qfalse, qtrue}	qboolean;
 #include "l_script.h"
 #include "l_memory.h"
 #include "l_log.h"
-
-#define qtrue	true
-#define qfalse	false
 #endif //MEQCC
 
 #ifdef BSPC
@@ -74,9 +68,6 @@ typedef enum {qfalse, qtrue}	qboolean;
 #include "../bspc/qbsp.h"
 #include "../bspc/l_log.h"
 #include "../bspc/l_mem.h"
-
-#define qtrue	true
-#define qfalse	false
 #endif //BSPC
 
 
@@ -1233,7 +1224,7 @@ void ResetScript(script_t *script)
 	Com_Memset(&script->token, 0, sizeof(token_t));
 } //end of the function ResetScript
 //============================================================================
-// returns true if at the end of the script
+// returns qtrue if at the end of the script
 //
 // Parameter:				-
 // Returns:					-

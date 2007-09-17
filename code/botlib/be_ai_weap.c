@@ -134,7 +134,7 @@ static weaponconfig_t *weaponconfig;
 // Returns:					-
 // Changes Globals:		-
 //========================================================================
-int BotValidWeaponNumber(int weaponnum)
+static qbool BotValidWeaponNumber(int weaponnum)
 {
 	if (weaponnum <= 0 || weaponnum > weaponconfig->numweapons)
 	{
@@ -467,7 +467,7 @@ int BotAllocWeaponState(void)
 	{
 		if (!botweaponstates[i])
 		{
-			botweaponstates[i] = GetClearedMemory(sizeof(bot_weaponstate_t));
+			botweaponstates[i] = (bot_weaponstate_t*)GetClearedMemory(sizeof(bot_weaponstate_t));
 			return i;
 		} //end if
 	} //end for

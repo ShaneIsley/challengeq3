@@ -165,7 +165,7 @@ typedef struct aas_routingupdate_s
 	vec3_t start;								//start point the area was entered
 	unsigned short int tmptraveltime;			//temporary travel time
 	unsigned short int *areatraveltimes;		//travel times within the area
-	qboolean inlist;							//true if the update is in the list
+	qbool inlist;							//qtrue if the update is in the list
 	struct aas_routingupdate_s *next;
 	struct aas_routingupdate_s *prev;
 } aas_routingupdate_t;
@@ -193,9 +193,9 @@ typedef struct aas_reachabilityareas_s
 
 typedef struct aas_s
 {
-	int loaded;									//true when an AAS file is loaded
-	int initialized;							//true when AAS has been initialized
-	int savefile;								//set true when file should be saved
+	int loaded;									//qtrue when an AAS file is loaded
+	int initialized;							//qtrue when AAS has been initialized
+	int savefile;								//set qtrue when file should be saved
 	int bspchecksum;
 	//current time
 	float time;

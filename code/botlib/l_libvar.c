@@ -262,7 +262,7 @@ void LibVarSet(char *var_name, char *value)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean LibVarChanged(char *var_name)
+qbool LibVarChanged(char *var_name)
 {
 	libvar_t *v;
 

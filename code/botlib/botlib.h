@@ -128,8 +128,8 @@ typedef struct bsp_surface_s
 //a trace is returned when a box is swept through the world
 typedef struct bsp_trace_s
 {
-	qboolean		allsolid;	// if true, plane is not valid
-	qboolean		startsolid;	// if true, the initial point was in a solid area
+	qbool		allsolid;	// if qtrue, plane is not valid
+	qbool		startsolid;	// if qtrue, the initial point was in a solid area
 	float			fraction;	// time completed, 1.0 = didn't hit anything
 	vec3_t			endpos;		// final position
 	cplane_t		plane;		// surface normal at impact
@@ -177,9 +177,9 @@ typedef struct botlib_import_s
 	//retrieve the contents at the given point
 	int			(*PointContents)(vec3_t point);
 	//check if the point is in potential visible sight
-	int			(*inPVS)(vec3_t p1, vec3_t p2);
+	qbool		(*inPVS)(vec3_t p1, vec3_t p2);
 	//retrieve the BSP entity data lump
-	char		*(*BSPEntityData)(void);
+	const char* (*BSPEntityData)();
 	//
 	void		(*BSPModelMinsMaxsOrigin)(int modelnum, vec3_t angles, vec3_t mins, vec3_t maxs, vec3_t origin);
 	//send a bot client command
@@ -221,8 +221,8 @@ typedef struct aas_export_s
 	//--------------------------------------------
 	int			(*AAS_PointAreaNum)(vec3_t point);
 	int			(*AAS_PointReachabilityAreaIndex)( vec3_t point );
-	int			(*AAS_TraceAreas)(vec3_t start, vec3_t end, int *areas, vec3_t *points, int maxareas);
-	int			(*AAS_BBoxAreas)(vec3_t absmins, vec3_t absmaxs, int *areas, int maxareas);
+	int			(*AAS_TraceAreas)( const vec3_t start, const vec3_t end, int *areas, vec3_t *points, int maxareas);
+	int			(*AAS_BBoxAreas)( const vec3_t absmins, const vec3_t absmaxs, int *areas, int maxareas);
 	int			(*AAS_AreaInfo)( int areanum, struct aas_areainfo_s *info );
 	//--------------------------------------------
 	// be_aas_bspq3.c
@@ -258,7 +258,7 @@ typedef struct aas_export_s
 	int			(*AAS_PredictClientMovement)(struct aas_clientmove_s *move,
 											int entnum, vec3_t origin,
 											int presencetype, int onground,
-											vec3_t velocity, vec3_t cmdmove,
+											const vec3_t velocity, vec3_t cmdmove,
 											int cmdframes,
 											int maxframes, float frametime,
 											int stopevent, int stopareanum, int visualize);

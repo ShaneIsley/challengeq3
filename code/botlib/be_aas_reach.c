@@ -81,7 +81,7 @@ int reach_strafejump;	//strafe jump (just normal jump but further)
 int reach_rocketjump;	//rocket jump
 int reach_bfgjump;		//bfg jump
 int reach_jumppad;		//jump pads
-//if true grapple reachabilities are skipped
+//if qtrue grapple reachabilities are skipped
 int calcgrapplereach;
 //linked reachability
 typedef struct aas_lreachability_s
@@ -592,7 +592,7 @@ int AAS_FallDamageDistance(void)
 {
 	float maxzvelocity, gravity, t;
 
-	maxzvelocity = sqrt(30 * 10000);
+	maxzvelocity = sqrt(float(30 * 10000));
 	gravity = aassettings.phys_gravity;
 	t = maxzvelocity / gravity;
 	return 0.5 * gravity * t * t;
@@ -630,7 +630,7 @@ float AAS_MaxJumpHeight(float phys_jumpvel)
 	return 0.5 * phys_gravity * (phys_jumpvel / phys_gravity) * (phys_jumpvel / phys_gravity);
 } //end of the function MaxJumpHeight
 //===========================================================================
-// returns true if a player can only crouch in the area
+// returns qtrue if a player can only crouch in the area
 //
 // Parameter:				-
 // Returns:					-
@@ -648,7 +648,7 @@ float AAS_MaxJumpDistance(float phys_jumpvel)
 	return phys_maxvelocity * (t + phys_jumpvel / phys_gravity);
 } //end of the function AAS_MaxJumpDistance
 //===========================================================================
-// returns true if a player can only crouch in the area
+// returns qtrue if a player can only crouch in the area
 //
 // Parameter:				-
 // Returns:					-
@@ -715,7 +715,7 @@ int AAS_AreaGrounded(int areanum)
 	return (aasworld.areasettings[areanum].areaflags & AREA_GROUNDED);
 } //end of the function AAS_AreaGround
 //===========================================================================
-// returns true if the area contains ladder faces
+// returns qtrue if the area contains ladder faces
 //
 // Parameter:				-
 // Returns:					-
@@ -777,13 +777,13 @@ unsigned short int AAS_BarrierJumpTravelTime(void)
 	return aassettings.phys_jumpvel / (aassettings.phys_gravity * 0.1);
 } //end op the function AAS_BarrierJumpTravelTime
 //===========================================================================
-// returns true if there already exists a reachability from area1 to area2
+// returns qtrue if there already exists a reachability from area1 to area2
 //
 // Parameter:				-
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_ReachabilityExists(int area1num, int area2num)
+qbool AAS_ReachabilityExists(int area1num, int area2num)
 {
 	aas_lreachability_t *r;
 
@@ -794,7 +794,7 @@ qboolean AAS_ReachabilityExists(int area1num, int area2num)
 	return qfalse;
 } //end of the function AAS_ReachabilityExists
 //===========================================================================
-// returns true if there is a solid just after the end point when going
+// returns qtrue if there is a solid just after the end point when going
 // from start to end
 //
 // Parameter:				-
@@ -1615,7 +1615,7 @@ float VectorDistance(vec3_t v1, vec3_t v2)
 	return VectorLength(dir);
 } //end of the function VectorDistance
 //===========================================================================
-// returns true if the first vector is between the last two vectors
+// returns qtrue if the first vector is between the last two vectors
 //
 // Parameter:				-
 // Returns:					-
@@ -4354,7 +4354,7 @@ void AAS_StoreReachability(void)
 // TRAVEL_FUNCBOB				100%
 //
 // Parameter:			-
-// Returns:				true if NOT finished
+// Returns:				qtrue if NOT finished
 // Changes Globals:		-
 //===========================================================================
 int AAS_ContinueInitReachability(float time)

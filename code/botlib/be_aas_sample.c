@@ -44,6 +44,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "be_aas_funcs.h"
 #include "be_aas_def.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4065) // empty switch()s
+#endif
+
 extern botlib_import_t botimport;
 
 //#define AAS_SAMPLE_DEBUG
@@ -403,7 +407,7 @@ vec_t AAS_BoxOriginDistanceFromPlane(vec3_t normal, vec3_t mins, vec3_t maxs, in
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_AreaEntityCollision(int areanum, vec3_t start, vec3_t end,
+qbool AAS_AreaEntityCollision(int areanum, vec3_t start, vec3_t end,
 										int presencetype, int passent, aas_trace_t *trace)
 {
 	int collision;
@@ -723,7 +727,7 @@ aas_trace_t AAS_TraceClientBBox(vec3_t start, vec3_t end, int presencetype,
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_TraceAreas(vec3_t start, vec3_t end, int *areas, vec3_t *points, int maxareas)
+int AAS_TraceAreas( const vec3_t start, const vec3_t end, int *areas, vec3_t *points, int maxareas)
 {
 	int side, nodenum, tmpplanenum;
 	int numareas;
@@ -923,7 +927,7 @@ int AAS_TraceAreas(vec3_t start, vec3_t end, int *areas, vec3_t *points, int max
 // Returns:					qtrue if the point is within the face boundaries
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_InsideFace(aas_face_t *face, vec3_t pnormal, vec3_t point, float epsilon)
+qbool AAS_InsideFace(aas_face_t *face, vec3_t pnormal, vec3_t point, float epsilon)
 {
 	int i, firstvertex, edgenum;
 	vec3_t v0;
@@ -975,7 +979,7 @@ qboolean AAS_InsideFace(aas_face_t *face, vec3_t pnormal, vec3_t point, float ep
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_PointInsideFace(int facenum, vec3_t point, float epsilon)
+qbool AAS_PointInsideFace(int facenum, vec3_t point, float epsilon)
 {
 	int i, firstvertex, edgenum;
 	vec_t *v1, *v2;
@@ -1124,7 +1128,7 @@ aas_face_t *AAS_TraceEndFace(aas_trace_t *trace)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_BoxOnPlaneSide2(vec3_t absmins, vec3_t absmaxs, aas_plane_t *p)
+static int AAS_BoxOnPlaneSide2( const vec3_t absmins, const vec3_t absmaxs, aas_plane_t *p)
 {
 	int i, sides;
 	float dist1, dist2;
@@ -1220,7 +1224,7 @@ typedef struct
 	int nodenum;		//node found after splitting
 } aas_linkstack_t;
 
-aas_link_t *AAS_AASLinkEntity(vec3_t absmins, vec3_t absmaxs, int entnum)
+aas_link_t *AAS_AASLinkEntity( const vec3_t absmins, const vec3_t absmaxs, int entnum)
 {
 	int side, nodenum;
 	aas_linkstack_t linkstack[128];
@@ -1337,7 +1341,7 @@ aas_link_t *AAS_LinkEntityClientBBox(vec3_t absmins, vec3_t absmaxs, int entnum,
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-int AAS_BBoxAreas(vec3_t absmins, vec3_t absmaxs, int *areas, int maxareas)
+int AAS_BBoxAreas( const vec3_t absmins, const vec3_t absmaxs, int *areas, int maxareas)
 {
 	aas_link_t *linkedareas, *link;
 	int num;

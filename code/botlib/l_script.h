@@ -199,9 +199,9 @@ int PS_ExpectTokenString(script_t *script, char *string);
 int PS_ExpectTokenType(script_t *script, int type, int subtype, token_t *token);
 //expect a token
 int PS_ExpectAnyToken(script_t *script, token_t *token);
-//returns true when the token is available
+//returns qtrue when the token is available
 int PS_CheckTokenString(script_t *script, char *string);
-//returns true an reads the token when a token with the given type is available
+//returns qtrue an reads the token when a token with the given type is available
 int PS_CheckTokenType(script_t *script, int type, int subtype, token_t *token);
 //skip tokens until the given token string is read
 int PS_SkipUntilString(script_t *script, char *string);
@@ -227,7 +227,7 @@ void SetScriptFlags(script_t *script, int flags);
 int GetScriptFlags(script_t *script);
 //reset a script
 void ResetScript(script_t *script);
-//returns true if at the end of the script
+//returns qtrue if at the end of the script
 int EndOfScript(script_t *script);
 //returns a pointer to the punctuation with the given number
 char *PunctuationFromNum(script_t *script, int num);

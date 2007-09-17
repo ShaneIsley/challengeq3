@@ -247,7 +247,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill)
 				return NULL;
 			} //end if
 			//if it's the correct skill
-			if (skill < 0 || token.intvalue == skill)
+			if (skill < 0 || token.intvalue == (unsigned)skill)
 			{
 				foundcharacter = qtrue;
 				ch->skill = token.intvalue;
@@ -302,7 +302,7 @@ bot_character_t *BotLoadCharacterFromFile(char *charfile, int skill)
 					else if (token.type == TT_STRING)
 					{
 						StripDoubleQuotes(token.string);
-						ch->c[index].value.string = GetMemory(strlen(token.string)+1);
+						ch->c[index].value.string = (char*)GetMemory(strlen(token.string)+1);
 						strcpy(ch->c[index].value.string, token.string);
 						ch->c[index].type = CT_STRING;
 					} //end else if

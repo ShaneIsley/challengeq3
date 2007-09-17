@@ -520,7 +520,7 @@ int AAS_WriteAASLump(fileHandle_t fp, aas_header_t *h, int lumpnum, void *data, 
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_WriteAASFile(char *filename)
+qbool AAS_WriteAASFile(char *filename)
 {
 	aas_header_t header;
 	fileHandle_t fp;

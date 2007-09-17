@@ -73,7 +73,7 @@ typedef struct bsp_entity_s
 //id Sofware BSP data
 typedef struct bsp_s
 {
-	//true when bsp file is loaded
+	//qtrue when bsp file is loaded
 	int loaded;
 	//entity data
 	int entdatasize;
@@ -167,7 +167,7 @@ int AAS_PointContents(vec3_t point)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_EntityCollision(int entnum,
+qbool AAS_EntityCollision(int entnum,
 					vec3_t start, vec3_t boxmins, vec3_t boxmaxs, vec3_t end,
 								int contentmask, bsp_trace_t *trace)
 {
@@ -182,24 +182,24 @@ qboolean AAS_EntityCollision(int entnum,
 	return qfalse;
 } //end of the function AAS_EntityCollision
 //===========================================================================
-// returns true if in Potentially Hearable Set
+// returns qtrue if in Potentially Hearable Set
 //
 // Parameter:				-
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_inPVS(vec3_t p1, vec3_t p2)
+qbool AAS_inPVS(vec3_t p1, vec3_t p2)
 {
 	return botimport.inPVS(p1, p2);
 } //end of the function AAS_InPVS
 //===========================================================================
-// returns true if in Potentially Visible Set
+// returns qtrue if in Potentially Visible Set
 //
 // Parameter:				-
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-qboolean AAS_inPHS(vec3_t p1, vec3_t p2)
+qbool AAS_inPHS(vec3_t p1, vec3_t p2)
 {
 	return qtrue;
 } //end of the function AAS_inPHS
