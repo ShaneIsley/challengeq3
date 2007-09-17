@@ -14,79 +14,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug TA|Win32"
-			OutputDirectory=".\build\botlib_debug_ta"
-			IntermediateDirectory=".\build\botlib_debug_ta"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;BOTLIB;DEBUG"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\botlib.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\botlib.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\build\botlib_release"
 			IntermediateDirectory=".\build\botlib_release"
@@ -118,7 +45,6 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;BOTLIB"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\botlib.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -307,79 +233,6 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
-		<Configuration
-			Name="Release TA|Win32"
-			OutputDirectory=".\build\botlib_release_ta"
-			IntermediateDirectory=".\build\botlib_release_ta"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;BOTLIB"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\botlib.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				WarningLevel="4"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\botlib.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -392,23 +245,13 @@
 				RelativePath="..\..\botlib\be_aas_bspq3.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -418,6 +261,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -429,15 +273,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -445,23 +281,13 @@
 				RelativePath="..\..\botlib\be_aas_cluster.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -471,6 +297,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -482,15 +309,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -498,23 +317,13 @@
 				RelativePath="..\..\botlib\be_aas_debug.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -524,6 +333,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -535,15 +345,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -551,23 +353,13 @@
 				RelativePath="..\..\botlib\be_aas_entity.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -577,6 +369,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -588,15 +381,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -604,23 +389,13 @@
 				RelativePath="..\..\botlib\be_aas_file.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -630,6 +405,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -641,15 +417,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -657,23 +425,13 @@
 				RelativePath="..\..\botlib\be_aas_main.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -683,6 +441,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -694,15 +453,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -710,23 +461,13 @@
 				RelativePath="..\..\botlib\be_aas_move.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -736,6 +477,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -747,15 +489,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -763,23 +497,13 @@
 				RelativePath="..\..\botlib\be_aas_optimize.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -789,6 +513,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -800,15 +525,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -816,23 +533,13 @@
 				RelativePath="..\..\botlib\be_aas_reach.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -842,6 +549,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -853,15 +561,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -869,23 +569,13 @@
 				RelativePath="..\..\botlib\be_aas_route.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -895,6 +585,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -906,15 +597,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -922,23 +605,13 @@
 				RelativePath="..\..\botlib\be_aas_routealt.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -948,6 +621,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -959,15 +633,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -975,23 +641,13 @@
 				RelativePath="..\..\botlib\be_aas_sample.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1001,6 +657,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1012,15 +669,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1028,23 +677,13 @@
 				RelativePath="..\..\botlib\be_ai_char.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1054,6 +693,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1065,15 +705,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1081,23 +713,13 @@
 				RelativePath="..\..\botlib\be_ai_chat.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1107,6 +729,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1118,15 +741,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1134,23 +749,13 @@
 				RelativePath="..\..\botlib\be_ai_gen.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1160,6 +765,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1171,15 +777,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1187,23 +785,13 @@
 				RelativePath="..\..\botlib\be_ai_goal.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1213,6 +801,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1224,15 +813,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1240,23 +821,13 @@
 				RelativePath="..\..\botlib\be_ai_move.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1266,6 +837,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1277,15 +849,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1293,23 +857,13 @@
 				RelativePath="..\..\botlib\be_ai_weap.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1319,6 +873,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1330,15 +885,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1346,23 +893,13 @@
 				RelativePath="..\..\botlib\be_ai_weight.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1372,6 +909,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1383,15 +921,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1399,23 +929,13 @@
 				RelativePath="..\..\botlib\be_ea.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1425,6 +945,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1436,15 +957,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1452,23 +965,13 @@
 				RelativePath="..\..\botlib\be_interface.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1478,6 +981,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1489,15 +993,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1505,23 +1001,13 @@
 				RelativePath="..\..\botlib\l_crc.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1531,6 +1017,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1542,15 +1029,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1558,23 +1037,13 @@
 				RelativePath="..\..\botlib\l_libvar.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1584,6 +1053,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1595,15 +1065,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1611,23 +1073,13 @@
 				RelativePath="..\..\botlib\l_log.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1637,6 +1089,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1648,15 +1101,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1664,23 +1109,13 @@
 				RelativePath="..\..\botlib\l_memory.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1690,6 +1125,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1701,15 +1137,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1717,23 +1145,13 @@
 				RelativePath="..\..\botlib\l_precomp.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1743,6 +1161,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1754,15 +1173,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1770,23 +1181,13 @@
 				RelativePath="..\..\botlib\l_script.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1796,6 +1197,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1807,15 +1209,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1823,23 +1217,13 @@
 				RelativePath="..\..\botlib\l_struct.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1849,6 +1233,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1860,15 +1245,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>

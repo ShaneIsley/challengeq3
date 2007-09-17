@@ -14,79 +14,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug TA|Win32"
-			OutputDirectory=".\build\renderer_debug_ta"
-			IntermediateDirectory=".\build\renderer_debug_ta"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\renderer.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\renderer.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\build\renderer_release"
 			IntermediateDirectory=".\build\renderer_release"
@@ -118,7 +45,6 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\renderer.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -206,79 +132,6 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)\renderer.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release TA|Win32"
-			OutputDirectory=".\build\renderer_release_ta"
-			IntermediateDirectory=".\build\renderer_release_ta"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\renderer.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				WarningLevel="4"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
 			/>
 			<Tool
@@ -395,23 +248,13 @@
 				RelativePath="..\..\renderer\tr_animation.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -423,15 +266,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -441,6 +276,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -448,23 +284,13 @@
 				RelativePath="..\..\renderer\tr_backend.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -476,15 +302,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -494,6 +312,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -501,23 +320,13 @@
 				RelativePath="..\..\renderer\tr_bsp.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -529,15 +338,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -547,6 +348,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -554,23 +356,13 @@
 				RelativePath="..\..\renderer\tr_cmds.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -582,15 +374,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -600,6 +384,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -607,23 +392,13 @@
 				RelativePath="..\..\renderer\tr_curve.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -635,15 +410,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -653,6 +420,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -660,23 +428,13 @@
 				RelativePath="..\..\renderer\tr_flares.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -688,15 +446,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -706,6 +456,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -713,23 +464,14 @@
 				RelativePath="..\..\renderer\tr_font.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
+						AdditionalIncludeDirectories="C:\tmp\freetype-2.3.5\include"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -738,18 +480,11 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
+						AdditionalIncludeDirectories="C:\tmp\freetype-2.3.5\include"
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -759,6 +494,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -766,23 +502,13 @@
 				RelativePath="..\..\renderer\tr_image.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -794,15 +520,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -812,6 +530,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -819,23 +538,13 @@
 				RelativePath="..\..\renderer\tr_init.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -847,15 +556,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -865,6 +566,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -872,23 +574,13 @@
 				RelativePath="..\..\renderer\tr_light.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -900,15 +592,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -918,6 +602,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -925,23 +610,13 @@
 				RelativePath="..\..\renderer\tr_main.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -953,15 +628,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -971,6 +638,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -978,23 +646,13 @@
 				RelativePath="..\..\renderer\tr_marks.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1006,15 +664,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1024,6 +674,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1031,23 +682,13 @@
 				RelativePath="..\..\renderer\tr_mesh.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1059,15 +700,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1077,6 +710,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1084,23 +718,13 @@
 				RelativePath="..\..\renderer\tr_model.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1112,15 +736,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1130,6 +746,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1137,23 +754,13 @@
 				RelativePath="..\..\renderer\tr_noise.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1165,15 +772,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1183,6 +782,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1190,23 +790,13 @@
 				RelativePath="..\..\renderer\tr_scene.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1218,15 +808,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1236,6 +818,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1243,23 +826,13 @@
 				RelativePath="..\..\renderer\tr_shade.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1271,15 +844,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1289,6 +854,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1296,23 +862,13 @@
 				RelativePath="..\..\renderer\tr_shade_calc.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1324,15 +880,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1342,6 +890,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1349,23 +898,13 @@
 				RelativePath="..\..\renderer\tr_shader.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1377,15 +916,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1395,6 +926,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1402,23 +934,13 @@
 				RelativePath="..\..\renderer\tr_shadows.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1430,15 +952,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1448,6 +962,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1455,23 +970,13 @@
 				RelativePath="..\..\renderer\tr_sky.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1483,15 +988,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1501,6 +998,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1508,23 +1006,13 @@
 				RelativePath="..\..\renderer\tr_surface.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1536,15 +1024,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1554,6 +1034,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1561,23 +1042,13 @@
 				RelativePath="..\..\renderer\tr_world.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1589,15 +1060,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1607,6 +1070,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1614,23 +1078,13 @@
 				RelativePath="..\..\win32\win_gamma.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1642,15 +1096,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1660,6 +1106,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1667,23 +1114,13 @@
 				RelativePath="..\..\win32\win_glimp.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1695,15 +1132,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1713,6 +1142,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1720,23 +1150,13 @@
 				RelativePath="..\..\win32\win_qgl.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="1"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1748,15 +1168,7 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="1"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1766,6 +1178,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
+						CompileAs="1"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1823,22 +1236,11 @@
 			Name="jpeg"
 			>
 			<Filter
-				Name="Source Files No. 1"
+				Name="Source Files"
 				>
 				<File
 					RelativePath="..\..\jpeg-6\jcapimin.c"
 					>
-					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Win32"
 						>
@@ -1857,15 +1259,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -1882,17 +1275,6 @@
 					RelativePath="..\..\jpeg-6\jccoefct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -1910,15 +1292,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -1935,17 +1308,6 @@
 					RelativePath="..\..\jpeg-6\jccolor.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -1963,15 +1325,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -1988,17 +1341,6 @@
 					RelativePath="..\..\jpeg-6\jcdctmgr.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2016,15 +1358,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2041,17 +1374,6 @@
 					RelativePath="..\..\jpeg-6\jchuff.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2069,15 +1391,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2094,17 +1407,6 @@
 					RelativePath="..\..\jpeg-6\jcinit.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2122,15 +1424,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2147,17 +1440,6 @@
 					RelativePath="..\..\jpeg-6\jcmainct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2175,15 +1457,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2200,17 +1473,6 @@
 					RelativePath="..\..\jpeg-6\jcmarker.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2228,15 +1490,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2253,17 +1506,6 @@
 					RelativePath="..\..\jpeg-6\jcmaster.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2281,15 +1523,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2306,17 +1539,6 @@
 					RelativePath="..\..\jpeg-6\jcomapi.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2334,15 +1556,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2359,17 +1572,6 @@
 					RelativePath="..\..\jpeg-6\jcparam.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2387,15 +1589,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2412,17 +1605,6 @@
 					RelativePath="..\..\jpeg-6\jcphuff.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2440,15 +1622,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2465,17 +1638,6 @@
 					RelativePath="..\..\jpeg-6\jcprepct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2493,15 +1655,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2518,17 +1671,6 @@
 					RelativePath="..\..\jpeg-6\jcsample.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2546,15 +1688,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2571,17 +1704,6 @@
 					RelativePath="..\..\jpeg-6\jctrans.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2599,15 +1721,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2624,17 +1737,6 @@
 					RelativePath="..\..\jpeg-6\jdapimin.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2652,15 +1754,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2677,17 +1770,6 @@
 					RelativePath="..\..\jpeg-6\jdapistd.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2705,15 +1787,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2730,17 +1803,6 @@
 					RelativePath="..\..\jpeg-6\jdatadst.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2758,15 +1820,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2783,17 +1836,6 @@
 					RelativePath="..\..\jpeg-6\jdatasrc.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2811,15 +1853,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2836,17 +1869,6 @@
 					RelativePath="..\..\jpeg-6\jdcoefct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2864,15 +1886,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2889,17 +1902,6 @@
 					RelativePath="..\..\jpeg-6\jdcolor.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2917,15 +1919,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2942,17 +1935,6 @@
 					RelativePath="..\..\jpeg-6\jddctmgr.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -2970,15 +1952,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2995,17 +1968,6 @@
 					RelativePath="..\..\jpeg-6\jdhuff.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3023,15 +1985,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3048,17 +2001,6 @@
 					RelativePath="..\..\jpeg-6\jdinput.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3076,15 +2018,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3101,17 +2034,6 @@
 					RelativePath="..\..\jpeg-6\jdmainct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3129,15 +2051,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3154,17 +2067,6 @@
 					RelativePath="..\..\jpeg-6\jdmarker.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3182,15 +2084,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3207,17 +2100,6 @@
 					RelativePath="..\..\jpeg-6\jdmaster.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3235,15 +2117,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3260,17 +2133,6 @@
 					RelativePath="..\..\jpeg-6\jdpostct.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3288,15 +2150,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3313,17 +2166,6 @@
 					RelativePath="..\..\jpeg-6\jdsample.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3341,15 +2183,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3366,17 +2199,6 @@
 					RelativePath="..\..\jpeg-6\jdtrans.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3394,15 +2216,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3419,17 +2232,6 @@
 					RelativePath="..\..\jpeg-6\jerror.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3447,15 +2249,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3472,17 +2265,6 @@
 					RelativePath="..\..\jpeg-6\jfdctflt.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3500,15 +2282,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3525,17 +2298,6 @@
 					RelativePath="..\..\jpeg-6\jidctflt.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3553,15 +2315,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3578,17 +2331,6 @@
 					RelativePath="..\..\jpeg-6\jmemmgr.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3606,15 +2348,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3631,17 +2364,6 @@
 					RelativePath="..\..\jpeg-6\jmemnobs.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3659,15 +2381,6 @@
 							PreprocessorDefinitions=""
 							BasicRuntimeChecks="3"
 							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3684,17 +2397,6 @@
 					RelativePath="..\..\jpeg-6\jutils.c"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="0"
-							PreprocessorDefinitions=""
-							BasicRuntimeChecks="3"
-							BrowseInformation="1"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						>
 						<Tool
@@ -3715,15 +2417,6 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release TA|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							Optimization="2"
-							PreprocessorDefinitions=""
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="vector|Win32"
 						>
 						<Tool
@@ -3735,7 +2428,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Header Files No. 1"
+				Name="Header Files"
 				>
 				<File
 					RelativePath="..\..\jpeg-6\jchuff.h"
@@ -3791,18 +2484,6 @@
 				RelativePath="..\..\ft2\ahangles.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -3822,16 +2503,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3849,18 +2520,6 @@
 				RelativePath="..\..\ft2\ahglobal.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -3880,16 +2539,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3907,18 +2556,6 @@
 				RelativePath="..\..\ft2\ahglyph.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -3938,16 +2575,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3965,18 +2592,6 @@
 				RelativePath="..\..\ft2\ahhint.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -3996,16 +2611,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4023,18 +2628,6 @@
 				RelativePath="..\..\ft2\ahmodule.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4054,16 +2647,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4081,18 +2664,6 @@
 				RelativePath="..\..\ft2\ahoptim.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4112,16 +2683,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4139,18 +2700,6 @@
 				RelativePath="..\..\ft2\ftcalc.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4170,16 +2719,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4197,18 +2736,6 @@
 				RelativePath="..\..\ft2\ftdebug.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4228,16 +2755,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4255,18 +2772,6 @@
 				RelativePath="..\..\ft2\ftextend.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4286,16 +2791,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4313,18 +2808,6 @@
 				RelativePath="..\..\ft2\ftglyph.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4344,16 +2827,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4371,18 +2844,6 @@
 				RelativePath="..\..\ft2\ftgrays.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4402,16 +2863,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4429,18 +2880,6 @@
 				RelativePath="..\..\ft2\ftinit.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4460,16 +2899,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4487,18 +2916,6 @@
 				RelativePath="..\..\ft2\ftlist.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4518,16 +2935,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4545,18 +2952,6 @@
 				RelativePath="..\..\ft2\ftmm.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4576,16 +2971,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4603,18 +2988,6 @@
 				RelativePath="..\..\ft2\ftnames.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4634,16 +3007,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4661,18 +3024,6 @@
 				RelativePath="..\..\ft2\ftobjs.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4692,16 +3043,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4719,18 +3060,6 @@
 				RelativePath="..\..\ft2\ftoutln.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4750,16 +3079,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4777,18 +3096,6 @@
 				RelativePath="..\..\ft2\ftraster.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4808,16 +3115,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4835,18 +3132,6 @@
 				RelativePath="..\..\ft2\ftrend1.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4866,16 +3151,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4893,18 +3168,6 @@
 				RelativePath="..\..\ft2\ftsmooth.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4924,16 +3187,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4951,18 +3204,6 @@
 				RelativePath="..\..\ft2\ftstream.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -4982,16 +3223,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5009,18 +3240,6 @@
 				RelativePath="..\..\ft2\ftsystem.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5040,16 +3259,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5067,18 +3276,6 @@
 				RelativePath="..\..\ft2\sfdriver.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5098,16 +3295,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5125,18 +3312,6 @@
 				RelativePath="..\..\ft2\sfobjs.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5156,16 +3331,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5183,18 +3348,6 @@
 				RelativePath="..\..\ft2\ttcmap.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5214,16 +3367,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5241,18 +3384,6 @@
 				RelativePath="..\..\ft2\ttdriver.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5272,16 +3403,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5299,18 +3420,6 @@
 				RelativePath="..\..\ft2\ttgload.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5330,16 +3439,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5357,18 +3456,6 @@
 				RelativePath="..\..\ft2\ttinterp.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5388,16 +3475,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5415,18 +3492,6 @@
 				RelativePath="..\..\ft2\ttload.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5446,16 +3511,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5473,18 +3528,6 @@
 				RelativePath="..\..\ft2\ttobjs.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5504,16 +3547,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5531,18 +3564,6 @@
 				RelativePath="..\..\ft2\ttpload.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5562,16 +3583,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5589,18 +3600,6 @@
 				RelativePath="..\..\ft2\ttpost.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5620,16 +3619,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5647,18 +3636,6 @@
 				RelativePath="..\..\ft2\ttsbit.c"
 				>
 				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Release|Win32"
 					ExcludedFromBuild="true"
 					>
@@ -5678,16 +3655,6 @@
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -5709,14 +3676,6 @@
 					RelativePath="..\..\ft2\ahangles.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5726,14 +3685,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5753,14 +3704,6 @@
 					RelativePath="..\..\ft2\ahglobal.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5770,14 +3713,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5797,14 +3732,6 @@
 					RelativePath="..\..\ft2\ahglyph.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5814,14 +3741,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5841,14 +3760,6 @@
 					RelativePath="..\..\ft2\ahhint.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5858,14 +3769,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5885,14 +3788,6 @@
 					RelativePath="..\..\ft2\ahloader.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5902,14 +3797,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5929,14 +3816,6 @@
 					RelativePath="..\..\ft2\ahmodule.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5946,14 +3825,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -5973,14 +3844,6 @@
 					RelativePath="..\..\ft2\ahoptim.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -5990,14 +3853,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6017,14 +3872,6 @@
 					RelativePath="..\..\ft2\ahtypes.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6034,14 +3881,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6061,14 +3900,6 @@
 					RelativePath="..\..\ft2\autohint.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6078,14 +3909,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6105,14 +3928,6 @@
 					RelativePath="..\..\ft2\freetype.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6122,14 +3937,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6149,14 +3956,6 @@
 					RelativePath="..\..\ft2\ftbbox.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6166,14 +3965,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6193,14 +3984,6 @@
 					RelativePath="..\..\ft2\ftcalc.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6210,14 +3993,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6237,14 +4012,6 @@
 					RelativePath="..\..\ft2\ftconfig.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6254,14 +4021,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6281,14 +4040,6 @@
 					RelativePath="..\..\ft2\ftdebug.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6298,14 +4049,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6325,14 +4068,6 @@
 					RelativePath="..\..\ft2\ftdriver.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6342,14 +4077,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6369,14 +4096,6 @@
 					RelativePath="..\..\ft2\fterrors.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6386,14 +4105,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6413,14 +4124,6 @@
 					RelativePath="..\..\ft2\ftextend.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6430,14 +4133,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6457,14 +4152,6 @@
 					RelativePath="..\..\ft2\ftglyph.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6474,14 +4161,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6501,14 +4180,6 @@
 					RelativePath="..\..\ft2\ftimage.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6518,14 +4189,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6545,14 +4208,6 @@
 					RelativePath="..\..\ft2\ftlist.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6562,14 +4217,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6589,14 +4236,6 @@
 					RelativePath="..\..\ft2\ftmemory.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6606,14 +4245,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6633,14 +4264,6 @@
 					RelativePath="..\..\ft2\ftmm.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6650,14 +4273,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6677,14 +4292,6 @@
 					RelativePath="..\..\ft2\ftmodule.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6694,14 +4301,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6721,14 +4320,6 @@
 					RelativePath="..\..\ft2\ftnames.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6738,14 +4329,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6765,14 +4348,6 @@
 					RelativePath="..\..\ft2\ftobjs.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6782,14 +4357,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6809,14 +4376,6 @@
 					RelativePath="..\..\ft2\ftoption.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6826,14 +4385,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6853,14 +4404,6 @@
 					RelativePath="..\..\ft2\ftoutln.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6870,14 +4413,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6897,14 +4432,6 @@
 					RelativePath="..\..\ft2\ftrender.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6914,14 +4441,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6941,14 +4460,6 @@
 					RelativePath="..\..\ft2\ftstream.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -6958,14 +4469,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -6985,14 +4488,6 @@
 					RelativePath="..\..\ft2\ftsystem.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7002,14 +4497,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7029,14 +4516,6 @@
 					RelativePath="..\..\ft2\fttypes.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7046,14 +4525,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7073,14 +4544,6 @@
 					RelativePath="..\..\ft2\psnames.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7090,14 +4553,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7117,14 +4572,6 @@
 					RelativePath="..\..\ft2\sfnt.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7134,14 +4581,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7161,14 +4600,6 @@
 					RelativePath="..\..\ft2\t1errors.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7178,14 +4609,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7205,14 +4628,6 @@
 					RelativePath="..\..\ft2\t1tables.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7222,14 +4637,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7249,14 +4656,6 @@
 					RelativePath="..\..\ft2\t1types.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7266,14 +4665,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7293,14 +4684,6 @@
 					RelativePath="..\..\ft2\t2errors.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7310,14 +4693,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7337,14 +4712,6 @@
 					RelativePath="..\..\ft2\t2types.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7354,14 +4721,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7381,14 +4740,6 @@
 					RelativePath="..\..\ft2\ttdriver.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7398,14 +4749,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7425,14 +4768,6 @@
 					RelativePath="..\..\ft2\tterrors.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7442,14 +4777,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7469,14 +4796,6 @@
 					RelativePath="..\..\ft2\ttgload.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7486,14 +4805,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7513,14 +4824,6 @@
 					RelativePath="..\..\ft2\ttinterp.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7530,14 +4833,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7557,14 +4852,6 @@
 					RelativePath="..\..\ft2\ttnameid.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7574,14 +4861,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7601,14 +4880,6 @@
 					RelativePath="..\..\ft2\ttobjs.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7618,14 +4889,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7645,14 +4908,6 @@
 					RelativePath="..\..\ft2\ttpload.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7662,14 +4917,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7689,14 +4936,6 @@
 					RelativePath="..\..\ft2\tttables.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7706,14 +4945,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7733,14 +4964,6 @@
 					RelativePath="..\..\ft2\tttags.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7750,14 +4973,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
@@ -7777,14 +4992,6 @@
 					RelativePath="..\..\ft2\tttypes.h"
 					>
 					<FileConfiguration
-						Name="Debug TA|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
 						Name="Release|Win32"
 						ExcludedFromBuild="true"
 						>
@@ -7794,14 +5001,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Debug|Win32"
-						ExcludedFromBuild="true"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release TA|Win32"
 						ExcludedFromBuild="true"
 						>
 						<Tool
