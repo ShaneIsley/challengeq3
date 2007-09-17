@@ -19,10 +19,7 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-/*
-** WIN_GAMMA.C
-*/
-#include <assert.h>
+
 #include "../renderer/tr_local.h"
 #include "../qcommon/qcommon.h"
 #include "glw_win.h"
@@ -30,21 +27,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static unsigned short s_oldHardwareGamma[3][256];
 
-/*
-** WG_CheckHardwareGamma
-**
-** Determines if the underlying hardware supports the Win32 gamma correction API.
-*/
-void WG_CheckHardwareGamma( void )
+
+void WG_CheckHardwareGamma()
 {
-	HDC hDC;
+	glConfig.deviceSupportsGamma = qfalse;
 
 	if (r_ignorehwgamma->integer)
 		return;
 
-	glConfig.deviceSupportsGamma = qfalse;
-
-	hDC = GetDC( GetDesktopWindow() );
+	HDC hDC = GetDC( GetDesktopWindow() );
 	glConfig.deviceSupportsGamma = GetDeviceGammaRamp( hDC, s_oldHardwareGamma );
 	ReleaseDC( GetDesktopWindow(), hDC );
 
@@ -58,7 +49,7 @@ void WG_CheckHardwareGamma( void )
 			 ( HIBYTE( s_oldHardwareGamma[2][255] ) <= HIBYTE( s_oldHardwareGamma[2][0] ) ) )
 		{
 			glConfig.deviceSupportsGamma = qfalse;
-			ri.Printf( PRINT_WARNING, "WARNING: device has broken gamma support, generated gamma.dat\n" );
+			ri.Printf( PRINT_WARNING, "WARNING: device has broken gamma support\n" );
 		}
 
 		//
@@ -67,11 +58,8 @@ void WG_CheckHardwareGamma( void )
 		//
 		if ( ( HIBYTE( s_oldHardwareGamma[0][181] ) == 255 ) )
 		{
-			int g;
-
 			ri.Printf( PRINT_WARNING, "WARNING: suspicious gamma tables, using linear ramp for restoration\n" );
-
-			for ( g = 0; g < 255; g++ )
+			for (unsigned short g = 0; g < 255; ++g)
 			{
 				s_oldHardwareGamma[0][g] = g << 8;
 				s_oldHardwareGamma[1][g] = g << 8;
@@ -108,20 +96,16 @@ void mapGammaMax( void ) {
 }
 */
 
-/*
-** GLimp_SetGamma
-**
-** This routine should only be called if glConfig.deviceSupportsGamma is TRUE
-*/
-void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned char blue[256] ) {
-	unsigned short table[3][256];
-	int		i, j;
-	int		ret;
-	OSVERSIONINFO	vinfo;
 
-	if ( !glConfig.deviceSupportsGamma || r_ignorehwgamma->integer || !glw_state.hDC ) {
+// this routine should only be called if glConfig.deviceSupportsGamma is TRUE
+
+void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned char blue[256] )
+{
+	unsigned short table[3][256];
+	int i, j;
+
+	if ( !glConfig.deviceSupportsGamma || r_ignorehwgamma->integer || !glw_state.hDC )
 		return;
-	}
 
 //mapGammaMax();
 
@@ -132,6 +116,7 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 	}
 
 	// Win2K puts this odd restriction on gamma ramps...
+	OSVERSIONINFO vinfo;
 	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
 	GetVersionEx( &vinfo );
 	if ( vinfo.dwMajorVersion == 5 && vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT ) {
@@ -150,6 +135,7 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 		Com_DPrintf( "skipping W2K gamma clamp.\n" );
 	}
 
+/* this is either a critical logic failure or unneeded - whichever it is, this is not the way to handle it
 	// enforce constantly increasing
 	for ( j = 0 ; j < 3 ; j++ ) {
 		for ( i = 1 ; i < 256 ; i++ ) {
@@ -158,9 +144,9 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 			}
 		}
 	}
+*/
 
-
-	ret = SetDeviceGammaRamp( glw_state.hDC, table );
+	BOOL ret = SetDeviceGammaRamp( glw_state.hDC, table );
 	if ( !ret ) {
 		Com_Printf( "SetDeviceGammaRamp failed.\n" );
 	}

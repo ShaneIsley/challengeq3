@@ -40,7 +40,10 @@ cvar_t		*r_fullscreen;
 
 LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
-static qboolean s_alttab_disabled;
+static qbool s_alttab_disabled;
+
+
+#pragma warning(disable : 4702) // unreachable code
 
 static void WIN_DisableAltTab( void )
 {
@@ -89,7 +92,7 @@ static void VID_AppActivate(BOOL fActive, BOOL minimize)
 	if (r_fullscreen->integer)
 		SetWindowPos( g_wv.hWnd, fActive ? HWND_TOPMOST : HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 
-	g_wv.isMinimized = minimize;
+	g_wv.isMinimized = (minimize == TRUE);
 
 	Com_DPrintf("VID_AppActivate: %i\n", fActive );
 
@@ -151,7 +154,7 @@ static int MapKey (int key)
 {
 	int result;
 	int modified;
-	qboolean is_extended;
+	qbool is_extended;
 
 //	Com_Printf( "0x%x\n", key);
 
@@ -232,7 +235,7 @@ LONG WINAPI MainWndProc (
     WPARAM  wParam,
     LPARAM  lParam)
 {
-	static qboolean flip = qtrue;
+	static qbool flip = qtrue;
 	int zDelta, i;
 
 	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/winui/windowsuserinterface/userinput/mouseinput/aboutmouseinput.asp

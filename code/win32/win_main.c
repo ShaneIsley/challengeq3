@@ -88,7 +88,7 @@ Sys_LowPhysicalMemory()
 ==================
 */
 
-qboolean Sys_LowPhysicalMemory() {
+qbool Sys_LowPhysicalMemory() {
 	MEMORYSTATUS stat;
   GlobalMemoryStatus (&stat);
 	return (stat.dwTotalPhys <= MEM_THRESHOLD) ? qtrue : qfalse;
@@ -174,12 +174,9 @@ void Sys_Mkdir( const char *path ) {
 	_mkdir (path);
 }
 
-/*
-==============
-Sys_Cwd
-==============
-*/
-char *Sys_Cwd( void ) {
+
+const char* Sys_Cwd()
+{
 	static char cwd[MAX_OSPATH];
 
 	_getcwd( cwd, sizeof( cwd ) - 1 );
@@ -188,23 +185,6 @@ char *Sys_Cwd( void ) {
 	return cwd;
 }
 
-/*
-==============
-Sys_DefaultCDPath
-==============
-*/
-char *Sys_DefaultCDPath( void ) {
-	return "";
-}
-
-/*
-==============
-Sys_DefaultBasePath
-==============
-*/
-char *Sys_DefaultBasePath( void ) {
-	return Sys_Cwd();
-}
 
 /*
 ==============================================================
@@ -263,7 +243,7 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 	_findclose (findhandle);
 }
 
-static qboolean strgtr(const char *s0, const char *s1) {
+static qbool strgtr(const char *s0, const char *s1) {
 	int l0, l1, i;
 
 	l0 = strlen(s0);
@@ -284,7 +264,7 @@ static qboolean strgtr(const char *s0, const char *s1) {
 	return qfalse;
 }
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs ) {
+char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs ) {
 	char		search[MAX_OSPATH];
 	int			nfiles;
 	char		**listCopy;
@@ -305,7 +285,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		if (!nfiles)
 			return NULL;
 
-		listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+		listCopy = (char**)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -358,7 +338,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		return NULL;
 	}
 
-	listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	listCopy = (char**)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -396,78 +376,8 @@ void	Sys_FreeFileList( char **list ) {
 //========================================================
 
 
-/*
-================
-Sys_ScanForCD
-
-Search all the drives to see if there is a valid CD to grab
-the cddir from
-================
-*/
-qboolean Sys_ScanForCD( void ) {
-	static char	cddir[MAX_OSPATH];
-	char		drive[4];
-	FILE		*f;
-	char		test[MAX_OSPATH];
-#if 0
-	// don't override a cdpath on the command line
-	if ( strstr( sys_cmdline, "cdpath" ) ) {
-		return;
-	}
-#endif
-
-	drive[0] = 'c';
-	drive[1] = ':';
-	drive[2] = '\\';
-	drive[3] = 0;
-
-	// scan the drives
-	for ( drive[0] = 'c' ; drive[0] <= 'z' ; drive[0]++ ) {
-		if ( GetDriveType (drive) != DRIVE_CDROM ) {
-			continue;
-		}
-
-		sprintf (cddir, "%s%s", drive, CD_BASEDIR);
-		sprintf (test, "%s\\%s", cddir, CD_EXE);
-		f = fopen( test, "r" );
-		if ( f ) {
-			fclose (f);
-			return qtrue;
-    } else {
-      sprintf(cddir, "%s%s", drive, CD_BASEDIR_LINUX);
-      sprintf(test, "%s\\%s", cddir, CD_EXE_LINUX);
-  		f = fopen( test, "r" );
-	  	if ( f ) {
-		  	fclose (f);
-			  return qtrue;
-      }
-    }
-	}
-
-	return qfalse;
-}
-
-/*
-================
-Sys_CheckCD
-
-Return true if the proper CD is in the drive
-================
-*/
-qboolean	Sys_CheckCD( void ) {
-  // FIXME: mission pack
-  return qtrue;
-	//return Sys_ScanForCD();
-}
-
-
-/*
-================
-Sys_GetClipboardData
-
-================
-*/
-char *Sys_GetClipboardData( void ) {
+char *Sys_GetClipboardData( void )
+{
 	char *data = NULL;
 	char *cliptext;
 
@@ -475,8 +385,8 @@ char *Sys_GetClipboardData( void ) {
 		HANDLE hClipboardData;
 
 		if ( ( hClipboardData = GetClipboardData( CF_TEXT ) ) != 0 ) {
-			if ( ( cliptext = GlobalLock( hClipboardData ) ) != 0 ) {
-				data = Z_Malloc( GlobalSize( hClipboardData ) + 1 );
+			if ( ( cliptext = (char*)GlobalLock( hClipboardData ) ) != 0 ) {
+				data = (char*)Z_Malloc( GlobalSize( hClipboardData ) + 1 );
 				Q_strncpyz( data, cliptext, GlobalSize( hClipboardData ) );
 				GlobalUnlock( hClipboardData );
 				
@@ -507,7 +417,7 @@ void Sys_UnloadDll( void *dllHandle ) {
 	if ( !dllHandle ) {
 		return;
 	}
-	if ( !FreeLibrary( dllHandle ) ) {
+	if ( !FreeLibrary( (HMODULE)dllHandle ) ) {
 		Com_Error (ERR_FATAL, "Sys_UnloadDll FreeLibrary failed");
 	}
 }
@@ -527,17 +437,12 @@ extern char		*FS_BuildOSPath( const char *base, const char *game, const char *qp
 // fqpath will be empty if dll not loaded, otherwise will hold fully qualified path of dll module loaded
 // fqpath buffersize must be at least MAX_QPATH+1 bytes long
 void * QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **entryPoint)(intptr_t, ...),
-				  intptr_t (QDECL *systemcalls)(intptr_t, ...) ) {
-	HINSTANCE	libHandle;
+				  intptr_t (QDECL *systemcalls)(intptr_t, ...) )
+{
 	void	(QDECL *dllEntry)( intptr_t (QDECL *syscallptr)(intptr_t, ...) );
-	char	*basepath;
-	char	*cdpath;
-	char	*gamedir;
-	char	*fn;
 #ifdef NDEBUG
 	static int	lastWarning = 0;
 	int		timestamp;
-  int   ret;
 #endif
 	char	filename[MAX_QPATH];
 
@@ -551,57 +456,39 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **ent
 		&& !Cvar_VariableIntegerValue( "com_blindlyLoadDLLs" ) ) {
 		if (FS_FileExists(filename)) {
 			lastWarning = timestamp;
-			ret = MessageBoxEx( NULL, "You are about to load a .DLL executable that\n"
-				  "has not been verified for use with Quake III Arena.\n"
-				  "This type of file can compromise the security of\n"
-				  "your computer.\n\n"
-				  "Select 'OK' if you choose to load it anyway.",
-				  "Security Warning", MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2 | MB_TOPMOST | MB_SETFOREGROUND,
-				  MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ) );
-			if( ret != IDOK ) {
+			if (IDOK != MessageBoxEx( NULL, "You are about to load a .DLL executable that\n"
+					"has not been verified for use with Quake III Arena.\n"
+					"This type of file can compromise the security of\n"
+					"your computer.\n\n"
+					"Select 'OK' if you choose to load it anyway.",
+					"Security Warning", MB_OKCANCEL | MB_ICONEXCLAMATION | MB_DEFBUTTON2 | MB_TOPMOST | MB_SETFOREGROUND,
+					MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ) ) )
 				return NULL;
-			}
 		}
 	}
 #endif
+
+	HINSTANCE libHandle;
 
 #ifndef NDEBUG
 	libHandle = LoadLibrary( filename );
-  if (libHandle)
-    Com_Printf("LoadLibrary '%s' ok\n", filename);
-  else
-    Com_Printf("LoadLibrary '%s' failed\n", filename);
+	Com_Printf( "LoadLibrary '%s' %s\n", filename, libHandle ? "ok" : "failed" );
 	if ( !libHandle ) {
 #endif
-	basepath = Cvar_VariableString( "fs_basepath" );
-	cdpath = Cvar_VariableString( "fs_cdpath" );
-	gamedir = Cvar_VariableString( "fs_game" );
 
-	fn = FS_BuildOSPath( basepath, gamedir, filename );
-	libHandle = LoadLibrary( fn );
+		const char* basepath = Cvar_VariableString( "fs_basepath" );
+		const char* gamedir = Cvar_VariableString( "fs_game" );
+
+		const char* fn = FS_BuildOSPath( basepath, gamedir, filename );
+		libHandle = LoadLibrary( fn );
+
 #ifndef NDEBUG
-  if (libHandle)
-    Com_Printf("LoadLibrary '%s' ok\n", fn);
-  else
-    Com_Printf("LoadLibrary '%s' failed\n", fn);
+		Com_Printf( "LoadLibrary '%s' %s\n", fn, libHandle ? "ok" : "failed" );
 #endif
 
-	if ( !libHandle ) {
-		if( cdpath[0] ) {
-			fn = FS_BuildOSPath( cdpath, gamedir, filename );
-			libHandle = LoadLibrary( fn );
-#ifndef NDEBUG
-      if (libHandle)
-        Com_Printf("LoadLibrary '%s' ok\n", fn);
-      else
-        Com_Printf("LoadLibrary '%s' failed\n", fn);
-#endif
-		}
-
-		if ( !libHandle ) {
+		if ( !libHandle )
 			return NULL;
-		}
-	}
+
 #ifndef NDEBUG
 	}
 #endif
@@ -655,8 +542,8 @@ void Sys_StreamSeek( fileHandle_t f, int offset, int origin ) {
 typedef struct {
 	fileHandle_t	file;
 	byte	*buffer;
-	qboolean	eof;
-	qboolean	active;
+	qbool	eof;
+	qbool	active;
 	int		bufferSize;
 	int		streamPosition;	// next byte to be returned by Sys_StreamRead
 	int		threadPosition;	// next byte to be read from file
@@ -939,8 +826,9 @@ Sys_GetEvent
 
 ================
 */
-sysEvent_t Sys_GetEvent( void ) {
-    MSG			msg;
+sysEvent_t Sys_GetEvent( void )
+{
+	MSG			msg;
 	sysEvent_t	ev;
 	char		*s;
 	msg_t		netmsg;
@@ -962,17 +850,14 @@ sysEvent_t Sys_GetEvent( void ) {
 		g_wv.sysMsgTime = msg.time;
 
 		TranslateMessage (&msg);
-      	DispatchMessage (&msg);
+		DispatchMessage (&msg);
 	}
 
 	// check for console commands
 	s = Sys_ConsoleInput();
 	if ( s ) {
-		char	*b;
-		int		len;
-
-		len = strlen( s ) + 1;
-		b = Z_Malloc( len );
+		int len = strlen( s ) + 1;
+		char* b = (char*)Z_Malloc( len );
 		Q_strncpyz( b, s, len-1 );
 		Sys_QueEvent( 0, SE_CONSOLE, 0, 0, len, b );
 	}
@@ -980,13 +865,10 @@ sysEvent_t Sys_GetEvent( void ) {
 	// check for network packets
 	MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
 	if ( Sys_GetPacket ( &adr, &netmsg ) ) {
-		netadr_t		*buf;
-		int				len;
-
 		// copy out to a seperate buffer for qeueing
 		// the readcount stepahead is for SOCKS support
-		len = sizeof( netadr_t ) + netmsg.cursize - netmsg.readcount;
-		buf = Z_Malloc( len );
+		int len = sizeof( netadr_t ) + netmsg.cursize - netmsg.readcount;
+		netadr_t* buf = (netadr_t*)Z_Malloc( len );
 		*buf = adr;
 		memcpy( buf+1, &netmsg.data[netmsg.readcount], netmsg.cursize - netmsg.readcount );
 		Sys_QueEvent( 0, SE_PACKET, 0, 0, len, buf );
@@ -1044,11 +926,9 @@ are initialized
 #define OSR2_BUILD_NUMBER 1111
 #define WIN98_BUILD_NUMBER 1998
 
-void Sys_Init( void ) {
-	int cpuid;
-
-	// make sure the timer is high precision, otherwise
-	// NT gets 18ms resolution
+void Sys_Init( void )
+{
+	// make sure the timer is high precision, otherwise NT gets 18ms resolution
 	timeBeginPeriod( 1 );
 
 	Cmd_AddCommand ("in_restart", Sys_In_Restart_f);
@@ -1090,7 +970,6 @@ void Sys_Init( void ) {
 
 	// save out a couple things in rom cvars for the renderer to access
 	Cvar_Get( "win_hinstance", va("%i", (int)g_wv.hInstance), CVAR_ROM );
-	Cvar_Get( "win_wndproc", va("%i", (int)MainWndProc), CVAR_ROM );
 
 	//
 	// figure out our CPU
@@ -1098,76 +977,25 @@ void Sys_Init( void ) {
 	Cvar_Get( "sys_cpustring", "detect", 0 );
 	if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring"), "detect" ) )
 	{
-		Com_Printf( "...detecting CPU, found " );
+		Com_Printf( "CPU: " );
 
-#ifndef __MINGW32__
-		cpuid = Sys_GetProcessorId();
-#else // See comments in win_shared.c
-		cpuid = CPUID_GENERIC;
-#endif
+		int cpuid = Sys_GetProcessorId();
 
 		switch ( cpuid )
 		{
 		case CPUID_GENERIC:
-			Cvar_Set( "sys_cpustring", "generic" );
-			break;
-		case CPUID_INTEL_UNSUPPORTED:
-			Cvar_Set( "sys_cpustring", "x86 (pre-Pentium)" );
-			break;
-		case CPUID_INTEL_PENTIUM:
-			Cvar_Set( "sys_cpustring", "x86 (P5/PPro, non-MMX)" );
-			break;
-		case CPUID_INTEL_MMX:
-			Cvar_Set( "sys_cpustring", "x86 (P5/Pentium2, MMX)" );
-			break;
-		case CPUID_INTEL_KATMAI:
-			Cvar_Set( "sys_cpustring", "Intel Pentium III" );
-			break;
-		case CPUID_AMD_3DNOW:
-			Cvar_Set( "sys_cpustring", "AMD w/ 3DNow!" );
 			break;
 		case CPUID_AXP:
 			Cvar_Set( "sys_cpustring", "Alpha AXP" );
+			break;
+		case CPUID_UNSUPPORTED:
+			Com_Error( ERR_FATAL, "Unsupported cpu type %s\n", Cvar_VariableString( "sys_cpustring" ) );
 			break;
 		default:
 			Com_Error( ERR_FATAL, "Unknown cpu type %d\n", cpuid );
 			break;
 		}
 	}
-	else
-	{
-		Com_Printf( "...forcing CPU type to " );
-		if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "generic" ) )
-		{
-			cpuid = CPUID_GENERIC;
-		}
-		else if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "x87" ) )
-		{
-			cpuid = CPUID_INTEL_PENTIUM;
-		}
-		else if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "mmx" ) )
-		{
-			cpuid = CPUID_INTEL_MMX;
-		}
-		else if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "3dnow" ) )
-		{
-			cpuid = CPUID_AMD_3DNOW;
-		}
-		else if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "PentiumIII" ) )
-		{
-			cpuid = CPUID_INTEL_KATMAI;
-		}
-		else if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring" ), "axp" ) )
-		{
-			cpuid = CPUID_AXP;
-		}
-		else
-		{
-			Com_Printf( "WARNING: unknown sys_cpustring '%s'\n", Cvar_VariableString( "sys_cpustring" ) );
-			cpuid = CPUID_GENERIC;
-		}
-	}
-	Cvar_SetValue( "sys_cpuid", cpuid );
 	Com_Printf( "%s\n", Cvar_VariableString( "sys_cpustring" ) );
 
 	Cvar_Set( "username", Sys_GetCurrentUser() );
@@ -1176,31 +1004,21 @@ void Sys_Init( void ) {
 }
 
 
-qboolean Sys_DetectAltivec( void )
+qbool Sys_DetectAltivec( void )
 {
-    return qfalse;  // never altivec on Windows...at least for now.  :)
+	return qfalse;  // never altivec on Windows...at least for now.  :)
 }
 
 
 
 //=======================================================================
 
-int	totalMsec, countMsec;
 
-/*
-==================
-WinMain
-
-==================
-*/
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-	char		cwd[MAX_OSPATH];
-	int			startTime, endTime;
-
-    // should never get a previous instance in Win32
-    if ( hPrevInstance ) {
-        return 0;
-	}
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+	// should never get a previous instance in Win32
+	if ( hPrevInstance )
+		return 0;
 
 	g_wv.hInstance = hInstance;
 	Q_strncpyz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
@@ -1213,16 +1031,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// get the initial time base
 	Sys_Milliseconds();
-#if 0
-	// if we find the CD, add a +set cddir xxx command line
-	Sys_ScanForCD();
-#endif
 
 	Sys_InitStreamThread();
 
 	Com_Init( sys_cmdline );
 	NET_Init();
 
+	char cwd[MAX_OSPATH];
 	_getcwd (cwd, sizeof(cwd));
 	Com_Printf("Working directory: %s\n", cwd);
 
@@ -1232,20 +1047,15 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		Sys_ShowConsole( 0, qfalse );
 	}
 
-    // main game loop
-	while( 1 ) {
+	int totalMsec = 0, countMsec = 0;
+
+	// main game loop
+	while (qtrue) {
 		// if not running as a game client, sleep a bit
-		if ( g_wv.isMinimized || ( com_dedicated && com_dedicated->integer ) ) {
+		if ( g_wv.isMinimized || ( com_dedicated && com_dedicated->integer ) )
 			Sleep( 5 );
-		}
 
-		// set low precision every frame, because some system calls
-		// reset it arbitrarily
-//		_controlfp( _PC_24, _MCW_PC );
-//    _controlfp( -1, _MCW_EM  ); // no exceptions, even if some crappy
-                                // syscall turns them back on!
-
-		startTime = Sys_Milliseconds();
+		int startTime = Sys_Milliseconds();
 
 		// make sure mouse and joystick are only called once a frame
 		IN_Frame();
@@ -1253,8 +1063,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		// run the game
 		Com_Frame();
 
-		endTime = Sys_Milliseconds();
-		totalMsec += endTime - startTime;
+		totalMsec += Sys_Milliseconds() - startTime;
 		countMsec++;
 	}
 

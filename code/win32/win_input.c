@@ -43,9 +43,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 typedef struct {
 	int			oldButtonState;
 
-	qboolean	mouseActive;
-	qboolean	mouseInitialized;
-  qboolean  mouseStartupDelayed; // delay mouse init to try DI again when we have a window
+	qbool	mouseActive;
+	qbool	mouseInitialized;
+  qbool  mouseStartupDelayed; // delay mouse init to try DI again when we have a window
 } WinMouseVars_t;
 
 static WinMouseVars_t s_wmv;
@@ -75,7 +75,7 @@ static MidiInfo_t s_midiInfo;
 #define	JOY_MAX_AXES		6				// X, Y, Z, R, U, V
 
 typedef struct {
-	qboolean	avail;
+	qbool	avail;
 	int			id;			// joystick number
 	JOYCAPS		jc;
 
@@ -101,7 +101,7 @@ cvar_t	*in_joyBallScale;
 cvar_t	*in_debugJoystick;
 cvar_t	*joy_threshold;
 
-qboolean	in_appactive;
+qbool	in_appactive;
 
 // forward-referenced functions
 void IN_StartupJoystick (void);
@@ -222,7 +222,7 @@ void IN_DIMouse( int *mx, int *my );
 IN_InitDIMouse
 ========================
 */
-qboolean IN_InitDIMouse( void ) {
+qbool IN_InitDIMouse( void ) {
     HRESULT		hr;
 	int			x, y;
 	DIPROPDWORD	dipdw = {
@@ -257,7 +257,7 @@ qboolean IN_InitDIMouse( void ) {
 	}
 
 	// register with DirectInput and get an IDirectInput to play with.
-	hr = DirectInput8Create( g_wv.hInstance, DIRECTINPUT_VERSION, (const GUID *)&IID_IDirectInput8, &g_pdi, NULL);
+	hr = DirectInput8Create( g_wv.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&g_pdi, NULL );
 
 	if (FAILED(hr)) {
 		Com_Printf ("iDirectInputCreate failed\n");
@@ -265,7 +265,7 @@ qboolean IN_InitDIMouse( void ) {
 	}
 
 	// obtain an interface to the system mouse device.
-	hr = IDirectInput_CreateDevice(g_pdi, &GUID_SysMouse, &g_pMouse, NULL);
+	hr = IDirectInput_CreateDevice( g_pdi, GUID_SysMouse, &g_pMouse, NULL );
 
 	if (FAILED(hr)) {
 		Com_Printf ("Couldn't open DI mouse device\n");
@@ -382,8 +382,6 @@ void IN_DIMouse( int *mx, int *my ) {
 	// fetch new events
 	for (;;)
 	{
-		int i;
-
 		dwElements = DX_MOUSE_BUFFER_SIZE;
 
 		hr = IDirectInputDevice_GetDeviceData(g_pMouse, sizeof(DIDEVICEOBJECTDATA), od, &dwElements, 0);
@@ -401,7 +399,7 @@ void IN_DIMouse( int *mx, int *my ) {
 			break;
 		}
 
-		for( i = 0; i < dwElements; i++ ) 
+		for (DWORD i = 0; i < dwElements; ++i)
 		{
 			switch (od[i].dwOfs) {
 			case DIMOFS_BUTTON0:
@@ -678,7 +676,7 @@ The window may have been destroyed and recreated
 between a deactivate and an activate.
 ===========
 */
-void IN_Activate (qboolean active) {
+void IN_Activate (qbool active) {
 	in_appactive = active;
 
 	if ( !active )
@@ -870,10 +868,11 @@ int	joyDirectionKeys[16] = {
 IN_JoyMove
 ===========
 */
-void IN_JoyMove( void ) {
+void IN_JoyMove( void )
+{
 	float	fAxisValue;
-	int		i;
-	DWORD	buttonstate, povstate;
+	UINT i;
+	DWORD buttonstate, povstate;
 	int		x, y;
 
 	// verify joystick is available and that the user wants to use it
@@ -891,7 +890,7 @@ void IN_JoyMove( void ) {
 		// turning off the joystick seems too harsh for 1 read error,
 		// but what should be done?
 		// Com_Printf ("IN_ReadJoystick: no response\n");
-		// joy.avail = false;
+		// joy.avail = qfalse;
 		return;
 	}
 

@@ -29,11 +29,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ** QGL_Init() - loads libraries, assigns function pointers, etc.
 ** QGL_Shutdown() - unloads libraries, NULLs function pointers
 */
-#include <float.h>
-#include "../renderer/tr_local.h"
-#include "glw_win.h"
 
-void QGL_EnableLogging( qboolean enable );
+#include "../qcommon/q_shared.h"
+
+#include <windows.h>
+#include <stdio.h>
+#include <time.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
+
+#include "glw_win.h"
 
 int ( WINAPI * qwglSwapIntervalEXT)( int interval );
 
@@ -749,7 +754,7 @@ static void ( APIENTRY * dllVertex4sv )(const GLshort *v);
 static void ( APIENTRY * dllVertexPointer )(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 static void ( APIENTRY * dllViewport )(GLint x, GLint y, GLsizei width, GLsizei height);
 
-static const char * BooleanToString( GLboolean b )
+static const char* BooleanToString( GLboolean b )
 {
 	if ( b == GL_FALSE )
 		return "GL_FALSE";
@@ -759,117 +764,70 @@ static const char * BooleanToString( GLboolean b )
 		return "OUT OF RANGE FOR BOOLEAN";
 }
 
-static const char * FuncToString( GLenum f )
+#define QGL_CASE_TO_STRING(x) case x: return #x;
+
+static const char* FuncToString( GLenum f )
 {
-	switch ( f )
-	{
-	case GL_ALWAYS:
-		return "GL_ALWAYS";
-	case GL_NEVER:
-		return "GL_NEVER";
-	case GL_LEQUAL:
-		return "GL_LEQUAL";
-	case GL_LESS:
-		return "GL_LESS";
-	case GL_EQUAL:
-		return "GL_EQUAL";
-	case GL_GREATER:
-		return "GL_GREATER";
-	case GL_GEQUAL:
-		return "GL_GEQUAL";
-	case GL_NOTEQUAL:
-		return "GL_NOTEQUAL";
-	default:
-		return "!!! UNKNOWN !!!";
+	switch ( f ) {
+		QGL_CASE_TO_STRING( GL_ALWAYS );
+		QGL_CASE_TO_STRING( GL_NEVER );
+		QGL_CASE_TO_STRING( GL_LEQUAL );
+		QGL_CASE_TO_STRING( GL_LESS );
+		QGL_CASE_TO_STRING( GL_EQUAL );
+		QGL_CASE_TO_STRING( GL_GREATER );
+		QGL_CASE_TO_STRING( GL_GEQUAL );
+		QGL_CASE_TO_STRING( GL_NOTEQUAL );
 	}
+	return "!!! UNKNOWN !!!";
 }
 
-static const char * PrimToString( GLenum mode )
+static const char* PrimToString( GLenum mode )
 {
-	static char prim[1024];
-
-	if ( mode == GL_TRIANGLES )
-		strcpy( prim, "GL_TRIANGLES" );
-	else if ( mode == GL_TRIANGLE_STRIP )
-		strcpy( prim, "GL_TRIANGLE_STRIP" );
-	else if ( mode == GL_TRIANGLE_FAN )
-		strcpy( prim, "GL_TRIANGLE_FAN" );
-	else if ( mode == GL_QUADS )
-		strcpy( prim, "GL_QUADS" );
-	else if ( mode == GL_QUAD_STRIP )
-		strcpy( prim, "GL_QUAD_STRIP" );
-	else if ( mode == GL_POLYGON )
-		strcpy( prim, "GL_POLYGON" );
-	else if ( mode == GL_POINTS )
-		strcpy( prim, "GL_POINTS" );
-	else if ( mode == GL_LINES )
-		strcpy( prim, "GL_LINES" );
-	else if ( mode == GL_LINE_STRIP )
-		strcpy( prim, "GL_LINE_STRIP" );
-	else if ( mode == GL_LINE_LOOP )
-		strcpy( prim, "GL_LINE_LOOP" );
-	else
-		sprintf( prim, "0x%x", mode );
-
-	return prim;
+	switch (mode) {
+		QGL_CASE_TO_STRING( GL_TRIANGLES );
+		QGL_CASE_TO_STRING( GL_TRIANGLE_STRIP );
+		QGL_CASE_TO_STRING( GL_TRIANGLE_FAN );
+		QGL_CASE_TO_STRING( GL_QUADS );
+		QGL_CASE_TO_STRING( GL_QUAD_STRIP );
+		QGL_CASE_TO_STRING( GL_POLYGON );
+		QGL_CASE_TO_STRING( GL_POINTS );
+		QGL_CASE_TO_STRING( GL_LINES );
+		QGL_CASE_TO_STRING( GL_LINE_STRIP );
+		QGL_CASE_TO_STRING( GL_LINE_LOOP );
+	}
+	return "!!! UNKNOWN !!!";
 }
 
-static const char * CapToString( GLenum cap )
+static const char* CapToString( GLenum cap )
 {
-	static char buffer[1024];
-
-	switch ( cap )
-	{
-	case GL_TEXTURE_2D:
-		return "GL_TEXTURE_2D";
-	case GL_BLEND:
-		return "GL_BLEND";
-	case GL_DEPTH_TEST:
-		return "GL_DEPTH_TEST";
-	case GL_CULL_FACE:
-		return "GL_CULL_FACE";
-	case GL_CLIP_PLANE0:
-		return "GL_CLIP_PLANE0";
-	case GL_COLOR_ARRAY:
-		return "GL_COLOR_ARRAY";
-	case GL_TEXTURE_COORD_ARRAY:
-		return "GL_TEXTURE_COORD_ARRAY";
-	case GL_VERTEX_ARRAY:
-		return "GL_VERTEX_ARRAY";
-	case GL_ALPHA_TEST:
-		return "GL_ALPHA_TEST";
-	case GL_STENCIL_TEST:
-		return "GL_STENCIL_TEST";
-	default:
-		sprintf( buffer, "0x%x", cap );
+	switch ( cap ) {
+		QGL_CASE_TO_STRING( GL_TEXTURE_2D );
+		QGL_CASE_TO_STRING( GL_BLEND );
+		QGL_CASE_TO_STRING( GL_DEPTH_TEST );
+		QGL_CASE_TO_STRING( GL_CULL_FACE );
+		QGL_CASE_TO_STRING( GL_CLIP_PLANE0 );
+		QGL_CASE_TO_STRING( GL_COLOR_ARRAY );
+		QGL_CASE_TO_STRING( GL_TEXTURE_COORD_ARRAY );
+		QGL_CASE_TO_STRING( GL_VERTEX_ARRAY );
+		QGL_CASE_TO_STRING( GL_ALPHA_TEST );
+		QGL_CASE_TO_STRING( GL_STENCIL_TEST );
 	}
-
-	return buffer;
+	return "!!! UNKNOWN !!!";
 }
 
-static const char * TypeToString( GLenum t )
+static const char* TypeToString( GLenum t )
 {
-	switch ( t )
-	{
-	case GL_BYTE:
-		return "GL_BYTE";
-	case GL_UNSIGNED_BYTE:
-		return "GL_UNSIGNED_BYTE";
-	case GL_SHORT:
-		return "GL_SHORT";
-	case GL_UNSIGNED_SHORT:
-		return "GL_UNSIGNED_SHORT";
-	case GL_INT:
-		return "GL_INT";
-	case GL_UNSIGNED_INT:
-		return "GL_UNSIGNED_INT";
-	case GL_FLOAT:
-		return "GL_FLOAT";
-	case GL_DOUBLE:
-		return "GL_DOUBLE";
-	default:
-		return "!!! UNKNOWN !!!";
+	switch ( t ) {
+		QGL_CASE_TO_STRING( GL_BYTE );
+		QGL_CASE_TO_STRING( GL_UNSIGNED_BYTE );
+		QGL_CASE_TO_STRING( GL_SHORT );
+		QGL_CASE_TO_STRING( GL_UNSIGNED_SHORT );
+		QGL_CASE_TO_STRING( GL_INT );
+		QGL_CASE_TO_STRING( GL_UNSIGNED_INT );
+		QGL_CASE_TO_STRING( GL_FLOAT );
+		QGL_CASE_TO_STRING( GL_DOUBLE );
 	}
+	return "!!! UNKNOWN !!!";
 }
 
 static void APIENTRY logAccum(GLenum op, GLfloat value)
@@ -914,43 +872,23 @@ static void APIENTRY logBitmap(GLsizei width, GLsizei height, GLfloat xorig, GLf
 	dllBitmap( width, height, xorig, yorig, xmove, ymove, bitmap );
 }
 
-static void BlendToName( char *n, GLenum f )
+static const char* BlendToName( GLenum f )
 {
-	switch ( f )
-	{
-	case GL_ONE:
-		strcpy( n, "GL_ONE" );
-		break;
-	case GL_ZERO:
-		strcpy( n, "GL_ZERO" );
-		break;
-	case GL_SRC_ALPHA:
-		strcpy( n, "GL_SRC_ALPHA" );
-		break;
-	case GL_ONE_MINUS_SRC_ALPHA:
-		strcpy( n, "GL_ONE_MINUS_SRC_ALPHA" );
-		break;
-	case GL_DST_COLOR:
-		strcpy( n, "GL_DST_COLOR" );
-		break;
-	case GL_ONE_MINUS_DST_COLOR:
-		strcpy( n, "GL_ONE_MINUS_DST_COLOR" );
-		break;
-	case GL_DST_ALPHA:
-		strcpy( n, "GL_DST_ALPHA" );
-		break;
-	default:
-		sprintf( n, "0x%x", f );
+	switch ( f ) {
+		QGL_CASE_TO_STRING( GL_ONE );
+		QGL_CASE_TO_STRING( GL_ZERO );
+		QGL_CASE_TO_STRING( GL_SRC_ALPHA );
+		QGL_CASE_TO_STRING( GL_ONE_MINUS_SRC_ALPHA );
+		QGL_CASE_TO_STRING( GL_DST_COLOR );
+		QGL_CASE_TO_STRING( GL_ONE_MINUS_DST_COLOR );
+		QGL_CASE_TO_STRING( GL_DST_ALPHA );
 	}
+	return "!!! UNKNOWN !!!";
 }
+
 static void APIENTRY logBlendFunc(GLenum sfactor, GLenum dfactor)
 {
-	char sf[128], df[128];
-
-	BlendToName( sf, sfactor );
-	BlendToName( df, dfactor );
-
-	fprintf( glw_state.log_fp, "glBlendFunc( %s, %s )\n", sf, df );
+	fprintf( glw_state.log_fp, "glBlendFunc( %s, %s )\n", BlendToName( sfactor ), BlendToName( dfactor ) );
 	dllBlendFunc( sfactor, dfactor );
 }
 
@@ -2810,13 +2748,13 @@ static void APIENTRY logViewport(GLint x, GLint y, GLsizei width, GLsizei height
 ** Unloads the specified DLL then nulls out all the proc pointers.  This
 ** is only called during a hard shutdown of the OGL subsystem (e.g. vid_restart).
 */
-void QGL_Shutdown( void )
+void QGL_Shutdown()
 {
-	ri.Printf( PRINT_ALL, "...shutting down QGL\n" );
+	//ri.Printf( PRINT_ALL, "...shutting down QGL\n" );
 
 	if ( glw_state.hinstOpenGL )
 	{
-		ri.Printf( PRINT_ALL, "...unloading OpenGL DLL\n" );
+		//ri.Printf( PRINT_ALL, "...unloading OpenGL DLL\n" );
 		FreeLibrary( glw_state.hinstOpenGL );
 	}
 
@@ -3184,48 +3122,6 @@ void QGL_Shutdown( void )
 	qwglSwapBuffers              = NULL;
 }
 
-#define GR_NUM_BOARDS 0x0f
-
-static qboolean GlideIsValid( void )
-{
-	HMODULE hGlide;
-//	int numBoards;
-//	void (__stdcall *grGet)(unsigned int, unsigned int, int*);
-
-    if ( ( hGlide = LoadLibrary("Glide3X") ) != 0 ) 
-	{
-		// FIXME: 3Dfx needs to fix this shit
-		return qtrue;
-
-#if 0
-        grGet = (void *)GetProcAddress( hGlide, "_grGet@12");
-
-		if ( grGet )
-		{
-	        grGet( GR_NUM_BOARDS, sizeof(int), &numBoards);
-		}
-		else
-		{
-			// if we've reached this point, something is seriously wrong
-			ri.Printf( PRINT_WARNING, "WARNING: could not find grGet in GLIDE3X.DLL\n" );
-			numBoards = 0;
-		}
-
-		FreeLibrary( hGlide );
-		hGlide = NULL;
-
-		if ( numBoards > 0 )
-		{
-			return qtrue;
-		}
-
-		ri.Printf( PRINT_WARNING, "WARNING: invalid Glide installation!\n" );
-#endif
-    }
-
-	return qfalse;
-} 
-
 #ifdef _MSC_VER
 #	pragma warning (disable : 4113 4133 4047 )
 #	define GPA( a ) GetProcAddress( glw_state.hinstOpenGL, a )
@@ -3242,8 +3138,9 @@ static qboolean GlideIsValid( void )
 ** operating systems we need to do the right thing, whatever that
 ** might be.
 */
-qboolean QGL_Init( const char *dllname )
+qbool QGL_Init( const char* dllname )
 {
+/*
 	char systemDir[1024];
 	char libName[1024];
 
@@ -3267,9 +3164,12 @@ qboolean QGL_Init( const char *dllname )
 	if ( ( glw_state.hinstOpenGL = LoadLibrary( dllname ) ) == 0 )
 	{
 		ri.Printf( PRINT_ALL, "failed\n" );
-		return qfalse;
+		return 0;
 	}
 	ri.Printf( PRINT_ALL, "succeeded\n" );
+*/
+	if ( ( glw_state.hinstOpenGL = LoadLibrary( dllname ) ) == 0 )
+		return qfalse;
 
 	qglAccum                     = dllAccum = GPA( "glAccum" );
 	qglAlphaFunc                 = dllAlphaFunc = GPA( "glAlphaFunc" );
@@ -3640,15 +3540,16 @@ qboolean QGL_Init( const char *dllname )
 	qwglChoosePixelFormatARB = 0;
 
 	// check logging
-	QGL_EnableLogging( r_logFile->integer );
+//	QGL_EnableLogging( (r_logFile->integer != 0) );
 
 	return qtrue;
-}
+};
 
-void QGL_EnableLogging( qboolean enable )
+
+void QGL_EnableLogging( qbool enable )
 {
-	static qboolean isEnabled;
-
+	static qbool isEnabled = 0;
+/*
 	// return if we're already active
 	if ( isEnabled && enable ) {
 		// decrement log counter and stop if it has reached 0
@@ -3656,9 +3557,9 @@ void QGL_EnableLogging( qboolean enable )
 		if ( r_logFile->integer ) {
 			return;
 		}
-		enable = qfalse;
+		enable = 0;
 	}
-
+*/
 	// return if we're already disabled
 	if ( !enable && !isEnabled )
 		return;
@@ -3669,21 +3570,12 @@ void QGL_EnableLogging( qboolean enable )
 	{
 		if ( !glw_state.log_fp )
 		{
-			struct tm *newtime;
 			time_t aclock;
-			char buffer[1024];
-			cvar_t	*basedir;
-
 			time( &aclock );
-			newtime = localtime( &aclock );
-
-			asctime( newtime );
-
-			basedir = ri.Cvar_Get( "fs_basepath", "", 0 );
-			Com_sprintf( buffer, sizeof(buffer), "%s/gl.log", basedir->string ); 
-			glw_state.log_fp = fopen( buffer, "wt" );
-
-			fprintf( glw_state.log_fp, "%s\n", asctime( newtime ) );
+			//cvar_t* basedir = ri.Cvar_Get( "fs_basepath", "", 0 );
+			//glw_state.log_fp = fopen( va("%s/gl.log", basedir->string), "wt" );
+			glw_state.log_fp = fopen( "gl.log", "wt" );
+			fprintf( glw_state.log_fp, "%s\n", asctime( localtime( &aclock ) ) );
 		}
 
 		qglAccum                     = logAccum;
@@ -4372,6 +4264,4 @@ void QGL_EnableLogging( qboolean enable )
 #ifdef _MSC_VER
 #pragma warning (default : 4113 4133 4047 )
 #endif
-
-
 

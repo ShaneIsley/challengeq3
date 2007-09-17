@@ -26,9 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "win_local.h"
 
 static WSADATA	winsockdata;
-static qboolean	winsockInitialized = qfalse;
-static qboolean usingSocks = qfalse;
-static qboolean networkingEnabled = qfalse;
+static qbool	winsockInitialized = qfalse;
+static qbool usingSocks = qfalse;
+static qbool networkingEnabled = qfalse;
 
 static cvar_t	*net_noudp;
 static cvar_t	*net_noipx;
@@ -167,7 +167,7 @@ idnewt
 	sscanf (copy, "%x", &val);	\
 	((struct sockaddr_ipx *)sadr)->dest = val
 
-qboolean Sys_StringToSockaddr( const char *s, struct sockaddr *sadr ) {
+qbool Sys_StringToSockaddr( const char *s, struct sockaddr *sadr ) {
 	struct hostent	*h;
 	int		val;
 	char	copy[MAX_STRING_CHARS];
@@ -217,7 +217,7 @@ idnewt
 192.246.40.70
 =============
 */
-qboolean Sys_StringToAdr( const char *s, netadr_t *a ) {
+qbool Sys_StringToAdr( const char *s, netadr_t *a ) {
 	struct sockaddr sadr;
 	
 	if ( !Sys_StringToSockaddr( s, &sadr ) ) {
@@ -239,11 +239,11 @@ Never called by the game logic, just the system event queing
 */
 int	recvfromCount;
 
-qboolean Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
-	int 	ret;
+qbool Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
+	int		ret;
 	struct sockaddr from;
 	int		fromlen;
-	int		net_socket;
+	SOCKET net_socket;
 	int		protocol;
 	int		err;
 
@@ -261,7 +261,7 @@ qboolean Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
 
 		fromlen = sizeof(from);
 		recvfromCount++;		// performance check
-		ret = recvfrom( net_socket, net_message->data, net_message->maxsize, 0, (struct sockaddr *)&from, &fromlen );
+		ret = recvfrom( net_socket, (char*)net_message->data, net_message->maxsize, 0, (struct sockaddr *)&from, &fromlen );
 		if (ret == SOCKET_ERROR)
 		{
 			err = WSAGetLastError();
@@ -354,7 +354,7 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		ret = sendto( net_socket, socksBuf, length+10, 0, &socksRelayAddr, sizeof(socksRelayAddr) );
 	}
 	else {
-		ret = sendto( net_socket, data, length, 0, &addr, sizeof(addr) );
+		ret = sendto( net_socket, (const char*)data, length, 0, &addr, sizeof(addr) );
 	}
 	if( ret == SOCKET_ERROR ) {
 		int err = WSAGetLastError();
@@ -384,7 +384,7 @@ Sys_IsLANAddress
 LAN clients will have their rate var ignored
 ==================
 */
-qboolean Sys_IsLANAddress( netadr_t adr ) {
+qbool Sys_IsLANAddress( netadr_t adr ) {
 	int		i;
 
 	if( adr.type == NA_LOOPBACK ) {
@@ -469,7 +469,7 @@ NET_IPSocket
 int NET_IPSocket( char *net_interface, int port ) {
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
-	qboolean			_true = qtrue;
+	qbool			_true = qtrue;
 	int					i = 1;
 	int					err;
 
@@ -520,7 +520,7 @@ int NET_IPSocket( char *net_interface, int port ) {
 
 	address.sin_family = AF_INET;
 
-	if( bind( newsocket, (void *)&address, sizeof(address) ) == SOCKET_ERROR ) {
+	if( bind( newsocket, (const sockaddr*)&address, sizeof(address) ) == SOCKET_ERROR ) {
 		Com_Printf( "WARNING: UDP_OpenSocket: bind: %s\n", NET_ErrorString() );
 		closesocket( newsocket );
 		return 0;
@@ -540,8 +540,8 @@ void NET_OpenSocks( int port ) {
 	int					err;
 	struct hostent		*h;
 	int					len;
-	qboolean			rfc1929;
-	unsigned char		buf[64];
+	qbool			rfc1929;
+	char		buf[64];
 
 	usingSocks = qfalse;
 
@@ -825,7 +825,7 @@ int NET_IPXSocket( int port ) {
 		address.sa_socket = htons( (short)port );
 	}
 
-	if( bind( newsocket, (void *)&address, sizeof(address) ) == SOCKET_ERROR ) {
+	if( bind( newsocket, (const sockaddr*)&address, sizeof(address) ) == SOCKET_ERROR ) {
 		Com_Printf( "WARNING: IPX_Socket: bind: %s\n", NET_ErrorString() );
 		closesocket( newsocket );
 		return 0;
@@ -857,8 +857,8 @@ void NET_OpenIPX( void ) {
 NET_GetCvars
 ====================
 */
-static qboolean NET_GetCvars( void ) {
-	qboolean	modified;
+static qbool NET_GetCvars( void ) {
+	qbool	modified;
 
 	modified = qfalse;
 
@@ -908,10 +908,10 @@ static qboolean NET_GetCvars( void ) {
 NET_Config
 ====================
 */
-void NET_Config( qboolean enableNetworking ) {
-	qboolean	modified;
-	qboolean	stop;
-	qboolean	start;
+void NET_Config( qbool enableNetworking ) {
+	qbool	modified;
+	qbool	stop;
+	qbool	start;
 
 	// get any latched changes to cvars
 	modified = NET_GetCvars();

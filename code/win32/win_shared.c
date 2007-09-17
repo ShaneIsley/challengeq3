@@ -74,25 +74,13 @@ void Sys_SnapVector( float *v )
 #endif
 
 
-/*
-**
-** Disable all optimizations temporarily so this code works correctly!
-**
-*/
+// disable all optimizations temporarily so this code works correctly!
 #ifdef _MSC_VER
 #pragma optimize( "", off )
+#pragma warning(disable : 4748) // don't fkn WHINE about using that pragma
 #endif
 
-// If you fancy porting this stuff to AT&T then feel free... :)
-// It's not actually used functionally though, so it may be a waste of effort
-#ifndef __MINGW32__
-/*
-** --------------------------------------------------------------------------------
-**
-** PROCESSOR STUFF
-**
-** --------------------------------------------------------------------------------
-*/
+
 static void CPUID( int func, unsigned regs[4] )
 {
 	unsigned regEAX, regEBX, regECX, regEDX;
@@ -111,9 +99,9 @@ static void CPUID( int func, unsigned regs[4] )
 	regs[3] = regEDX;
 }
 
-static int IsPentium( void )
+static int IsPentium()
 {
-	__asm 
+	__asm
 	{
 		pushfd						// save eflags
 		pop		eax
@@ -144,71 +132,34 @@ good:
 	return qtrue;
 }
 
-static int Is3DNOW( void )
+static const char* CPU_Name()
 {
-	unsigned regs[4];
-	char pstring[16];
-	char processorString[13];
+	static unsigned regs[4];
 
-	// get name of processor
-	CPUID( 0, ( unsigned int * ) pstring );
-	processorString[0] = pstring[4];
-	processorString[1] = pstring[5];
-	processorString[2] = pstring[6];
-	processorString[3] = pstring[7];
-	processorString[4] = pstring[12];
-	processorString[5] = pstring[13];
-	processorString[6] = pstring[14];
-	processorString[7] = pstring[15];
-	processorString[8] = pstring[8];
-	processorString[9] = pstring[9];
-	processorString[10] = pstring[10];
-	processorString[11] = pstring[11];
-	processorString[12] = 0;
+	CPUID( 0, regs );
 
-//  REMOVED because you can have 3DNow! on non-AMD systems
-//	if ( strcmp( processorString, "AuthenticAMD" ) )
-//		return qfalse;
-
-	// check AMD-specific functions
-	CPUID( 0x80000000, regs );
-	if ( regs[0] < 0x80000000 )
-		return qfalse;
-
-	// bit 31 of EDX denotes 3DNOW! support
-	CPUID( 0x80000001, regs );
-	if ( regs[3] & ( 1 << 31 ) )
-		return qtrue;
-
-	return qfalse;
+	regs[0] = regs[1];
+	regs[1] = regs[3];
+	regs[3] = 0;
+	return (const char*)regs;
 }
 
-static int IsKNI( void )
+static int CPU_Cores()
 {
 	unsigned regs[4];
-
-	// get CPU feature bits
 	CPUID( 1, regs );
-
-	// bit 25 of EDX denotes KNI existence
-	if ( regs[3] & ( 1 << 25 ) )
-		return qtrue;
-
-	return qfalse;
+	return ((regs[1] & 0x00FF0000) >> 16);
 }
 
-static int IsMMX( void )
+struct CPU_FeatureBit { const char* s; int reg, bit; } CPU_FeatureBits[] =
 {
-	unsigned regs[4];
+	{ " MMX",  3, 23 },
+	{ " SSE",  3, 25 },
+	{ " SSE2", 3, 26 },
+	{ " SSE3", 2, 26 },
+	{ 0 }
+};
 
-	// get CPU feature bits
-	CPUID( 1, regs );
-
-	// bit 23 of EDX denotes MMX existence
-	if ( regs[3] & ( 1 << 23 ) )
-		return qtrue;
-	return qfalse;
-}
 
 int Sys_GetProcessorId( void )
 {
@@ -219,43 +170,37 @@ int Sys_GetProcessorId( void )
 #else
 
 	// verify we're at least a Pentium or 486 w/ CPUID support
-	if ( !IsPentium() )
-		return CPUID_INTEL_UNSUPPORTED;
-
-	// check for MMX
-	if ( !IsMMX() )
-	{
-		// Pentium or PPro
-		return CPUID_INTEL_PENTIUM;
+	if ( !IsPentium() ) {
+		Cvar_Set( "sys_cpustring", "x86 (pre-Pentium)" );
+		return CPUID_UNSUPPORTED;
 	}
 
-	// see if we're an AMD 3DNOW! processor
-	if ( Is3DNOW() )
-	{
-		return CPUID_AMD_3DNOW;
+	char s[64] = "";
+	Q_strcat( s, sizeof(s), CPU_Name() );
+
+	if (CPU_Cores() > 1)
+		Q_strcat( s, sizeof(s), va(" %d cores", CPU_Cores()) );
+
+	unsigned regs[4];
+	CPUID( 1, regs );
+
+	for (int i = 0; CPU_FeatureBits[i].s; ++i) {
+		if (regs[CPU_FeatureBits[i].reg] & (1 << regs[CPU_FeatureBits[i].bit])) {
+			Q_strcat( s, sizeof(s), CPU_FeatureBits[i].s );
+		}
 	}
 
-	// see if we're an Intel Katmai
-	if ( IsKNI() )
-	{
-		return CPUID_INTEL_KATMAI;
-	}
-
-	// by default we're functionally a vanilla Pentium/MMX or P2/MMX
-	return CPUID_INTEL_MMX;
+	Cvar_Set( "sys_cpustring", s );
+	return CPUID_GENERIC;
 
 #endif
 }
-#endif
 
-/*
-**
-** Re-enable optimizations back to what they were
-**
-*/
+
 #ifdef _MSC_VER
 #pragma optimize( "", on )
 #endif
+
 
 //============================================
 
@@ -266,10 +211,5 @@ char *Sys_GetCurrentUser( void )
 
 char	*Sys_DefaultHomePath(void) {
 	return NULL;
-}
-
-char *Sys_DefaultInstallPath(void)
-{
-	return Sys_Cwd();
 }
 
