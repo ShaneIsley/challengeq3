@@ -62,14 +62,14 @@ typedef struct flare_s {
 
 	int			addedFrame;
 
-	qboolean	inPortal;				// true if in a portal view of the scene
+	qbool	inPortal;				// qtrue if in a portal view of the scene
 	int			frameSceneNum;
 	void		*surface;
 	int			fogNum;
 
 	int			fadeTime;
 
-	qboolean	visible;			// state of last test
+	qbool	visible;			// state of last test
 	float		drawIntensity;		// may be non 0 even if !visible due to fading
 
 	int			windowX, windowY;
@@ -84,7 +84,7 @@ typedef struct flare_s {
 flare_t		r_flareStructs[MAX_FLARES];
 flare_t		*r_activeFlares, *r_inactiveFlares;
 
-int flareCoeff;
+float flareCoeff;
 
 /*
 ==================
@@ -260,7 +260,7 @@ RB_TestFlare
 */
 void RB_TestFlare( flare_t *f ) {
 	float			depth;
-	qboolean		visible;
+	qbool		visible;
 	float			fade;
 	float			screenZ;
 
@@ -443,7 +443,7 @@ extend past the portal edge will be overwritten.
 void RB_RenderFlares (void) {
 	flare_t		*f;
 	flare_t		**prev;
-	qboolean	draw;
+	qbool	draw;
 
 	if ( !r_flares->integer ) {
 		return;

@@ -33,13 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #elif defined( _WIN32 )
 
 #if _MSC_VER
-#pragma warning (disable: 4201)
-#pragma warning (disable: 4214)
-#pragma warning (disable: 4514)
-#pragma warning (disable: 4032)
-#pragma warning (disable: 4201)
-#pragma warning (disable: 4214)
-#pragma warning (disable: 4996)
+#pragma warning (disable: 4996) // deprecated ZOMGOVERRUN! nannywhine
 #endif
 
 #include <windows.h>
@@ -176,6 +170,11 @@ typedef void (APIENTRY * PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum target);
 #define GL_RGB_S3TC							0x83A0
 #define GL_RGB4_S3TC						0x83A1
 
+extern "C" {
+
+void QGL_EnableLogging( qbool enable );
+qbool QGL_Init( const char* dllname );
+void QGL_Shutdown();
 
 // extensions will be function pointers on all platforms
 
@@ -571,6 +570,8 @@ extern BOOL ( WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
 extern BOOL ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
 
 extern BOOL ( WINAPI * qwglSwapIntervalEXT)( int interval );
+
+};
 
 #endif	// _WIN32
 

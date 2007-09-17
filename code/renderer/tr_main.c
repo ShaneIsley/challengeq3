@@ -126,7 +126,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 	int		i;
 	float	dist;
 	cplane_t	*frust;
-	qboolean mightBeClipped = qfalse;
+	qbool mightBeClipped = qfalse;
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
@@ -619,9 +619,9 @@ be moving and rotating.
 Returns qtrue if it should be mirrored
 =================
 */
-qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
+qbool R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
 							 orientation_t *surface, orientation_t *camera,
-							 vec3_t pvsOrigin, qboolean *mirror ) {
+							 vec3_t pvsOrigin, qbool *mirror ) {
 	int			i;
 	cplane_t	originalPlane, plane;
 	trRefEntity_t	*e;
@@ -738,7 +738,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	return qfalse;
 }
 
-static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
+static qbool IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
 	int			i;
 	cplane_t	originalPlane, plane;
@@ -803,7 +803,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 **
 ** Determines if a surface is completely offscreen.
 */
-static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) {
+static qbool SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) {
 	float shortest = 100000000;
 	int entityNum;
 	int numTriangles;
@@ -908,7 +908,7 @@ R_MirrorViewBySurface
 Returns qtrue if another view has been rendered
 ========================
 */
-qboolean R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
+qbool R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 	vec4_t			clipDest[128];
 	viewParms_t		newParms;
 	viewParms_t		oldParms;
@@ -1052,31 +1052,20 @@ static void R_RadixSort( drawSurf_t *source, int size )
 
 //==========================================================================================
 
-/*
-=================
-R_AddDrawSurf
-=================
-*/
-void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, 
-				   int fogIndex, int dlightMap ) {
-	int			index;
 
-	// instead of checking for overflow, we just mask the index
-	// so it wraps around
-	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
+void R_AddDrawSurf( surfaceType_t *surface, const shader_t* shader, int fogIndex, int dlightMap )
+{
+	// instead of checking for overflow, we just mask the index so it wraps around
+	int index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 32 bit value so it can be
 	// compared quickly during the qsorting process
-	tr.refdef.drawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
-		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
+	tr.refdef.drawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT)
+			| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
 }
 
-/*
-=================
-R_DecomposeSort
-=================
-*/
+
 void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
@@ -1141,22 +1130,16 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	R_AddDrawSurfCmd( drawSurfs, numDrawSurfs );
 }
 
-/*
-=============
-R_AddEntitySurfaces
-=============
-*/
-void R_AddEntitySurfaces (void) {
-	trRefEntity_t	*ent;
-	shader_t		*shader;
 
-	if ( !r_drawentities->integer ) {
+static void R_AddEntitySurfaces()
+{
+	trRefEntity_t* ent;
+	const shader_t* shader;
+
+	if ( !r_drawentities->integer )
 		return;
-	}
 
-	for ( tr.currentEntityNum = 0; 
-	      tr.currentEntityNum < tr.refdef.num_entities; 
-		  tr.currentEntityNum++ ) {
+	for (tr.currentEntityNum = 0; tr.currentEntityNum < tr.refdef.num_entities; ++tr.currentEntityNum) {
 		ent = tr.currentEntity = &tr.refdef.entities[tr.currentEntityNum];
 
 		ent->needDlights = qfalse;
@@ -1232,42 +1215,32 @@ void R_AddEntitySurfaces (void) {
 			ri.Error( ERR_DROP, "R_AddEntitySurfaces: Bad reType" );
 		}
 	}
-
 }
 
 
-/*
-====================
-R_GenerateDrawSurfs
-====================
-*/
-void R_GenerateDrawSurfs( void ) {
-	R_AddWorldSurfaces ();
+static void R_GenerateDrawSurfs()
+{
+	R_AddWorldSurfaces();
 
 	R_AddPolygonSurfaces();
 
 	// set the projection matrix with the minimum zfar
 	// now that we have the world bounded
-	// this needs to be done before entities are
-	// added, because they use the projection
-	// matrix for lod calculation
-	R_SetupProjection ();
+	// this needs to be done before entities are added,
+	// because they use the projection matrix for lod calculation
+	R_SetupProjection();
 
-	R_AddEntitySurfaces ();
+	R_AddEntitySurfaces();
 }
 
-/*
-================
-R_DebugPolygon
-================
-*/
-void R_DebugPolygon( int color, int numPoints, float *points ) {
-	int		i;
+
+static void R_DebugPolygon( int color, int numPoints, const float* points )
+{
+	int i;
 
 	GL_State( GLS_DEPTHMASK_TRUE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 
 	// draw solid shade
-
 	qglColor3f( color&1, (color>>1)&1, (color>>2)&1 );
 	qglBegin( GL_POLYGON );
 	for ( i = 0 ; i < numPoints ; i++ ) {
@@ -1287,17 +1260,13 @@ void R_DebugPolygon( int color, int numPoints, float *points ) {
 	qglDepthRange( 0, 1 );
 }
 
-/*
-====================
-R_DebugGraphics
 
-Visualization aid for movement clipping debugging
-====================
-*/
-void R_DebugGraphics( void ) {
-	if ( !r_debugSurface->integer ) {
+// visualization aid for movement clipping debugging
+
+static void R_DebugGraphics()
+{
+	if ( !r_debugSurface->integer )
 		return;
-	}
 
 	// the render thread can't make callbacks to the main thread
 	R_SyncRenderThread();
@@ -1308,20 +1277,12 @@ void R_DebugGraphics( void ) {
 }
 
 
-/*
-================
-R_RenderView
+// a view may be either the actual camera view, or a mirror / remote location
 
-A view may be either the actual camera view,
-or a mirror / remote location
-================
-*/
-void R_RenderView (viewParms_t *parms) {
-	int		firstDrawSurf;
-
-	if ( parms->viewportWidth <= 0 || parms->viewportHeight <= 0 ) {
+void R_RenderView( const viewParms_t* parms )
+{
+	if ( parms->viewportWidth <= 0 || parms->viewportHeight <= 0 )
 		return;
-	}
 
 	tr.viewCount++;
 
@@ -1329,14 +1290,14 @@ void R_RenderView (viewParms_t *parms) {
 	tr.viewParms.frameSceneNum = tr.frameSceneNum;
 	tr.viewParms.frameCount = tr.frameCount;
 
-	firstDrawSurf = tr.refdef.numDrawSurfs;
+	int firstDrawSurf = tr.refdef.numDrawSurfs;
 
 	tr.viewCount++;
 
 	// set viewParms.world
-	R_RotateForViewer ();
+	R_RotateForViewer();
 
-	R_SetupFrustum ();
+	R_SetupFrustum();
 
 	R_GenerateDrawSurfs();
 

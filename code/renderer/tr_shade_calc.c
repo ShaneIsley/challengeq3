@@ -112,13 +112,8 @@ DEFORMATIONS
 ====================================================================
 */
 
-/*
-========================
-RB_CalcDeformVertexes
 
-========================
-*/
-void RB_CalcDeformVertexes( deformStage_t *ds )
+static void RB_CalcDeformVertexes( const deformStage_t* ds )
 {
 	int i;
 	vec3_t	offset;
@@ -162,14 +157,11 @@ void RB_CalcDeformVertexes( deformStage_t *ds )
 	}
 }
 
-/*
-=========================
-RB_CalcDeformNormals
 
-Wiggle the normals for wavy environment mapping
-=========================
-*/
-void RB_CalcDeformNormals( deformStage_t *ds ) {
+// wiggle the normals for wavy environment mapping
+
+static void RB_CalcDeformNormals( const deformStage_t* ds )
+{
 	int i;
 	float	scale;
 	float	*xyz = ( float * ) tess.xyz;
@@ -195,13 +187,9 @@ void RB_CalcDeformNormals( deformStage_t *ds ) {
 	}
 }
 
-/*
-========================
-RB_CalcBulgeVertexes
 
-========================
-*/
-void RB_CalcBulgeVertexes( deformStage_t *ds ) {
+static void RB_CalcBulgeVertexes( const deformStage_t* ds )
+{
 	int i;
 	const float *st = ( const float * ) tess.texCoords[0];
 	float		*xyz = ( float * ) tess.xyz;
@@ -225,14 +213,10 @@ void RB_CalcBulgeVertexes( deformStage_t *ds ) {
 }
 
 
-/*
-======================
-RB_CalcMoveVertexes
+// a deformation that can move an entire surface along a wave path
 
-A deformation that can move an entire surface along a wave path
-======================
-*/
-void RB_CalcMoveVertexes( deformStage_t *ds ) {
+static void RB_CalcMoveVertexes( const deformStage_t* ds )
+{
 	int			i;
 	float		*xyz;
 	float		*table;
@@ -330,26 +314,20 @@ void DeformText( const char *text ) {
 	}
 }
 
-/*
-==================
-GlobalVectorToLocal
-==================
-*/
-static void GlobalVectorToLocal( const vec3_t in, vec3_t out ) {
+
+static void GlobalVectorToLocal( const vec3_t in, vec3_t out )
+{
 	out[0] = DotProduct( in, backEnd.or.axis[0] );
 	out[1] = DotProduct( in, backEnd.or.axis[1] );
 	out[2] = DotProduct( in, backEnd.or.axis[2] );
 }
 
-/*
-=====================
-AutospriteDeform
 
-Assuming all the triangles for this shader are independant
-quads, rebuild them as forward facing sprites
-=====================
-*/
-static void AutospriteDeform( void ) {
+// assuming all the triangles for this shader are independant quads,
+// rebuild them as forward facing sprites
+
+static void AutospriteDeform()
+{
 	int		i;
 	int		oldVerts;
 	float	*xyz;
@@ -395,18 +373,13 @@ static void AutospriteDeform( void ) {
 			VectorSubtract( vec3_origin, left, left );
 		}
 
-	  // compensate for scale in the axes if necessary
-  	if ( backEnd.currentEntity->e.nonNormalizedAxes ) {
-      float axisLength;
-		  axisLength = VectorLength( backEnd.currentEntity->e.axis[0] );
-  		if ( !axisLength ) {
-	  		axisLength = 0;
-  		} else {
-	  		axisLength = 1.0f / axisLength;
-  		}
-      VectorScale(left, axisLength, left);
-      VectorScale(up, axisLength, up);
-    }
+		// compensate for scale in the axes if necessary
+		if ( backEnd.currentEntity->e.nonNormalizedAxes ) {
+			float axisLength = VectorLength( backEnd.currentEntity->e.axis[0] );
+			axisLength = axisLength ? (1.0f / axisLength) : 1.0f;
+			VectorScale(left, axisLength, left);
+			VectorScale(up, axisLength, up);
+		}
 
 		RB_AddQuadStamp( mid, left, up, tess.vertexColors[i] );
 	}
@@ -510,7 +483,7 @@ static void Autosprite2Deform( void ) {
 			v2 = xyz + 4 * edgeVerts[nums[j]][1];
 
 			l = 0.5 * sqrt( lengths[j] );
-			
+
 			// we need to see which direction this edge
 			// is used to determine direction of projection
 			for ( k = 0 ; k < 5 ; k++ ) {
@@ -532,22 +505,17 @@ static void Autosprite2Deform( void ) {
 }
 
 
-/*
-=====================
-RB_DeformTessGeometry
-
-=====================
-*/
-void RB_DeformTessGeometry( void ) {
+void RB_DeformTessGeometry()
+{
 	int		i;
-	deformStage_t	*ds;
+	const deformStage_t* ds;
 
 	for ( i = 0 ; i < tess.shader->numDeforms ; i++ ) {
 		ds = &tess.shader->deforms[ i ];
 
 		switch ( ds->deformation ) {
-        case DEFORM_NONE:
-            break;
+		case DEFORM_NONE:
+			break;
 		case DEFORM_NORMALS:
 			RB_CalcDeformNormals( ds );
 			break;
@@ -810,7 +778,7 @@ void RB_CalcFogTexCoords( float *st ) {
 	float		*v;
 	float		s, t;
 	float		eyeT;
-	qboolean	eyeOutside;
+	qbool	eyeOutside;
 	fog_t		*fog;
 	vec3_t		local;
 	vec4_t		fogDistanceVector, fogDepthVector = {0, 0, 0, 0};

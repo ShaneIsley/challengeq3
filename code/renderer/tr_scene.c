@@ -68,17 +68,13 @@ void R_ToggleSmpFrame( void ) {
 }
 
 
-/*
-====================
-RE_ClearScene
-
-====================
-*/
-void RE_ClearScene( void ) {
+void RE_ClearScene()
+{
 	r_firstSceneDlight = r_numdlights;
 	r_firstSceneEntity = r_numentities;
 	r_firstScenePoly = r_numpolys;
 }
+
 
 /*
 ===========================================================================
@@ -88,24 +84,17 @@ DISCRETE POLYS
 ===========================================================================
 */
 
-/*
-=====================
-R_AddPolygonSurfaces
 
-Adds all the scene's polys into this view's drawsurf list
-=====================
-*/
-void R_AddPolygonSurfaces( void ) {
-	int			i;
-	shader_t	*sh;
-	srfPoly_t	*poly;
+// adds all the scene's polys into this view's drawsurf list
 
+void R_AddPolygonSurfaces()
+{
 	tr.currentEntityNum = ENTITYNUM_WORLD;
 	tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
-	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
-		sh = R_GetShaderByHandle( poly->hShader );
-		R_AddDrawSurf( ( void * )poly, sh, poly->fogIndex, qfalse );
+	srfPoly_t* poly = tr.refdef.polys;
+	for (int i = 0; i < tr.refdef.numPolys; ++i, ++poly) {
+		R_AddDrawSurf( (surfaceType_t*)poly, R_GetShaderByHandle( poly->hShader ), poly->fogIndex, qfalse );
 	}
 }
 
@@ -148,7 +137,7 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		poly->hShader = hShader;
 		poly->numVerts = numVerts;
 		poly->verts = &backEndData[tr.smpFrame]->polyVerts[r_numpolyverts];
-		
+
 		Com_Memcpy( poly->verts, &verts[numVerts*j], numVerts * sizeof( *verts ) );
 
 		r_numpolys++;

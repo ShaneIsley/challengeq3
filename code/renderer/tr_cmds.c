@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 volatile renderCommandList_t	*renderCommandList;
 
-volatile qboolean	renderThreadActive;
+volatile qbool	renderThreadActive;
 
 
 /*
@@ -114,7 +114,7 @@ R_IssueRenderCommands
 int	c_blockedOnRender;
 int	c_blockedOnMain;
 
-void R_IssueRenderCommands( qboolean runPerformanceCounters ) {
+void R_IssueRenderCommands( qbool runPerformanceCounters ) {
 	renderCommandList_t	*cmdList;
 
 	cmdList = &backEndData[tr.smpFrame]->commands;
@@ -211,20 +211,14 @@ void *R_GetCommandBuffer( int bytes ) {
 }
 
 
-/*
-=============
-R_AddDrawSurfCmd
+// technically, all commands should probably check tr.registered
+// but realistically, only begin+end frame really need to
+#define R_CMD(T, ID) T* cmd = (T*)R_GetCommandBuffer( sizeof(T) ); if (!cmd) return; cmd->commandId = ID;
 
-=============
-*/
-void	R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	drawSurfsCommand_t	*cmd;
 
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_DRAW_SURFS;
+void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs )
+{
+	R_CMD( drawSurfsCommand_t, RC_DRAW_SURFS );
 
 	cmd->drawSurfs = drawSurfs;
 	cmd->numDrawSurfs = numDrawSurfs;
@@ -234,25 +228,12 @@ void	R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 }
 
 
-/*
-=============
-RE_SetColor
+// passing NULL will set the color to white
 
-Passing NULL will set the color to white
-=============
-*/
 void RE_SetColor( const float* rgba )
 {
-	setColorCommand_t* cmd;
+	R_CMD( setColorCommand_t, RC_SET_COLOR );
 
-	if ( !tr.registered )
-		return;
-
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_SET_COLOR;
 	if ( !rgba )
 		rgba = colorWhite;
 
@@ -263,23 +244,10 @@ void RE_SetColor( const float* rgba )
 }
 
 
-/*
-=============
-RE_StretchPic
-=============
-*/
-void RE_StretchPic ( float x, float y, float w, float h, 
-					  float s1, float t1, float s2, float t2, qhandle_t hShader ) {
-	stretchPicCommand_t	*cmd;
+void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader )
+{
+	R_CMD( stretchPicCommand_t, RC_STRETCH_PIC );
 
-  if (!tr.registered) {
-    return;
-  }
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_STRETCH_PIC;
 	cmd->shader = R_GetShaderByHandle( hShader );
 	cmd->x = x;
 	cmd->y = y;
@@ -292,20 +260,13 @@ void RE_StretchPic ( float x, float y, float w, float h,
 }
 
 
-/*
-====================
-RE_BeginFrame
+// if running in stereo, RE_BeginFrame will be called twice for each RE_EndFrame
 
-If running in stereo, RE_BeginFrame will be called twice
-for each RE_EndFrame
-====================
-*/
-void RE_BeginFrame( stereoFrame_t stereoFrame ) {
-	drawBufferCommand_t	*cmd;
-
-	if ( !tr.registered ) {
+void RE_BeginFrame( stereoFrame_t stereoFrame )
+{
+	if (!tr.registered)
 		return;
-	}
+
 	glState.finishCalled = qfalse;
 
 	tr.frameCount++;
@@ -368,24 +329,19 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 		R_SetColorMappings();
 	}
 
-    // check for errors
-    if ( !r_ignoreGLErrors->integer ) {
-        int	err;
-
+	// check for errors
+	if ( !r_ignoreGLErrors->integer ) {
+		int err;
 		R_SyncRenderThread();
-        if ( ( err = qglGetError() ) != GL_NO_ERROR ) {
-            ri.Error( ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!\n", err );
-        }
-    }
+		if ( ( err = qglGetError() ) != GL_NO_ERROR ) {
+			ri.Error( ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!\n", err );
+		}
+	}
 
 	//
 	// draw buffer stuff
 	//
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_DRAW_BUFFER;
+	R_CMD( drawBufferCommand_t, RC_DRAW_BUFFER );
 
 	if ( glConfig.stereoEnabled ) {
 		if ( stereoFrame == STEREO_LEFT ) {
@@ -408,24 +364,12 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 }
 
 
-/*
-=============
-RE_EndFrame
-
-Returns the number of msec spent in the back end
-=============
-*/
-void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
-	swapBuffersCommand_t	*cmd;
-
-	if ( !tr.registered ) {
+void RE_EndFrame( int *frontEndMsec, int *backEndMsec )
+{
+	if (!tr.registered)
 		return;
-	}
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if ( !cmd ) {
-		return;
-	}
-	cmd->commandId = RC_SWAP_BUFFERS;
+
+	R_CMD( swapBuffersCommand_t, RC_SWAP_BUFFERS );
 
 	R_IssueRenderCommands( qtrue );
 
@@ -443,26 +387,10 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	backEnd.pc.msec = 0;
 }
 
-/*
-=============
-RE_TakeVideoFrame
-=============
-*/
-void RE_TakeVideoFrame( int width, int height,
-		byte *captureBuffer, byte *encodeBuffer, qboolean motionJpeg )
+
+void RE_TakeVideoFrame( int width, int height, byte *captureBuffer, byte *encodeBuffer, qbool motionJpeg )
 {
-	videoFrameCommand_t	*cmd;
-
-	if( !tr.registered ) {
-		return;
-	}
-
-	cmd = R_GetCommandBuffer( sizeof( *cmd ) );
-	if( !cmd ) {
-		return;
-	}
-
-	cmd->commandId = RC_VIDEOFRAME;
+	R_CMD( videoFrameCommand_t, RC_VIDEOFRAME );
 
 	cmd->width = width;
 	cmd->height = height;

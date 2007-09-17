@@ -28,7 +28,7 @@ This file does all of the processing necessary to turn a raw grid of points
 read from the map file into a srfGridMesh_t ready for rendering.
 
 The level of detail solution is direction independent, based only on subdivided
-distance from the true curve.
+distance from the qtrue curve.
 
 Only a single entry point:
 
@@ -119,8 +119,8 @@ static void MakeMeshNormals( int width, int height, drawVert_t ctrl[MAX_GRID_SIZ
 	int		x, y;
 	drawVert_t	*dv;
 	vec3_t		around[8], temp;
-	qboolean	good[8];
-	qboolean	wrapWidth, wrapHeight;
+	qbool	good[8];
+	qbool	wrapWidth, wrapHeight;
 	float		len;
 static	int	neighbors[8][2] = {
 	{0,1}, {1,1}, {1,0}, {1,-1}, {0,-1}, {-1,-1}, {-1,0}, {-1,1}
@@ -298,13 +298,13 @@ srfGridMesh_t *R_CreateSurfaceGridMesh(int width, int height,
 	size = (width * height - 1) * sizeof( drawVert_t ) + sizeof( *grid );
 
 #ifdef PATCH_STITCHING
-	grid = /*ri.Hunk_Alloc*/ ri.Malloc( size );
+	grid = (srfGridMesh_t*) /*ri.Hunk_Alloc*/ ri.Malloc( size );
 	Com_Memset(grid, 0, size);
 
-	grid->widthLodError = /*ri.Hunk_Alloc*/ ri.Malloc( width * 4 );
+	grid->widthLodError = (float*) /*ri.Hunk_Alloc*/ ri.Malloc( width * 4 );
 	Com_Memcpy( grid->widthLodError, errorTable[0], width * 4 );
 
-	grid->heightLodError = /*ri.Hunk_Alloc*/ ri.Malloc( height * 4 );
+	grid->heightLodError = (float*) /*ri.Hunk_Alloc*/ ri.Malloc( height * 4 );
 	Com_Memcpy( grid->heightLodError, errorTable[1], height * 4 );
 #else
 	grid = ri.Hunk_Alloc( size );

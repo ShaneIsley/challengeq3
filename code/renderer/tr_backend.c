@@ -35,10 +35,8 @@ static float	s_flipMatrix[16] = {
 };
 
 
-/*
-** GL_Bind
-*/
-void GL_Bind( image_t *image ) {
+void GL_Bind( const image_t* image )
+{
 	int texnum;
 
 	if ( !image ) {
@@ -521,7 +519,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
-	qboolean		depthRange, oldDepthRange;
+	qbool		depthRange, oldDepthRange;
 	int				i;
 	drawSurf_t		*drawSurf;
 	unsigned int oldSort = (unsigned int)-1;
@@ -641,7 +639,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	RB_DrawSun();
 #endif
 	// darken down any stencil shadows
-	RB_ShadowFinish();		
+	RB_ShadowFinish();
 
 	// add light flares on lights that aren't obscured
 	RB_RenderFlares();
@@ -656,23 +654,19 @@ RENDER BACK END THREAD FUNCTIONS
 ============================================================================
 */
 
-/*
-================
-RB_SetGL2D
 
-================
-*/
-void	RB_SetGL2D (void) {
+static void RB_SetGL2D()
+{
 	backEnd.projection2D = qtrue;
 
 	// set 2D virtual screen size
 	qglViewport( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	qglScissor( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	qglMatrixMode(GL_PROJECTION);
-    qglLoadIdentity ();
-	qglOrtho (0, glConfig.vidWidth, glConfig.vidHeight, 0, 0, 1);
+	qglLoadIdentity();
+	qglOrtho( 0, glConfig.vidWidth, glConfig.vidHeight, 0, 0, 1 );
 	qglMatrixMode(GL_MODELVIEW);
-    qglLoadIdentity ();
+	qglLoadIdentity();
 
 	GL_State( GLS_DEPTHTEST_DISABLE |
 			  GLS_SRCBLEND_SRC_ALPHA |
@@ -696,7 +690,7 @@ Stretches a raw 32 bit power of 2 bitmap image over the given screen rectangle.
 Used for cinematics.
 =============
 */
-void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty) {
+void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qbool dirty) {
 	int			i, j;
 	int			start, end;
 
@@ -762,7 +756,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	qglEnd ();
 }
 
-void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty) {
+void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int client, qbool dirty) {
 
 	GL_Bind( tr.scratchImage[client] );
 
@@ -785,42 +779,27 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 }
 
 
-/*
-=============
-RB_SetColor
-
-=============
-*/
-const void	*RB_SetColor( const void *data ) {
-	const setColorCommand_t	*cmd;
-
-	cmd = (const setColorCommand_t *)data;
+static const void* RB_SetColor( const void* data )
+{
+	const setColorCommand_t* cmd = (const setColorCommand_t*)data;
 
 	backEnd.color2D[0] = cmd->color[0] * 255;
 	backEnd.color2D[1] = cmd->color[1] * 255;
 	backEnd.color2D[2] = cmd->color[2] * 255;
 	backEnd.color2D[3] = cmd->color[3] * 255;
 
-	return (const void *)(cmd + 1);
+	return (const void*)(cmd + 1);
 }
 
-/*
-=============
-RB_StretchPic
-=============
-*/
-const void *RB_StretchPic ( const void *data ) {
-	const stretchPicCommand_t	*cmd;
-	shader_t *shader;
-	int		numVerts, numIndexes;
 
-	cmd = (const stretchPicCommand_t *)data;
+static const void* RB_StretchPic( const void* data )
+{
+	const stretchPicCommand_t* cmd = (const stretchPicCommand_t*)data;
 
-	if ( !backEnd.projection2D ) {
+	if ( !backEnd.projection2D )
 		RB_SetGL2D();
-	}
 
-	shader = cmd->shader;
+	const shader_t* shader = cmd->shader;
 	if ( shader != tess.shader ) {
 		if ( tess.numIndexes ) {
 			RB_EndSurface();
@@ -830,8 +809,8 @@ const void *RB_StretchPic ( const void *data ) {
 	}
 
 	RB_CHECKOVERFLOW( 4, 6 );
-	numVerts = tess.numVertexes;
-	numIndexes = tess.numIndexes;
+	int numVerts = tess.numVertexes;
+	int numIndexes = tess.numIndexes;
 
 	tess.numVertexes += 4;
 	tess.numIndexes += 6;
@@ -876,45 +855,30 @@ const void *RB_StretchPic ( const void *data ) {
 	tess.texCoords[ numVerts + 3 ][0][0] = cmd->s1;
 	tess.texCoords[ numVerts + 3 ][0][1] = cmd->t2;
 
-	return (const void *)(cmd + 1);
+	return (const void*)(cmd + 1);
 }
 
 
-/*
-=============
-RB_DrawSurfs
-
-=============
-*/
-const void	*RB_DrawSurfs( const void *data ) {
-	const drawSurfsCommand_t	*cmd;
+static const void* RB_DrawSurfs( const void* data )
+{
+	const drawSurfsCommand_t* cmd = (const drawSurfsCommand_t*)data;
 
 	// finish any 2D drawing if needed
-	if ( tess.numIndexes ) {
+	if ( tess.numIndexes )
 		RB_EndSurface();
-	}
-
-	cmd = (const drawSurfsCommand_t *)data;
 
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
 
 	RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
-	return (const void *)(cmd + 1);
+	return (const void*)(cmd + 1);
 }
 
 
-/*
-=============
-RB_DrawBuffer
-
-=============
-*/
-const void	*RB_DrawBuffer( const void *data ) {
-	const drawBufferCommand_t	*cmd;
-
-	cmd = (const drawBufferCommand_t *)data;
+static const void* RB_DrawBuffer( const void* data )
+{
+	const drawBufferCommand_t* cmd = (const drawBufferCommand_t*)data;
 
 	qglDrawBuffer( cmd->buffer );
 
@@ -924,42 +888,34 @@ const void	*RB_DrawBuffer( const void *data ) {
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	return (const void *)(cmd + 1);
+	return (const void*)(cmd + 1);
 }
 
-/*
-===============
-RB_ShowImages
 
-Draw all the images to the screen, on top of whatever
-was there.  This is used to test for texture thrashing.
+/*
+Draw all the images to the screen, on top of whatever was there
+This is used to test for texture thrashing in 1999, but is useless now
 
 Also called by RE_EndRegistration
-===============
 */
-void RB_ShowImages( void ) {
-	int		i;
-	image_t	*image;
-	float	x, y, w, h;
-	int		start, end;
-
-	if ( !backEnd.projection2D ) {
+void RB_ShowImages()
+{
+	if ( !backEnd.projection2D )
 		RB_SetGL2D();
-	}
 
 	qglClear( GL_COLOR_BUFFER_BIT );
 
 	qglFinish();
 
-	start = ri.Milliseconds();
+	int start = ri.Milliseconds();
 
-	for ( i=0 ; i<tr.numImages ; i++ ) {
-		image = tr.images[i];
+	for (int i = 0; i < tr.numImages; ++i) {
+		const image_t* image = tr.images[i];
 
-		w = glConfig.vidWidth / 20;
-		h = glConfig.vidHeight / 15;
-		x = i % 20 * w;
-		y = i / 20 * h;
+		float w = glConfig.vidWidth / 20;
+		float h = glConfig.vidHeight / 15;
+		float x = i % 20 * w;
+		float y = i / 20 * h;
 
 		// show in proportional size in mode 2
 		if ( r_showImages->integer == 2 ) {
@@ -982,9 +938,7 @@ void RB_ShowImages( void ) {
 
 	qglFinish();
 
-	end = ri.Milliseconds();
-	ri.Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
-
+	ri.Printf( PRINT_ALL, "%i msec to draw all images\n", ri.Milliseconds() - start );
 }
 
 
@@ -1012,19 +966,13 @@ const void	*RB_SwapBuffers( const void *data ) {
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
 	if ( r_measureOverdraw->integer ) {
-		int i;
-		long sum = 0;
-		unsigned char *stencilReadback;
-
-		stencilReadback = ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight );
+		RI_AutoPtr stencilReadback( glConfig.vidWidth * glConfig.vidHeight );
 		qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilReadback );
 
-		for ( i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++ ) {
+		long sum = 0;
+		for (int i = 0; i < glConfig.vidWidth * glConfig.vidHeight; ++i)
 			sum += stencilReadback[i];
-		}
-
 		backEnd.pc.c_overDraw += sum;
-		ri.Hunk_FreeTempMemory( stencilReadback );
 	}
 
 
@@ -1078,7 +1026,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			data = RB_SwapBuffers( data );
 			break;
 		case RC_SCREENSHOT:
-			data = RB_TakeScreenshotCmd( data );
+			data = RB_TakeScreenshotCmd( (const screenshotCommand_t*)data );
 			break;
 		case RC_VIDEOFRAME:
 			data = RB_TakeVideoFrameCmd( data );

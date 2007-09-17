@@ -33,12 +33,12 @@ frame.
 
 */
 
-/*
-==============
-R_AddAnimSurfaces
-==============
-*/
-void R_AddAnimSurfaces( trRefEntity_t *ent ) {
+
+void R_AddAnimSurfaces( trRefEntity_t *ent )
+{
+	// this is clearly unfinished, incorrect code
+	ri.Error( ERR_DROP, "R_AddAnimSurfaces" );
+#if 0
 	md4Header_t		*header;
 	md4Surface_t	*surface;
 	md4LOD_t		*lod;
@@ -51,9 +51,10 @@ void R_AddAnimSurfaces( trRefEntity_t *ent ) {
 	surface = (md4Surface_t *)( (byte *)lod + lod->ofsSurfaces );
 	for ( i = 0 ; i < lod->numSurfaces ; i++ ) {
 		shader = R_GetShaderByHandle( surface->shaderIndex );
-		R_AddDrawSurf( (void *)surface, shader, 0 /*fogNum*/, qfalse );
+		R_AddDrawSurf( (surfaceType_t*)surface, shader, 0 /*fogNum*/, qfalse );
 		surface = (md4Surface_t *)( (byte *)surface + surface->ofsEnd );
 	}
+#endif
 }
 
 /*
@@ -324,7 +325,7 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 	int				lodnum = 0;
 	int				fogNum = 0;
 	int				cull;
-	qboolean	personalModel;
+	qbool	personalModel;
 
 	header = (mdrHeader_t *) tr.currentModel->md4;
 	

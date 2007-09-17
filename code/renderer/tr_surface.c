@@ -229,7 +229,7 @@ void RB_SurfaceTriangles( srfTriangles_t *srf ) {
 	float		*xyz, *normal, *texCoords;
 	byte		*color;
 	int			dlightBits;
-	qboolean	needsNormal;
+	qbool	needsNormal;
 
 	dlightBits = srf->dlightBits[backEnd.smpFrame];
 	tess.dlightBits |= dlightBits;
@@ -1009,7 +1009,7 @@ void RB_SurfaceGrid( srfGridMesh_t *cv ) {
 	int		numVertexes;
 	int		dlightBits;
 	int		*vDlightBits;
-	qboolean	needsNormal;
+	qbool	needsNormal;
 
 	dlightBits = cv->dlightBits[backEnd.smpFrame];
 	tess.dlightBits |= dlightBits;
@@ -1179,14 +1179,11 @@ void RB_SurfaceAxis( void ) {
 
 //===========================================================================
 
-/*
-====================
-RB_SurfaceEntity
 
-Entities that have a single procedurally generated surface
-====================
-*/
-void RB_SurfaceEntity( surfaceType_t *surfType ) {
+// entities that have a single procedurally generated surface
+
+static void RB_SurfaceEntity( surfaceType_t* surfType )
+{
 	switch( backEnd.currentEntity->e.reType ) {
 	case RT_SPRITE:
 		RB_SurfaceSprite();
