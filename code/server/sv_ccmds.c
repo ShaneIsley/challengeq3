@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "server.h"
+#include "../qcommon/vm_local.h"
 
 /*
 ===============================================================================
@@ -153,7 +154,7 @@ Restart the server on a different map
 static void SV_Map_f( void ) {
 	char		*cmd;
 	char		*map;
-	qboolean	killBots, cheat;
+	qbool	killBots, cheat;
 	char		expanded[MAX_QPATH];
 	char		mapname[MAX_QPATH];
 
@@ -225,8 +226,7 @@ This allows fair starts with variable load times.
 static void SV_MapRestart_f( void ) {
 	int			i;
 	client_t	*client;
-	char		*denied;
-	qboolean	isBot;
+	qbool	isBot;
 	int			delay;
 
 	// make sure we aren't restarting twice in the same frame
@@ -316,7 +316,7 @@ static void SV_MapRestart_f( void ) {
 		SV_AddServerCommand( client, "map_restart\n" );
 
 		// connect the client again, without the firstTime flag
-		denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
+		const char* denied = (const char*)VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
 		if ( denied ) {
 			// this generally shouldn't happen, because the client
 			// was connected before the level change
@@ -726,7 +726,7 @@ SV_AddOperatorCommands
 ==================
 */
 void SV_AddOperatorCommands( void ) {
-	static qboolean	initialized;
+	static qbool	initialized;
 
 	if ( initialized ) {
 		return;

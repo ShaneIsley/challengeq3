@@ -448,7 +448,7 @@ Redirect all printfs
 ===============
 */
 void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
-	qboolean	valid;
+	qbool	valid;
 	unsigned int time;
 	char		remaining[1024];
 	// TTimo - scaled down to accumulate, but not overflow anything network wise, print wise etc.
@@ -507,36 +507,28 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	Com_EndRedirect ();
 }
 
-/*
-=================
-SV_ConnectionlessPacket
 
-A connectionless packet has four leading 0xff
-characters to distinguish it from a game channel.
-Clients that are in the game can still send
-connectionless packets.
-=================
-*/
-void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
-	char	*s;
-	char	*c;
+// a connectionless packet has four leading 0xff characters to distinguish it from a game channel.
+// clients that are in the game can still send connectionless packets.
 
+static void SV_ConnectionlessPacket( const netadr_t from, msg_t* msg )
+{
 	MSG_BeginReadingOOB( msg );
 	MSG_ReadLong( msg );		// skip the -1 marker
 
-	if (!Q_strncmp("connect", (char *) &msg->data[4], 7)) {
+	if (!Q_strncmp("connect", (const char*)&msg->data[4], 7)) {
 		Huff_Decompress(msg, 12);
 	}
 
-	s = MSG_ReadStringLine( msg );
+	const char* s = MSG_ReadStringLine( msg );
 	Cmd_TokenizeString( s );
 
-	c = Cmd_Argv(0);
-	Com_DPrintf ("SV packet %s : %s\n", NET_AdrToString(from), c);
+	const char* c = Cmd_Argv(0);
+	Com_DPrintf("SV packet %s : %s\n", NET_AdrToString(from), c);
 
 	if (!Q_stricmp(c, "getstatus")) {
 		SVC_Status( from  );
-  } else if (!Q_stricmp(c, "getinfo")) {
+	} else if (!Q_stricmp(c, "getinfo")) {
 		SVC_Info( from );
 	} else if (!Q_stricmp(c, "getchallenge")) {
 		SV_GetChallenge( from );
@@ -551,37 +543,29 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		// server disconnect messages when their new server sees our final
 		// sequenced messages to the old client
 	} else {
-		Com_DPrintf ("bad connectionless packet from %s:\n%s\n"
-		, NET_AdrToString (from), s);
+		Com_DPrintf("bad connectionless packet from %s:\n%s\n", NET_AdrToString(from), s);
 	}
 }
 
 //============================================================================
 
-/*
-=================
-SV_ReadPackets
-=================
-*/
-void SV_PacketEvent( netadr_t from, msg_t *msg ) {
-	int			i;
-	client_t	*cl;
-	int			qport;
 
+void SV_PacketEvent( const netadr_t& from, msg_t* msg )
+{
 	// check for connectionless packet (0xffffffff) first
 	if ( msg->cursize >= 4 && *(int *)msg->data == -1) {
 		SV_ConnectionlessPacket( from, msg );
 		return;
 	}
 
-	// read the qport out of the message so we can fix up
-	// stupid address translating routers
+	// read the qport out of the message so we can fix up stupid NATs
 	MSG_BeginReadingOOB( msg );
-	MSG_ReadLong( msg );				// sequence number
-	qport = MSG_ReadShort( msg ) & 0xffff;
+	MSG_ReadLong( msg ); // sequence number
+	int qport = MSG_ReadShort( msg ) & 0xffff;
 
 	// find which client the message is from
-	for (i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
+	client_t* cl = svs.clients;
+	for (int i = 0; i < sv_maxclients->integer; ++i, ++cl) {
 		if (cl->state == CS_FREE) {
 			continue;
 		}
@@ -594,9 +578,8 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 			continue;
 		}
 
-		// the IP port can't be used to differentiate them, because
-		// some address translating routers periodically change UDP
-		// port assignments
+		// the IP port can't be used to differentiate them,
+		// because some NATs periodically change UDP port assignments
 		if (cl->netchan.remoteAddress.port != from.port) {
 			Com_Printf( "SV_PacketEvent: fixing up a translated port\n" );
 			cl->netchan.remoteAddress.port = from.port;
@@ -614,7 +597,7 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 		}
 		return;
 	}
-	
+
 	// if we received a sequenced packet from an address we don't recognize,
 	// send an out of band disconnect packet to it
 	NET_OutOfBandPrint( NS_SERVER, from, "disconnect" );
@@ -729,7 +712,7 @@ void SV_CheckTimeouts( void ) {
 SV_CheckPaused
 ==================
 */
-qboolean SV_CheckPaused( void ) {
+qbool SV_CheckPaused( void ) {
 	int		count;
 	client_t	*cl;
 	int		i;

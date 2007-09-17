@@ -93,7 +93,7 @@ void SV_BotFreeClient( int clientNum ) {
 BotDrawDebugPolygons
 ==================
 */
-void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, float *points), int value) {
+void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, const float* points), int value) {
 	static cvar_t *bot_debug, *bot_groundonly, *bot_reachability, *bot_highlightarea;
 	bot_debugpoly_t *poly;
 	int i, parm0;
@@ -230,21 +230,15 @@ int BotImport_PointContents(vec3_t point) {
 	return SV_PointContents(point, -1);
 }
 
-/*
-==================
-BotImport_inPVS
-==================
-*/
-int BotImport_inPVS(vec3_t p1, vec3_t p2) {
+
+qbool BotImport_inPVS(vec3_t p1, vec3_t p2)
+{
 	return SV_inPVS (p1, p2);
 }
 
-/*
-==================
-BotImport_BSPEntityData
-==================
-*/
-char *BotImport_BSPEntityData(void) {
+
+static const char* BotImport_BSPEntityData()
+{
 	return CM_EntityString();
 }
 
@@ -518,14 +512,11 @@ SV_BotInitBotLib
 void SV_BotInitBotLib(void) {
 	botlib_import_t	botlib_import;
 
-	if ( !Cvar_VariableValue("fs_restrict") && !Sys_CheckCD() ) {
-		Com_Error( ERR_NEED_CD, "Game CD not in drive" );
-	}
-
+/*
 	if (debugpolygons) Z_Free(debugpolygons);
 	bot_maxdebugpolys = Cvar_VariableIntegerValue("bot_maxdebugpolys");
 	debugpolygons = Z_Malloc(sizeof(bot_debugpoly_t) * bot_maxdebugpolys);
-
+*/
 	botlib_import.Print = BotImport_Print;
 	botlib_import.Trace = BotImport_Trace;
 	botlib_import.EntityTrace = BotImport_EntityTrace;

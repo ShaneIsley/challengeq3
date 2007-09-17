@@ -22,58 +22,45 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // sv_game.c -- interface to the game dll
 
 #include "server.h"
-
+#include "../qcommon/vm_local.h"
 #include "../botlib/botlib.h"
+#include "../qcommon/vm_shim.h"
+
 
 botlib_export_t	*botlib_export;
 
-void SV_GameError( const char *string ) {
-	Com_Error( ERR_DROP, "%s", string );
-}
-
-void SV_GamePrint( const char *string ) {
-	Com_Printf( "%s", string );
-}
 
 // these functions must be used instead of pointer arithmetic, because
 // the game allocates gentities with private information after the server shared part
-int	SV_NumForGentity( sharedEntity_t *ent ) {
-	int		num;
 
-	num = ( (byte *)ent - (byte *)sv.gentities ) / sv.gentitySize;
-
-	return num;
+int SV_NumForGentity( const sharedEntity_t* ent )
+{
+	return (((byte*)ent - (byte*)sv.gentities) / sv.gentitySize);
 }
 
-sharedEntity_t *SV_GentityNum( int num ) {
-	sharedEntity_t *ent;
-
-	ent = (sharedEntity_t *)((byte *)sv.gentities + sv.gentitySize*(num));
-
-	return ent;
+sharedEntity_t* SV_GentityNum( int num )
+{
+	return (sharedEntity_t*)((byte*)sv.gentities + (sv.gentitySize * num));
 }
 
-playerState_t *SV_GameClientNum( int num ) {
-	playerState_t	*ps;
-
-	ps = (playerState_t *)((byte *)sv.gameClients + sv.gameClientSize*(num));
-
-	return ps;
+playerState_t* SV_GameClientNum( int num )
+{
+	return (playerState_t*)((byte*)sv.gameClients + (sv.gameClientSize * num));
 }
 
-svEntity_t	*SV_SvEntityForGentity( sharedEntity_t *gEnt ) {
+svEntity_t* SV_SvEntityForGentity( const sharedEntity_t* gEnt )
+{
 	if ( !gEnt || gEnt->s.number < 0 || gEnt->s.number >= MAX_GENTITIES ) {
 		Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
 	}
 	return &sv.svEntities[ gEnt->s.number ];
 }
 
-sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt ) {
-	int		num;
-
-	num = svEnt - sv.svEntities;
-	return SV_GentityNum( num );
+sharedEntity_t* SV_GEntityForSvEntity( const svEntity_t* svEnt )
+{
+	return SV_GentityNum( svEnt - sv.svEntities );
 }
+
 
 /*
 ===============
@@ -109,32 +96,23 @@ void SV_GameDropClient( int clientNum, const char *reason ) {
 }
 
 
-/*
-=================
-SV_SetBrushModel
+// sets mins and maxs for inline bmodels
 
-sets mins and maxs for inline bmodels
-=================
-*/
-void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
-	clipHandle_t	h;
-	vec3_t			mins, maxs;
-
-	if (!name) {
+static void SV_SetBrushModel( sharedEntity_t* ent, const char* name )
+{
+	if (!name)
 		Com_Error( ERR_DROP, "SV_SetBrushModel: NULL" );
-	}
 
-	if (name[0] != '*') {
+	if (name[0] != '*')
 		Com_Error( ERR_DROP, "SV_SetBrushModel: %s isn't a brush model", name );
-	}
-
 
 	ent->s.modelindex = atoi( name + 1 );
 
-	h = CM_InlineModel( ent->s.modelindex );
+	vec3_t mins, maxs;
+	clipHandle_t h = CM_InlineModel( ent->s.modelindex );
 	CM_ModelBounds( h, mins, maxs );
-	VectorCopy (mins, ent->r.mins);
-	VectorCopy (maxs, ent->r.maxs);
+	VectorCopy( mins, ent->r.mins );
+	VectorCopy( maxs, ent->r.maxs );
 	ent->r.bmodel = qtrue;
 
 	ent->r.contents = -1;		// we don't know exactly what is in the brushes
@@ -143,15 +121,9 @@ void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
 }
 
 
+// also checks portalareas so that doors block sight
 
-/*
-=================
-SV_inPVS
-
-Also checks portalareas so that doors block sight
-=================
-*/
-qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
+qbool SV_inPVS( const vec3_t p1, const vec3_t p2 )
 {
 	int		leafnum;
 	int		cluster;
@@ -174,14 +146,9 @@ qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
 }
 
 
-/*
-=================
-SV_inPVSIgnorePortals
+// does NOT check portalareas
 
-Does NOT check portalareas
-=================
-*/
-qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
+qbool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2 )
 {
 	int		leafnum;
 	int		cluster;
@@ -204,65 +171,44 @@ qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 }
 
 
-/*
-========================
-SV_AdjustAreaPortalState
-========================
-*/
-void SV_AdjustAreaPortalState( sharedEntity_t *ent, qboolean open ) {
-	svEntity_t	*svEnt;
+static void SV_AdjustAreaPortalState( sharedEntity_t* ent, qbool open )
+{
+	svEntity_t* svEnt = SV_SvEntityForGentity( ent );
 
-	svEnt = SV_SvEntityForGentity( ent );
-	if ( svEnt->areanum2 == -1 ) {
+	if ( svEnt->areanum2 == -1 )
 		return;
-	}
+
 	CM_AdjustAreaPortalState( svEnt->areanum, svEnt->areanum2, open );
 }
 
 
-/*
-==================
-SV_GameAreaEntities
-==================
-*/
-qboolean	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
-	const float	*origin, *angles;
-	clipHandle_t	ch;
-	trace_t			trace;
+static qbool SV_EntityContact( const vec3_t mins, const vec3_t maxs, const sharedEntity_t* gEnt, int capsule )
+{
+	trace_t trace;
 
 	// check for exact collision
-	origin = gEnt->r.currentOrigin;
-	angles = gEnt->r.currentAngles;
+	const float* origin = gEnt->r.currentOrigin;
+	const float* angles = gEnt->r.currentAngles;
 
-	ch = SV_ClipHandleForEntity( gEnt );
-	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs,
-		ch, -1, origin, angles, capsule );
+	clipHandle_t ch = SV_ClipHandleForEntity( gEnt );
+	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs, ch, -1, origin, angles, capsule );
 
 	return trace.startsolid;
 }
 
 
-/*
-===============
-SV_GetServerinfo
-
-===============
-*/
-void SV_GetServerinfo( char *buffer, int bufferSize ) {
-	if ( bufferSize < 1 ) {
+static void SV_GetServerinfo( char* buffer, int bufferSize )
+{
+	if ( bufferSize < 1 )
 		Com_Error( ERR_DROP, "SV_GetServerinfo: bufferSize == %i", bufferSize );
-	}
+
 	Q_strncpyz( buffer, Cvar_InfoString( CVAR_SERVERINFO ), bufferSize );
 }
 
-/*
-===============
-SV_LocateGameData
 
-===============
-*/
-void SV_LocateGameData( sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t,
-					   playerState_t *clients, int sizeofGameClient ) {
+static void SV_LocateGameData( sharedEntity_t* gEnts, int numGEntities, int sizeofGEntity_t,
+						playerState_t* clients, int sizeofGameClient )
+{
 	sv.gentities = gEnts;
 	sv.gentitySize = sizeofGEntity_t;
 	sv.num_entities = numGEntities;
@@ -272,40 +218,35 @@ void SV_LocateGameData( sharedEntity_t *gEnts, int numGEntities, int sizeofGEnti
 }
 
 
-/*
-===============
-SV_GetUsercmd
-
-===============
-*/
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
-	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
+static void SV_GetUsercmd( int clientNum, usercmd_t* cmd )
+{
+	if ( clientNum < 0 || clientNum >= sv_maxclients->integer )
 		Com_Error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
-	}
+
 	*cmd = svs.clients[clientNum].lastUsercmd;
 }
 
-//==============================================
 
-static int	FloatAsInt( float f ) {
+///////////////////////////////////////////////////////////////
+
+
+static int FloatAsInt( float f )
+{
 	union
 	{
-	    int i;
-	    float f;
+		int i;
+		float f;
 	} temp;
-	
+
 	temp.f = f;
 	return temp.i;
 }
 
-/*
-====================
-SV_GameSystemCalls
 
-The module is making a system call
-====================
-*/
-intptr_t SV_GameSystemCalls( intptr_t *args ) {
+// the module is making a system call
+
+intptr_t SV_GameSystemCalls( intptr_t* args )
+{
 	switch( args[0] ) {
 	case G_PRINT:
 		Com_Printf( "%s", VMA(1) );
@@ -315,17 +256,20 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 	case G_MILLISECONDS:
 		return Sys_Milliseconds();
+	case G_REAL_TIME:
+		return Com_RealTime( VMA(1) );
+
 	case G_CVAR_REGISTER:
-		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
+		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] );
 		return 0;
 	case G_CVAR_UPDATE:
 		Cvar_Update( VMA(1) );
 		return 0;
 	case G_CVAR_SET:
-		Cvar_Set( (const char *)VMA(1), (const char *)VMA(2) );
+		Cvar_Set( VMA(1), VMA(2) );
 		return 0;
 	case G_CVAR_VARIABLE_INTEGER_VALUE:
-		return Cvar_VariableIntegerValue( (const char *)VMA(1) );
+		return Cvar_VariableIntegerValue( VMA(1) );
 	case G_CVAR_VARIABLE_STRING_BUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
 		return 0;
@@ -339,7 +283,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 
 	case G_FS_FOPEN_FILE:
-		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
+		return FS_FOpenFileByMode( VMA(1), VMA(2), (fsMode_t)args[3] );
 	case G_FS_READ:
 		FS_Read2( VMA(1), args[2], args[3] );
 		return 0;
@@ -421,32 +365,23 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_GET_USERCMD:
 		SV_GetUsercmd( args[1], VMA(2) );
 		return 0;
+
 	case G_GET_ENTITY_TOKEN:
 		{
-			const char	*s;
-
-			s = COM_Parse( &sv.entityParsePoint );
+			const char* s = COM_Parse( &sv.entityParsePoint );
 			Q_strncpyz( VMA(1), s, args[2] );
-			if ( !sv.entityParsePoint && !s[0] ) {
-				return qfalse;
-			} else {
-				return qtrue;
-			}
+			return (sv.entityParsePoint || s[0]);
 		}
-
+/*
 	case G_DEBUG_POLYGON_CREATE:
 		return BotImport_DebugPolygonCreate( args[1], args[2], VMA(3) );
 	case G_DEBUG_POLYGON_DELETE:
 		BotImport_DebugPolygonDelete( args[1] );
 		return 0;
-	case G_REAL_TIME:
-		return Com_RealTime( VMA(1) );
 	case G_SNAPVECTOR:
 		Sys_SnapVector( VMA(1) );
 		return 0;
-
-		//====================================
-
+*/
 	case BOTLIB_SETUP:
 		return SV_BotLibSetup();
 	case BOTLIB_SHUTDOWN:
@@ -833,11 +768,11 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 
 	case TRAP_SQRT:
 		return FloatAsInt( sqrt( VMF(1) ) );
-
+/*
 	case TRAP_MATRIXMULTIPLY:
 		MatrixMultiply( VMA(1), VMA(2), VMA(3) );
 		return 0;
-
+*/
 	case TRAP_ANGLEVECTORS:
 		AngleVectors( VMA(1), VMA(2), VMA(3), VMA(4) );
 		return 0;
@@ -852,122 +787,88 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
-
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %i", args[0] );
 	}
 	return -1;
 }
 
-/*
-===============
-SV_ShutdownGameProgs
 
-Called every time a map changes
-===============
-*/
-void SV_ShutdownGameProgs( void ) {
-	if ( !gvm ) {
+///////////////////////////////////////////////////////////////
+
+
+// called every time a map changes
+
+void SV_ShutdownGameProgs()
+{
+	if ( !gvm )
 		return;
-	}
+
 	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
 	VM_Free( gvm );
 	gvm = NULL;
 }
 
-/*
-==================
-SV_InitGameVM
 
-Called for both a full init and a restart
-==================
-*/
-static void SV_InitGameVM( qboolean restart ) {
-	int		i;
+// called for both a full init and a restart
+
+static void SV_InitGameVM( qbool restart )
+{
+	if ( !gvm )
+		Com_Error( ERR_FATAL, "VM_%s on game failed", restart ? "Restart" : "Create" );
 
 	// start the entity parsing at the beginning
 	sv.entityParsePoint = CM_EntityString();
 
-	// clear all gentity pointers that might still be set from
-	// a previous level
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=522
-	//   now done before GAME_INIT call
-	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
+	// clear all gentity pointers that might still be set from a previous level
+	for (int i = 0; i < sv_maxclients->integer; ++i)
 		svs.clients[i].gentity = NULL;
-	}
-	
+
 	// use the current msec count for a random seed
 	// init for this gamestate
-	VM_Call (gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart);
+	VM_Call( gvm, GAME_INIT, sv.time, Com_Milliseconds(), restart );
 }
 
 
 
-/*
-===================
-SV_RestartGameProgs
+// called on a map_restart, but not on a normal map change
 
-Called on a map_restart, but not on a normal map change
-===================
-*/
-void SV_RestartGameProgs( void ) {
-	if ( !gvm ) {
+void SV_RestartGameProgs()
+{
+	if ( !gvm )
 		return;
-	}
+
 	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
 
-	// do a restart instead of a free
 	gvm = VM_Restart( gvm );
-	if ( !gvm ) { // bk001212 - as done below
-		Com_Error( ERR_FATAL, "VM_Restart on game failed" );
-	}
 
 	SV_InitGameVM( qtrue );
 }
 
 
-/*
-===============
-SV_InitGameProgs
+// called on a normal map change, not on a map_restart
 
-Called on a normal map change, not on a map_restart
-===============
-*/
-void SV_InitGameProgs( void ) {
-	cvar_t	*var;
+void SV_InitGameProgs()
+{
 	//FIXME these are temp while I make bots run in vm
-	extern int	bot_enable;
+	extern int bot_enable;
 
-	var = Cvar_Get( "bot_enable", "1", CVAR_LATCH );
-	if ( var ) {
-		bot_enable = var->integer;
-	}
-	else {
-		bot_enable = 0;
-	}
+	cvar_t* var = Cvar_Get( "bot_enable", "1", CVAR_LATCH );
+	bot_enable = (var && var->integer);
 
 	// load the dll or bytecode
-	gvm = VM_Create( "qagame", SV_GameSystemCalls, Cvar_VariableValue( "vm_game" ) );
-	if ( !gvm ) {
-		Com_Error( ERR_FATAL, "VM_Create on game failed" );
-	}
+	gvm = VM_Create( "qagame", SV_GameSystemCalls, (vmInterpret_t)Cvar_VariableIntegerValue( "vm_game" ) );
 
 	SV_InitGameVM( qfalse );
 }
 
 
-/*
-====================
-SV_GameCommand
+// see if the current console command is claimed by the game
 
-See if the current console command is claimed by the game
-====================
-*/
-qboolean SV_GameCommand( void ) {
-	if ( sv.state != SS_GAME ) {
+qbool SV_GameCommand()
+{
+	if ( sv.state != SS_GAME )
 		return qfalse;
-	}
-
 	return VM_Call( gvm, GAME_CONSOLE_COMMAND );
 }
 

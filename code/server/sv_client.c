@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // sv_client.c -- server code for dealing with clients
 
 #include "server.h"
+#include "../qcommon/vm_local.h"
 
 static void SV_CloseDownload( client_t *cl );
 
@@ -239,7 +240,6 @@ void SV_DirectConnect( netadr_t from ) {
 	int			challenge;
 	char		*password;
 	int			startIndex;
-	intptr_t		denied;
 	int			count;
 
 	Com_DPrintf ("SVC_DirectConnect ()\n");
@@ -420,13 +420,12 @@ gotnewcl:
 	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
 
 	// get the game a chance to reject this connection or modify the userinfo
-	denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
+	intptr_t denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
 	if ( denied ) {
 		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
-		char *str = VM_ExplicitArgPtr( gvm, denied );
-
-		NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", str );
-		Com_DPrintf ("Game rejected a connection: %s.\n", str);
+		const char* s = (const char*)VM_ExplicitArgPtr( gvm, denied );
+		NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", s );
+		Com_DPrintf( "Game rejected a connection: %s.\n", s );
 		return;
 	}
 
@@ -860,7 +859,7 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 		curindex = (cl->downloadCurrentBlock % MAX_DOWNLOAD_WINDOW);
 
 		if (!cl->downloadBlocks[curindex])
-			cl->downloadBlocks[curindex] = Z_Malloc( MAX_DOWNLOAD_BLKSIZE );
+			cl->downloadBlocks[curindex] = (byte*)Z_Malloc( MAX_DOWNLOAD_BLKSIZE );
 
 		cl->downloadBlockSize[curindex] = FS_Read( cl->downloadBlocks[curindex], MAX_DOWNLOAD_BLKSIZE, cl->download );
 
@@ -993,7 +992,7 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 	int nClientChkSum[1024];
 	int nServerChkSum[1024];
 	const char *pPaks, *pArg;
-	qboolean bGood = qtrue;
+	qbool bGood = qtrue;
 
 	// if we are pure, we "expect" the client to load certain things from 
 	// certain pk3 files, namely we want the client to have loaded the
@@ -1260,9 +1259,9 @@ SV_ExecuteClientCommand
 Also called by bot code
 ==================
 */
-void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
+void SV_ExecuteClientCommand( client_t *cl, const char *s, qbool clientOK ) {
 	ucmd_t	*u;
-	qboolean bProcessed = qfalse;
+	qbool bProcessed = qfalse;
 	
 	Cmd_TokenizeString( s );
 
@@ -1290,10 +1289,10 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 SV_ClientCommand
 ===============
 */
-static qboolean SV_ClientCommand( client_t *cl, msg_t *msg ) {
+static qbool SV_ClientCommand( client_t *cl, msg_t *msg ) {
 	int		seq;
 	const char	*s;
-	qboolean clientOk = qtrue;
+	qbool clientOk = qtrue;
 
 	seq = MSG_ReadLong( msg );
 	s = MSG_ReadString( msg );
@@ -1373,7 +1372,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qbool delta ) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;

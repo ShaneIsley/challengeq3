@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "server.h"
+#include "../qcommon/vm_local.h"
 
 /*
 ===============
@@ -216,13 +217,14 @@ NOT cause this to be called, unless the game is exited to
 the menu system first.
 ===============
 */
-void SV_Startup( void ) {
-	if ( svs.initialized ) {
+void SV_Startup( void )
+{
+	if ( svs.initialized )
 		Com_Error( ERR_FATAL, "SV_Startup: svs.initialized" );
-	}
+
 	SV_BoundMaxClients( 1 );
 
-	svs.clients = Z_Malloc (sizeof(client_t) * sv_maxclients->integer );
+	svs.clients = Z_New<client_t>( sv_maxclients->integer );
 	if ( com_dedicated->integer ) {
 		svs.numSnapshotEntities = sv_maxclients->integer * PACKET_BACKUP * 64;
 	} else {
@@ -243,7 +245,6 @@ SV_ChangeMaxClients
 void SV_ChangeMaxClients( void ) {
 	int		oldMaxClients;
 	int		i;
-	client_t	*oldClients;
 	int		count;
 
 	// get the highest client number in use
@@ -264,7 +265,7 @@ void SV_ChangeMaxClients( void ) {
 		return;
 	}
 
-	oldClients = Hunk_AllocateTempMemory( count * sizeof(client_t) );
+	client_t* oldClients = (client_t*)Hunk_AllocateTempMemory( count * sizeof(client_t) );
 	// copy the clients to hunk memory
 	for ( i = 0 ; i < count ; i++ ) {
 		if ( svs.clients[i].state >= CS_CONNECTED ) {
@@ -279,7 +280,7 @@ void SV_ChangeMaxClients( void ) {
 	Z_Free( svs.clients );
 
 	// allocate new clients
-	svs.clients = Z_Malloc ( sv_maxclients->integer * sizeof(client_t) );
+	svs.clients = Z_New<client_t>( sv_maxclients->integer );
 	Com_Memset( svs.clients, 0, sv_maxclients->integer * sizeof(client_t) );
 
 	// copy the clients over
@@ -344,10 +345,10 @@ clients along with it.
 This is NOT called for map_restart
 ================
 */
-void SV_SpawnServer( char *server, qboolean killBots ) {
+void SV_SpawnServer( char *server, qbool killBots ) {
 	int			i;
 	int			checksum;
-	qboolean	isBot;
+	qbool	isBot;
 	char		systemInfo[16384];
 	const char	*p;
 
@@ -384,7 +385,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	FS_ClearPakReferences(0);
 
 	// allocate the snapshot entities on the hunk
-	svs.snapshotEntities = Hunk_Alloc( sizeof(entityState_t)*svs.numSnapshotEntities, h_high );
+	svs.snapshotEntities = (entityState_t*)Hunk_Alloc( sizeof(entityState_t)*svs.numSnapshotEntities, h_high );
 	svs.nextSnapshotEntities = 0;
 
 	// toggle the server bit so clients can detect that a
@@ -459,8 +460,6 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
 		// send the new gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
-			char	*denied;
-
 			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
 				if ( killBots ) {
 					SV_DropClient( &svs.clients[i], "" );
@@ -473,7 +472,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 			}
 
 			// connect the client again
-			denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
+			const char* denied = (const char*)VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
 			if ( denied ) {
 				// this generally shouldn't happen, because the client
 				// was connected before the level change

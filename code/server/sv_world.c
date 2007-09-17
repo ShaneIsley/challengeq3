@@ -576,7 +576,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		}
 
 		if ( trace.fraction < clip->trace.fraction ) {
-			qboolean	oldStart;
+			qbool	oldStart;
 
 			// make sure we keep a startsolid from a previous trace
 			oldStart = clip->trace.startsolid;
