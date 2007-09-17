@@ -59,7 +59,7 @@ to the current frame
 ==================
 */
 void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old, 
-					 qboolean unchanged) {
+					 qbool unchanged) {
 	entityState_t	*state;
 
 	// save the parsed entity state into the big circular buffer so
@@ -336,7 +336,7 @@ void CL_SystemInfoChanged( void ) {
 	const char		*s, *t;
 	char			key[BIG_INFO_KEY];
 	char			value[BIG_INFO_VALUE];
-	qboolean		gameSet;
+	qbool		gameSet;
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	// NOTE TTimo:

@@ -29,15 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #if USE_OPENAL_DLOPEN
 
-#if USE_SDL_VIDEO
-#include "SDL.h"
-#include "SDL_loadso.h"
-#define OBJTYPE void *
-#define OBJLOAD(x) SDL_LoadObject(x)
-#define SYMLOAD(x,y) SDL_LoadFunction(x,y)
-#define OBJFREE(x) SDL_UnloadObject(x)
-
-#elif defined _WIN32
+#if defined _WIN32
 #include <windows.h>
 #define OBJTYPE HMODULE
 #define OBJLOAD(x) LoadLibrary(x)
@@ -133,7 +125,7 @@ LPALCGETINTEGERV qalcGetIntegerv;
 
 static OBJTYPE OpenALLib = NULL;
 
-static qboolean alinit_fail = qfalse;
+static qbool alinit_fail = qfalse;
 
 /*
 =================
@@ -163,7 +155,7 @@ static void *GPA(char *str)
 QAL_Init
 =================
 */
-qboolean QAL_Init(const char *libname)
+qbool QAL_Init(const char *libname)
 {
 	if(OpenALLib)
 		return qtrue;
@@ -354,7 +346,7 @@ void QAL_Shutdown( void )
 	qalcGetIntegerv = NULL;
 }
 #else
-qboolean QAL_Init(const char *libname)
+qbool QAL_Init(const char *libname)
 {
 	return qtrue;
 }

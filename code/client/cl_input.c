@@ -55,7 +55,7 @@ kbutton_t	in_up, in_down;
 kbutton_t	in_buttons[16];
 
 
-qboolean	in_mlooking;
+qbool	in_mlooking;
 
 
 void IN_MLookDown( void ) {
@@ -314,7 +314,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// the walking flag is to keep animations consistant
 	// even during acceleration and develeration
 	//
-	if ( in_speed.active ^ cl_run->integer ) {
+	if ( in_speed.active ^ !!cl_run->integer ) {
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_WALKING;
 	} else {
@@ -384,7 +384,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	int		movespeed;
 	float	anglespeed;
 
-	if ( in_speed.active ^ cl_run->integer ) {
+	if ( in_speed.active ^ !!cl_run->integer ) {
 		movespeed = 2;
 	} else {
 		movespeed = 1;
@@ -614,7 +614,7 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-qboolean CL_ReadyToSendPacket( void ) {
+qbool CL_ReadyToSendPacket( void ) {
 	int		oldPacketNum;
 	int		delta;
 

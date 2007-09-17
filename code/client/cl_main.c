@@ -85,9 +85,9 @@ typedef struct serverStatus_s
 	char string[BIG_INFO_STRING];
 	netadr_t address;
 	int time, startTime;
-	qboolean pending;
-	qboolean print;
-	qboolean retrieved;
+	qbool pending;
+	qbool print;
+	qbool retrieved;
 } serverStatus_t;
 
 serverStatus_t cl_serverStatusList[MAX_SERVERSTATUSREQUESTS];
@@ -97,7 +97,6 @@ int serverStatusCount;
 	void hA3Dg_ExportRenderGeom (refexport_t *incoming_re);
 #endif
 
-extern void SV_BotFrame( int time );
 void CL_CheckForResend( void );
 void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
@@ -724,7 +723,7 @@ Sends a disconnect message to the server
 This is also called on Com_Error and Com_Quit, so it shouldn't cause any errors
 =====================
 */
-void CL_Disconnect( qboolean showMainMenu ) {
+void CL_Disconnect( qbool showMainMenu ) {
 	if ( !com_cl_running || !com_cl_running->integer ) {
 		return;
 	}
@@ -839,7 +838,7 @@ void CL_RequestMotd( void ) {
 		BigShort( cls.updateServer.port ) );
 	
 	info[0] = 0;
-  // NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a true randomization
+  // NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a qtrue randomization
   // only srand I could catch before here is tr_noise.c l:26 srand(1001)
   // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=382
   // NOTE: the Com_Milliseconds xoring only affects the lower 16-bit word,
@@ -1442,7 +1441,7 @@ void CL_NextDownload(void) {
 	char *dlURL;
 #endif
 
-	qboolean  useCURL = qfalse;
+	qbool  useCURL = qfalse;
 	// We are looking to start a download here
 	if (*clc.downloadList) {
 		s = clc.downloadList;
@@ -2204,7 +2203,9 @@ void CL_ShutdownRef( void ) {
 CL_InitRenderer
 ============
 */
-void CL_InitRenderer( void ) {
+
+void CL_InitRenderer( void )
+{
 	// this sets up the renderer and calls R_Init
 	re.BeginRegistration( &cls.glconfig );
 
@@ -2214,6 +2215,11 @@ void CL_InitRenderer( void ) {
 	cls.consoleShader = re.RegisterShader( "console" );
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
 	g_consoleField.widthInChars = g_console_field_width;
+
+	//re.RegisterFont( "MC360", 20, &cls.fontConsole );
+	//re.RegisterFont( "DGL_EnterSansman", 16, &cls.fontConsole );
+	re.RegisterFont( "DGL_FranklinGothic_M", 20, &cls.fontConsole );
+	//re.RegisterFont( "M_12pt", 8, &cls.fontConsole );
 }
 
 /*
@@ -2592,7 +2598,7 @@ CL_Shutdown
 ===============
 */
 void CL_Shutdown( void ) {
-	static qboolean recursive = qfalse;
+	static qbool recursive = qfalse;
 	
 	// check whether the client is running at all.
 	if(!(com_cl_running && com_cl_running->integer))
@@ -3007,7 +3013,7 @@ void CL_LocalServers_f( void ) {
 	cls.pingUpdateSource = AS_LOCAL;
 
 	for (i = 0; i < MAX_OTHER_SERVERS; i++) {
-		qboolean b = cls.localServers[i].visible;
+		qbool b = cls.localServers[i].visible;
 		Com_Memset(&cls.localServers[i], 0, sizeof(cls.localServers[i]));
 		cls.localServers[i].visible = b;
 	}
@@ -3297,12 +3303,12 @@ void CL_Ping_f( void ) {
 CL_UpdateVisiblePings_f
 ==================
 */
-qboolean CL_UpdateVisiblePings_f(int source) {
+qbool CL_UpdateVisiblePings_f(int source) {
 	int			slots, i;
 	char		buff[MAX_STRING_CHARS];
 	int			pingTime;
 	int			max;
-	qboolean status = qfalse;
+	qbool status = qfalse;
 
 	if (source < 0 || source > AS_FAVORITES) {
 		return qfalse;
@@ -3446,10 +3452,10 @@ void CL_ShowIP_f(void) {
 
 /*
 =================
-bool CL_CDKeyValidate
+qbool CL_CDKeyValidate
 =================
 */
-qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
+qbool CL_CDKeyValidate( const char *key, const char *checksum ) {
 	char	ch;
 	byte	sum;
 	char	chs[3];

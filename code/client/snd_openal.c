@@ -103,13 +103,13 @@ typedef struct alSfx_s
 {
 	char			filename[MAX_QPATH];
 	ALuint		buffer;					// OpenAL buffer
-	qboolean	isDefault;			// Couldn't be loaded - use default FX
-	qboolean	inMemory;				// Sound is stored in memory
-	qboolean	isLocked;				// Sound is locked (can not be unloaded)
+	qbool	isDefault;			// Couldn't be loaded - use default FX
+	qbool	inMemory;				// Sound is stored in memory
+	qbool	isLocked;				// Sound is locked (can not be unloaded)
 	int				lastUsedTime;		// Time last used
 } alSfx_t;
 
-static qboolean alBuffersInitialised = qfalse;
+static qbool alBuffersInitialised = qfalse;
 
 // Sound effect storage, data structures
 #define MAX_SFX 4096
@@ -224,7 +224,7 @@ static void S_AL_BufferUnload(sfxHandle_t sfx)
 S_AL_BufferEvict
 =================
 */
-static qboolean S_AL_BufferEvict( void )
+static qbool S_AL_BufferEvict( void )
 {
 	int	i, oldestBuffer = -1;
 	int	oldestTime = Sys_Milliseconds( );
@@ -367,7 +367,7 @@ S_AL_BufferInit
 =================
 */
 static
-qboolean S_AL_BufferInit( void )
+qbool S_AL_BufferInit( void )
 {
 	if(alBuffersInitialised)
 		return qtrue;
@@ -419,7 +419,7 @@ S_AL_RegisterSound
 =================
 */
 static
-sfxHandle_t S_AL_RegisterSound( const char *sample, qboolean compressed )
+sfxHandle_t S_AL_RegisterSound( const char *sample, qbool compressed )
 {
 	sfxHandle_t sfx = S_AL_BufferFind(sample);
 
@@ -462,13 +462,13 @@ typedef struct src_s
 	int							isLooping;	// Is this a looping effect (attached to an entity)
 	int							isTracking;	// Is this object tracking it's owner
 
-	qboolean				local;			// Is this local (relative to the cam)
+	qbool				local;			// Is this local (relative to the cam)
 } src_t;
 
 #define MAX_SRC 128
 static src_t srcList[MAX_SRC];
 static int srcCount = 0;
-static qboolean alSourcesInitialised = qfalse;
+static qbool alSourcesInitialised = qfalse;
 static vec3_t lastListenerOrigin = { 0.0f, 0.0f, 0.0f };
 
 typedef struct sentity_s
@@ -478,10 +478,10 @@ typedef struct sentity_s
 	int							srcAllocated; // If a src_t has been allocated to this entity
 	int							srcIndex;
 
-	qboolean				loopAddedThisFrame;
+	qbool				loopAddedThisFrame;
 	alSrcPriority_t	loopPriority;
 	sfxHandle_t			loopSfx;
-	qboolean				startLoopingSound;
+	qbool				startLoopingSound;
 } sentity_t;
 
 static sentity_t entityList[MAX_GENTITIES];
@@ -510,7 +510,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 S_AL_HearingThroughEntity
 =================
 */
-static qboolean S_AL_HearingThroughEntity( int entityNum )
+static qbool S_AL_HearingThroughEntity( int entityNum )
 {
 	float	distanceSq;
 
@@ -541,7 +541,7 @@ S_AL_SrcInit
 =================
 */
 static
-qboolean S_AL_SrcInit( void )
+qbool S_AL_SrcInit( void )
 {
 	int i;
 	int limit;
@@ -607,7 +607,7 @@ S_AL_SrcSetup
 =================
 */
 static void S_AL_SrcSetup(srcHandle_t src, sfxHandle_t sfx, alSrcPriority_t priority,
-		int entity, int channel, qboolean local)
+		int entity, int channel, qbool local)
 {
 	ALuint buffer;
 
@@ -893,7 +893,7 @@ S_AL_ClearLoopingSounds
 =================
 */
 static
-void S_AL_ClearLoopingSounds( qboolean killall )
+void S_AL_ClearLoopingSounds( qbool killall )
 {
 	int i;
 	for(i = 0; i < srcCount; i++)
@@ -1088,7 +1088,7 @@ void S_AL_SrcUpdate( void )
 			continue;
 		}
 
-		// Query relativity of source, don't move if it's true
+		// Query relativity of source, don't move if it's qtrue
 		qalGetSourcei( srcList[ i ].alSource, AL_SOURCE_RELATIVE, &state );
 
 		// See if it needs to be moved
@@ -1134,7 +1134,7 @@ ALuint S_AL_SrcGet(srcHandle_t src)
 
 
 static srcHandle_t streamSourceHandle = -1;
-static qboolean streamPlaying = qfalse;
+static qbool streamPlaying = qfalse;
 static ALuint streamSource;
 
 /*
@@ -1279,7 +1279,7 @@ void S_AL_StreamDie( void )
 #define NUM_MUSIC_BUFFERS	4
 #define	MUSIC_BUFFER_SIZE 4096
 
-static qboolean musicPlaying = qfalse;
+static qbool musicPlaying = qfalse;
 static srcHandle_t musicSourceHandle = -1;
 static ALuint musicSource;
 static ALuint musicBuffers[NUM_MUSIC_BUFFERS];
@@ -1707,7 +1707,7 @@ void S_AL_Shutdown( void )
 S_AL_Init
 =================
 */
-qboolean S_AL_Init( soundInterface_t *si )
+qbool S_AL_Init( soundInterface_t *si )
 {
 #if USE_OPENAL
 	if( !si ) {

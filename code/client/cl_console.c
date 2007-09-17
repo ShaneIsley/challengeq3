@@ -31,7 +31,7 @@ int g_console_field_width = 78;
 
 #define		CON_TEXTSIZE	32768
 typedef struct {
-	qboolean	initialized;
+	qbool	initialized;
 
 	short	text[CON_TEXTSIZE];
 	int		current;		// line where next message will be printed
@@ -160,7 +160,7 @@ void Con_Clear_f (void) {
 	Con_Bottom();		// go to end
 }
 
-						
+
 /*
 ================
 Con_Dump_f
@@ -222,7 +222,7 @@ void Con_Dump_f (void)
 	FS_FCloseFile( f );
 }
 
-						
+
 /*
 ================
 Con_ClearNotify
@@ -236,7 +236,6 @@ void Con_ClearNotify( void ) {
 	}
 }
 
-						
 
 /*
 ================
@@ -337,17 +336,14 @@ void Con_Init (void) {
 Con_Linefeed
 ===============
 */
-void Con_Linefeed (qboolean skipnotify)
+void Con_Linefeed (qbool skipnotify)
 {
 	int		i;
 
 	// mark time for transparent overlay
 	if (con.current >= 0)
 	{
-    if (skipnotify)
-		  con.times[con.current % NUM_CON_TIMES] = 0;
-    else
-		  con.times[con.current % NUM_CON_TIMES] = cls.realtime;
+		con.times[con.current % NUM_CON_TIMES] = skipnotify ? 0 : cls.realtime;
 	}
 
 	con.x = 0;
@@ -357,6 +353,7 @@ void Con_Linefeed (qboolean skipnotify)
 	for(i=0; i<con.linewidth; i++)
 		con.text[(con.current%con.totallines)*con.linewidth+i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
 }
+
 
 /*
 ================
@@ -371,7 +368,7 @@ void CL_ConsolePrint( char *txt ) {
 	int		y;
 	int		c, l;
 	int		color;
-	qboolean skipnotify = qfalse;		// NERVE - SMF
+	qbool skipnotify = qfalse;		// NERVE - SMF
 	int prev;							// NERVE - SMF
 
 	// TTimo - prefix for text that shows up in console but not in notify
@@ -380,12 +377,12 @@ void CL_ConsolePrint( char *txt ) {
 		skipnotify = qtrue;
 		txt += 12;
 	}
-	
+
 	// for some demos we don't want to ever show anything on the console
 	if ( cl_noprint && cl_noprint->integer ) {
 		return;
 	}
-	
+
 	if (!con.initialized) {
 		con.color[0] = 
 		con.color[1] = 
@@ -467,15 +464,22 @@ DRAWING
 */
 
 
-/*
-================
-Con_DrawInput
+// changing colors every char is bad, but
 
-Draw the editline after a ] prompt
-================
-*/
-void Con_DrawInput (void) {
-	int		y;
+static void Con_DrawShadowedChar( int x, int y, int c, const vec4_t color )
+{
+	re.SetColor( colorBlack );
+	SCR_DrawSmallChar( x + 1, y + 1, c );
+	re.SetColor( color );
+	SCR_DrawSmallChar( x, y, c );
+}
+
+
+// Draw the editline after a ] prompt
+
+static void Con_DrawInput()
+{
+	int y;
 
 	if ( cls.state != CA_DISCONNECTED && !(cls.keyCatchers & KEYCATCH_CONSOLE ) ) {
 		return;
@@ -483,9 +487,7 @@ void Con_DrawInput (void) {
 
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 
-	re.SetColor( con.color );
-
-	SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
+	Con_DrawShadowedChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']', con.color );
 
 	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
 		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
@@ -570,33 +572,49 @@ void Con_DrawNotify (void)
 
 }
 
-/*
-================
-Con_DrawSolidConsole
 
-Draws the console with the solid background
-================
-*/
-void Con_DrawSolidConsole( float frac ) {
+///////////////////////////////////////////////////////////////
+
+
+static float CPMA_HUD_DrawChar( float x, float y, int ch )
+{
+	if ((ch >= GLYPH_START) && (ch <= GLYPH_END)) {
+		ch -= GLYPH_START;
+		re.DrawStretchPic( con.xadjust + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
+		return cls.fontConsole.pitches[ch];
+	}
+	return 0;
+}
+
+
+static float CPMA_HUD_StringWidth( const char* s )
+{
+	int ch;
+	float w = 0;
+	while (ch = *s++)
+		if ((ch >= GLYPH_START) && (ch <= GLYPH_END))
+			w += cls.fontConsole.pitches[ch - GLYPH_START];
+	return w;
+}
+
+
+static void Con_DrawSolidConsole( float frac )
+{
 	int				i, x, y;
 	int				rows;
 	short			*text;
 	int				row;
-	int				lines;
-//	qhandle_t		conShader;
-	int				currentColor;
+	//int				currentColor;
 	vec4_t			color;
 
-	lines = cls.glconfig.vidHeight * frac;
-	if (lines <= 0)
+	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
+	if (scanlines <= 0)
 		return;
-
-	if (lines > cls.glconfig.vidHeight )
-		lines = cls.glconfig.vidHeight;
 
 	// on wide screens, we will center the text
 	con.xadjust = 0;
 	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
+	con.xadjust += SMALLCHAR_WIDTH;
 
 	// draw the background
 	y = frac * SCREEN_HEIGHT - 2;
@@ -604,78 +622,82 @@ void Con_DrawSolidConsole( float frac ) {
 		y = 0;
 	}
 	else {
-		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
+		//SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
+		MAKERGBA( color, 0.5, 0.5, 0.5, 1.0 );
+		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
 	}
 
-	MAKERGBA( color, 0.4f, 0.4f, 0.4f, 1.0 );
+	MAKERGBA( color, 0.33f, 0.33f, 0.33f, 1.0 );
 	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
 
-	// draw the version number
-	re.SetColor( NULL );
-
-	i = strlen( Q3_VERSION );
-
-	for (x=0 ; x<i ; x++) {
-
-		SCR_DrawSmallChar( cls.glconfig.vidWidth - ( i - x ) * SMALLCHAR_WIDTH, 
-
-			(lines-(SMALLCHAR_HEIGHT+SMALLCHAR_HEIGHT/2)), Q3_VERSION[x] );
-
-	}
-
-
 	// draw the text
-	con.vislines = lines;
-	rows = (lines-SMALLCHAR_WIDTH)/SMALLCHAR_WIDTH;		// rows of text to draw
+	con.vislines = scanlines;
+	rows = (scanlines - cls.fontConsole.vpitch) / cls.fontConsole.vpitch;
 
-	y = lines - (SMALLCHAR_HEIGHT*3);
+	y = scanlines - (cls.fontConsole.vpitch * 3);
+
+	i = 0;
+	x = cls.glconfig.vidWidth - CPMA_HUD_StringWidth(Q3_VERSION) - SMALLCHAR_WIDTH;
+	for (i = 0; Q3_VERSION[i]; ++i) {
+		x += CPMA_HUD_DrawChar( x, scanlines - cls.fontConsole.height, Q3_VERSION[i] );
+	}
+	re.SetColor( NULL );
 
 	// draw from the bottom up
 	if (con.display != con.current)
 	{
-	// draw arrows to show the buffer is backscrolled
-		re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
-		for (x=0 ; x<con.linewidth ; x+=4)
-			SCR_DrawSmallChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
-		y -= SMALLCHAR_HEIGHT;
-		rows--;
+		// draw arrows to show the buffer is backscrolled
+		re.SetColor( colorBlack );
+		for (x = 0; x < con.linewidth; x += 4)
+			CPMA_HUD_DrawChar( x * SMALLCHAR_WIDTH, y, '^' );
+		y -= cls.fontConsole.vpitch;
+		--rows;
 	}
-	
+
 	row = con.display;
 
 	if ( con.x == 0 ) {
 		row--;
 	}
 
-	currentColor = 7;
-	re.SetColor( g_color_table[currentColor] );
+	re.SetColor( colorWhite );
 
-	for (i=0 ; i<rows ; i++, y -= SMALLCHAR_HEIGHT, row--)
+	for (i = 0; i < rows; ++i, --row, y -= cls.fontConsole.vpitch )
 	{
 		if (row < 0)
 			break;
 		if (con.current - row >= con.totallines) {
 			// past scrollback wrap point
-			continue;	
+			continue;
 		}
 
 		text = con.text + (row % con.totallines)*con.linewidth;
 
-		for (x=0 ; x<con.linewidth ; x++) {
-			if ( ( text[x] & 0xff ) == ' ' ) {
-				continue;
-			}
+/* lol - this can pass the 1Kverts surface limit now if you use a small enough font...  :P
+		// since fonts are now texture-per-char, minimize the glBinds rather than the glColors
+		x = 0;
+		for (int i = 0; i < con.linewidth; ++i) {
+			re.SetColor( colorBlack );
+			CPMA_HUD_DrawChar( 1 + x, y + 1, (text[i] & 0xFF) );
+			re.SetColor( colorWhite );
+			x += CPMA_HUD_DrawChar( x, y, (text[i] & 0xFF) );
+		}
+*/
+		re.SetColor( colorBlack );
+		x = 0;
+		for (int i = 0; i < con.linewidth; ++i) {
+			x += CPMA_HUD_DrawChar( 1 + x, y + 1, (text[i] & 0xFF) );
+		}
 
-			if ( (text[x]>>8) != currentColor ) {
-				currentColor = (text[x]>>8);
-				re.SetColor( g_color_table[currentColor] );
-			}
-			SCR_DrawSmallChar(  con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
+		re.SetColor( colorWhite );
+		x = 0;
+		for (int i = 0; i < con.linewidth; ++i) {
+			x += CPMA_HUD_DrawChar( x, y, (text[i] & 0xFF) );
 		}
 	}
 
 	// draw the input prompt, user text, and cursor if desired
-	Con_DrawInput ();
+	Con_DrawInput();
 
 	re.SetColor( NULL );
 }

@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
-qboolean	scr_initialized;		// ready to draw
+qbool	scr_initialized;		// ready to draw
 
 cvar_t		*cl_timegraph;
 cvar_t		*cl_debuggraph;
@@ -196,7 +196,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawStringExt( int x, int y, float size, const char *string, const float *setColor, qboolean forceColor ) {
+void SCR_DrawStringExt( int x, int y, float size, const char *string, const float *setColor, qbool forceColor ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -263,7 +263,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor ) {
+void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qbool forceColor ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;

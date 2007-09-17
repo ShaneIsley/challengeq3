@@ -128,18 +128,13 @@ void S_CodecRegister(snd_codec_t *codec)
 	codecs = codec;
 }
 
-/*
-=================
-S_CodecLoad
-=================
-*/
-void *S_CodecLoad(const char *filename, snd_info_t *info)
+
+byte* S_CodecLoad( const char* filename, snd_info_t* info )
 {
-	snd_codec_t *codec;
 	char fn[MAX_QPATH];
 
-	codec = S_FindCodecForFile(filename);
-	if(!codec)
+	snd_codec_t* codec = S_FindCodecForFile(filename);
+	if (!codec)
 	{
 		Com_Printf("Unknown extension for %s\n", filename);
 		return NULL;
@@ -148,7 +143,7 @@ void *S_CodecLoad(const char *filename, snd_info_t *info)
 	strncpy(fn, filename, sizeof(fn));
 	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
 
-	return codec->load(fn, info);
+	return (byte*)codec->load(fn, info);
 }
 
 /*
@@ -194,7 +189,6 @@ S_CodecUtilOpen
 */
 snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 {
-	snd_stream_t *stream;
 	fileHandle_t hnd;
 	int length;
 
@@ -206,8 +200,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 		return NULL;
 	}
 
-	// Allocate a stream
-	stream = Z_Malloc(sizeof(snd_stream_t));
+	snd_stream_t* stream = Z_New<snd_stream_t>();
 	if(!stream)
 	{
 		FS_FCloseFile(hnd);

@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "client.h"
+#include "../qcommon/vm_local.h"
+#include "../qcommon/vm_shim.h"
 
 #include "../botlib/botlib.h"
 
@@ -506,7 +508,7 @@ static void LAN_GetPingInfo( int n, char *buf, int buflen ) {
 LAN_MarkServerVisible
 ====================
 */
-static void LAN_MarkServerVisible(int source, int n, qboolean visible ) {
+static void LAN_MarkServerVisible(int source, int n, qbool visible ) {
 	if (n == -1) {
 		int count = MAX_OTHER_SERVERS;
 		serverInfo_t *server = NULL;
@@ -594,7 +596,7 @@ static int LAN_ServerIsVisible(int source, int n ) {
 LAN_UpdateVisiblePings
 =======================
 */
-qboolean LAN_UpdateVisiblePings(int source ) {
+qbool LAN_UpdateVisiblePings(int source ) {
 	return CL_UpdateVisiblePings_f(source);
 }
 
@@ -824,7 +826,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_FS_FOPENFILE:
-		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
+		return FS_FOpenFileByMode( VMA(1), VMA(2), (fsMode_t)args[3] );
 
 	case UI_FS_READ:
 		FS_Read2( VMA(1), args[2], args[3] );
@@ -881,7 +883,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		re.DrawStretchPic( VMF(1), VMF(2), VMF(3), VMF(4), VMF(5), VMF(6), VMF(7), VMF(8), args[9] );
 		return 0;
 
-  case UI_R_MODELBOUNDS:
+	case UI_R_MODELBOUNDS:
 		re.ModelBounds( args[1], VMA(2), VMA(3) );
 		return 0;
 
@@ -919,7 +921,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return Key_GetOverstrikeMode();
 
 	case UI_KEY_SETOVERSTRIKEMODE:
-		Key_SetOverstrikeMode( args[1] );
+		Key_SetOverstrikeMode( (args[1] != 0) );
 		return 0;
 
 	case UI_KEY_CLEARSTATES:
@@ -939,7 +941,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 	case UI_GETCLIENTSTATE:
 		GetClientState( VMA(1) );
-		return 0;		
+		return 0;
 
 	case UI_GETGLCONFIG:
 		CL_GetGlconfig( VMA(1) );
@@ -1022,9 +1024,9 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_SET_CDKEY:
 		CLUI_SetCDKey( VMA(1) );
 		return 0;
-	
+
 	case UI_SET_PBCLSTATUS:
-		return 0;	
+		return 0;
 
 	case UI_R_REGISTERFONT:
 		re.RegisterFont( VMA(1), args[2], VMA(3));
@@ -1060,6 +1062,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
+/*
 	case UI_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );
 	case UI_PC_LOAD_SOURCE:
@@ -1070,6 +1073,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
 	case UI_PC_SOURCE_FILE_AND_LINE:
 		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
+*/
 
 	case UI_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();
@@ -1107,10 +1111,8 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return CL_CDKeyValidate(VMA(1), VMA(2));
 
 
-		
 	default:
 		Com_Error( ERR_DROP, "Bad UI system trap: %i", args[0] );
-
 	}
 
 	return 0;
@@ -1132,32 +1134,20 @@ void CL_ShutdownUI( void ) {
 	uivm = NULL;
 }
 
-/*
-====================
-CL_InitUI
-====================
-*/
-#define UI_OLD_API_VERSION	4
 
-void CL_InitUI( void ) {
-	int		v;
-	vmInterpret_t		interpret;
+#define UI_OLD_API_VERSION 4
 
-	// load the dll or bytecode
-	if ( cl_connectedToPureServer != 0 ) {
-		// if sv_pure is set we only allow qvms to be loaded
-		interpret = VMI_COMPILED;
-	}
-	else {
-		interpret = Cvar_VariableValue( "vm_ui" );
-	}
+void CL_InitUI( void )
+{
+	// if sv_pure is set we only allow qvms to be loaded
+	vmInterpret_t interpret = cl_connectedToPureServer ? VMI_COMPILED : (vmInterpret_t)Cvar_VariableIntegerValue("vm_ui");
+
 	uivm = VM_Create( "ui", CL_UISystemCalls, interpret );
-	if ( !uivm ) {
+	if ( !uivm )
 		Com_Error( ERR_FATAL, "VM_Create on UI failed" );
-	}
 
 	// sanity check
-	v = VM_Call( uivm, UI_GETAPIVERSION );
+	int v = VM_Call( uivm, UI_GETAPIVERSION );
 	if (v == UI_OLD_API_VERSION) {
 //		Com_Printf(S_COLOR_YELLOW "WARNING: loading old Quake III Arena User Interface version %d\n", v );
 		// init for this gamestate
@@ -1173,25 +1163,17 @@ void CL_InitUI( void ) {
 	}
 }
 
-qboolean UI_usesUniqueCDKey( void ) {
-	if (uivm) {
-		return (VM_Call( uivm, UI_HASUNIQUECDKEY) == qtrue);
-	} else {
-		return qfalse;
-	}
+
+qbool UI_usesUniqueCDKey( void )
+{
+	return (uivm && VM_Call( uivm, UI_HASUNIQUECDKEY ));
 }
 
-/*
-====================
-UI_GameCommand
 
-See if the current console command is claimed by the ui
-====================
-*/
-qboolean UI_GameCommand( void ) {
-	if ( !uivm ) {
-		return qfalse;
-	}
+// see if the current console command is claimed by the ui
 
-	return VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime );
+qbool UI_GameCommand( void )
+{
+	return (uivm && VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime ));
 }
+

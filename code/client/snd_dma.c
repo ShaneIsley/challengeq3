@@ -61,7 +61,7 @@ channel_t   loop_channels[MAX_CHANNELS];
 int			numLoopChannels;
 
 static int	s_soundStarted;
-static		qboolean	s_soundMuted;
+static		qbool	s_soundMuted;
 
 dma_t		dma;
 
@@ -313,7 +313,7 @@ S_RegisterSound
 Creates a default buzz sound if the file can't be loaded
 ==================
 */
-sfxHandle_t	S_Base_RegisterSound( const char *name, qboolean compressed ) {
+sfxHandle_t	S_Base_RegisterSound( const char *name, qbool compressed ) {
 	sfx_t	*sfx;
 
 	compressed = qfalse;
@@ -660,7 +660,7 @@ S_ClearLoopingSounds
 
 ==================
 */
-void S_Base_ClearLoopingSounds( qboolean killall ) {
+void S_Base_ClearLoopingSounds( qbool killall ) {
 	int i;
 	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
 		if (killall || loopSounds[i].kill == qtrue || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
@@ -1007,12 +1007,10 @@ void S_Base_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 
 /*
 ============
-S_Respatialize
-
 Change the volumes of all the playing sounds for changes in their positions
 ============
 */
-void S_Base_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater ) {
+void S_Base_Respatialize( int entityNum, const vec3_t head, const vec3_t axis[3], int inwater ) {
 	int			i;
 	channel_t	*ch;
 	vec3_t		origin;
@@ -1048,8 +1046,7 @@ void S_Base_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int 
 		}
 	}
 
-	// add loopsounds
-	S_AddLoopSounds ();
+	S_AddLoopSounds();
 }
 
 
@@ -1060,10 +1057,10 @@ S_ScanChannelStarts
 Returns qtrue if any new sounds were started since the last mix
 ========================
 */
-qboolean S_ScanChannelStarts( void ) {
+qbool S_ScanChannelStarts( void ) {
 	channel_t		*ch;
 	int				i;
-	qboolean		newSamples;
+	qbool		newSamples;
 
 	newSamples = qfalse;
 	ch = s_channels;
@@ -1444,8 +1441,8 @@ void S_Base_Shutdown( void ) {
 S_Init
 ================
 */
-qboolean S_Base_Init( soundInterface_t *si ) {
-	qboolean	r;
+qbool S_Base_Init( soundInterface_t *si ) {
+	qbool	r;
 
 	if( !si ) {
 		return qfalse;

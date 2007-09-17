@@ -28,15 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t* cl_cURLLib;
 
-#if USE_SDL_VIDEO
-#include "SDL.h"
-#include "SDL_loadso.h"
-#define OBJTYPE void *
-#define OBJLOAD(x) SDL_LoadObject(x)
-#define SYMLOAD(x,y) SDL_LoadFunction(x,y)
-#define OBJFREE(x) SDL_UnloadObject(x)
-
-#elif defined _WIN32
+#if defined _WIN32
 #include <windows.h>
 #define OBJTYPE HMODULE
 #define OBJLOAD(x) LoadLibrary(x)
@@ -118,7 +110,7 @@ static void *GPA(char *str)
 CL_cURL_Init
 =================
 */
-qboolean CL_cURL_Init()
+qbool CL_cURL_Init()
 {
 #if defined(USE_CURL_DLOPEN)
 	if(cURLLib)
@@ -154,7 +146,7 @@ qboolean CL_cURL_Init()
 	qcurl_easy_duphandle = GPA("curl_easy_duphandle");
 	qcurl_easy_reset = GPA("curl_easy_reset");
 	qcurl_easy_strerror = GPA("curl_easy_strerror");
-	
+
 	qcurl_multi_init = GPA("curl_multi_init");
 	qcurl_multi_add_handle = GPA("curl_multi_add_handle");
 	qcurl_multi_remove_handle = GPA("curl_multi_remove_handle");

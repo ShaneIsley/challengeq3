@@ -22,14 +22,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cl_cgame.c  -- client system interaction with client game
 
 #include "client.h"
+#include "../qcommon/vm_local.h"
+#include "../qcommon/vm_shim.h"
 
 #include "../botlib/botlib.h"
 
 extern	botlib_export_t	*botlib_export;
 
-extern qboolean loadCamera(const char *name);
+extern qbool loadCamera(const char *name);
 extern void startCamera(int time);
-extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
+extern qbool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 /*
 ====================
@@ -55,7 +57,7 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+qbool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -84,7 +86,7 @@ int CL_GetCurrentCmdNumber( void ) {
 CL_GetParseEntityState
 ====================
 */
-qboolean	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
+qbool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 	// can't return anything that hasn't been parsed yet
 	if ( parseEntityNumber >= cl.parseEntitiesNum ) {
 		Com_Error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
@@ -115,7 +117,7 @@ void	CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
 CL_GetSnapshot
 ====================
 */
-qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
+qbool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	clSnapshot_t	*clSnap;
 	int				i, count;
 
@@ -261,7 +263,7 @@ CL_GetServerCommand
 Set up argc/argv for the given command
 ===================
 */
-qboolean CL_GetServerCommand( int serverCommandNumber ) {
+qbool CL_GetServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
 	static char bigConfigString[BIG_INFO_STRING];
@@ -443,7 +445,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		Cmd_ArgsBuffer( VMA(1), args[2] );
 		return 0;
 	case CG_FS_FOPENFILE:
-		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
+		return FS_FOpenFileByMode( VMA(1), VMA(2), (fsMode_t)args[3] );
 	case CG_FS_READ:
 		FS_Read2( VMA(1), args[2], args[3] );
 		return 0;
@@ -526,7 +528,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		S_UpdateEntityPosition( args[1], VMA(2) );
 		return 0;
 	case CG_S_RESPATIALIZE:
-		S_Respatialize( args[1], VMA(2), VMA(3), args[4] );
+		S_Respatialize( args[1], VMA(2), (const vec3_t*)VMA(3), args[4] );
 		return 0;
 	case CG_S_REGISTERSOUND:
 		return S_RegisterSound( VMA(1), args[2] );
@@ -638,6 +640,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_ACOS:
 		return FloatAsInt( Q_acos( VMF(1) ) );
 
+/*
 	case CG_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );
 	case CG_PC_LOAD_SOURCE:
@@ -648,6 +651,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
 	case CG_PC_SOURCE_FILE_AND_LINE:
 		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
+*/
 
 	case CG_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();
@@ -715,7 +719,6 @@ void CL_InitCGame( void ) {
 	const char			*info;
 	const char			*mapname;
 	int					t1, t2;
-	vmInterpret_t		interpret;
 
 	t1 = Sys_Milliseconds();
 
@@ -727,14 +730,9 @@ void CL_InitCGame( void ) {
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cl.mapname, sizeof( cl.mapname ), "maps/%s.bsp", mapname );
 
-	// load the dll or bytecode
-	if ( cl_connectedToPureServer != 0 ) {
-		// if sv_pure is set we only allow qvms to be loaded
-		interpret = VMI_COMPILED;
-	}
-	else {
-		interpret = Cvar_VariableValue( "vm_cgame" );
-	}
+	// if sv_pure is set we only allow qvms to be loaded
+	vmInterpret_t interpret = cl_connectedToPureServer ? VMI_COMPILED : (vmInterpret_t)Cvar_VariableIntegerValue("vm_cgame");
+
 	cgvm = VM_Create( "cgame", CL_CgameSystemCalls, interpret );
 	if ( !cgvm ) {
 		Com_Error( ERR_DROP, "VM_Create on cgame failed" );
@@ -768,19 +766,11 @@ void CL_InitCGame( void ) {
 }
 
 
-/*
-====================
-CL_GameCommand
+// see if the current console command is claimed by the cgame
 
-See if the current console command is claimed by the cgame
-====================
-*/
-qboolean CL_GameCommand( void ) {
-	if ( !cgvm ) {
-		return qfalse;
-	}
-
-	return VM_Call( cgvm, CG_CONSOLE_COMMAND );
+qbool CL_GameCommand( void )
+{
+	return (cgvm && VM_Call( cgvm, CG_CONSOLE_COMMAND ));
 }
 
 

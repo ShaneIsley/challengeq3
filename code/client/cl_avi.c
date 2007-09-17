@@ -40,7 +40,7 @@ typedef struct audioFormat_s
 
 typedef struct aviFileData_s
 {
-  qboolean      fileOpen;
+  qbool      fileOpen;
   fileHandle_t  f;
   char          fileName[ MAX_QPATH ];
   int           fileSize;
@@ -55,9 +55,9 @@ typedef struct aviFileData_s
   int           width, height;
   int           numVideoFrames;
   int           maxRecordSize;
-  qboolean      motionJpeg;
+  qbool      motionJpeg;
 
-  qboolean      audio;
+  qbool      audio;
   audioFormat_t a;
   int           numAudioFrames;
 
@@ -318,111 +318,92 @@ void CL_WriteAVIHeader( void )
   }
 }
 
-/*
-===============
-CL_OpenAVIForWriting
 
-Creates an AVI file and gets it into a state where
-writing the actual data can begin
-===============
-*/
-qboolean CL_OpenAVIForWriting( const char *fileName )
+// creates an AVI file and get it into a state where writing the actual data can begin
+
+qbool CL_OpenAVIForWriting( const char *fileName )
 {
-  if( afd.fileOpen )
-    return qfalse;
+	if ( afd.fileOpen )
+		return qfalse;
 
-  Com_Memset( &afd, 0, sizeof( aviFileData_t ) );
+	Com_Memset( &afd, 0, sizeof( aviFileData_t ) );
 
-  // Don't start if a framerate has not been chosen
-  if( cl_aviFrameRate->integer <= 0 )
-  {
-    Com_Printf( S_COLOR_RED "cl_aviFrameRate must be >= 1\n" );
-    return qfalse;
-  }
+	// don't start if a framerate has not been chosen
+	if ( cl_aviFrameRate->integer <= 0 ) {
+		Com_Printf( S_COLOR_RED "cl_aviFrameRate must be >= 1\n" );
+		return qfalse;
+	}
 
-  if( ( afd.f = FS_FOpenFileWrite( fileName ) ) <= 0 )
-    return qfalse;
+	if ( ( afd.f = FS_FOpenFileWrite( fileName ) ) <= 0 )
+		return qfalse;
 
-  if( ( afd.idxF = FS_FOpenFileWrite(
-          va( "%s" INDEX_FILE_EXTENSION, fileName ) ) ) <= 0 )
-  {
-    FS_FCloseFile( afd.f );
-    return qfalse;
-  }
+	if ( ( afd.idxF = FS_FOpenFileWrite( va( "%s" INDEX_FILE_EXTENSION, fileName ) ) ) <= 0 ) {
+		FS_FCloseFile( afd.f );
+		return qfalse;
+	}
 
-  Q_strncpyz( afd.fileName, fileName, MAX_QPATH );
+	Q_strncpyz( afd.fileName, fileName, MAX_QPATH );
 
-  afd.frameRate = cl_aviFrameRate->integer;
-  afd.framePeriod = (int)( 1000000.0f / afd.frameRate );
-  afd.width = cls.glconfig.vidWidth;
-  afd.height = cls.glconfig.vidHeight;
+	afd.frameRate = cl_aviFrameRate->integer;
+	afd.framePeriod = (int)( 1000000.0f / afd.frameRate );
+	afd.width = cls.glconfig.vidWidth;
+	afd.height = cls.glconfig.vidHeight;
 
-  if( cl_aviMotionJpeg->integer )
-    afd.motionJpeg = qtrue;
-  else
-    afd.motionJpeg = qfalse;
+	afd.motionJpeg = (cl_aviMotionJpeg->integer != 0);
 
-  afd.cBuffer = Z_Malloc( afd.width * afd.height * 4 );
-  afd.eBuffer = Z_Malloc( afd.width * afd.height * 4 );
+	afd.cBuffer = (byte*)Z_Malloc( afd.width * afd.height * 4 );
+	afd.eBuffer = (byte*)Z_Malloc( afd.width * afd.height * 4 );
 
-  afd.a.rate = dma.speed;
-  afd.a.format = WAV_FORMAT_PCM;
-  afd.a.channels = dma.channels;
-  afd.a.bits = dma.samplebits;
-  afd.a.sampleSize = ( afd.a.bits / 8 ) * afd.a.channels;
+	afd.a.rate = dma.speed;
+	afd.a.format = WAV_FORMAT_PCM;
+	afd.a.channels = dma.channels;
+	afd.a.bits = dma.samplebits;
+	afd.a.sampleSize = ( afd.a.bits / 8 ) * afd.a.channels;
 
-  if( afd.a.rate % afd.frameRate )
-  {
-    int suggestRate = afd.frameRate;
+	if ( afd.a.rate % afd.frameRate )
+	{
+		int suggestRate = afd.frameRate;
+		while ((afd.a.rate % suggestRate) && suggestRate)
+			--suggestRate;
+		Com_Printf( S_COLOR_YELLOW "WARNING: cl_aviFrameRate is not a divisor "
+				"of the audio rate, suggest %d\n", suggestRate );
+	}
 
-    while( ( afd.a.rate % suggestRate ) && suggestRate >= 1 )
-      suggestRate--;
+	afd.audio = qfalse;
+	if ( Cvar_VariableIntegerValue( "s_initsound" ) ) {
+		if ( Q_stricmp( Cvar_VariableString( "s_backend" ), "OpenAL" ) ) {
+			afd.audio = ( afd.a.bits == 16 && afd.a.channels == 2 );
+		}
+	}
+	if (!afd.audio) {
+		Com_Printf( S_COLOR_YELLOW "WARNING: Audio capture is not supported with OpenAL."
+				"Set s_useOpenAL to 0 for audio capture\n" );
+	}
 
-    Com_Printf( S_COLOR_YELLOW "WARNING: cl_aviFrameRate is not a divisor "
-        "of the audio rate, suggest %d\n", suggestRate );
-  }
+	// this doesn't write a real header, but allocates the
+	// correct amount of space at the beginning of the file
+	CL_WriteAVIHeader( );
 
-  if( !Cvar_VariableIntegerValue( "s_initsound" ) )
-  {
-    afd.audio = qfalse;
-  }
-  else if( Q_stricmp( Cvar_VariableString( "s_backend" ), "OpenAL" ) )
-  {
-    if( afd.a.bits == 16 && afd.a.channels == 2 )
-      afd.audio = qtrue;
-    else
-      afd.audio = qfalse; //FIXME: audio not implemented for this case
-  }
-  else
-  {
-    afd.audio = qfalse;
-    Com_Printf( S_COLOR_YELLOW "WARNING: Audio capture is not supported "
-        "with OpenAL. Set s_useOpenAL to 0 for audio capture\n" );
-  }
+	SafeFS_Write( buffer, bufIndex, afd.f );
+	afd.fileSize = bufIndex;
 
-  // This doesn't write a real header, but allocates the
-  // correct amount of space at the beginning of the file
-  CL_WriteAVIHeader( );
+	bufIndex = 0;
+	START_CHUNK( "idx1" );
+	SafeFS_Write( buffer, bufIndex, afd.idxF );
 
-  SafeFS_Write( buffer, bufIndex, afd.f );
-  afd.fileSize = bufIndex;
+	afd.moviSize = 4; // for the "movi" header signature
+	afd.fileOpen = qtrue;
 
-  bufIndex = 0;
-  START_CHUNK( "idx1" );
-  SafeFS_Write( buffer, bufIndex, afd.idxF );
-
-  afd.moviSize = 4; // For the "movi"
-  afd.fileOpen = qtrue;
-
-  return qtrue;
+	return qtrue;
 }
+
 
 /*
 ===============
 CL_CheckFileSize
 ===============
 */
-static qboolean CL_CheckFileSize( int bytesToAdd )
+static qbool CL_CheckFileSize( int bytesToAdd )
 {
   unsigned int newFileSize;
 
@@ -583,7 +564,7 @@ CL_CloseAVI
 Closes the AVI file and writes an index chunk
 ===============
 */
-qboolean CL_CloseAVI( void )
+qbool CL_CloseAVI( void )
 {
   int indexRemainder;
   int indexSize = afd.numIndices * 16;
@@ -655,7 +636,7 @@ qboolean CL_CloseAVI( void )
 CL_VideoRecording
 ===============
 */
-qboolean CL_VideoRecording( void )
+qbool CL_VideoRecording( void )
 {
   return afd.fileOpen;
 }

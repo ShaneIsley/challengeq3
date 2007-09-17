@@ -83,9 +83,10 @@ void SND_setup(void) {
 
 	scs = (cv->integer*1536);
 
-	buffer = malloc(scs*sizeof(sndBuffer) );
+	// KHB !!!  erm, leak much?
+	buffer = (sndBuffer*)malloc(scs*sizeof(sndBuffer) );
 	// allocate the stack based hunk allocator
-	sfxScratchBuffer = malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
+	sfxScratchBuffer = (short*)malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
 	sfxScratchPointer = NULL;
 
 	inUse = scs*sizeof(sndBuffer);
@@ -107,7 +108,7 @@ ResampleSfx
 resample / decimate to the current source rate
 ================
 */
-static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qboolean compressed ) {
+static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qbool compressed ) {
 	int		outcount;
 	int		srcsample;
 	float	stepscale;
@@ -195,12 +196,10 @@ The filename may be different than sfx->name in the case
 of a forced fallback of a player specific sound
 ==============
 */
-qboolean S_LoadSound( sfx_t *sfx )
+qbool S_LoadSound( sfx_t *sfx )
 {
 	byte	*data;
-	short	*samples;
 	snd_info_t	info;
-//	int		size;
 
 	// player specific sounds are never directly loaded
 	if ( sfx->soundName[0] == '*') {
@@ -220,7 +219,7 @@ qboolean S_LoadSound( sfx_t *sfx )
 		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->soundName);
 	}
 
-	samples = Hunk_AllocateTempMemory(info.samples * sizeof(short) * 2);
+	short* samples = (short*)Hunk_AllocateTempMemory(info.samples * sizeof(short) * 2);
 
 	sfx->lastTimeUsed = Com_Milliseconds()+1;
 

@@ -128,7 +128,7 @@ static void S_ByteSwapRawSamples( int samples, int width, int s_channels, const 
 S_ReadRIFFHeader
 =================
 */
-static qboolean S_ReadRIFFHeader(fileHandle_t file, snd_info_t *info)
+static qbool S_ReadRIFFHeader(fileHandle_t file, snd_info_t *info)
 {
 	char dump[16];
 	int wav_format;
@@ -289,6 +289,6 @@ int S_WAV_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 	stream->pos += bytes;
 	samples = (bytes / stream->info.width) / stream->info.channels;
 	FS_Read(buffer, bytes, stream->file);
-	S_ByteSwapRawSamples(samples, stream->info.width, stream->info.channels, buffer);
+	S_ByteSwapRawSamples(samples, stream->info.width, stream->info.channels, (byte*)buffer);
 	return bytes;
 }

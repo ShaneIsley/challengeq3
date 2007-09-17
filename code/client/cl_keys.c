@@ -35,12 +35,12 @@ int			historyLine;	// the line being displayed from history buffer
 
 field_t		g_consoleField;
 field_t		chatField;
-qboolean	chat_team;
+qbool	chat_team;
 
 int			chat_playerNum;
 
 
-qboolean	key_overstrikeMode;
+qbool	key_overstrikeMode;
 
 int				anykeydown;
 qkey_t		keys[MAX_KEYS];
@@ -200,7 +200,7 @@ Handles horizontal scrolling and cursor blinking
 x, y, amd width are in pixels
 ===================
 */
-void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, qboolean showCursor ) {
+void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, qbool showCursor ) {
 	int		len;
 	int		drawLen;
 	int		prestep;
@@ -282,12 +282,12 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 	}
 }
 
-void Field_Draw( field_t *edit, int x, int y, int width, qboolean showCursor ) 
+void Field_Draw( field_t *edit, int x, int y, int width, qbool showCursor ) 
 {
 	Field_VariableSizeDraw( edit, x, y, width, SMALLCHAR_WIDTH, showCursor );
 }
 
-void Field_BigDraw( field_t *edit, int x, int y, int width, qboolean showCursor ) 
+void Field_BigDraw( field_t *edit, int x, int y, int width, qbool showCursor ) 
 {
 	Field_VariableSizeDraw( edit, x, y, width, BIGCHAR_WIDTH, showCursor );
 }
@@ -655,12 +655,12 @@ void Message_Key( int key ) {
 //============================================================================
 
 
-qboolean Key_GetOverstrikeMode( void ) {
+qbool Key_GetOverstrikeMode( void ) {
 	return key_overstrikeMode;
 }
 
 
-void Key_SetOverstrikeMode( qboolean state ) {
+void Key_SetOverstrikeMode( qbool state ) {
 	key_overstrikeMode = state;
 }
 
@@ -670,7 +670,7 @@ void Key_SetOverstrikeMode( qboolean state ) {
 Key_IsDown
 ===================
 */
-qboolean Key_IsDown( int keynum ) {
+qbool Key_IsDown( int keynum ) {
 	if ( keynum == -1 ) {
 		return qfalse;
 	}
@@ -986,7 +986,7 @@ void CL_AddKeyUpCommands( int key, char *kb ) {
 	int i;
 	char button[1024], *buttonPtr;
 	char	cmd[1024];
-	qboolean keyevent;
+	qbool keyevent;
 
 	if ( !kb ) {
 		return;
@@ -1028,7 +1028,7 @@ CL_KeyEvent
 Called by the system for both key up and key down events
 ===================
 */
-void CL_KeyEvent (int key, qboolean down, unsigned time) {
+void CL_KeyEvent (int key, qbool down, unsigned time) {
 	char	*kb;
 	char	cmd[1024];
 
@@ -1056,11 +1056,8 @@ void CL_KeyEvent (int key, qboolean down, unsigned time) {
 			if (keys[K_ALT].down)
 			{
 				Key_ClearStates();
-				Cvar_SetValue( "r_fullscreen",
-						!Cvar_VariableIntegerValue( "r_fullscreen" ) );
-#if !USE_SDL_VIDEO // This is handled in sdl_glimp.c/GLimp_EndFrame
+				Cvar_SetValue( "r_fullscreen", !Cvar_VariableIntegerValue( "r_fullscreen" ) );
 				Cbuf_ExecuteText( EXEC_APPEND, "vid_restart\n");
-#endif
 				return;
 			}
 		}
@@ -1072,7 +1069,7 @@ void CL_KeyEvent (int key, qboolean down, unsigned time) {
 		if (!down) {
 			return;
 		}
-    Con_ToggleConsole_f ();
+		Con_ToggleConsole_f ();
 		return;
 	}
 

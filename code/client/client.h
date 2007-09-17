@@ -30,11 +30,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../cgame/cg_public.h"
 #include "../game/bg_public.h"
 
+/* fucking amateur hour garbage code - best to just externC the whole pile i expect
 #define USE_CURL
 // note: we REALLY don't want to use a dll for curl, but the .lib is SO bloated  >:(
 //#define CURL_STATICLIB
 #define USE_CURL_DLOPEN
 #include "cl_curl.h"
+*/
 
 // tjw: file full of random crap that gets used to create cl_guid
 #define QKEY_FILE "qkey"
@@ -44,7 +46,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // snapshots are a view of the server at a given time
 typedef struct {
-	qboolean		valid;			// cleared if delta parsing was invalid
+	qbool		valid;			// cleared if delta parsing was invalid
 	int				snapFlags;		// rate delayed and dropped commands
 
 	int				serverTime;		// server time the message is valid for (in msec)
@@ -99,9 +101,9 @@ typedef struct {
 	int			oldFrameServerTime;	// to check tournament restarts
 	int			serverTimeDelta;	// cl.serverTime = cls.realtime + cl.serverTimeDelta
 									// this value changes as net lag varies
-	qboolean	extrapolatedSnapshot;	// set if any cgame frame has been forced to extrapolate
+	qbool	extrapolatedSnapshot;	// set if any cgame frame has been forced to extrapolate
 									// cleared when CL_AdjustTimeDelta looks at it
-	qboolean	newSnapshots;		// set on parse of any valid packet
+	qbool	newSnapshots;		// set on parse of any valid packet
 
 	gameState_t	gameState;			// configstrings
 	char		mapname[MAX_QPATH];	// extracted from CS_SERVERINFO
@@ -199,11 +201,11 @@ typedef struct {
 	int			downloadCount;	// how many bytes we got
 	int			downloadSize;	// how many bytes we got
 	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
-	qboolean	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
+	qbool	downloadRestart;	// if qtrue, we need to do another FS_Restart because we downloaded a pak
 #if defined(USE_CURL)
-	qboolean	cURLEnabled;
-	qboolean	cURLUsed;
-	qboolean	cURLDisconnected;
+	qbool	cURLEnabled;
+	qbool	cURLUsed;
+	qbool	cURLDisconnected;
 	char		downloadURL[MAX_OSPATH];
 	CURL		*downloadCURL;
 	CURLM		*downloadCURLM;
@@ -211,11 +213,11 @@ typedef struct {
 
 	// demo information
 	char		demoName[MAX_QPATH];
-	qboolean	spDemoRecording;
-	qboolean	demorecording;
-	qboolean	demoplaying;
-	qboolean	demowaiting;	// don't record until a non-delta message is received
-	qboolean	firstDemoFrameSkipped;
+	qbool	spDemoRecording;
+	qbool	demorecording;
+	qbool	demoplaying;
+	qbool	demowaiting;	// don't record until a non-delta message is received
+	qbool	firstDemoFrameSkipped;
 	fileHandle_t	demofile;
 
 	int			timeDemoFrames;		// counter of rendered frames
@@ -256,7 +258,7 @@ typedef struct {
 	int			minPing;
 	int			maxPing;
 	int			ping;
-	qboolean	visible;
+	qbool	visible;
 	int			punkbuster;
 } serverInfo_t;
 
@@ -269,16 +271,16 @@ typedef struct {
 	connstate_t	state;				// connection status
 	int			keyCatchers;		// bit flags
 
-	qboolean	cddialog;			// bring up the cd needed dialog next frame
+	qbool	cddialog;			// bring up the cd needed dialog next frame
 
 	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 
 	// when the server clears the hunk, all of these must be restarted
-	qboolean	rendererStarted;
-	qboolean	soundStarted;
-	qboolean	soundRegistered;
-	qboolean	uiStarted;
-	qboolean	cgameStarted;
+	qbool	rendererStarted;
+	qbool	soundStarted;
+	qbool	soundRegistered;
+	qbool	uiStarted;
+	qbool	cgameStarted;
 
 	int			framecount;
 	int			frametime;			// msec since last frame
@@ -317,6 +319,8 @@ typedef struct {
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
 	qhandle_t	consoleShader;
+
+	fontInfo_t fontConsole;
 } clientStatic_t;
 
 extern	clientStatic_t		cls;
@@ -401,7 +405,7 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
-qboolean CL_CDKeyValidate( const char *key, const char *checksum );
+qbool CL_CDKeyValidate( const char *key, const char *checksum );
 int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
 
 
@@ -412,8 +416,8 @@ typedef struct {
 	int			down[2];		// key nums holding it down
 	unsigned	downtime;		// msec timestamp
 	unsigned	msec;			// msec down this frame if both a down and up happened
-	qboolean	active;			// current state
-	qboolean	wasPressed;		// set when down, not cleared when up
+	qbool	active;			// current state
+	qbool	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
 extern	kbutton_t	in_mlook, in_klook;
@@ -448,7 +452,7 @@ void	CL_LocalServers_f( void );
 void	CL_GlobalServers_f( void );
 void	CL_FavoriteServers_f( void );
 void	CL_Ping_f( void );
-qboolean CL_UpdateVisiblePings_f( int source );
+qbool CL_UpdateVisiblePings_f( int source );
 
 
 //
@@ -489,7 +493,7 @@ void	SCR_DrawNamedPic( float x, float y, float width, float height, const char *
 
 void	SCR_DrawBigString( int x, int y, const char *s, float alpha );			// draws a string with embedded color control characters with fade
 void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color );	// ignores embedded color control characters
-void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor );
+void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qbool forceColor );
 void	SCR_DrawSmallChar( int x, int y, int ch );
 
 
@@ -506,7 +510,7 @@ e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);
 void CIN_DrawCinematic (int handle);
 void CIN_SetExtents (int handle, int x, int y, int w, int h);
-void CIN_SetLooping (int handle, qboolean loop);
+void CIN_SetLooping (int handle, qbool loop);
 void CIN_UploadCinematic(int handle);
 void CIN_CloseAllVideos(void);
 
@@ -515,7 +519,7 @@ void CIN_CloseAllVideos(void);
 //
 void CL_InitCGame( void );
 void CL_ShutdownCGame( void );
-qboolean CL_GameCommand( void );
+qbool CL_GameCommand( void );
 void CL_CGameRendering( stereoFrame_t stereo );
 void CL_SetCGameTime( void );
 void CL_FirstSnapshot( void );
@@ -537,14 +541,14 @@ void LAN_SaveServersToCache( void );
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 void CL_Netchan_TransmitNextFragment( netchan_t *chan );
-qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
+qbool CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 
 //
 // cl_avi.c
 //
-qboolean CL_OpenAVIForWriting( const char *filename );
+qbool CL_OpenAVIForWriting( const char *filename );
 void CL_TakeVideoFrame( void );
 void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
 void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
-qboolean CL_CloseAVI( void );
-qboolean CL_VideoRecording( void );
+qbool CL_CloseAVI( void );
+qbool CL_VideoRecording( void );

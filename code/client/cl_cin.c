@@ -52,7 +52,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MAX_VIDEO_HANDLES	16
 
-extern glconfig_t glConfig;
 extern	int		s_paintedtime;
 extern	int		s_rawend;
 
@@ -95,7 +94,7 @@ typedef struct {
 	char				fileName[MAX_OSPATH];
 	int					CIN_WIDTH, CIN_HEIGHT;
 	int					xpos, ypos, width, height;
-	qboolean			looping, holdAtEnd, dirty, alterGameState, silent, shader;
+	qbool			looping, holdAtEnd, dirty, alterGameState, silent, shader;
 	fileHandle_t		iFile;
 	e_status			status;
 	unsigned int		startTime;
@@ -117,9 +116,9 @@ typedef struct {
 
 	long				samplesPerPixel;				// defaults to 2
 	byte*				gray;
-	unsigned int		xsize, ysize, maxsize, minsize;
+	long				xsize, ysize, maxsize, minsize;
 
-	qboolean			half, smootheddouble, inMemory;
+	qbool			half, smootheddouble, inMemory;
 	long				normalBuffer0;
 	long				roq_flags;
 	long				roqF0;
@@ -1153,7 +1152,7 @@ redump:
 			if (cinTable[currentHandle].numQuads != 1) cinTable[currentHandle].numQuads = 0;
 			break;
 		case	ROQ_PACKET:
-			cinTable[currentHandle].inMemory = cinTable[currentHandle].roq_flags;
+			cinTable[currentHandle].inMemory = (cinTable[currentHandle].roq_flags != 0);
 			cinTable[currentHandle].RoQFrameSize = 0;           // for header
 			break;
 		case	ROQ_QUAD_HANG:
@@ -1196,7 +1195,11 @@ redump:
 		}
 		return;
 	}
-	if (cinTable[currentHandle].inMemory && (cinTable[currentHandle].status != FMV_EOF)) { cinTable[currentHandle].inMemory--; framedata += 8; goto redump; }
+	if (cinTable[currentHandle].inMemory && (cinTable[currentHandle].status != FMV_EOF)) {
+		cinTable[currentHandle].inMemory = qfalse;
+		framedata += 8;
+		goto redump;
+	}
 //
 // one more frame hits the dust
 //
@@ -1319,9 +1322,7 @@ Fetch and decompress the pending frame
 
 e_status CIN_RunCinematic (int handle)
 {
-        // bk001204 - init
-	int	start = 0;
-	int     thisTime = 0;
+	int thisTime = 0;
 
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return FMV_EOF;
 
@@ -1351,13 +1352,13 @@ e_status CIN_RunCinematic (int handle)
 
 	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
 	thisTime = CL_ScaledMilliseconds()*com_timescale->value;
-	if (cinTable[currentHandle].shader && (abs(thisTime - cinTable[currentHandle].lastTime))>100) {
+	if (cinTable[currentHandle].shader && (abs(int(thisTime - cinTable[currentHandle].lastTime)))>100) {
 		cinTable[currentHandle].startTime += thisTime - cinTable[currentHandle].lastTime;
 	}
 	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
 	cinTable[currentHandle].tfps = ((((CL_ScaledMilliseconds()*com_timescale->value) - cinTable[currentHandle].startTime)*3)/100);
 
-	start = cinTable[currentHandle].startTime;
+	unsigned start = cinTable[currentHandle].startTime;
 	while(  (cinTable[currentHandle].tfps != cinTable[currentHandle].numQuads)
 		&& (cinTable[currentHandle].status == FMV_PLAY) ) 
 	{
@@ -1490,7 +1491,7 @@ void CIN_SetExtents (int handle, int x, int y, int w, int h) {
 	cinTable[handle].dirty = qtrue;
 }
 
-void CIN_SetLooping(int handle, qboolean loop) {
+void CIN_SetLooping(int handle, qbool loop) {
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return;
 	cinTable[handle].looping = loop;
 }
@@ -1520,7 +1521,7 @@ void CIN_DrawCinematic (int handle) {
 
 	if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY)) {
 		int ix, iy, *buf2, *buf3, xm, ym, ll;
-                
+
 		xm = cinTable[handle].CIN_WIDTH/256;
 		ym = cinTable[handle].CIN_HEIGHT/256;
                 ll = 8;
@@ -1529,7 +1530,7 @@ void CIN_DrawCinematic (int handle) {
                 }
                 
 		buf3 = (int*)buf;
-		buf2 = Hunk_AllocateTempMemory( 256*256*4 );
+		buf2 = (int*)Hunk_AllocateTempMemory( 256*256*4 );
                 if (xm==2 && ym==2) {
                     byte *bc2, *bc3;
                     int	ic, iiy;
@@ -1579,7 +1580,7 @@ void CIN_DrawCinematic (int handle) {
 
 void CL_PlayCinematic_f(void) {
 	char	*arg, *s;
-	qboolean	holdatend;
+	qbool	holdatend;
 	int bits = CIN_system;
 
 	Com_DPrintf("CL_PlayCinematic_f\n");
