@@ -208,14 +208,11 @@ int	ParseHex( const char *text ) {
 	return value;
 }
 
-/*
-===============
-VM_LoadSymbols
-===============
-*/
-void VM_LoadSymbols( vm_t *vm ) {
+
+void VM_LoadSymbols( vm_t* vm )
+{
 	int		len;
-	char	*mapfile, *text_p, *token;
+	char	*mapfile;
 	char	name[MAX_QPATH];
 	char	symbols[MAX_QPATH];
 	vmSymbol_t	**prev, *sym;
@@ -241,7 +238,8 @@ void VM_LoadSymbols( vm_t *vm ) {
 	numInstructions = vm->instructionPointersLength >> 2;
 
 	// parse the symbols
-	text_p = mapfile;
+	const char* token;
+	const char* text_p = mapfile;
 	prev = &vm->symbols;
 	count = 0;
 
@@ -270,7 +268,7 @@ void VM_LoadSymbols( vm_t *vm ) {
 			break;
 		}
 		chars = strlen( token );
-		sym = Hunk_Alloc( sizeof( *sym ) + chars, h_high );
+		sym = (vmSymbol_t*)Hunk_Alloc( sizeof( *sym ) + chars, h_high );
 		*prev = sym;
 		prev = &sym->next;
 		sym->next = NULL;
@@ -303,7 +301,7 @@ Dlls will call this directly
    This is likely due to C's inability to pass "..." parameters to
    a function in one clean chunk. On PowerPC Linux, these parameters
    are not necessarily passed on the stack, so while (&arg[0] == arg)
-   is true, (&arg[1] == 2nd function parameter) is not necessarily
+   is qtrue, (&arg[1] == 2nd function parameter) is not necessarily
    accurate, as arg's value might have been stored to the stack or
    other piece of scratch memory to give it a valid address, but the
    next parameter might still be sitting in a register.
@@ -356,7 +354,7 @@ VM_LoadQVM
 Load a .qvm file
 =================
 */
-vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
+vmHeader_t *VM_LoadQVM( vm_t *vm, qbool alloc ) {
 	int					length;
 	int					dataLength;
 	int					i;
@@ -420,7 +418,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 
 	if( alloc ) {
 		// allocate zero filled space for initialized and uninitialized data
-		vm->dataBase = Hunk_Alloc( dataLength, h_high );
+		vm->dataBase = (byte*)Hunk_Alloc( dataLength, h_high );
 		vm->dataMask = dataLength - 1;
 	} else {
 		// clear the data
@@ -440,7 +438,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 		Com_Printf( "Loading %d jump table targets\n", vm->numJumpTableTargets );
 
 		if( alloc ) {
-			vm->jumpTableTargets = Hunk_Alloc( header->jtrgLength, h_high );
+			vm->jumpTableTargets = (byte*)Hunk_Alloc( header->jtrgLength, h_high );
 		} else {
 			Com_Memset( vm->jumpTableTargets, 0, header->jtrgLength );
 		}
@@ -569,7 +567,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 
 	// allocate space for the jump targets, which will be filled in by the compile/prep functions
 	vm->instructionPointersLength = header->instructionCount * 4;
-	vm->instructionPointers = Hunk_Alloc( vm->instructionPointersLength, h_high );
+	vm->instructionPointers = (int*)Hunk_Alloc( vm->instructionPointersLength, h_high );
 
 	// copy or compile the instructions
 	vm->codeLength = header->codeLength;
@@ -651,37 +649,36 @@ void VM_Clear(void) {
 	lastVM = NULL;
 }
 
-void *VM_ArgPtr( intptr_t intValue ) {
-	if ( !intValue ) {
-		return NULL;
-	}
-	// bk001220 - currentVM is missing on reconnect
-	if ( currentVM==NULL )
-	  return NULL;
+
+intptr_t VM_ArgPtr( intptr_t intValue )
+{
+	if (!intValue || !currentVM)
+		return 0;
 
 	if ( currentVM->entryPoint ) {
-		return (void *)(currentVM->dataBase + intValue);
+		return (intptr_t)(currentVM->dataBase + intValue);
 	}
 	else {
-		return (void *)(currentVM->dataBase + (intValue & currentVM->dataMask));
+		return (intptr_t)(currentVM->dataBase + (intValue & currentVM->dataMask));
 	}
 }
 
-void *VM_ExplicitArgPtr( vm_t *vm, intptr_t intValue ) {
+
+intptr_t VM_ExplicitArgPtr( const vm_t* vm, intptr_t intValue )
+{
 	if ( !intValue ) {
 		return NULL;
 	}
 
 	// bk010124 - currentVM is missing on reconnect here as well?
-	if ( currentVM==NULL )
-	  return NULL;
+	if (!currentVM)
+		NULL;
 
-	//
 	if ( vm->entryPoint ) {
-		return (void *)(vm->dataBase + intValue);
+		return (intptr_t)(vm->dataBase + intValue);
 	}
 	else {
-		return (void *)(vm->dataBase + (intValue & vm->dataMask));
+		return (intptr_t)(vm->dataBase + (intValue & vm->dataMask));
 	}
 }
 
@@ -817,7 +814,7 @@ void VM_VmProfile_f( void ) {
 		return;
 	}
 
-	sorted = Z_Malloc( vm->numSymbols * sizeof( *sorted ) );
+	sorted = (vmSymbol_t**)Z_Malloc( vm->numSymbols * sizeof( *sorted ) );
 	sorted[0] = vm->symbols;
 	total = sorted[0]->profileCount;
 	for ( i = 1 ; i < vm->numSymbols ; i++ ) {

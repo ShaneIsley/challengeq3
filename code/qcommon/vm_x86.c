@@ -62,7 +62,17 @@ static	int		pc = 0;
 
 static	int		*instructionPointers = NULL;
 
+/* KHB !!!  ftol() was obsoleted a long time ago
+if we ever want it back, this hackfn is pretty decent
 #define FTOL_PTR
+long ftol( float x )
+  static const double magic = 6755399441055744.0; // 2^51 + 2^52
+
+  double tmp = x;
+  tmp += (x > 0) ? -0.499999999999 : +0.499999999999;
+  tmp += magic;
+  return *(long*)&tmp;
+*/
 
 #ifdef _MSC_VER
 
@@ -209,7 +219,7 @@ void callAsmCall(void)
 }
 
 // Note the C space function AsmCall is never actually called, and is in fact
-// arbitrarily named (though this is not true for the MSC version).  When a vm
+// arbitrarily named (though this is not qtrue for the MSC version).  When a vm
 // makes a system call, control jumps straight to the doAsmCall label.
 void AsmCall( void ) {
 	asm( CMANG(doAsmCall) ":				\n\t" \
@@ -380,7 +390,7 @@ static void EmitMovEAXEDI(vm_t *vm) {
 	EmitString( "8B 07" );		// mov eax, dword ptr [edi]
 }
 
-qboolean EmitMovEBXEDI(vm_t *vm, int andit) {
+qbool EmitMovEBXEDI(vm_t *vm, int andit) {
 	if (LastCommand == LAST_COMMAND_MOV_EDI_EAX) 
 	{	// mov [edi], eax
 		compiledOfs -= 2;
@@ -421,13 +431,13 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 	int		maxLength;
 	int		v;
 	int		i;
-	qboolean opt;
+	qbool opt;
 
 	// allocate a very large temp buffer, we will shrink it later
 	maxLength = header->codeLength * 8;
-	buf = Z_Malloc( maxLength );
-	jused = Z_Malloc(header->instructionCount + 2 );
-	
+	buf = (byte*)Z_Malloc( maxLength );
+	jused = (byte*)Z_Malloc(header->instructionCount + 2 );
+
 	Com_Memset(jused, 0, header->instructionCount+2);
 
 	// ensure that the optimisation pass knows about all the jump
@@ -1086,7 +1096,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 		Com_Error(ERR_DROP, "VM_CompileX86: can't mmap memory");
 #elif _WIN32
 	// allocate memory with EXECUTE permissions under windows.
-	vm->codeBase = VirtualAlloc(NULL, compiledOfs, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	vm->codeBase = (byte*)VirtualAlloc(NULL, compiledOfs, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	if(!vm->codeBase)
 		Com_Error(ERR_DROP, "VM_CompileX86: VirtualAlloc failed");
 #else
@@ -1101,7 +1111,6 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 #elif _WIN32
 	{
 		DWORD oldProtect = 0;
-		
 		// remove write permissions.
 		if(!VirtualProtect(vm->codeBase, compiledOfs, PAGE_EXECUTE_READ, &oldProtect))
 			Com_Error(ERR_DROP, "VM_CompileX86: VirtualProtect failed");
@@ -1203,9 +1212,9 @@ int	VM_CallCompiled( vm_t *vm, int *args ) {
 		static void *memEntryPoint;
 
 		memProgramStack	= programStack;
-		memOpStack      = opStack;     
-		memEntryPoint   = entryPoint;  
-		
+		memOpStack      = opStack;
+		memEntryPoint   = entryPoint;
+
 		__asm__("	pushal				\n" \
 				"	movl %0,%%esi		\n" \
 				"	movl %1,%%edi		\n" \

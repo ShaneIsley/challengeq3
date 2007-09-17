@@ -44,7 +44,6 @@ typedef struct
 #define	ON_EPSILON	0.1f
 #endif
 
-winding_t	*AllocWinding (int points);
 vec_t	WindingArea (winding_t *w);
 void	WindingCenter (winding_t *w, vec3_t center);
 void	ClipWindingEpsilon (winding_t *in, vec3_t normal, vec_t dist, 

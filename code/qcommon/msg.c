@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static huffman_t		msgHuff;
 
-static qboolean			msgInit = qfalse;
+static qbool			msgInit = qfalse;
 
 int pcount[256];
 
@@ -83,7 +83,7 @@ void MSG_BeginReadingOOB( msg_t *msg ) {
 	msg->oob = qtrue;
 }
 
-void MSG_Copy(msg_t *buf, byte *data, int length, msg_t *src)
+void MSG_Copy( msg_t* buf, byte* data, int length, const msg_t* src )
 {
 	if (length<src->cursize) {
 		Com_Error( ERR_DROP, "MSG_Copy: can't copy into a smaller msg_t buffer");
@@ -184,7 +184,7 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 int MSG_ReadBits( msg_t *msg, int bits ) {
 	int			value;
 	int			get;
-	qboolean	sgn;
+	qbool	sgn;
 	int			i, nbits;
 //	FILE*	fp;
 
@@ -865,7 +865,7 @@ identical, under the assumption that the in-order delta code will catch it.
 ==================
 */
 void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
-						   qboolean force ) {
+						   qbool force ) {
 	int			i, lc;
 	int			numFields;
 	netField_t	*field;

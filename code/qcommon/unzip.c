@@ -235,7 +235,7 @@ typedef Byte    *voidp;
 #define Z_DEFLATED   8
 /* The deflate compression method (the only one supported in this version) */
 
-#define Z_NULL  (void *)0  /* for initializing zalloc, zfree, opaque */
+#define Z_NULL 0  /* for initializing zalloc, zfree, opaque */
 
 #define zlib_version zlibVersion()
 /* for compatibility with versions < 1.0.2 */
@@ -2432,7 +2432,7 @@ struct inflate_blocks_state {
          *codes;
     } decode;           /* if CODES, current state */
   } sub;                /* submode */
-  uInt last;            /* true if this block is the last block */
+  uInt last;            /* qtrue if this block is the last block */
 
   /* mode independent information */
   uInt bitk;            /* bits in bit buffer */
@@ -2471,8 +2471,12 @@ struct inflate_blocks_state {
 /*   load static pointers */
 #define LOAD {LOADIN LOADOUT}
 
-/* masks for lower bits (size given to avoid silly warnings with Visual C++) */
-static  uInt inflate_mask[17];
+/* AND'ing with mask[n] masks the lower n bits */
+static uInt inflate_mask[] = {
+    0x0000,
+    0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
+    0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
+};
 
 /* copy as much as possible from the sliding window to the output area */
 static  int inflate_flush OF((
@@ -2837,7 +2841,7 @@ void inflate_set_dictionary(inflate_blocks_statef *s, const Byte *d, uInt n)
   s->read = s->write = s->window + n;
 }
 
-/* Returns true if inflate is currently at the end of a block generated
+/* Returns qtrue if inflate is currently at the end of a block generated
  * by Z_SYNC_FLUSH or Z_FULL_FLUSH. 
  * IN assertion: s != Z_NULL
  */
@@ -2846,14 +2850,6 @@ int inflate_blocks_sync_point(inflate_blocks_statef *s)
   return s->mode == LENS;
 }
 #endif
-
-
-/* And'ing with mask[n] masks the lower n bits */
-static uInt inflate_mask[17] = {
-    0x0000,
-    0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
-    0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
-};
 
 
 /* copy as much as possible from the sliding window to the output area */
@@ -4267,7 +4263,7 @@ int inflateSync(z_streamp z)
   return Z_OK;
 }
 
-/* Returns true if inflate is currently at the end of a block generated
+/* Returns qtrue if inflate is currently at the end of a block generated
  * by Z_SYNC_FLUSH or Z_FULL_FLUSH. This function is used by one PPP
  * implementation to provide an additional safety check. PPP uses Z_SYNC_FLUSH
  * but removes the length bytes of the resulting empty stored block. When

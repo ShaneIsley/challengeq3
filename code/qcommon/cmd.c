@@ -439,7 +439,7 @@ will point into this temporary buffer.
 */
 // NOTE TTimo define that to track tokenization issues
 //#define TKN_DBG
-static void Cmd_TokenizeString2( const char *text_in, qboolean ignoreQuotes ) {
+static void Cmd_TokenizeString2( const char *text_in, qbool ignoreQuotes ) {
 	const char	*text;
 	char	*textOut;
 
@@ -559,16 +559,13 @@ void Cmd_TokenizeStringIgnoreQuotes( const char *text_in ) {
 	Cmd_TokenizeString2( text_in, qtrue );
 }
 
-/*
-============
-Cmd_AddCommand
-============
-*/
-void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
-	cmd_function_t	*cmd;
-	
+
+void Cmd_AddCommand( const char *cmd_name, xcommand_t function )
+{
+	cmd_function_t* cmd;
+
 	// fail if the command already exists
-	for ( cmd = cmd_functions ; cmd ; cmd=cmd->next ) {
+	for ( cmd = cmd_functions ; cmd ; cmd = cmd->next ) {
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			// allow completion-only commands to be silently doubled
 			if ( function != NULL ) {
@@ -579,7 +576,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	}
 
 	// use a small malloc to avoid zone fragmentation
-	cmd = S_Malloc (sizeof(cmd_function_t));
+	cmd = (cmd_function_t*)S_Malloc(sizeof(cmd_function_t));
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
 	cmd->next = cmd_functions;

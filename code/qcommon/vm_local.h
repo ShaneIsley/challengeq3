@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "q_shared.h"
 #include "qcommon.h"
 
+
 typedef enum {
 	OP_UNDEF, 
 
@@ -124,14 +125,14 @@ typedef struct vmSymbol_s {
 #define	VM_OFFSET_SYSTEM_CALL		4
 
 struct vm_s {
-    // DO NOT MOVE OR CHANGE THESE WITHOUT CHANGING THE VM_OFFSET_* DEFINES
-    // USED BY THE ASM CODE
-    int			programStack;		// the vm may be recursively entered
-    intptr_t			(*systemCall)( intptr_t *parms );
+	// DO NOT MOVE OR CHANGE THESE WITHOUT CHANGING THE VM_OFFSET_* DEFINES
+	// USED BY THE ASM CODE
+	int			programStack;		// the vm may be recursively entered
+	intptr_t			(*systemCall)( intptr_t *parms );
 
 	//------------------------------------
-   
-    char		name[MAX_QPATH];
+
+	char		name[MAX_QPATH];
 
 	// for dynamic linked modules
 	void		*dllHandle;
@@ -139,9 +140,9 @@ struct vm_s {
 	void (*destroy)(vm_t* self);
 
 	// for interpreted modules
-	qboolean	currentlyInterpreting;
+	qbool	currentlyInterpreting;
 
-	qboolean	compiled;
+	qbool	compiled;
 	byte		*codeBase;
 	int			codeLength;
 
@@ -181,4 +182,19 @@ vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value );
 int VM_SymbolToValue( vm_t *vm, const char *symbol );
 const char *VM_ValueToSymbol( vm_t *vm, int value );
 void VM_LogSyscalls( int *args );
+
+intptr_t VM_ArgPtr( intptr_t intValue );
+intptr_t VM_ExplicitArgPtr( const vm_t* vm, intptr_t intValue );
+//#define VMA(x) VM_ArgPtr(args[x])
+
+static ID_INLINE float _vmf(intptr_t x)
+{
+	union {
+		intptr_t l;
+		float f;
+	} t;
+	t.l = x;
+	return t.f;
+}
+#define VMF(x) _vmf(args[x])
 

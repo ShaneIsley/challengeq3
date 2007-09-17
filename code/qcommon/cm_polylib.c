@@ -41,25 +41,17 @@ void pw(winding_t *w)
 }
 
 
-/*
-=============
-AllocWinding
-=============
-*/
-winding_t	*AllocWinding (int points)
+static winding_t* AllocWinding( int points )
 {
-	winding_t	*w;
-	int			s;
-
 	c_winding_allocs++;
 	c_winding_points += points;
 	c_active_windings++;
 	if (c_active_windings > c_peak_windings)
 		c_peak_windings = c_active_windings;
 
-	s = sizeof(vec_t)*3*points + sizeof(int);
-	w = Z_Malloc (s);
-	Com_Memset (w, 0, s); 
+	int s = sizeof(vec_t)*3*points + sizeof(int);
+	winding_t* w = (winding_t*)Z_Malloc(s);
+	Com_Memset(w, 0, s);
 	return w;
 }
 
@@ -606,7 +598,7 @@ WindingOnPlaneSide
 */
 int		WindingOnPlaneSide (winding_t *w, vec3_t normal, vec_t dist)
 {
-	qboolean	front, back;
+	qbool	front, back;
 	int			i;
 	vec_t		d;
 
@@ -656,8 +648,8 @@ void	AddWindingToConvexHull( winding_t *w, winding_t **hull, vec3_t normal ) {
 	vec3_t		hullPoints[MAX_HULL_POINTS];
 	vec3_t		newHullPoints[MAX_HULL_POINTS];
 	vec3_t		hullDirs[MAX_HULL_POINTS];
-	qboolean	hullSide[MAX_HULL_POINTS];
-	qboolean	outside;
+	qbool	hullSide[MAX_HULL_POINTS];
+	qbool	outside;
 
 	if ( !*hull ) {
 		*hull = CopyWinding( w );

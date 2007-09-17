@@ -26,43 +26,48 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define Q3_VERSION				"CNQ3 1.34"
+#define Q3_VERSION				"CNQ3 2.00"
 #define CLIENT_WINDOW_TITLE		"Quake3"
 #define CONSOLE_WINDOW_TITLE	"Quake3 Console"
-// 1.32 released 7-10-2002
 
 #define BASEGAME			"baseq3"
 #define APEXGAME			"cpma"
 
-#define MAX_TEAMNAME 32
+#if defined(_DEBUG)
+#define COMPILE_TIME_ASSERT( pred ) switch(0) { case 0: case pred: ; }
+#else
+#define COMPILE_TIME_ASSERT( pred )
+#endif
+
+#if defined(__cplusplus) || defined(bool)
+#define bool DO_NOT_WANT
+#define true DO_NOT_WANT
+#define false DO_NOT_WANT
+#endif
+// technically-correct form, handy for catching sloppy code that mismixes bool and int, *cough* JPVW  :P
+//typedef enum { qfalse, qtrue } qbool;
+typedef int qbool;
+const qbool qfalse = 0;
+const qbool qtrue = !0;
+
 
 #ifdef _MSC_VER
 
-#pragma warning(disable : 4018)     // signed/unsigned mismatch
-#pragma warning(disable : 4032)
-#pragma warning(disable : 4051)
-#pragma warning(disable : 4057)		// slightly different base types
-#pragma warning(disable : 4100)		// unreferenced formal parameter
-#pragma warning(disable : 4115)
-#pragma warning(disable : 4125)		// decimal digit terminates octal escape sequence
-#pragma warning(disable : 4127)		// conditional expression is constant
-#pragma warning(disable : 4136)
-#pragma warning(disable : 4152)		// nonstandard extension, function/data pointer conversion in expression
-//#pragma warning(disable : 4201)
-//#pragma warning(disable : 4214)
-#pragma warning(disable : 4244)
-#pragma warning(disable : 4142)		// benign redefinition
-//#pragma warning(disable : 4305)		// truncation from const double to float
-//#pragma warning(disable : 4310)		// cast truncates constant value
-//#pragma warning(disable:  4505) 	// unreferenced local function has been removed
-#pragma warning(disable : 4514)
-#pragma warning(disable : 4702)		// unreachable code
-#pragma warning(disable : 4711)		// selected for automatic inline expansion
-#pragma warning(disable : 4220)		// varargs matches remaining parameters
-//#pragma intrinsic( memset, memcpy )
-
 #if (_MSC_VER >= 1400)
 #define _CRT_SECURE_NO_DEPRECATE 1
+#endif
+
+#pragma warning(disable : 4018)		// signed/unsigned mismatch
+#pragma warning(disable : 4389)		// also signed/unsigned mismatch
+#pragma warning(disable : 4244)		// conversion to smaller type
+#pragma warning(disable : 4100)		// unreferenced formal parameter
+#pragma warning(disable : 4127)		// conditional expression is constant
+#pragma warning(disable : 4706)		// assignment within conditional (nanny mode)
+//#pragma intrinsic( memset, memcpy )
+
+#if defined(__cplusplus) && !defined(min)
+	template <typename T> __forceinline T min( T a, T b ) { return (a < b) ? a : b; }
+	template <typename T> __forceinline T max( T a, T b ) { return (a > b) ? a : b; }
 #endif
 
 #endif // _MSC_VER
@@ -114,7 +119,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //=============================================================
 
 #ifdef Q3_VM
-   typedef int intptr_t;
+	typedef int intptr_t;
 #else
 # ifndef _MSC_VER
 #  include <stdint.h>
@@ -132,8 +137,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 typedef unsigned char 		byte;
 
-typedef enum {qfalse, qtrue}	qboolean;
-
 typedef int		qhandle_t;
 typedef int		sfxHandle_t;
 typedef int		fileHandle_t;
@@ -141,10 +144,12 @@ typedef int		clipHandle_t;
 
 #define PAD(x,y) (((x)+(y)-1) & ~((y)-1))
 
-#ifdef __GNUC__
-#define ALIGN(x) __attribute__((aligned(x)))
+#if defined(_MSC_VER)
+	#define ALIGN(x) __declspec( align(x) )
+#elif defined(__GNUC__)
+	#define ALIGN(x) __align(x)
 #else
-#define ALIGN(x)
+	#define ALIGN(x)
 #endif
 
 #ifndef NULL
@@ -563,11 +568,11 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] );
 void SetPlaneSignbits( struct cplane_s *out );
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
 
-qboolean BoundsIntersect(const vec3_t mins, const vec3_t maxs,
+qbool BoundsIntersect(const vec3_t mins, const vec3_t maxs,
 		const vec3_t mins2, const vec3_t maxs2);
-qboolean BoundsIntersectSphere(const vec3_t mins, const vec3_t maxs,
+qbool BoundsIntersectSphere(const vec3_t mins, const vec3_t maxs,
 		const vec3_t origin, vec_t radius);
-qboolean BoundsIntersectPoint(const vec3_t mins, const vec3_t maxs,
+qbool BoundsIntersectPoint(const vec3_t mins, const vec3_t maxs,
 		const vec3_t origin);
 
 float	AngleMod(float a);
@@ -579,7 +584,7 @@ float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
 
-qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
+qbool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
@@ -604,8 +609,8 @@ void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
-char	*COM_Parse( char **data_p );
-char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
+const char* COM_Parse( const char** data_p );
+const char* COM_ParseExt( const char** data_p, qbool allowLineBreak );
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... );
 void	COM_ParseWarning( char *format, ... );
@@ -633,14 +638,14 @@ typedef struct pc_token_s
 
 // data is an in/out parm, returns a parsed out token
 
-void	COM_MatchToken( char**buf_p, char *match );
+void COM_MatchToken( const char** data, const char* match );
 
-void SkipBracedSection (char **program);
-void SkipRestOfLine ( char **data );
+void SkipBracedSection( const char** data );
+void SkipRestOfLine( const char** data );
 
-void Parse1DMatrix (char **buf_p, int x, float *m);
-void Parse2DMatrix (char **buf_p, int y, int x, float *m);
-void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m);
+//void Parse1DMatrix (char **buf_p, int x, float *m);
+//void Parse2DMatrix (char **buf_p, int y, int x, float *m);
+//void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m);
 
 void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
@@ -726,7 +731,7 @@ void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
-qboolean Info_Validate( const char *s );
+qbool Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
@@ -774,7 +779,7 @@ typedef struct cvar_s {
 	char		*resetString;		// cvar_restart will reset to this value
 	char		*latchedString;		// for CVAR_LATCH vars
 	int			flags;
-	qboolean	modified;			// set each time the cvar is changed
+	qbool	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
 	float		value;				// atof( string )
 	int			integer;			// atoi( string )
@@ -835,8 +840,8 @@ typedef struct cplane_s {
 
 // a trace is returned when a box is swept through the world
 typedef struct {
-	qboolean	allsolid;	// if true, plane is not valid
-	qboolean	startsolid;	// if true, the initial point was in a solid area
+	qbool	allsolid;	// if qtrue, plane is not valid
+	qbool	startsolid;	// if qtrue, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0 = didn't hit anything
 	vec3_t		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact, transformed to world space
@@ -1157,6 +1162,8 @@ typedef enum {
 } connstate_t;
 
 
+#if 0 // since this has never, ever, worked
+
 #define GLYPH_START 0
 #define GLYPH_END 255
 #define GLYPH_CHARSTART 32
@@ -1183,6 +1190,21 @@ typedef struct {
   float glyphScale;
   char name[MAX_QPATH];
 } fontInfo_t;
+
+#endif
+
+#define GLYPH_START 32
+#define GLYPH_END 126
+#define GLYPHS_PER_FONT (GLYPH_END - GLYPH_START + 1)
+
+typedef struct {
+	int height;
+	int vpitch;
+	qhandle_t shaders[GLYPHS_PER_FONT];
+	byte widths[GLYPHS_PER_FONT];  // the size of the TEXTURE containing the glyph
+	byte pitches[GLYPHS_PER_FONT]; // the size of the glyph WITHIN that texture
+} fontInfo_t;
+
 
 #define Square(x) ((x)*(x))
 

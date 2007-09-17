@@ -23,16 +23,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "qfiles.h"
 
 
-void		CM_LoadMap( const char *name, qboolean clientload, int *checksum);
-void		CM_ClearMap( void );
+void CM_LoadMap( const char* name, qbool clientload, int* checksum );
+void CM_ClearMap();
 clipHandle_t CM_InlineModel( int index );		// 0 = world, 1 + are bmodels
 clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule );
 
 void		CM_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
 
-int			CM_NumClusters (void);
 int			CM_NumInlineModels( void );
-char		*CM_EntityString (void);
+const char* CM_EntityString();
 
 // returns an ORed contents mask
 int			CM_PointContents( const vec3_t p, clipHandle_t model );
@@ -58,8 +57,8 @@ int			CM_BoxLeafnums( const vec3_t mins, const vec3_t maxs, int *list,
 int			CM_LeafCluster (int leafnum);
 int			CM_LeafArea (int leafnum);
 
-void		CM_AdjustAreaPortalState( int area1, int area2, qboolean open );
-qboolean	CM_AreasConnected( int area1, int area2 );
+void		CM_AdjustAreaPortalState( int area1, int area2, qbool open );
+qbool	CM_AreasConnected( int area1, int area2 );
 
 int			CM_WriteAreaBits( byte *buffer, int area );
 
@@ -73,4 +72,4 @@ int	CM_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projecti
 				   int maxPoints, vec3_t pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
 
 // cm_patch.c
-void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, float *points) );
+void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, const float* points) );

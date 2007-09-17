@@ -112,7 +112,7 @@ typedef struct {
 	int			numClusters;
 	int			clusterBytes;
 	byte		*visibility;
-	qboolean	vised;			// if false, visibility is just a single cluster of ffs
+	qbool	vised;			// if qfalse, visibility is just a single cluster of ffs
 
 	int			numEntityChars;
 	char		*entityString;
@@ -141,11 +141,12 @@ extern	cvar_t		*cm_noCurves;
 extern	cvar_t		*cm_playerCurveClip;
 
 // cm_test.c
+extern void CM_FloodAreaConnections();
 
 // Used for oriented capsule collision detection
 typedef struct
 {
-	qboolean	use;
+	qbool	use;
 	float		radius;
 	float		halfheight;
 	vec3_t		offset;
@@ -161,7 +162,7 @@ typedef struct {
 	vec3_t		bounds[2];	// enclosing box of start and end surrounding by size
 	vec3_t		modelOrigin;// origin of the model tracing through
 	int			contents;	// ored contents of the model tracing through
-	qboolean	isPoint;	// optimized case
+	qbool	isPoint;	// optimized case
 	trace_t		trace;		// returned from trace call
 	sphere_t	sphere;		// sphere for oriendted capsule collision
 } traceWork_t;
@@ -169,7 +170,7 @@ typedef struct {
 typedef struct leafList_s {
 	int		count;
 	int		maxcount;
-	qboolean	overflowed;
+	qbool	overflowed;
 	int		*list;
 	vec3_t	bounds[2];
 	int		lastLeaf;		// for overflows where each leaf can't be stored individually
@@ -184,11 +185,11 @@ void CM_StoreBrushes( leafList_t *ll, int nodenum );
 
 void CM_BoxLeafnums_r( leafList_t *ll, int nodenum );
 
-cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle );
+const cmodel_t* CM_ClipHandleToModel( clipHandle_t handle );
 
 // cm_patch.c
 
-struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *points );
+struct patchCollide_s* CM_GeneratePatchCollide( int width, int height, const vec3_t* points );
 void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+qbool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 void CM_ClearLevelPatches( void );

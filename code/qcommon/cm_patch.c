@@ -30,7 +30,7 @@ This file does not reference any globals, and has these entry points:
 void CM_ClearLevelPatches( void );
 struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, const vec3_t *points );
 void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
+qbool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, flaot *points) );
 
 
@@ -53,7 +53,7 @@ typedef struct {
 	int			numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
 	int			borderPlanes[4+6+16];
 	int			borderInward[4+6+16];
-	qboolean	borderNoAdjust[4+6+16];
+	qbool	borderNoAdjust[4+6+16];
 } facet_t;
 
 typedef struct patchCollide_s {
@@ -70,8 +70,8 @@ typedef struct patchCollide_s {
 typedef struct {
 	int			width;
 	int			height;
-	qboolean	wrapWidth;
-	qboolean	wrapHeight;
+	qbool	wrapWidth;
+	qbool	wrapHeight;
 	vec3_t	points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
 } cGrid_t;
 
@@ -86,7 +86,7 @@ int	c_totalPatchEdges;
 
 static const patchCollide_t	*debugPatchCollide;
 static const facet_t		*debugFacet;
-static qboolean		debugBlock;
+static qbool		debugBlock;
 static vec3_t		debugBlockPoints[4];
 
 /*
@@ -120,11 +120,11 @@ static int CM_SignbitsForNormal( vec3_t normal ) {
 =====================
 CM_PlaneFromPoints
 
-Returns false if the triangle is degenrate.
+Returns qfalse if the triangle is degenrate.
 The normal will point out of the clock for clockwise ordered points
 =====================
 */
-static qboolean CM_PlaneFromPoints( vec4_t plane, vec3_t a, vec3_t b, vec3_t c ) {
+static qbool CM_PlaneFromPoints( vec4_t plane, vec3_t a, vec3_t b, vec3_t c ) {
 	vec3_t	d1, d2;
 
 	VectorSubtract( b, a, d1 );
@@ -151,11 +151,11 @@ GRID SUBDIVISION
 =================
 CM_NeedsSubdivision
 
-Returns true if the given quadratic curve is not flat enough for our
+Returns qtrue if the given quadratic curve is not flat enough for our
 collision detection purposes
 =================
 */
-static qboolean	CM_NeedsSubdivision( vec3_t a, vec3_t b, vec3_t c ) {
+static qbool	CM_NeedsSubdivision( vec3_t a, vec3_t b, vec3_t c ) {
 	vec3_t		cmid;
 	vec3_t		lmid;
 	vec3_t		delta;
@@ -207,7 +207,7 @@ Swaps the rows and columns in place
 static void CM_TransposeGrid( cGrid_t *grid ) {
 	int			i, j, l;
 	vec3_t		temp;
-	qboolean	tempWrap;
+	qbool	tempWrap;
 
 	if ( grid->width > grid->height ) {
 		for ( i = 0 ; i < grid->height ; i++ ) {
@@ -283,7 +283,7 @@ CM_SubdivideGridColumns
 
 Adds columns as necessary to the grid until
 all the aproximating points are within SUBDIVIDE_DISTANCE
-from the true curve
+from the qtrue curve
 =================
 */
 static void CM_SubdivideGridColumns( cGrid_t *grid ) {
@@ -354,7 +354,7 @@ CM_ComparePoints
 ======================
 */
 #define	POINT_EPSILON	0.1
-static qboolean CM_ComparePoints( float *a, float *b ) {
+static qbool CM_ComparePoints( float *a, float *b ) {
 	float		d;
 
 	d = a[0] - b[0];
@@ -423,14 +423,9 @@ static	facet_t			facets[MAX_PATCH_PLANES]; //maybe MAX_FACETS ??
 #define	NORMAL_EPSILON	0.0001
 #define	DIST_EPSILON	0.02
 
-/*
-==================
-CM_PlaneEqual
-==================
-*/
-int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
-	float invplane[4];
 
+static int CM_PlaneEqual( const patchPlane_t* p, float plane[4], qbool* flipped )
+{
 	if (
 	   fabs(p->plane[0] - plane[0]) < NORMAL_EPSILON
 	&& fabs(p->plane[1] - plane[1]) < NORMAL_EPSILON
@@ -441,6 +436,7 @@ int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
 		return qtrue;
 	}
 
+	float invplane[4];
 	VectorNegate(plane, invplane);
 	invplane[3] = -plane[3];
 
@@ -457,41 +453,31 @@ int CM_PlaneEqual(patchPlane_t *p, float plane[4], int *flipped) {
 	return qfalse;
 }
 
-/*
-==================
-CM_SnapVector
-==================
-*/
-void CM_SnapVector(vec3_t normal) {
-	int		i;
 
-	for (i=0 ; i<3 ; i++)
+static void CM_SnapVector( vec3_t normal )
+{
+	for (int i = 0; i < 3; ++i)
 	{
 		if ( fabs(normal[i] - 1) < NORMAL_EPSILON )
 		{
-			VectorClear (normal);
+			VectorClear(normal);
 			normal[i] = 1;
 			break;
 		}
 		if ( fabs(normal[i] - -1) < NORMAL_EPSILON )
 		{
-			VectorClear (normal);
+			VectorClear(normal);
 			normal[i] = -1;
 			break;
 		}
 	}
 }
 
-/*
-==================
-CM_FindPlane2
-==================
-*/
-int CM_FindPlane2(float plane[4], int *flipped) {
-	int i;
 
+static int CM_FindPlane2( float plane[4], qbool* flipped )
+{
 	// see if the points are close enough to an existing plane
-	for ( i = 0 ; i < numPlanes ; i++ ) {
+	for (int i = 0; i < numPlanes; ++i) {
 		if (CM_PlaneEqual(&planes[i], plane, flipped)) return i;
 	}
 
@@ -503,11 +489,9 @@ int CM_FindPlane2(float plane[4], int *flipped) {
 	Vector4Copy( plane, planes[numPlanes].plane );
 	planes[numPlanes].signbits = CM_SignbitsForNormal( plane );
 
-	numPlanes++;
-
 	*flipped = qfalse;
 
-	return numPlanes-1;
+	return numPlanes++;
 }
 
 /*
@@ -753,7 +737,7 @@ CM_ValidateFacet
 If the facet isn't bounded by its borders, we screwed up.
 ==================
 */
-static qboolean CM_ValidateFacet( facet_t *facet ) {
+static qbool CM_ValidateFacet( facet_t *facet ) {
 	float		plane[4];
 	int			j;
 	winding_t	*w;
@@ -808,7 +792,7 @@ CM_AddFacetBevels
 void CM_AddFacetBevels( facet_t *facet ) {
 
 	int i, j, k, l;
-	int axis, dir, order, flipped;
+	int axis, dir, order;
 	float plane[4], d, newplane[4];
 	winding_t *w, *w2;
 	vec3_t mins, maxs, vec, vec2;
@@ -835,18 +819,15 @@ void CM_AddFacetBevels( facet_t *facet ) {
 
 	// add the axial planes
 	order = 0;
+	qbool flipped;
 	for ( axis = 0 ; axis < 3 ; axis++ )
 	{
 		for ( dir = -1 ; dir <= 1 ; dir += 2, order++ )
 		{
 			VectorClear(plane);
 			plane[axis] = dir;
-			if (dir == 1) {
-				plane[3] = maxs[axis];
-			}
-			else {
-				plane[3] = -mins[axis];
-			}
+			plane[3] = (dir == 1) ? maxs[axis] : -mins[axis];
+
 			//if it's the surface plane
 			if (CM_PlaneEqual(&planes[facet->surfacePlane], plane, &flipped)) {
 				continue;
@@ -984,7 +965,7 @@ static void CM_PatchCollideFromGrid( cGrid_t *grid, patchCollide_t *pf ) {
 	int				gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2];
 	facet_t			*facet;
 	int				borders[4];
-	int				noAdjust[4];
+	qbool noAdjust[4];
 
 	numPlanes = 0;
 	numFacets = 0;
@@ -1092,7 +1073,7 @@ static void CM_PatchCollideFromGrid( cGrid_t *grid, patchCollide_t *pf ) {
 						facet->borderPlanes[2] = CM_EdgePlaneNum( grid, gridPlanes, i, j, 4 );
 					}
 				}
- 				CM_SetBorderInward( facet, grid, gridPlanes, i, j, 0 );
+				CM_SetBorderInward( facet, grid, gridPlanes, i, j, 0 );
 				if ( CM_ValidateFacet( facet ) ) {
 					CM_AddFacetBevels( facet );
 					numFacets++;
@@ -1129,9 +1110,9 @@ static void CM_PatchCollideFromGrid( cGrid_t *grid, patchCollide_t *pf ) {
 	// copy the results out
 	pf->numPlanes = numPlanes;
 	pf->numFacets = numFacets;
-	pf->facets = Hunk_Alloc( numFacets * sizeof( *pf->facets ), h_high );
+	pf->facets = (facet_t*)Hunk_Alloc( numFacets * sizeof( *pf->facets ), h_high );
 	Com_Memcpy( pf->facets, facets, numFacets * sizeof( *pf->facets ) );
-	pf->planes = Hunk_Alloc( numPlanes * sizeof( *pf->planes ), h_high );
+	pf->planes = (patchPlane_t*)Hunk_Alloc( numPlanes * sizeof( *pf->planes ), h_high );
 	Com_Memcpy( pf->planes, planes, numPlanes * sizeof( *pf->planes ) );
 }
 
@@ -1146,8 +1127,8 @@ collision detection with a patch mesh.
 Points is packed as concatenated rows.
 ===================
 */
-struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *points ) {
-	patchCollide_t	*pf;
+struct patchCollide_s* CM_GeneratePatchCollide( int width, int height, const vec3_t* points )
+{
 	cGrid_t			grid;
 	int				i, j;
 
@@ -1189,7 +1170,7 @@ struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *p
 	// we now have a grid of points exactly on the curve
 	// the aproximate surface defined by these points will be
 	// collided against
-	pf = Hunk_Alloc( sizeof( *pf ), h_high );
+	patchCollide_t* pf = (patchCollide_t*)Hunk_Alloc( sizeof( *pf ), h_high );
 	ClearBounds( pf->bounds[0], pf->bounds[1] );
 	for ( i = 0 ; i < grid.width ; i++ ) {
 		for ( j = 0 ; j < grid.height ; j++ ) {
@@ -1230,7 +1211,7 @@ CM_TracePointThroughPatchCollide
 ====================
 */
 void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
-	qboolean	frontFacing[MAX_PATCH_PLANES];
+	qbool	frontFacing[MAX_PATCH_PLANES];
 	float		intersection[MAX_PATCH_PLANES];
 	float		intersect;
 	const patchPlane_t	*planes;
@@ -1516,7 +1497,7 @@ POSITION TEST
 CM_PositionTestInPatchCollide
 ====================
 */
-qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
+qbool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
 	int i, j;
 	float offset, t;
 	patchPlane_t *planes;
@@ -1616,10 +1597,11 @@ Called from the renderer
 ==================
 */
 #ifndef BSPC
-void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, float *points), int value);
+void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, const float* points), int value);
 #endif
 
-void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, float *points) ) {
+void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, const float* points) )
+{
 	static cvar_t	*cv;
 #ifndef BSPC
 	static cvar_t	*cv2;

@@ -203,7 +203,7 @@ int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int li
 	VectorCopy( maxs, ll.bounds[1] );
 	ll.count = 0;
 	ll.maxcount = listsize;
-	ll.list = (void *)list;
+	ll.list = (int*)list;
 	ll.storeLeafs = CM_StoreBrushes;
 	ll.lastLeaf = 0;
 	ll.overflowed = qfalse;
@@ -227,18 +227,17 @@ int CM_PointContents( const vec3_t p, clipHandle_t model ) {
 	int			leafnum;
 	int			i, k;
 	int			brushnum;
-	cLeaf_t		*leaf;
 	cbrush_t	*b;
 	int			contents;
 	float		d;
-	cmodel_t	*clipm;
 
 	if (!cm.numNodes) {	// map not loaded
 		return 0;
 	}
 
+	const cLeaf_t* leaf;
 	if ( model ) {
-		clipm = CM_ClipHandleToModel( model );
+		const cmodel_t* clipm = CM_ClipHandleToModel( model );
 		leaf = &clipm->leaf;
 	} else {
 		leafnum = CM_PointLeafnum_r (p, 0);
@@ -360,7 +359,7 @@ CM_FloodAreaConnections
 
 ====================
 */
-void	CM_FloodAreaConnections( void ) {
+void	CM_FloodAreaConnections() {
 	int		i;
 	cArea_t	*area;
 	int		floodnum;
@@ -386,7 +385,7 @@ CM_AdjustAreaPortalState
 
 ====================
 */
-void	CM_AdjustAreaPortalState( int area1, int area2, qboolean open ) {
+void	CM_AdjustAreaPortalState( int area1, int area2, qbool open ) {
 	if ( area1 < 0 || area2 < 0 ) {
 		return;
 	}
@@ -415,7 +414,7 @@ CM_AreasConnected
 
 ====================
 */
-qboolean	CM_AreasConnected( int area1, int area2 ) {
+qbool	CM_AreasConnected( int area1, int area2 ) {
 #ifndef BSPC
 	if ( cm_noAreas->integer ) {
 		return qtrue;

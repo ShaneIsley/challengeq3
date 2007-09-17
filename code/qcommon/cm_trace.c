@@ -236,13 +236,8 @@ void CM_TestBoxInBrush( traceWork_t *tw, cbrush_t *brush ) {
 }
 
 
-
-/*
-================
-CM_TestInLeaf
-================
-*/
-void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
+static void CM_TestInLeaf( traceWork_t* tw, const cLeaf_t* leaf )
+{
 	int			k;
 	int			brushnum;
 	cbrush_t	*b;
@@ -376,7 +371,6 @@ bounding box inside capsule check
 void CM_TestBoundingBoxInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	vec3_t mins, maxs, offset, size[2];
 	clipHandle_t h;
-	cmodel_t *cmod;
 	int i;
 
 	// mins maxs of the capsule
@@ -400,7 +394,7 @@ void CM_TestBoundingBoxInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	// replace the capsule with the bounding box
 	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse);
 	// calculate collision
-	cmod = CM_ClipHandleToModel( h );
+	const cmodel_t* cmod = CM_ClipHandleToModel( h );
 	CM_TestInLeaf( tw, &cmod->leaf );
 }
 
@@ -488,7 +482,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 	float		dist;
 	float		enterFrac, leaveFrac;
 	float		d1, d2;
-	qboolean	getout, startout;
+	qbool	getout, startout;
 	float		f;
 	cbrushside_t	*side, *leadside;
 	float		t;
@@ -660,12 +654,9 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 	}
 }
 
-/*
-================
-CM_TraceThroughLeaf
-================
-*/
-void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
+
+static void CM_TraceThroughLeaf( traceWork_t* tw, const cLeaf_t* leaf )
+{
 	int			k;
 	int			brushnum;
 	cbrush_t	*b;
@@ -989,7 +980,6 @@ bounding box vs. capsule collision
 void CM_TraceBoundingBoxThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	vec3_t mins, maxs, offset, size[2];
 	clipHandle_t h;
-	cmodel_t *cmod;
 	int i;
 
 	// mins maxs of the capsule
@@ -1013,7 +1003,7 @@ void CM_TraceBoundingBoxThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	// replace the capsule with the bounding box
 	h = CM_TempBoxModel(tw->size[0], tw->size[1], qfalse);
 	// calculate collision
-	cmod = CM_ClipHandleToModel( h );
+	const cmodel_t* cmod = CM_ClipHandleToModel( h );
 	CM_TraceThroughLeaf( tw, &cmod->leaf );
 }
 
@@ -1154,13 +1144,12 @@ CM_Trace
 ==================
 */
 void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, const vec3_t mins, const vec3_t maxs,
-						  clipHandle_t model, const vec3_t origin, int brushmask, int capsule, sphere_t *sphere ) {
+						clipHandle_t model, const vec3_t origin, int brushmask, int capsule, sphere_t *sphere ) {
 	int			i;
 	traceWork_t	tw;
 	vec3_t		offset;
-	cmodel_t	*cmod;
 
-	cmod = CM_ClipHandleToModel( model );
+	const cmodel_t* cmod = CM_ClipHandleToModel( model );
 
 	cm.checkcount++;		// for multi-check avoidance
 
@@ -1173,7 +1162,6 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, const vec
 
 	if (!cm.numNodes) {
 		*results = tw.trace;
-
 		return;	// map not loaded, shouldn't happen
 	}
 
@@ -1391,7 +1379,7 @@ void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t 
 						  const vec3_t origin, const vec3_t angles, int capsule ) {
 	trace_t		trace;
 	vec3_t		start_l, end_l;
-	qboolean	rotated;
+	qbool	rotated;
 	vec3_t		offset;
 	vec3_t		symetricSize[2];
 	vec3_t		matrix[3], transpose[3];
