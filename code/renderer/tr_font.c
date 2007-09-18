@@ -24,8 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_local.h"
 
-#pragma comment(lib, "../../../external/freetype235MT.lib")
-
 #include <ft2build.h>
 #include <freetype/freetype.h>
 #include <freetype/ftoutln.h>
