@@ -469,7 +469,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories="C:\tmp\freetype-2.3.5\include"
+						AdditionalIncludeDirectories="../../freetype-2.3.5/include"
 						PreprocessorDefinitions=""
 						CompileAs="2"
 					/>
@@ -480,7 +480,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						AdditionalIncludeDirectories="C:\tmp\freetype-2.3.5\include"
+						AdditionalIncludeDirectories="../../freetype-2.3.5/include"
 						PreprocessorDefinitions=""
 						BasicRuntimeChecks="3"
 						BrowseInformation="1"
@@ -493,6 +493,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
+						AdditionalIncludeDirectories="../../freetype-2.3.5/include"
 						PreprocessorDefinitions=""
 						CompileAs="2"
 					/>
