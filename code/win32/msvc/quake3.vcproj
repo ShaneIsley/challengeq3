@@ -15,104 +15,6 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Release TA|Win32"
-			OutputDirectory=".\build\quake3_release_ta"
-			IntermediateDirectory=".\build\quake3_release_ta"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName="$(IntDir)\quake3.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				PreprocessorDefinitions="_WIN32;WIN32;NDEBUG;_WINDOWS;USE_OPENAL"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\quake3.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				BrowseInformation="1"
-				WarningLevel="4"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3-TA.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ProgramDatabaseFile="$(IntDir)\quake3.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(IntDir)\quake3.map"
-				SubSystem="2"
-				StackReserveSize="8388608"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Post build processing.."
-				CommandLine="rem bash -c &quot;perl ./unix/cons -- release-TA&quot;"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\..\..\.."
 			IntermediateDirectory=".\build\quake3_debug"
@@ -174,7 +76,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3-DEBUG.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
@@ -214,103 +116,6 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release TA DEMO|Win32"
-			OutputDirectory=".\build\quake3_release_ta_demo"
-			IntermediateDirectory=".\build\quake3_release_ta_demo"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName=".\quake3___Win32_Release_TA_DEMO/quake3.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="2"
-				PreprocessorDefinitions="_WIN32;WIN32;NDEBUG;_WINDOWS;PRE_RELEASE_TADEMO;PRE_RELEASE_DEMO"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\quake3.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				WarningLevel="4"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="1"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3-TA-DEMO.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(IntDir)\quake3.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(IntDir)\quake3.map"
-				SubSystem="2"
-				StackReserveSize="8388608"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\..\..\.."
 			IntermediateDirectory=".\build\quake3_release"
@@ -347,7 +152,6 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\quake3.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -370,7 +174,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
@@ -388,103 +192,6 @@
 			<Tool
 				Name="VCManifestTool"
 				EmbedManifest="false"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug TA DEMO|Win32"
-			OutputDirectory=".\build\quake3_debug_ta_demo"
-			IntermediateDirectory=".\build\quake3_debug_ta_demo"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName=".\quake3___Win32_Debug_TA_DEMO/quake3.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;PRE_RELEASE_TADEMO;PRE_RELEASE_DEMO"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\quake3.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				BrowseInformation="1"
-				BrowseInformationFile="$(IntDir)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				ResourceOutputFileName="..\winquake.res"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3-TA-DEMO-DEBUG.exe"
-				LinkIncremental="2"
-				SuppressStartupBanner="true"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(IntDir)\quake3.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(IntDir)\quake3.map"
-				SubSystem="2"
-				StackReserveSize="8388608"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -567,7 +274,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\..\ChallengeQ3-VECTOR.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
@@ -603,105 +310,6 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
-		<Configuration
-			Name="Debug TA|Win32"
-			OutputDirectory=".\build\quake3_debug_ta"
-			IntermediateDirectory=".\build\quake3_debug_ta"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="true"
-				SuppressStartupBanner="true"
-				TargetEnvironment="1"
-				TypeLibraryName="$(IntDir)\quake3.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;USE_OPENAL"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(IntDir)\quake3.pch"
-				AssemblerListingLocation="$(IntDir)\"
-				ObjectFile="$(IntDir)\"
-				ProgramDataBaseFileName="$(IntDir)\"
-				BrowseInformation="1"
-				BrowseInformationFile="$(IntDir)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				ResourceOutputFileName="..\winquake.res"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="..\..\..\..\ChallengeQ3-TA-DEBUG.exe"
-				LinkIncremental="2"
-				SuppressStartupBanner="true"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(IntDir)\quake3.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(IntDir)\quake3.map"
-				SubSystem="2"
-				StackReserveSize="8388608"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Post build processing.."
-				CommandLine="rem bash -c &quot;perl ./unix/cons -- debug-TA&quot;"
-			/>
-		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -713,20 +321,34 @@
 			<File
 				RelativePath="..\..\client\cl_avi.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\cl_cgame.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -735,15 +357,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -753,16 +367,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -772,16 +377,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -789,16 +385,6 @@
 				RelativePath="..\..\client\cl_cin.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -806,15 +392,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -824,16 +402,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -843,16 +412,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -860,16 +420,6 @@
 				RelativePath="..\..\client\cl_console.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -877,15 +427,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -895,16 +437,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -914,36 +447,41 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\cl_curl.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\cl_input.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -952,15 +490,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -970,16 +500,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -989,16 +510,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1006,16 +518,6 @@
 				RelativePath="..\..\client\cl_keys.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1023,15 +525,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1041,16 +535,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1060,16 +545,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1077,16 +553,6 @@
 				RelativePath="..\..\client\cl_main.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1094,15 +560,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1112,16 +570,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1131,16 +580,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1148,16 +588,6 @@
 				RelativePath="..\..\client\cl_net_chan.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1165,15 +595,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1183,16 +605,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1202,16 +615,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1219,16 +623,6 @@
 				RelativePath="..\..\client\cl_parse.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1236,15 +630,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1254,16 +640,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1273,16 +650,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1290,16 +658,6 @@
 				RelativePath="..\..\client\cl_scrn.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1307,15 +665,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1325,16 +675,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1344,16 +685,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1361,16 +693,6 @@
 				RelativePath="..\..\client\cl_ui.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1378,15 +700,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1396,16 +710,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1415,16 +720,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1432,16 +728,6 @@
 				RelativePath="..\..\qcommon\cm_load.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1449,15 +735,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1467,16 +745,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1486,16 +755,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1503,16 +763,6 @@
 				RelativePath="..\..\qcommon\cm_patch.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1520,15 +770,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1538,16 +780,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1557,16 +790,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1574,16 +798,6 @@
 				RelativePath="..\..\qcommon\cm_polylib.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1591,15 +805,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1609,16 +815,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1628,16 +825,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1645,16 +833,6 @@
 				RelativePath="..\..\qcommon\cm_test.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1662,15 +840,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1680,16 +850,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1699,16 +860,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1716,16 +868,6 @@
 				RelativePath="..\..\qcommon\cm_trace.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1733,15 +875,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1751,16 +885,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1770,16 +895,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1787,16 +903,6 @@
 				RelativePath="..\..\qcommon\cmd.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1804,15 +910,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1822,16 +920,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1841,16 +930,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1858,16 +938,6 @@
 				RelativePath="..\..\qcommon\common.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1875,15 +945,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1893,16 +955,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1912,16 +965,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -1929,16 +973,6 @@
 				RelativePath="..\..\qcommon\cvar.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -1946,15 +980,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1964,16 +990,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1983,16 +1000,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2000,16 +1008,6 @@
 				RelativePath="..\..\qcommon\files.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2017,15 +1015,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2035,16 +1025,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2054,16 +1035,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2071,16 +1043,6 @@
 				RelativePath="..\..\qcommon\huffman.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2088,15 +1050,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2106,16 +1060,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2125,16 +1070,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2142,16 +1078,6 @@
 				RelativePath="..\..\qcommon\md4.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2159,15 +1085,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2177,16 +1095,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2196,16 +1105,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2213,16 +1113,6 @@
 				RelativePath="..\..\qcommon\md5.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2230,15 +1120,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2248,16 +1130,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2267,16 +1140,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2284,16 +1148,6 @@
 				RelativePath="..\..\qcommon\msg.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2301,15 +1155,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2319,16 +1165,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2338,16 +1175,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2355,16 +1183,6 @@
 				RelativePath="..\..\qcommon\net_chan.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2372,15 +1190,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2390,16 +1200,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2409,44 +1210,97 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\.\qcommon\q_math.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\.\qcommon\q_shared.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\qal.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_adpcm.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -2455,15 +1309,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2473,16 +1319,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2492,44 +1329,97 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_codec.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_codec_ogg.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_codec_wav.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_dma.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -2538,15 +1428,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2556,16 +1438,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2575,36 +1448,41 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_main.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_mem.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -2613,15 +1491,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2631,16 +1501,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2650,16 +1511,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2667,16 +1519,6 @@
 				RelativePath="..\..\client\snd_mix.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2684,15 +1526,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2702,16 +1536,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2721,36 +1546,41 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_openal.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\client\snd_wavelet.c"
 				>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
@@ -2759,15 +1589,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2777,16 +1599,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2796,16 +1609,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2813,16 +1617,6 @@
 				RelativePath="..\..\server\sv_bot.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2830,15 +1624,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2848,16 +1634,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2867,16 +1644,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2884,16 +1652,6 @@
 				RelativePath="..\..\server\sv_ccmds.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2901,15 +1659,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2919,16 +1669,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2938,16 +1679,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -2955,16 +1687,6 @@
 				RelativePath="..\..\server\sv_client.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -2972,15 +1694,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -2990,16 +1704,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3009,16 +1714,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3026,16 +1722,6 @@
 				RelativePath="..\..\server\sv_game.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3043,15 +1729,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3061,16 +1739,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3080,16 +1749,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3097,16 +1757,6 @@
 				RelativePath="..\..\server\sv_init.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3114,15 +1764,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3132,16 +1774,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3151,16 +1784,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3168,16 +1792,6 @@
 				RelativePath="..\..\server\sv_main.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3185,15 +1799,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3203,16 +1809,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3222,16 +1819,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3239,16 +1827,6 @@
 				RelativePath="..\..\server\sv_net_chan.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3256,15 +1834,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3274,16 +1844,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3293,16 +1854,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3310,16 +1862,6 @@
 				RelativePath="..\..\server\sv_snapshot.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3327,15 +1869,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3345,16 +1879,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3364,16 +1889,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3381,16 +1897,6 @@
 				RelativePath="..\..\server\sv_world.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3398,15 +1904,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3416,16 +1914,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3435,16 +1924,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3452,16 +1932,6 @@
 				RelativePath="..\..\qcommon\unzip.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3469,15 +1939,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3487,16 +1949,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3506,16 +1959,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3523,16 +1967,6 @@
 				RelativePath="..\..\qcommon\vm.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3540,15 +1974,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3558,16 +1984,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3577,16 +1994,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3594,16 +2002,6 @@
 				RelativePath="..\..\qcommon\vm_interpreted.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3611,15 +2009,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3629,16 +2019,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3648,16 +2029,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3665,16 +2037,6 @@
 				RelativePath="..\..\qcommon\vm_x86.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3682,15 +2044,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3700,16 +2054,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3719,16 +2064,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3736,16 +2072,6 @@
 				RelativePath="..\..\win32\win_input.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3753,15 +2079,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3771,16 +2089,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3790,16 +2099,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3807,16 +2107,6 @@
 				RelativePath="..\..\win32\win_main.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3824,15 +2114,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3842,16 +2124,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3861,16 +2134,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3878,16 +2142,6 @@
 				RelativePath="..\..\win32\win_net.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3895,15 +2149,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3913,16 +2159,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3932,16 +2169,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -3949,16 +2177,6 @@
 				RelativePath="..\..\win32\win_shared.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -3966,15 +2184,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -3984,16 +2194,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4003,16 +2204,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -4020,16 +2212,6 @@
 				RelativePath="..\..\win32\win_snd.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -4037,15 +2219,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4055,16 +2229,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4074,16 +2239,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -4091,16 +2247,6 @@
 				RelativePath="..\..\win32\win_syscon.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -4108,15 +2254,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4126,16 +2264,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4145,16 +2274,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -4162,16 +2282,6 @@
 				RelativePath="..\..\win32\win_wndproc.c"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
@@ -4179,15 +2289,7 @@
 						Optimization="0"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4197,16 +2299,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -4216,16 +2309,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="2"
 						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
+						CompileAs="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -4343,6 +2427,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\qcommon\vm_shim.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\win32\win_local.h"
 				>
 			</File>
@@ -4359,25 +2447,7 @@
 				RelativePath="..\..\win32\winquake.rc"
 				>
 				<FileConfiguration
-					Name="Release TA|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="win32"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="win32"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA DEMO|Win32"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
@@ -4395,25 +2465,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug TA DEMO|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="win32"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="win32"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug TA|Win32"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
