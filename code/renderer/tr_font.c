@@ -146,8 +146,8 @@ void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 		return;
 	}
 
-	//err = FT_Set_Pixel_Sizes( face, 0, pointSize * glConfig.vidHeight / 480 );
-	err = FT_Set_Pixel_Sizes( face, 0, pointSize );
+	// no, this isn't a typo: we want to precompensate for the screen's aspect ratio
+	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidHeight / 640, pointSize * glConfig.vidHeight / 480 );
 
 	font->vpitch = GLYPH_TRUNC( face->size->metrics.height );
 	font->height = CeilPO2( font->vpitch );
