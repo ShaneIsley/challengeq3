@@ -16,6 +16,7 @@
 
 
 #ifdef _MSC_VER
+#pragma warning (disable: 4996) // deprecated ZOMGOVERRUN! nannywhine
 
 #pragma warning(disable : 4018)     // signed/unsigned mismatch
 #pragma warning(disable : 4032)
