@@ -2268,6 +2268,8 @@ static void Com_DetectAltivec(void)
 }
 
 
+#pragma warning (disable: 4611) // setjmp + destructors = bad. which it is, but...
+
 void Com_Init( char *commandLine )
 {
 	Com_Printf( "%s %s %s\n", Q3_VERSION, PLATFORM_STRING, __DATE__ );
