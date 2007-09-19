@@ -580,8 +580,11 @@ static float CPMA_HUD_DrawChar( float x, float y, int ch )
 {
 	if ((ch >= GLYPH_START) && (ch <= GLYPH_END)) {
 		ch -= GLYPH_START;
-		re.DrawStretchPic( con.xadjust + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
-		return cls.fontConsole.pitches[ch];
+		//re.DrawStretchPic( con.xadjust + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
+		//return cls.fontConsole.pitches[ch];
+		int offset = 0.5 * (cls.fontConsole.maxpitch - cls.fontConsole.pitches[ch]);
+		re.DrawStretchPic( con.xadjust + offset + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
+		return cls.fontConsole.maxpitch;
 	}
 	return 0;
 }
@@ -593,19 +596,19 @@ static float CPMA_HUD_StringWidth( const char* s )
 	float w = 0;
 	while (ch = *s++)
 		if ((ch >= GLYPH_START) && (ch <= GLYPH_END))
-			w += cls.fontConsole.pitches[ch - GLYPH_START];
+			//w += cls.fontConsole.pitches[ch - GLYPH_START];
+			w += cls.fontConsole.maxpitch;
 	return w;
 }
 
 
 static void Con_DrawSolidConsole( float frac )
 {
-	int				i, x, y;
-	int				rows;
-	short			*text;
-	int				row;
-	//int				currentColor;
-	vec4_t			color;
+	int		i, x, y;
+	int		rows;
+	short	*text;
+	int		row;
+	vec4_t	color;
 
 	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
 	if (scanlines <= 0)
@@ -623,7 +626,7 @@ static void Con_DrawSolidConsole( float frac )
 	}
 	else {
 		//SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
-		MAKERGBA( color, 0.5, 0.5, 0.5, 1.0 );
+		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
 		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
 	}
 
@@ -660,7 +663,8 @@ static void Con_DrawSolidConsole( float frac )
 		row--;
 	}
 
-	re.SetColor( colorWhite );
+	int colorCode = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
+	re.SetColor( g_color_table[colorCode] );
 
 	for (i = 0; i < rows; ++i, --row, y -= cls.fontConsole.vpitch )
 	{
@@ -692,6 +696,10 @@ static void Con_DrawSolidConsole( float frac )
 		re.SetColor( colorWhite );
 		x = 0;
 		for (int i = 0; i < con.linewidth; ++i) {
+			if ((text[i] >> 8) != colorCode) {
+				colorCode = (text[i] >> 8);
+				re.SetColor( g_color_table[colorCode] );
+			}
 			x += CPMA_HUD_DrawChar( x, y, (text[i] & 0xFF) );
 		}
 	}
