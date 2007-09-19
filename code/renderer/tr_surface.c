@@ -148,27 +148,20 @@ void RB_AddQuadStamp( vec3_t origin, vec3_t left, vec3_t up, byte *color ) {
 	RB_AddQuadStampExt( origin, left, up, color, 0, 0, 1, 1 );
 }
 
-/*
-==============
-RB_SurfaceSprite
-==============
-*/
-static void RB_SurfaceSprite( void ) {
-	vec3_t		left, up;
-	float		radius;
+
+static void RB_SurfaceSprite()
+{
+	vec3_t left, up;
+	float radius = backEnd.currentEntity->e.radius;
 
 	// calculate the xyz locations for the four corners
-	radius = backEnd.currentEntity->e.radius;
 	if ( backEnd.currentEntity->e.rotation == 0 ) {
 		VectorScale( backEnd.viewParms.or.axis[1], radius, left );
 		VectorScale( backEnd.viewParms.or.axis[2], radius, up );
 	} else {
-		float	s, c;
-		float	ang;
-		
-		ang = M_PI * backEnd.currentEntity->e.rotation / 180;
-		s = sin( ang );
-		c = cos( ang );
+		float ang = M_PI * backEnd.currentEntity->e.rotation / 180;
+		float s = sin( ang );
+		float c = cos( ang );
 
 		VectorScale( backEnd.viewParms.or.axis[1], c * radius, left );
 		VectorMA( left, -s * radius, backEnd.viewParms.or.axis[2], left );
@@ -278,39 +271,24 @@ void RB_SurfaceTriangles( srfTriangles_t *srf ) {
 }
 
 
-
-/*
-==============
-RB_SurfaceBeam
-==============
-*/
-void RB_SurfaceBeam( void ) 
+static void RB_SurfaceBeam()
 {
-#define NUM_BEAM_SEGS 6
-	refEntity_t *e;
-	int	i;
-	vec3_t perpvec;
+	const int NUM_BEAM_SEGS = 6;
+
+	int i;
+	vec3_t start_points[NUM_BEAM_SEGS], end_points[NUM_BEAM_SEGS];
+
+	refEntity_t* e = &backEnd.currentEntity->e;
+
 	vec3_t direction, normalized_direction;
-	vec3_t	start_points[NUM_BEAM_SEGS], end_points[NUM_BEAM_SEGS];
-	vec3_t oldorigin, origin;
-
-	e = &backEnd.currentEntity->e;
-
-	oldorigin[0] = e->oldorigin[0];
-	oldorigin[1] = e->oldorigin[1];
-	oldorigin[2] = e->oldorigin[2];
-
-	origin[0] = e->origin[0];
-	origin[1] = e->origin[1];
-	origin[2] = e->origin[2];
-
-	normalized_direction[0] = direction[0] = oldorigin[0] - origin[0];
-	normalized_direction[1] = direction[1] = oldorigin[1] - origin[1];
-	normalized_direction[2] = direction[2] = oldorigin[2] - origin[2];
+	normalized_direction[0] = direction[0] = e->oldorigin[0] - e->origin[0];
+	normalized_direction[1] = direction[1] = e->oldorigin[1] - e->origin[1];
+	normalized_direction[2] = direction[2] = e->oldorigin[2] - e->origin[2];
 
 	if ( VectorNormalize( normalized_direction ) == 0 )
 		return;
 
+	vec3_t perpvec;
 	PerpendicularVector( perpvec, normalized_direction );
 
 	VectorScale( perpvec, 4, perpvec );

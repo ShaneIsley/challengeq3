@@ -98,17 +98,10 @@ void R_AddPolygonSurfaces()
 	}
 }
 
-/*
-=====================
-RE_AddPolyToScene
 
-=====================
-*/
-void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys ) {
-	srfPoly_t	*poly;
+void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t* verts, int numPolys )
+{
 	int			i, j;
-	int			fogIndex;
-	fog_t		*fog;
 	vec3_t		bounds[2];
 
 	if ( !tr.registered ) {
@@ -120,19 +113,16 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		return;
 	}
 
-	for ( j = 0; j < numPolys; j++ ) {
-		if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
-      /*
-      NOTE TTimo this was initially a PRINT_WARNING
-      but it happens a lot with high fighting scenes and particles
-      since we don't plan on changing the const and making for room for those effects
-      simply cut this message to developer only
-      */
-			ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
-			return;
-		}
+	// make sure the entire set will fit, rather than taking as many as we can
+	// both ways have downsides, but if we ARE hitting the cap we're already screwed
+	// and it's better to avoid something degenerate than to squeeze in 3 extra snowflakes
+	if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
+		ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
+		return;
+	}
 
-		poly = &backEndData[tr.smpFrame]->polys[r_numpolys];
+	for ( j = 0; j < numPolys; j++ ) {
+		srfPoly_t* poly = &backEndData[tr.smpFrame]->polys[r_numpolys];
 		poly->surfaceType = SF_POLY;
 		poly->hShader = hShader;
 		poly->numVerts = numVerts;
@@ -143,36 +133,27 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		r_numpolys++;
 		r_numpolyverts += numVerts;
 
-		// if no world is loaded
-		if ( tr.world == NULL ) {
-			fogIndex = 0;
-		}
-		// see if it is in a fog volume
-		else if ( tr.world->numfogs == 1 ) {
-			fogIndex = 0;
-		} else {
-			// find which fog volume the poly is in
+		poly->fogIndex = 0;
+		// find which fog volume the poly is in (if any)
+		if (tr.world && (tr.world->numfogs > 1)) {
 			VectorCopy( poly->verts[0].xyz, bounds[0] );
 			VectorCopy( poly->verts[0].xyz, bounds[1] );
 			for ( i = 1 ; i < poly->numVerts ; i++ ) {
 				AddPointToBounds( poly->verts[i].xyz, bounds[0], bounds[1] );
 			}
-			for ( fogIndex = 1 ; fogIndex < tr.world->numfogs ; fogIndex++ ) {
-				fog = &tr.world->fogs[fogIndex]; 
+			for ( i = 1 ; i < tr.world->numfogs ; i++ ) {
+				const fog_t* fog = &tr.world->fogs[i];
 				if ( bounds[1][0] >= fog->bounds[0][0]
-					&& bounds[1][1] >= fog->bounds[0][1]
-					&& bounds[1][2] >= fog->bounds[0][2]
-					&& bounds[0][0] <= fog->bounds[1][0]
-					&& bounds[0][1] <= fog->bounds[1][1]
-					&& bounds[0][2] <= fog->bounds[1][2] ) {
+						&& bounds[1][1] >= fog->bounds[0][1]
+						&& bounds[1][2] >= fog->bounds[0][2]
+						&& bounds[0][0] <= fog->bounds[1][0]
+						&& bounds[0][1] <= fog->bounds[1][1]
+						&& bounds[0][2] <= fog->bounds[1][2] ) {
+					poly->fogIndex = i;
 					break;
 				}
 			}
-			if ( fogIndex == tr.world->numfogs ) {
-				fogIndex = 0;
-			}
 		}
-		poly->fogIndex = fogIndex;
 	}
 }
 
@@ -180,17 +161,12 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 //=================================================================================
 
 
-/*
-=====================
-RE_AddRefEntityToScene
-
-=====================
-*/
-void RE_AddRefEntityToScene( const refEntity_t *ent ) {
+void RE_AddRefEntityToScene( const refEntity_t* ent )
+{
 	if ( !tr.registered ) {
 		return;
 	}
-  // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=402
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=402
 	if ( r_numentities >= ENTITYNUM_WORLD ) {
 		return;
 	}
