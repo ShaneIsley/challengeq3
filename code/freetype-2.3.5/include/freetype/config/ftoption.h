@@ -230,7 +230,7 @@ FT_BEGIN_HEADER
   /*   You would normally undefine this configuration macro when building  */
   /*   a version of FreeType that doesn't contain a Type 1 or CFF driver.  */
   /*                                                                       */
-#define FT_CONFIG_OPTION_POSTSCRIPT_NAMES
+#undef FT_CONFIG_OPTION_POSTSCRIPT_NAMES
 
 
   /*************************************************************************/
@@ -248,7 +248,7 @@ FT_BEGIN_HEADER
   /*   able to synthetize a Unicode charmap out of the glyphs found in the */
   /*   fonts.                                                              */
   /*                                                                       */
-#define FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
+#undef FT_CONFIG_OPTION_ADOBE_GLYPH_LIST
 
 
   /*************************************************************************/
@@ -601,7 +601,7 @@ FT_BEGIN_HEADER
   /* files into an existing face.  Note that if set, the T1 driver will be */
   /* unable to produce kerning distances.                                  */
   /*                                                                       */
-#undef T1_CONFIG_OPTION_NO_AFM
+#define T1_CONFIG_OPTION_NO_AFM
 
 
   /*************************************************************************/
@@ -610,7 +610,7 @@ FT_BEGIN_HEADER
   /* compilation of the Multiple Masters font support in the Type 1        */
   /* driver.                                                               */
   /*                                                                       */
-#undef T1_CONFIG_OPTION_NO_MM_SUPPORT
+#define T1_CONFIG_OPTION_NO_MM_SUPPORT
 
 
   /*************************************************************************/
