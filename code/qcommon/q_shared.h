@@ -1201,9 +1201,10 @@ typedef struct {
 typedef struct {
 	int height;
 	int vpitch;
+	int maxpitch;
 	qhandle_t shaders[GLYPHS_PER_FONT];
-	byte widths[GLYPHS_PER_FONT];  // the size of the TEXTURE containing the glyph
-	byte pitches[GLYPHS_PER_FONT]; // the size of the glyph WITHIN that texture
+	int widths[GLYPHS_PER_FONT];  // the size of the TEXTURE containing the glyph
+	int pitches[GLYPHS_PER_FONT]; // the size of the glyph WITHIN that texture
 } fontInfo_t;
 
 

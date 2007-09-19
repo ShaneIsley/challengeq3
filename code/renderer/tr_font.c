@@ -85,6 +85,7 @@ static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* 
 		ri.Printf( PRINT_ALL, "R_RenderGlyph: Format %d not supported\n", face->glyph->format );
 		return qfalse;
 	}
+	FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
 
 	FT_Bitmap ftb;
 	ftb.pixel_mode = ft_pixel_mode_grays;
@@ -96,6 +97,8 @@ static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* 
 	ftb.pitch = ftb.width;
 	// several fonts have pitch<width on some chars, which obviously doesn't work very well...
 	font->pitches[i - GLYPH_START] = max( ftb.pitch, GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
+	if (font->pitches[i - GLYPH_START] > font->maxpitch)
+		font->maxpitch = font->pitches[i - GLYPH_START];
 
 	ftb.buffer = (byte*)Z_Malloc( ftb.pitch * ftb.rows );
 	FT_Outline_Get_Bitmap( ft, &face->glyph->outline, &ftb );
@@ -154,6 +157,8 @@ void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 		const char* s = va( "Font-%s-%02d-%02X", fontName, pointSize, i );
 		R_UploadGlyph( face, font, i, s );
 	}
+
+	FT_Done_Face( face );
 
 	ri.Printf( PRINT_ALL, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
 }
