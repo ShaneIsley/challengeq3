@@ -578,7 +578,10 @@ void Con_DrawNotify (void)
 
 static float CPMA_HUD_DrawChar( float x, float y, int ch )
 {
-	if ((ch >= GLYPH_START) && (ch <= GLYPH_END)) {
+	if (ch == GLYPH_START)
+		return cls.fontConsole.maxpitch;
+
+	if ((ch > GLYPH_START) && (ch <= GLYPH_END)) {
 		ch -= GLYPH_START;
 		//re.DrawStretchPic( con.xadjust + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
 		//return cls.fontConsole.pitches[ch];
@@ -586,6 +589,7 @@ static float CPMA_HUD_DrawChar( float x, float y, int ch )
 		re.DrawStretchPic( con.xadjust + offset + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
 		return cls.fontConsole.maxpitch;
 	}
+
 	return 0;
 }
 
