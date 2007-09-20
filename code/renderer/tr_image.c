@@ -481,20 +481,16 @@ static const byte mipBlendColors[16][4] = {
 };
 
 
+// note that the "32" here is for the image's STRIDE - it has nothing to do with the actual COMPONENTS
+
 static void Upload32( unsigned int* data,
 							int width, int height,
 							qbool mipmap,
 							qbool picmip,
-							qbool lightMap,
-							int *format,
+							GLenum* format,
 							int *pUploadWidth, int *pUploadHeight )
 {
-	int			samples;
-	int			scaled_width, scaled_height;
-	int			i, c;
-	byte		*scan;
-	GLenum		internalFormat = GL_RGB;
-	float		rMax = 0, gMax = 0, bMax = 0;
+	int scaled_width, scaled_height;
 
 	// convert to exact power of 2 sizes
 	//
@@ -545,71 +541,45 @@ static void Upload32( unsigned int* data,
 		scaled_height >>= 1;
 	}
 
-	//
-	// scan the texture for each channel's max values
-	// and verify if the alpha channel is being used or not
-	//
-	c = width*height;
-	scan = ((byte *)data);
-	samples = 3;
-	if (!lightMap) {
-		for ( i = 0; i < c; i++ )
+	// select proper internal format
+	GLenum internalFormat = GL_RGB;
+	switch (*format) {
+	case GL_RGB:
+		if ( glConfig.textureCompression == TC_S3TC )
 		{
-			if ( scan[i*4+0] > rMax )
-			{
-				rMax = scan[i*4+0];
-			}
-			if ( scan[i*4+1] > gMax )
-			{
-				gMax = scan[i*4+1];
-			}
-			if ( scan[i*4+2] > bMax )
-			{
-				bMax = scan[i*4+2];
-			}
-			if ( scan[i*4 + 3] != 255 ) 
-			{
-				samples = 4;
-				break;
-			}
+			internalFormat = GL_RGB4_S3TC;
 		}
-		// select proper internal format
-		if ( samples == 3 )
+		else if ( r_texturebits->integer == 16 )
 		{
-			if ( glConfig.textureCompression == TC_S3TC )
-			{
-				internalFormat = GL_RGB4_S3TC;
-			}
-			else if ( r_texturebits->integer == 16 )
-			{
-				internalFormat = GL_RGB5;
-			}
-			else if ( r_texturebits->integer == 32 )
-			{
-				internalFormat = GL_RGB8;
-			}
-			else
-			{
-				internalFormat = 3;
-			}
+			internalFormat = GL_RGB5;
 		}
-		else if ( samples == 4 )
+		else if ( r_texturebits->integer == 32 )
 		{
-			if ( r_texturebits->integer == 16 )
-			{
-				internalFormat = GL_RGBA4;
-			}
-			else if ( r_texturebits->integer == 32 )
-			{
-				internalFormat = GL_RGBA8;
-			}
-			else
-			{
-				internalFormat = 4;
-			}
+			internalFormat = GL_RGB8;
 		}
-	} else {
-		internalFormat = 3;
+		else
+		{
+			internalFormat = 3;
+		}
+		break;
+
+	case GL_RGBA:
+		if ( r_texturebits->integer == 16 )
+		{
+			internalFormat = GL_RGBA4;
+		}
+		else if ( r_texturebits->integer == 32 )
+		{
+			internalFormat = GL_RGBA8;
+		}
+		else
+		{
+			internalFormat = 4;
+		}
+		break;
+
+	default:
+		ri.Error( ERR_DROP, "Upload32: Invalid format %d\n", *format );
 	}
 
 	RI_AutoPtr pScaled( sizeof(unsigned) * scaled_width * scaled_height );
@@ -690,7 +660,7 @@ done:
 // this is the only way any image_t are created
 // !!! i'm pretty sure this DOESN'T work correctly for non-POT images
 
-image_t* R_CreateImage( const char* name, byte* pic, int width, int height,
+image_t* R_CreateImage( const char* name, byte* pic, int width, int height, GLenum format,
 						qbool mipmap, qbool allowPicmip, int glWrapClampMode )
 {
 	if (strlen(name) >= MAX_QPATH)
@@ -703,6 +673,7 @@ image_t* R_CreateImage( const char* name, byte* pic, int width, int height,
 	image->texnum = 1024 + tr.numImages;
 	tr.numImages++;
 
+	image->internalFormat = format;
 	image->mipmap = mipmap;
 	image->allowPicmip = allowPicmip;
 
@@ -724,7 +695,6 @@ image_t* R_CreateImage( const char* name, byte* pic, int width, int height,
 	Upload32( (unsigned int*)pic, image->width, image->height,
 								image->mipmap,
 								allowPicmip,
-								isLightmap,
 								&image->internalFormat,
 								&image->uploadWidth,
 								&image->uploadHeight );
@@ -1049,7 +1019,7 @@ static void LoadPCX32 ( const char *filename, byte **pic, int *width, int *heigh
 */
 
 
-static qbool LoadTGA( const char* name, byte** pic, int* w, int* h )
+static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* format )
 {
 	*pic = NULL;
 
@@ -1082,6 +1052,8 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h )
 	//if ( ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 ) && targa_header.image_type != 3 )
 	if ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 )
 		ri.Error(ERR_DROP, "LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
+
+	*format = (targa_header.pixel_size == 32) ? GL_RGBA : GL_RGB;
 
 	int columns = targa_header.width;
 	int rows = targa_header.height;
@@ -1787,7 +1759,7 @@ int SaveJPGToBuffer( byte *buffer, int quality,
 //===================================================================
 
 
-static void R_LoadImage( const char* name, byte** pic, int* w, int* h )
+static void R_LoadImage( const char* name, byte** pic, int* w, int* h, GLenum* format )
 {
 	*pic = NULL;
 
@@ -1800,9 +1772,10 @@ static void R_LoadImage( const char* name, byte** pic, int* w, int* h )
 		return;
 	}
 
-	if (!Q_stricmp( name+len-4, ".tga" ) && LoadTGA( name, pic, w, h ))
+	if (!Q_stricmp( name+len-4, ".tga" ) && LoadTGA( name, pic, w, h, format ))
 		return;
 
+	*format = GL_RGB;
 #if defined(_DEBUG)
 	// either this is REALLY a jpg, or just as likely some moron got the extension wrong
 	if (!Q_stricmp( name+len-4, ".jpg" ) && LoadJPG( name, pic, w, h ))
@@ -1832,29 +1805,18 @@ static void R_LoadImage( const char* name, byte** pic, int* w, int* h )
 }
 
 
-/*
-===============
-R_FindImageFile
+// finds or loads the given image - returns NULL if it fails, not a default image
 
-Finds or loads the given image.
-Returns NULL if it fails, not a default image.
-==============
-*/
-image_t	*R_FindImageFile( const char *name, qbool mipmap, qbool allowPicmip, int glWrapClampMode ) {
-	image_t	*image;
-	int		width, height;
-	byte	*pic;
-	long	hash;
-
-	if (!name) {
+image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode )
+{
+	if (!name)
 		return NULL;
-	}
 
-	hash = generateHashValue(name);
+	long hash = generateHashValue(name);
 
-	//
 	// see if the image is already loaded
 	//
+	image_t* image;
 	for (image=hashTable[hash]; image; image=image->next) {
 		if ( !strcmp( name, image->imgName ) ) {
 			// the white image can be used with any set of parms, but other mismatches are errors
@@ -1873,10 +1835,15 @@ image_t	*R_FindImageFile( const char *name, qbool mipmap, qbool allowPicmip, int
 		}
 	}
 
-	//
 	// load the pic from disk
 	//
-	R_LoadImage( name, &pic, &width, &height );
+	byte* pic;
+	int width, height;
+	GLenum format;
+	R_LoadImage( name, &pic, &width, &height, &format );
+
+/* no, the quake fs is case-insensitive, which means this case can only trip for developer/impure
+which means either they should get their shit RIGHT, or we don't care
 	if ( pic == NULL ) {                                    // if we dont get a successful load
 	  char altname[MAX_QPATH];                              // copy the name
     int len;                                              //  
@@ -1891,14 +1858,16 @@ image_t	*R_FindImageFile( const char *name, qbool mipmap, qbool allowPicmip, int
       return NULL;                                        // bail
     }
 	}
+*/
 
-	image = R_CreateImage( ( char * ) name, pic, width, height, mipmap, allowPicmip, glWrapClampMode );
+	if (!pic)
+		return NULL;
+
+	image = R_CreateImage( name, pic, width, height, format, mipmap, allowPicmip, glWrapClampMode );
 	ri.Free( pic );
 	return image;
 }
 
-
-#if 1
 
 #define DLIGHT_SIZE 64
 #define DLIGHT_FULLBRIGHT (DLIGHT_SIZE * DLIGHT_SIZE)
@@ -1921,25 +1890,11 @@ static void R_CreateDlightImage( void )
 	}
 
 	// this is a large enough image now that it should be mipmapped
-	tr.dlightImage = R_CreateImage( "*dlight", (byte*)data, DLIGHT_SIZE, DLIGHT_SIZE, qtrue, qfalse, GL_CLAMP );
+	tr.dlightImage = R_CreateImage( "*dlight", (byte*)data, DLIGHT_SIZE, DLIGHT_SIZE, GL_RGBA, qtrue, qfalse, GL_CLAMP );
 }
 
-#else
 
-static void R_CreateDlightImage( void )
-{
-	int w, h;
-	byte* p;
-
-	R_LoadImage( "lights/round.tga", &p, &w, &h );
-	tr.dlightImage = R_CreateImage( "*dlight", p, w, h, qtrue, qfalse, GL_CLAMP );
-	ri.Free( p );
-}
-
-#endif
-
-
-void R_InitFogTable( void )
+void R_InitFogTable()
 {
 	const float exp = 0.5;
 
@@ -1995,7 +1950,7 @@ static void R_CreateFogImage()
 		}
 	}
 
-	tr.fogImage = R_CreateImage( "*fog", p, FOG_S, FOG_T, qfalse, qfalse, GL_CLAMP_TO_EDGE );
+	tr.fogImage = R_CreateImage( "*fog", p, FOG_S, FOG_T, GL_RGBA, qfalse, qfalse, GL_CLAMP_TO_EDGE );
 	qglTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, colorWhite );
 }
 
@@ -2031,7 +1986,7 @@ static void R_CreateDefaultImage()
 		data[i][DEFAULT_SIZE-1][3] = 255;
 	}
 
-	tr.defaultImage = R_CreateImage( "*default", (byte*)data, DEFAULT_SIZE, DEFAULT_SIZE, qtrue, qfalse, GL_REPEAT );
+	tr.defaultImage = R_CreateImage( "*default", (byte*)data, DEFAULT_SIZE, DEFAULT_SIZE, GL_RGBA, qtrue, qfalse, GL_REPEAT );
 }
 
 
@@ -2044,7 +1999,7 @@ static void R_CreateBuiltinImages()
 
 	// we use a solid white image instead of disabling texturing
 	Com_Memset( data, 255, sizeof( data ) );
-	tr.whiteImage = R_CreateImage( "*white", (byte*)data, 8, 8, qfalse, qfalse, GL_REPEAT );
+	tr.whiteImage = R_CreateImage( "*white", (byte*)data, 8, 8, GL_RGBA, qfalse, qfalse, GL_REPEAT );
 
 	// with overbright bits active, we need an image which is some fraction of full color,
 	// for default lightmaps, etc
@@ -2057,12 +2012,12 @@ static void R_CreateBuiltinImages()
 		}
 	}
 
-	tr.identityLightImage = R_CreateImage( "*identityLight", (byte*)data, 8, 8, qfalse, qfalse, GL_REPEAT );
+	tr.identityLightImage = R_CreateImage( "*identityLight", (byte*)data, 8, 8, GL_RGBA, qfalse, qfalse, GL_REPEAT );
 
 	// scratchimages usually used for cinematic drawing (signal-quality effects)
 	// these are just placeholders: RE_StretchRaw will regenerate them when it wants them
 	for (x = 0; x < 32; ++x)
-		tr.scratchImage[x] = R_CreateImage( "*scratch", (byte*)data, DEFAULT_SIZE, DEFAULT_SIZE, qfalse, qtrue, GL_CLAMP );
+		tr.scratchImage[x] = R_CreateImage( "*scratch", (byte*)data, DEFAULT_SIZE, DEFAULT_SIZE, GL_RGBA, qfalse, qtrue, GL_CLAMP );
 
 	R_CreateDlightImage();
 	R_CreateFogImage();

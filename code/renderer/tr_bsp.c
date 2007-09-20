@@ -197,11 +197,11 @@ static	void R_LoadLightmaps( lump_t *l ) {
 				image[j*4+3] = 255;
 			}
 		}
-		tr.lightmaps[i] = R_CreateImage( va("*lightmap%d",i), image, 
-			LIGHTMAP_SIZE, LIGHTMAP_SIZE, qfalse, qfalse, GL_CLAMP );
+		tr.lightmaps[i] = R_CreateImage( va("*lightmap%d",i), image,
+			LIGHTMAP_SIZE, LIGHTMAP_SIZE, GL_RGB, qfalse, qfalse, GL_CLAMP );
 	}
 
-	if ( r_lightmap->integer == 2 )	{
+	if ( r_lightmap->integer == 2 ) {
 		ri.Printf( PRINT_ALL, "Brightest lightmap value: %d\n", ( int ) ( maxIntensity * 255 ) );
 	}
 }

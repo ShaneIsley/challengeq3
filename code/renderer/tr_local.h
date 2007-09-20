@@ -108,7 +108,7 @@ typedef struct image_s {
 	int		uploadWidth, uploadHeight;	// after power of two and picmip but not including clamp to MAX_TEXTURE_SIZE
 	GLuint	texnum;					// gl texture binding
 
-	int		internalFormat;
+	GLenum	internalFormat;
 	int		TMU;
 
 	qbool	mipmap;
@@ -1200,11 +1200,11 @@ qbool	R_GetEntityToken( char *buffer, int size );
 model_t		*R_AllocModel( void );
 
 void		R_Init( void );
-image_t		*R_FindImageFile( const char *name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );
-
-image_t		*R_CreateImage( const char* name, byte* pic, int width, int height, qbool mipmap
-					, qbool allowPicmip, int wrapClampMode );
 qbool	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
+
+image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );
+image_t* R_CreateImage( const char* name, byte* pic, int width, int height, GLenum format,
+					qbool mipmap, qbool allowPicmip, int wrapClampMode );
 
 void	R_SetColorMappings();
 void	R_GammaCorrect( byte *buffer, int bufSize );
@@ -1212,7 +1212,7 @@ void	R_GammaCorrect( byte *buffer, int bufSize );
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
 
-void	R_InitFogTable( void );
+void	R_InitFogTable();
 float	R_FogFactor( float s, float t );
 void	R_InitImages();
 void	R_DeleteTextures();

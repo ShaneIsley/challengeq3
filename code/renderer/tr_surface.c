@@ -278,7 +278,7 @@ static void RB_SurfaceBeam()
 	int i;
 	vec3_t start_points[NUM_BEAM_SEGS], end_points[NUM_BEAM_SEGS];
 
-	refEntity_t* e = &backEnd.currentEntity->e;
+	const refEntity_t* e = &backEnd.currentEntity->e;
 
 	vec3_t direction, normalized_direction;
 	normalized_direction[0] = direction[0] = e->oldorigin[0] - e->origin[0];
