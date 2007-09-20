@@ -66,6 +66,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="&quot;..\..\freetype-2.3.5\objs\freetype235.lib&quot;"
 				OutputFile="$(OutDir)\renderer.lib"
 				SuppressStartupBanner="true"
 			/>

@@ -173,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
+				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib &quot;.\build\renderer_release\renderer.lib&quot; &quot;..\..\freetype-2.3.5\objs\freetype235.lib&quot; &quot;.\build\botlib_release\botlib.lib&quot;"
 				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
