@@ -1093,7 +1093,7 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* form
 
 	#define WRAP_TGA if ((++x == columns) && y--) { x = 0; dst = *pic + y*columns*4; }
 
-	// RLE RGB(A)
+	// RLE BGR(A)
 	if (targa_header.image_type == 10) {
 		int y = rows-1;
 		while (y >= 0) {
@@ -1123,71 +1123,6 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* form
 	#undef WRAP_TGA
 
 	#undef UNMUNGE_TGA_PIXEL
-
-/*
-	byte r, g, b, a;
-	if ( targa_header.image_type == 2 || targa_header.image_type == 3 ) {
-		// uncompressed RGB or gray scale image
-		for (int y = rows-1; y >= 0; --y)
-		{
-			dst = *pic + y*columns*4;
-			for (int x = 0; x < columns; ++x)
-			{
-				switch (targa_header.pixel_size)
-				{
-				case 8: r = g = b = *buf_p++; a = 255; break;
-				case 24: b = *buf_p++; g = *buf_p++; r = *buf_p++; a = 255; break;
-				case 32: b = *buf_p++; g = *buf_p++; r = *buf_p++; a = *buf_p++; break;
-				default:
-					ri.Error( ERR_DROP, "LoadTGA: illegal pixel_size '%d' in file '%s'\n", targa_header.pixel_size, name );
-					break;
-				}
-				*dst++ = r; *dst++ = g; *dst++ = b; *dst++ = a;
-			}
-		}
-	}
-	else if (targa_header.image_type == 10) {
-		// runlength encoded RGB images
-		if ((targa_header.pixel_size != 24) && (targa_header.pixel_size != 32))
-			ri.Error( ERR_DROP, "LoadTGA: illegal pixel_size '%d' in file '%s'\n", targa_header.pixel_size, name );
-
-		for (int y = rows-1; y >= 0; --y)
-		{
-			dst = *pic + y*columns*4;
-			for (int x = 0; x < columns; )
-			{
-				int packetHeader = *buf_p++;
-				int packetSize = 1 + (packetHeader & 0x7f);
-
-				if (packetHeader & 0x80) { // run-length packet
-					b = *buf_p++; g = *buf_p++; r = *buf_p++;
-					a = (targa_header.pixel_size == 32) ? *buf_p++ : 255;
-					while (packetSize--) {
-						*dst++ = r; *dst++ = g; *dst++ = b; *dst++ = a;
-						if (++x == columns) { // run spans across rows
-							x = 0;
-							if (--y == 0)
-								goto breakOut;
-							dst = *pic + y*columns*4;
-						}
-					}
-				}
-				else while (packetSize--) { // non run-length packet
-					b = *buf_p++; g = *buf_p++; r = *buf_p++;
-					a = (targa_header.pixel_size == 32) ? *buf_p++ : 255;
-					*dst++ = r; *dst++ = g; *dst++ = b; *dst++ = a;
-					if (++x == columns) { // pixel packets span across rows
-						x = 0;
-						if (--y == 0)
-							goto breakOut;
-						dst = *pic + y*columns*4;
-					}
-				}
-			}
-			breakOut: ;
-		}
-	}
-*/
 
 #if 0 
   // TTimo: this is the chunk of code to ensure a behavior that meets TGA specs 
