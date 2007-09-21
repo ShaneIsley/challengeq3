@@ -1746,6 +1746,8 @@ static qbool CollapseMultitexture( void ) {
 	return qtrue;
 }
 
+
+#if 0 // KHB  i don't believe this is true for any normal/correct implementation
 /*
 =============
 
@@ -1790,7 +1792,7 @@ static void FixRenderCommandList( int newShader ) {
 
 				for( i = 0, drawSurf = ds_cmd->drawSurfs; i < ds_cmd->numDrawSurfs; i++, drawSurf++ ) {
 					R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlightMap );
-                    sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
+					sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
 						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | entityNum | ( fogNum << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
@@ -1819,25 +1821,22 @@ static void FixRenderCommandList( int newShader ) {
 	}
 }
 
-/*
-==============
-SortNewShader
+#endif
 
-Positions the most recently created shader in the tr.sortedShaders[]
-array so that the shader->sort key is sorted reletive to the other
-shaders.
+
+/*
+Positions the most recently created shader in the tr.sortedShaders[] array
+such that the shader->sort key is sorted relative to the other shaders.
 
 Sets shader->sortedIndex
-==============
 */
-static void SortNewShader( void ) {
-	int		i;
-	float	sort;
-	shader_t	*newShader;
 
-	newShader = tr.shaders[ tr.numShaders - 1 ];
-	sort = newShader->sort;
+static void SortNewShader()
+{
+	shader_t* newShader = tr.shaders[ tr.numShaders - 1 ];
+	float sort = newShader->sort;
 
+	int i;
 	for ( i = tr.numShaders - 2 ; i >= 0 ; i-- ) {
 		if ( tr.sortedShaders[ i ]->sort <= sort ) {
 			break;
@@ -1848,7 +1847,7 @@ static void SortNewShader( void ) {
 
 	// Arnout: fix rendercommandlist
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=493
-	FixRenderCommandList( i+1 );
+	//FixRenderCommandList( i+1 );
 
 	newShader->sortedIndex = i+1;
 	tr.sortedShaders[i+1] = newShader;
@@ -2034,7 +2033,7 @@ static shader_t *FinishShader( void ) {
 			break;
 		}
 
-    // check for a missing texture
+		// check for a missing texture
 		if ( !pStage->bundle[0].image[0] ) {
 			ri.Printf( PRINT_WARNING, "Shader %s has a stage with no image\n", shader.name );
 			pStage->active = qfalse;
@@ -2072,7 +2071,6 @@ static shader_t *FinishShader( void ) {
     //if (pStage->rgbGen == CGEN_VERTEX) {
     //  vertexLightmap = qtrue;
     //}
-
 
 
 		//
@@ -2233,18 +2231,18 @@ be defined for every single image used in the game, three default
 shader behaviors can be auto-created for any image:
 
 If lightmapIndex == LIGHTMAP_NONE, then the image will have
-dynamic diffuse lighting applied to it, as apropriate for most
+dynamic diffuse lighting applied to it, as appropriate for most
 entity skin surfaces.
 
 If lightmapIndex == LIGHTMAP_2D, then the image will be used
 for 2D rendering unless an explicit shader is found
 
 If lightmapIndex == LIGHTMAP_BY_VERTEX, then the image will use
-the vertex rgba modulate values, as apropriate for misc_model
+the vertex rgba modulate values, as appropriate for misc_model
 pre-lit surfaces.
 
 Other lightmapIndex values will have a lightmap stage created
-and src*dest blending applied with the texture, as apropriate for
+and src*dest blending applied with the texture, as appropriate for
 most world construction surfaces.
 
 ===============
