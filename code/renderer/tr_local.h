@@ -1236,9 +1236,6 @@ const shader_t* R_GetShaderByHandle( qhandle_t hShader );
 shader_t	*R_GetShaderByState( int index, long *cycleTime );
 void		R_InitShaders( void );
 void		R_ShaderList_f( void );
-// ta shit that we should nuke
-void    R_RemapShader(const char *oldShader, const char *newShader, const char *timeOffset);
-shader_t *R_FindShaderByName( const char *name );
 
 /*
 ====================================================================
