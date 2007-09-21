@@ -1805,7 +1805,6 @@ which means either they should get their shit RIGHT, or we don't care
 
 
 #define DLIGHT_SIZE 64
-#define DLIGHT_FULLBRIGHT (DLIGHT_SIZE * DLIGHT_SIZE)
 
 static void R_CreateDlightImage( void )
 {
