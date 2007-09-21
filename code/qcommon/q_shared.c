@@ -434,9 +434,11 @@ int COM_Compress( char* p )
 			}
 			// copy quoted strings unmolested
 			if (c == '"') {
+				*out++ = c;
 				do {
 					*out++ = *in++;
 				} while ((c = *in) && (c != '"'));
+				++in;
 			}
 			*out++ = c;
 		}
