@@ -896,7 +896,7 @@ void SCR_DebugGraph (float value, int color);	// FIXME: move logging to common?
 //
 // server interface
 //
-void SV_Init( void );
+void SV_Init();
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( const netadr_t& from, msg_t* msg );

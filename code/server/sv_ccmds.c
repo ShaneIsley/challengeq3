@@ -720,17 +720,14 @@ static void SV_KillServer_f( void ) {
 
 //===========================================================
 
-/*
-==================
-SV_AddOperatorCommands
-==================
-*/
-void SV_AddOperatorCommands( void ) {
-	static qbool	initialized;
 
-	if ( initialized ) {
+void SV_AddOperatorCommands()
+{
+	static qbool initialized;
+
+	if ( initialized )
 		return;
-	}
+
 	initialized = qtrue;
 
 	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
@@ -756,12 +753,9 @@ void SV_AddOperatorCommands( void ) {
 	}
 }
 
-/*
-==================
-SV_RemoveOperatorCommands
-==================
-*/
-void SV_RemoveOperatorCommands( void ) {
+
+void SV_RemoveOperatorCommands()
+{
 #if 0
 	// removing these won't let the server start again
 	Cmd_RemoveCommand ("heartbeat");

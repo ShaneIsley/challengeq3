@@ -566,8 +566,9 @@ Only called at main exe startup, not for each game
 */
 void SV_BotInitBotLib(void);
 
-void SV_Init (void) {
-	SV_AddOperatorCommands ();
+void SV_Init()
+{
+	SV_AddOperatorCommands();
 
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
@@ -606,7 +607,6 @@ void SV_Init (void) {
 
 	sv_allowDownload = Cvar_Get ("sv_allowDownload", "0", CVAR_SERVERINFO);
 	Cvar_Get ("sv_dlURL", "", CVAR_SERVERINFO);
-	sv_master[0] = Cvar_Get ("sv_master1", MASTER_SERVER_NAME, 0 );
 	sv_reconnectlimit = Cvar_Get ("sv_reconnectlimit", "3", 0);
 	sv_showloss = Cvar_Get ("sv_showloss", "0", 0);
 	sv_padPackets = Cvar_Get ("sv_padPackets", "0", 0);
@@ -614,6 +614,10 @@ void SV_Init (void) {
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );
 	sv_strictAuth = Cvar_Get ("sv_strictAuth", "1", CVAR_ARCHIVE );
+
+	sv_master[0] = Cvar_Get ("sv_master1", MASTER_SERVER_NAME, 0 );
+	for (int i = 1; i < MAX_MASTER_SERVERS; ++i)
+		sv_master[i] = Cvar_Get( va("sv_master%d", i+1), "", 0 );
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
 	SV_BotInitCvars();
