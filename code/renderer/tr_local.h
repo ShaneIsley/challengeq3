@@ -1101,7 +1101,6 @@ extern	cvar_t	*r_showImages;
 extern	cvar_t	*r_debugSort;
 
 extern	cvar_t	*r_printShaders;
-extern	cvar_t	*r_saveFontData;
 
 //====================================================================
 
@@ -1141,10 +1140,10 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, 
 ** GL wrapper/helper functions
 */
 void	GL_Bind( const image_t* image );
-void	GL_SetDefaultState (void);
+void	GL_SetDefaultState();
 void	GL_SelectTexture( int unit );
 void	GL_TextureMode( const char *string );
-void	GL_CheckErrors( void );
+void	GL_CheckErrors();
 void	GL_State( unsigned long stateVector );
 void	GL_TexEnv( int env );
 void	GL_Cull( int cullType );
@@ -1199,7 +1198,7 @@ qbool	R_GetEntityToken( char *buffer, int size );
 
 model_t		*R_AllocModel( void );
 
-void		R_Init( void );
+void		R_Init();
 qbool	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );

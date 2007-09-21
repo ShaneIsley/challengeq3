@@ -145,7 +145,6 @@ cvar_t	*r_directedScale;
 cvar_t	*r_debugLight;
 cvar_t	*r_debugSort;
 cvar_t	*r_printShaders;
-cvar_t	*r_saveFontData;
 
 cvar_t	*r_maxpolys;
 int		max_polys;
@@ -184,10 +183,8 @@ static void AssertCvarRange( cvar_t *cv, float minVal, float maxVal, qbool shoul
 ** setting variables, checking GL constants, and reporting the gfx system config
 ** to the user.
 */
-static void InitOpenGL( void )
+static void InitOpenGL()
 {
-	char renderer_buffer[1024];
-
 	//
 	// initialize OS specific portions of the renderer
 	//
@@ -202,22 +199,16 @@ static void InitOpenGL( void )
 
 	if ( glConfig.vidWidth == 0 )
 	{
-		GLint		temp;
-
 		GLimp_Init();
 
-		strcpy( renderer_buffer, glConfig.renderer_string );
-		Q_strlwr( renderer_buffer );
-
-		// OpenGL driver constants
+		GLint temp;
 		qglGetIntegerv( GL_MAX_TEXTURE_SIZE, &temp );
 		glConfig.maxTextureSize = temp;
 
-		// stubbed or broken drivers may have reported 0...
-		if ( glConfig.maxTextureSize <= 0 ) 
-		{
-			glConfig.maxTextureSize = 0;
-		}
+		// GL requires all implementations to support at least 64x64
+		// but we have no "nice" way out from here, and i'd hope no driver is THAT broken still
+		//if ( glConfig.maxTextureSize < 64 )
+		//	return qfalse;
 	}
 
 	// init command buffers and SMP
@@ -230,86 +221,70 @@ static void InitOpenGL( void )
 	GL_SetDefaultState();
 }
 
-/*
-==================
-GL_CheckErrors
-==================
-*/
-void GL_CheckErrors( void ) {
-    int		err;
-    char	s[64];
 
-    err = qglGetError();
-    if ( err == GL_NO_ERROR ) {
-        return;
-    }
-    if ( r_ignoreGLErrors->integer ) {
-        return;
-    }
-    switch( err ) {
-        case GL_INVALID_ENUM:
-            strcpy( s, "GL_INVALID_ENUM" );
-            break;
-        case GL_INVALID_VALUE:
-            strcpy( s, "GL_INVALID_VALUE" );
-            break;
-        case GL_INVALID_OPERATION:
-            strcpy( s, "GL_INVALID_OPERATION" );
-            break;
-        case GL_STACK_OVERFLOW:
-            strcpy( s, "GL_STACK_OVERFLOW" );
-            break;
-        case GL_STACK_UNDERFLOW:
-            strcpy( s, "GL_STACK_UNDERFLOW" );
-            break;
-        case GL_OUT_OF_MEMORY:
-            strcpy( s, "GL_OUT_OF_MEMORY" );
-            break;
-        default:
-            Com_sprintf( s, sizeof(s), "%i", err);
-            break;
-    }
+void GL_CheckErrors()
+{
+	int err = qglGetError();
+	if ((err == GL_NO_ERROR) || r_ignoreGLErrors->integer)
+		return;
 
-    ri.Error( ERR_FATAL, "GL_CheckErrors: %s", s );
+	char s[64];
+	switch( err ) {
+		case GL_INVALID_ENUM:
+			strcpy( s, "GL_INVALID_ENUM" );
+			break;
+		case GL_INVALID_VALUE:
+			strcpy( s, "GL_INVALID_VALUE" );
+			break;
+		case GL_INVALID_OPERATION:
+			strcpy( s, "GL_INVALID_OPERATION" );
+			break;
+		case GL_STACK_OVERFLOW:
+			strcpy( s, "GL_STACK_OVERFLOW" );
+			break;
+		case GL_STACK_UNDERFLOW:
+			strcpy( s, "GL_STACK_UNDERFLOW" );
+			break;
+		case GL_OUT_OF_MEMORY:
+			strcpy( s, "GL_OUT_OF_MEMORY" );
+			break;
+		default:
+			Com_sprintf( s, sizeof(s), "%i", err);
+			break;
+	}
+
+	ri.Error( ERR_FATAL, "GL_CheckErrors: %s", s );
 }
 
 
-/*
-** R_GetModeInfo
-*/
-typedef struct vidmode_s
+typedef struct
 {
-    const char *description;
-    int         width, height;
-	float		pixelAspect;		// pixel width / height
+	const char* description;
+	int width, height;
 } vidmode_t;
 
-vidmode_t r_vidModes[] =
+static const vidmode_t r_vidModes[] =
 {
-    { "Mode  0: 320x240",		320,	240,	1 },
-    { "Mode  1: 400x300",		400,	300,	1 },
-    { "Mode  2: 512x384",		512,	384,	1 },
-    { "Mode  3: 640x480",		640,	480,	1 },
-    { "Mode  4: 800x600",		800,	600,	1 },
-    { "Mode  5: 960x720",		960,	720,	1 },
-    { "Mode  6: 1024x768",		1024,	768,	1 },
-    { "Mode  7: 1152x864",		1152,	864,	1 },
-    { "Mode  8: 1280x1024",		1280,	1024,	1 },
-    { "Mode  9: 1600x1200",		1600,	1200,	1 },
-    { "Mode 10: 2048x1536",		2048,	1536,	1 },
-    { "Mode 11: 856x480 (wide)",856,	480,	1 }
+	{ "Mode  0: 320x240",		320,	240,	},
+	{ "Mode  1: 400x300",		400,	300,	},
+	{ "Mode  2: 512x384",		512,	384,	},
+	{ "Mode  3: 640x480",		640,	480,	},
+	{ "Mode  4: 800x600",		800,	600,	},
+	{ "Mode  5: 960x720",		960,	720,	},
+	{ "Mode  6: 1024x768",		1024,	768,	},
+	{ "Mode  7: 1152x864",		1152,	864,	},
+	{ "Mode  8: 1280x1024",		1280,	1024,	},
+	{ "Mode  9: 1600x1200",		1600,	1200,	},
+	{ "Mode 10: 2048x1536",		2048,	1536,	},
+	{ "Mode 11: 856x480 (wide)",856,	480,	}
 };
-static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
-qbool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
-	vidmode_t	*vm;
+static const int s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
-    if ( mode < -1 ) {
-        return qfalse;
-	}
-	if ( mode >= s_numVidModes ) {
+qbool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode )
+{
+	if ((mode < -1) || (mode >= s_numVidModes))
 		return qfalse;
-	}
 
 	if ( mode == -1 ) {
 		*width = r_customwidth->integer;
@@ -318,18 +293,15 @@ qbool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 		return qtrue;
 	}
 
-	vm = &r_vidModes[mode];
+	const vidmode_t* vm = &r_vidModes[mode];
+	*width  = vm->width;
+	*height = vm->height;
+	*windowAspect = (float)vm->width / vm->height;
 
-    *width  = vm->width;
-    *height = vm->height;
-    *windowAspect = (float)vm->width / ( vm->height * vm->pixelAspect );
-
-    return qtrue;
+	return qtrue;
 }
 
-/*
-** R_ModeList_f
-*/
+
 static void R_ModeList_f( void )
 {
 	int i;
@@ -346,7 +318,7 @@ static void R_ModeList_f( void )
 /* 
 ============================================================================== 
 
-						SCREEN SHOTS 
+						SCREEN SHOTS
 
 screenshots get written in fs_homepath + fs_gamedir
 vanilla q3 .. baseq3/screenshots/ *.tga
@@ -564,10 +536,8 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 
 //============================================================================
 
-/*
-** GL_SetDefaultState
-*/
-void GL_SetDefaultState( void )
+
+void GL_SetDefaultState()
 {
 	qglClearDepth( 1.0f );
 
@@ -610,14 +580,9 @@ void GL_SetDefaultState( void )
 }
 
 
-/*
-================
-GfxInfo_f
-================
-*/
-void GfxInfo_f( void ) 
+void GfxInfo_f( void )
 {
-	cvar_t *sys_cpustring = ri.Cvar_Get( "sys_cpustring", "", 0 );
+	cvar_t* sys_cpustring = ri.Cvar_Get( "sys_cpustring", "", 0 );
 	const char *enablestrings[] =
 	{
 		"disabled",
@@ -698,12 +663,8 @@ void GfxInfo_f( void )
 	}
 }
 
-/*
-===============
-R_Register
-===============
-*/
-void R_Register( void )
+
+static void R_Register()
 {
 	//
 	// latched and archived variables
@@ -792,7 +753,6 @@ void R_Register( void )
 	r_debugLight = ri.Cvar_Get( "r_debuglight", "0", CVAR_TEMP );
 	r_debugSort = ri.Cvar_Get( "r_debugSort", "0", CVAR_CHEAT );
 	r_printShaders = ri.Cvar_Get( "r_printShaders", "0", 0 );
-	r_saveFontData = ri.Cvar_Get( "r_saveFontData", "0", 0 );
 
 	r_nocurves = ri.Cvar_Get ("r_nocurves", "0", CVAR_CHEAT );
 	r_drawworld = ri.Cvar_Get ("r_drawworld", "1", CVAR_CHEAT );
@@ -846,7 +806,7 @@ void R_Register( void )
 }
 
 
-void R_Init( void )
+void R_Init()
 {
 	COMPILE_TIME_ASSERT( sizeof(glconfig_t) == 11332 );
 	COMPILE_TIME_ASSERT( sizeof(TargaHeader) == 18 );
