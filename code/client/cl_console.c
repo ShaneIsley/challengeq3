@@ -145,12 +145,9 @@ void Con_MessageMode4_f (void) {
 	cls.keyCatchers ^= KEYCATCH_MESSAGE;
 }
 
-/*
-================
-Con_Clear_f
-================
-*/
-void Con_Clear_f (void) {
+
+void Con_Clear_f( void )
+{
 	int		i;
 
 	for ( i = 0 ; i < CON_TEXTSIZE ; i++ ) {
@@ -161,18 +158,12 @@ void Con_Clear_f (void) {
 }
 
 
-/*
-================
-Con_Dump_f
+// save the console contents out to a file
 
-Save the console contents out to a file
-================
-*/
-void Con_Dump_f (void)
+void Con_Dump_f( void )
 {
 	int		l, x, i;
 	short	*line;
-	fileHandle_t	f;
 	char	buffer[1024];
 
 	if (Cmd_Argc() != 2)
@@ -181,14 +172,17 @@ void Con_Dump_f (void)
 		return;
 	}
 
-	Com_Printf ("Dumped console text to %s.\n", Cmd_Argv(1) );
+	Q_strncpyz( buffer, Cmd_Argv(1), MAX_QPATH - 4 );
+	COM_DefaultExtension( buffer, sizeof(buffer), ".txt" );
 
-	f = FS_FOpenFileWrite( Cmd_Argv( 1 ) );
+	fileHandle_t f = FS_FOpenFileWrite( buffer );
 	if (!f)
 	{
-		Com_Printf ("ERROR: couldn't open.\n");
+		Com_Printf( "ERROR: couldn't open %s\n", buffer );
 		return;
 	}
+
+	Com_Printf( "Dumped console text to %s\n", buffer );
 
 	// skip empty lines
 	for (l = con.current - con.totallines + 1 ; l <= con.current ; l++)
