@@ -985,7 +985,7 @@ void CL_Setenv_f( void ) {
 			strcat( buffer, " " );
 		}
 
-		_putenv( buffer );
+		putenv( buffer );
 	} else if ( argc == 2 ) {
 		char *env = getenv( Cmd_Argv(1) );
 

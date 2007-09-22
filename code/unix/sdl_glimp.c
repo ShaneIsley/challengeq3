@@ -585,9 +585,6 @@ static int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen )
   else
     colorbits = r_colorbits->value;
 
-  if ( !Q_stricmp( r_glDriver->string, _3DFX_DRIVER_NAME ) )
-    colorbits = 16;
-
   if (!r_depthbits->value)
     depthbits = 24;
   else
@@ -918,7 +915,6 @@ static qboolean GLW_LoadOpenGL( const char *name )
 void GLimp_Init( void )
 {
   qboolean attemptedlibGL = qfalse;
-  qboolean attempted3Dfx = qfalse;
   qboolean success = qfalse;
   char  buf[1024];
   cvar_t *lastValidRenderer = ri.Cvar_Get( "r_lastValidRenderer", "(uninitialized)", CVAR_ARCHIVE );
@@ -947,9 +943,6 @@ void GLimp_Init( void )
     if ( !Q_stricmp( r_glDriver->string, OPENGL_DRIVER_NAME ) )
     {
       attemptedlibGL = qtrue;
-    } else if ( !Q_stricmp( r_glDriver->string, _3DFX_DRIVER_NAME ) )
-    {
-      attempted3Dfx = qtrue;
     }
 
     #if 0
@@ -1042,21 +1035,6 @@ void GLimp_Init( void )
   // this is where hardware specific workarounds that should be
   // detected/initialized every startup should go.
   //
-  if ( Q_stristr( buf, "banshee" ) || Q_stristr( buf, "Voodoo_Graphics" ) )
-  {
-    glConfig.hardwareType = GLHW_3DFX_2D3D;
-  } else if ( Q_stristr( buf, "rage pro" ) || Q_stristr( buf, "RagePro" ) )
-  {
-    glConfig.hardwareType = GLHW_RAGEPRO;
-  } else if ( Q_stristr( buf, "permedia2" ) )
-  {
-    glConfig.hardwareType = GLHW_PERMEDIA2;
-  } else if ( Q_stristr( buf, "riva 128" ) )
-  {
-    glConfig.hardwareType = GLHW_RIVA128;
-  } else if ( Q_stristr( buf, "riva tnt " ) )
-  {
-  }
 
   ri.Cvar_Set( "r_lastValidRenderer", glConfig.renderer_string );
 
@@ -1374,12 +1352,6 @@ void IN_Frame (void) {
     // temporarily deactivate if not in the game and
     // running on the desktop
     // voodoo always counts as full screen
-    if (Cvar_VariableValue ("r_fullscreen") == 0
-        && strcmp( Cvar_VariableString("r_glDriver"), _3DFX_DRIVER_NAME ) )
-    {
-      IN_DeactivateMouse ();
-      return;
-    }
   }
 
   IN_ActivateMouse();

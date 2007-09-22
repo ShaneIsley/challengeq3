@@ -57,9 +57,8 @@ static logfile_t logfile;
 //===========================================================================
 void Log_Open(char *filename)
 {
-	size_t len;
 	if (!LibVarValue("log", "0")) return;
-	if (!filename || !(len=strlen(filename)))
+	if (!filename || !strlen(filename))
 	{
 		botimport.Print(PRT_MESSAGE, "openlog <filename>\n");
 		return;
@@ -69,13 +68,13 @@ void Log_Open(char *filename)
 		botimport.Print(PRT_ERROR, "log file %s is already opened\n", logfile.filename);
 		return;
 	} //end if
-	fopen_s( &logfile.fp, filename, "wb");
+	logfile.fp = fopen(filename, "wb");
 	if (!logfile.fp)
 	{
 		botimport.Print(PRT_ERROR, "can't open the log file %s\n", filename);
 		return;
 	} //end if
-	strncpy_s(logfile.filename, MAX_LOGFILENAMESIZE, filename, len);
+	strncpy(logfile.filename, filename, MAX_LOGFILENAMESIZE);
 	botimport.Print(PRT_MESSAGE, "Opened log %s\n", logfile.filename);
 } //end of the function Log_Create
 //===========================================================================
