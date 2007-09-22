@@ -75,7 +75,12 @@ typedef qbool qboolean;
 
 
 //Ignore __attribute__ on non-gcc platforms
-#ifndef __GNUC__
+#ifdef __GNUC__
+#if defined(__cplusplus) && !defined(min)
+	template <typename T> inline T min( T a, T b ) { return (a < b) ? a : b; }
+	template <typename T> inline T max( T a, T b ) { return (a > b) ? a : b; }
+#endif
+#else
 #ifndef __attribute__
 #define __attribute__(x)
 #endif

@@ -101,7 +101,7 @@ USE_OPENAL_DLOPEN=0
 endif
 
 ifndef USE_CURL
-USE_CURL=1
+USE_CURL=0
 endif
 
 ifndef USE_CURL_DLOPEN
@@ -167,7 +167,7 @@ MKDIR=mkdir
 
 ifeq ($(PLATFORM),linux)
 
-  CC=gcc
+  CC=g++
 
   ifeq ($(ARCH),alpha)
     ARCH=axp
@@ -185,7 +185,7 @@ ifeq ($(PLATFORM),linux)
   endif
   endif
 
-  BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes -pipe
+  BASE_CFLAGS = -Wall -Weffc++ -Wold-style-cast -fno-strict-aliasing -Wimplicit -Wstrict-prototypes -pipe
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL=1
