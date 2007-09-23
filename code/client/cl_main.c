@@ -2184,7 +2184,7 @@ void CL_InitRenderer( void )
 
 	//re.RegisterFont( "MC360", 8, &cls.fontConsole );
 	//re.RegisterFont( "DGL_EnterSansman", 8, &cls.fontConsole );
-	re.RegisterFont( "DGL_FranklinGothic_M", 8, &cls.fontConsole );
+	re.RegisterFont( "Vera", 8, &cls.fontConsole );
 	//re.RegisterFont( "M_12pt", 4, &cls.fontConsole );
 }
 

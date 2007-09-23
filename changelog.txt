@@ -1,6 +1,6 @@
 
 
-the code now requires a C99-class compiler
+the code now requires a C++ compiler
 
 screenshot filename is YYYY_MM_DD-HH_MM_SS-TTT
 this means they'll never collide *; moviemakers won't run out;
