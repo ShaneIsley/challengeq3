@@ -66,25 +66,19 @@ typedef qbool qboolean;
 #pragma warning(disable : 4706)		// assignment within conditional (nanny mode)
 //#pragma intrinsic( memset, memcpy )
 
+#endif // _MSC_VER
+
+
+#if !defined(__GNUC__) && !defined(__attribute__)
+#define __attribute__(x)
+#endif
+
+
 #if defined(__cplusplus) && !defined(min)
 	template <typename T> __forceinline T min( T a, T b ) { return (a < b) ? a : b; }
 	template <typename T> __forceinline T max( T a, T b ) { return (a > b) ? a : b; }
 #endif
 
-#endif // _MSC_VER
-
-
-//Ignore __attribute__ on non-gcc platforms
-#ifdef __GNUC__
-#if defined(__cplusplus) && !defined(min)
-	template <typename T> inline T min( T a, T b ) { return (a < b) ? a : b; }
-	template <typename T> inline T max( T a, T b ) { return (a > b) ? a : b; }
-#endif
-#else
-#ifndef __attribute__
-#define __attribute__(x)
-#endif
-#endif
 
 /**********************************************************************
   VM Considerations
