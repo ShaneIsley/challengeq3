@@ -738,18 +738,10 @@ static qbool NET_GetCvars( void ) {
 }
 
 
-/*
-====================
-NET_Config
-====================
-*/
-void NET_Config( qbool enableNetworking ) {
-	qbool	modified;
-	qbool	stop;
-	qbool	start;
-
+void NET_Config( qbool enableNetworking )
+{
 	// get any latched changes to cvars
-	modified = NET_GetCvars();
+	qbool modified = NET_GetCvars();
 
 	if( net_noudp->integer ) {
 		enableNetworking = qfalse;
@@ -760,6 +752,7 @@ void NET_Config( qbool enableNetworking ) {
 		return;
 	}
 
+	qbool stop, start;
 	if( enableNetworking == networkingEnabled ) {
 		if( enableNetworking ) {
 			stop = qtrue;
@@ -795,22 +788,17 @@ void NET_Config( qbool enableNetworking ) {
 	}
 
 	if( start ) {
-		if (! net_noudp->integer ) {
+		if ( !net_noudp->integer ) {
 			NET_OpenIP();
 		}
 	}
 }
 
 
-/*
-====================
-NET_Init
-====================
-*/
-void NET_Init( void ) {
-	int		r;
+void NET_Init()
+{
+	int r = WSAStartup( MAKEWORD( 1, 1 ), &winsockdata );
 
-	r = WSAStartup( MAKEWORD( 1, 1 ), &winsockdata );
 	if( r ) {
 		Com_Printf( "WARNING: Winsock initialization failed, returned %d\n", r );
 		return;
@@ -827,12 +815,10 @@ void NET_Init( void ) {
 }
 
 
-/*
-====================
-NET_Shutdown
-====================
-*/
-void NET_Shutdown( void ) {
+// never actually called  :P
+
+void NET_Shutdown()
+{
 	if ( !winsockInitialized ) {
 		return;
 	}
@@ -853,11 +839,7 @@ void NET_Sleep( int msec ) {
 }
 
 
-/*
-====================
-NET_Restart_f
-====================
-*/
-void NET_Restart( void ) {
+void NET_Restart()
+{
 	NET_Config( networkingEnabled );
 }

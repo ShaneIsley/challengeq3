@@ -142,13 +142,13 @@ typedef struct {
 	unsigned short port;
 } netadr_t;
 
-void NET_Init( void );
-void NET_Shutdown( void );
-void NET_Restart( void );
+void NET_Init();
+void NET_Shutdown();
+void NET_Restart();
 void NET_Config( qbool enableNetworking );
-void NET_FlushPacketQueue( void );
+void NET_FlushPacketQueue();
 void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to );
-void QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ... );
+void QDECL NET_OutOfBandPrint( netsrc_t net_socket, const netadr_t& adr, const char* format, ... );
 void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
 qbool NET_CompareAdr (netadr_t a, netadr_t b);

@@ -583,19 +583,17 @@ qbool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message)
 }
 
 
-void NET_SendLoopPacket (netsrc_t sock, int length, const void *data, netadr_t to)
+static void NET_SendLoopPacket( netsrc_t sock, int length, const void *data, netadr_t to )
 {
-	int		i;
-	loopback_t	*loop;
+	loopback_t* loop = &loopbacks[sock^1];
 
-	loop = &loopbacks[sock^1];
-
-	i = loop->send & (MAX_LOOPBACK-1);
+	int i = loop->send & (MAX_LOOPBACK-1);
 	loop->send++;
 
-	Com_Memcpy (loop->msgs[i].data, data, length);
+	Com_Memcpy( loop->msgs[i].data, data, length );
 	loop->msgs[i].datalen = length;
 }
+
 
 //=============================================================================
 
@@ -634,17 +632,15 @@ static void NET_QueuePacket( int length, const void* data, netadr_t to, int offs
 	}
 }
 
-void NET_FlushPacketQueue(void)
-{
-	packetQueue_t *last;
-	int now;
 
-	while(packetQueue) {
-		now = Sys_Milliseconds();
-		if(packetQueue->release >= now)
+void NET_FlushPacketQueue()
+{
+	packetQueue_t* last;
+
+	while (packetQueue) {
+		if (packetQueue->release >= Sys_Milliseconds())
 			break;
-		Sys_SendPacket(packetQueue->length, packetQueue->data,
-			packetQueue->to);
+		Sys_SendPacket( packetQueue->length, packetQueue->data, packetQueue->to );
 		last = packetQueue;
 		packetQueue = packetQueue->next;
 		Z_Free(last->data);
@@ -652,15 +648,16 @@ void NET_FlushPacketQueue(void)
 	}
 }
 
-void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) {
 
-	// sequenced packets are shown in netchan, so just show oob
-	if ( showpackets->integer && *(int *)data == -1 )	{
+void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to )
+{
+	// sequenced packets are shown in netchan, so just show OOB
+	if ( showpackets->integer && *(int *)data == -1 ) {
 		Com_Printf ("send packet %4i\n", length);
 	}
 
 	if ( to.type == NA_LOOPBACK ) {
-		NET_SendLoopPacket (sock, length, data, to);
+		NET_SendLoopPacket( sock, length, data, to );
 		return;
 	}
 	if ( to.type == NA_BOT ) {
@@ -681,17 +678,12 @@ void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) 
 	}
 }
 
-/*
-===============
-NET_OutOfBandPrint
 
-Sends a text message in an out-of-band datagram
-================
-*/
-void QDECL NET_OutOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, ... ) {
-	va_list		argptr;
-	char		string[MAX_MSGLEN];
+// sends a text message in an out-of-band datagram
 
+void QDECL NET_OutOfBandPrint( netsrc_t sock, const netadr_t& adr, const char* format, ... )
+{
+	char string[MAX_MSGLEN];
 
 	// set the header
 	string[0] = -1;
@@ -699,12 +691,12 @@ void QDECL NET_OutOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, 
 	string[2] = -1;
 	string[3] = -1;
 
+	va_list argptr;
 	va_start( argptr, format );
-	vsnprintf( string+4, sizeof(string)-4, format, argptr );
+	int n = 4 + vsnprintf( string+4, sizeof(string)-4, format, argptr );
 	va_end( argptr );
 
-	// send the datagram
-	NET_SendPacket( sock, strlen( string ), string, adr );
+	NET_SendPacket( sock, n, string, adr );
 }
 
 /*
