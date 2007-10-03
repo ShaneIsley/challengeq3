@@ -613,18 +613,18 @@ void COM_MatchToken( const char** data, const char* match )
 	}
 }
 
-//Returns the index in g_color_table[] corresponding to the colour code.
-int ColorIndex( char ccode ) {
-
+// returns the index in g_color_table[] corresponding to the colour code; white on failure
+int ColorIndex( char ccode )
+{
 	if ( ccode >= '0' && ccode <= '9' ) {
 		return (ccode - '0');
 	} else if ( ccode >= 'a' && ccode <= 'z' ) {
-		return (2 * (ccode - 'a') + 10);
+		return ((ccode - 'a') + 10);
 	} else if ( ccode >= 'A' && ccode <= 'Z' ) {
-		return (2 * (ccode - 'A') + 11);
-	} else {
-		return 7;
+		return ((ccode - 'A') + 10);
 	}
+
+	return 7;
 }
 
 /*
