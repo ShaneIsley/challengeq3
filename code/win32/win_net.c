@@ -828,14 +828,10 @@ void NET_Shutdown()
 }
 
 
-/*
-====================
-NET_Sleep
+// should sleep for x msec or until net socket is ready, if it's a server
 
-sleeps msec or until net socket is ready
-====================
-*/
-void NET_Sleep( int msec ) {
+void NET_Sleep( int msec )
+{
 }
 
 

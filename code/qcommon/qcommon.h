@@ -147,17 +147,17 @@ void NET_Shutdown();
 void NET_Restart();
 void NET_Config( qbool enableNetworking );
 void NET_FlushPacketQueue();
-void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to );
-void QDECL NET_OutOfBandPrint( netsrc_t net_socket, const netadr_t& adr, const char* format, ... );
-void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
+void NET_SendPacket( netsrc_t sock, int length, const void* data, const netadr_t& to );
+void QDECL NET_OutOfBandPrint( netsrc_t sock, const netadr_t& adr, const char* format, ... );
+void QDECL NET_OutOfBandData( netsrc_t sock, const netadr_t& adr, const byte* data, int len );
 
-qbool NET_CompareAdr (netadr_t a, netadr_t b);
-qbool NET_CompareBaseAdr (netadr_t a, netadr_t b);
-qbool NET_IsLocalAddress (netadr_t adr);
+qbool NET_CompareAdr( const netadr_t& a, const netadr_t& b );
+qbool NET_CompareBaseAdr( const netadr_t& a, const netadr_t& b );
+qbool NET_IsLocalAddress( const netadr_t& a );
 const char* NET_AdrToString( const netadr_t& a );
-qbool NET_StringToAdr ( const char *s, netadr_t *a);
-qbool NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
-void NET_Sleep(int msec);
+qbool NET_StringToAdr( const char* s, netadr_t* a );
+qbool NET_GetLoopPacket( netsrc_t sock, netadr_t *net_from, msg_t *net_message );
+void NET_Sleep( int msec );
 
 
 #define MAX_MSGLEN 16384 // max length of a message, which may be fragmented into multiple packets

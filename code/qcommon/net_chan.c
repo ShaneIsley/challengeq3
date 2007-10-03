@@ -54,26 +54,22 @@ to the new value before sending out any replies.
 
 #define	FRAGMENT_BIT	(1<<31)
 
-cvar_t		*showpackets;
-cvar_t		*showdrop;
-cvar_t		*qport;
+cvar_t* showpackets;
+cvar_t* showdrop;
+cvar_t* qport;
 
-static char *netsrcString[2] = {
+static const char* netsrcString[2] = {
 	"client",
 	"server"
 };
 
-/*
-===============
-Netchan_Init
 
-===============
-*/
-void Netchan_Init( int port ) {
+void Netchan_Init( int port )
+{
 	port &= 0xffff;
-	showpackets = Cvar_Get ("showpackets", "0", CVAR_TEMP );
-	showdrop = Cvar_Get ("showdrop", "0", CVAR_TEMP );
-	qport = Cvar_Get ("net_qport", va("%i", port), CVAR_INIT );
+	showpackets = Cvar_Get( "showpackets", "0", CVAR_TEMP );
+	showdrop = Cvar_Get( "showdrop", "0", CVAR_TEMP );
+	qport = Cvar_Get( "net_qport", va("%i", port), CVAR_INIT );
 }
 
 /*
@@ -85,7 +81,7 @@ called to open a channel to a remote system
 */
 void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport ) {
 	Com_Memset (chan, 0, sizeof(*chan));
-	
+
 	chan->sock = sock;
 	chan->remoteAddress = adr;
 	chan->qport = qport;
@@ -93,91 +89,6 @@ void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport ) {
 	chan->outgoingSequence = 1;
 }
 
-// TTimo: unused, commenting out to make gcc happy
-#if 0
-/*
-==============
-Netchan_ScramblePacket
-
-A probably futile attempt to make proxy hacking somewhat
-more difficult.
-==============
-*/
-#define	SCRAMBLE_START	6
-static void Netchan_ScramblePacket( msg_t *buf ) {
-	unsigned	seed;
-	int			i, j, c, mask, temp;
-	int			seq[MAX_PACKETLEN];
-
-	seed = ( LittleLong( *(unsigned *)buf->data ) * 3 ) ^ ( buf->cursize * 123 );
-	c = buf->cursize;
-	if ( c <= SCRAMBLE_START ) {
-		return;
-	}
-	if ( c > MAX_PACKETLEN ) {
-		Com_Error( ERR_DROP, "MAX_PACKETLEN" );
-	}
-
-	// generate a sequence of "random" numbers
-	for (i = 0 ; i < c ; i++) {
-		seed = (119 * seed + 1);
-		seq[i] = seed;
-	}
-
-	// transpose each character
-	for ( mask = 1 ; mask < c-SCRAMBLE_START ; mask = ( mask << 1 ) + 1 ) {
-	}
-	mask >>= 1;
-	for (i = SCRAMBLE_START ; i < c ; i++) {
-		j = SCRAMBLE_START + ( seq[i] & mask );
-		temp = buf->data[j];
-		buf->data[j] = buf->data[i];
-		buf->data[i] = temp;
-	}
-
-	// byte xor the data after the header
-	for (i = SCRAMBLE_START ; i < c ; i++) {
-		buf->data[i] ^= seq[i];
-	}
-}
-
-static void Netchan_UnScramblePacket( msg_t *buf ) {
-	unsigned	seed;
-	int			i, j, c, mask, temp;
-	int			seq[MAX_PACKETLEN];
-
-	seed = ( LittleLong( *(unsigned *)buf->data ) * 3 ) ^ ( buf->cursize * 123 );
-	c = buf->cursize;
-	if ( c <= SCRAMBLE_START ) {
-		return;
-	}
-	if ( c > MAX_PACKETLEN ) {
-		Com_Error( ERR_DROP, "MAX_PACKETLEN" );
-	}
-
-	// generate a sequence of "random" numbers
-	for (i = 0 ; i < c ; i++) {
-		seed = (119 * seed + 1);
-		seq[i] = seed;
-	}
-
-	// byte xor the data after the header
-	for (i = SCRAMBLE_START ; i < c ; i++) {
-		buf->data[i] ^= seq[i];
-	}
-
-	// transpose each character in reverse order
-	for ( mask = 1 ; mask < c-SCRAMBLE_START ; mask = ( mask << 1 ) + 1 ) {
-	}
-	mask >>= 1;
-	for (i = c-1 ; i >= SCRAMBLE_START ; i--) {
-		j = SCRAMBLE_START + ( seq[i] & mask );
-		temp = buf->data[j];
-		buf->data[j] = buf->data[i];
-		buf->data[i] = temp;
-	}
-}
-#endif
 
 /*
 =================
@@ -376,11 +287,10 @@ qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 			, sequence );
 		}
 	}
-	
 
 	//
-	// if this is the final framgent of a reliable message,
-	// bump incoming_reliable_sequence 
+	// if this is the final fragment of a reliable message,
+	// bump incoming_reliable_sequence
 	//
 	if ( fragmented ) {
 		// TTimo
@@ -439,14 +349,12 @@ qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 
 		Com_Memcpy( msg->data + 4, chan->fragmentBuffer, chan->fragmentLength );
 		msg->cursize = chan->fragmentLength + 4;
-		chan->fragmentLength = 0;
 		msg->readcount = 4;	// past the sequence number
 		msg->bit = 32;	// past the sequence number
 
-		// TTimo
-		// clients were not acking fragmented messages
+		chan->fragmentLength = 0;
 		chan->incomingSequence = sequence;
-		
+
 		return qtrue;
 	}
 
@@ -461,14 +369,10 @@ qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 
 //==============================================================================
 
-/*
-===================
-NET_CompareBaseAdr
 
-Compares without the port
-===================
-*/
-qbool	NET_CompareBaseAdr (netadr_t a, netadr_t b)
+// compares without the port
+
+qbool NET_CompareBaseAdr( const netadr_t& a, const netadr_t& b )
 {
 	if (a.type != b.type)
 		return qfalse;
@@ -477,15 +381,18 @@ qbool	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 		return qtrue;
 
 	if (a.type == NA_IP)
-	{
-		if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3])
-			return qtrue;
-		return qfalse;
-	}
+		return (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3]);
 
 	Com_Printf ("NET_CompareBaseAdr: bad address type\n");
 	return qfalse;
 }
+
+
+qbool NET_CompareAdr( const netadr_t& a, const netadr_t& b )
+{
+	return (NET_CompareBaseAdr(a, b) && (a.port == b.port));
+}
+
 
 const char* NET_AdrToString( const netadr_t& a )
 {
@@ -506,29 +413,9 @@ const char* NET_AdrToString( const netadr_t& a )
 }
 
 
-qbool	NET_CompareAdr (netadr_t a, netadr_t b)
+qbool NET_IsLocalAddress( const netadr_t& a )
 {
-	if (a.type != b.type)
-		return qfalse;
-
-	if (a.type == NA_LOOPBACK)
-		return qtrue;
-
-	if (a.type == NA_IP)
-	{
-		if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3] && a.port == b.port)
-			return qtrue;
-		return qfalse;
-	}
-
-	Com_Printf ("NET_CompareAdr: bad address type\n");
-	return qfalse;
-}
-
-
-qbool NET_IsLocalAddress( netadr_t adr )
-{
-	return (adr.type == NA_LOOPBACK);
+	return (a.type == NA_LOOPBACK);
 }
 
 
@@ -558,12 +445,9 @@ typedef struct {
 loopback_t	loopbacks[2];
 
 
-qbool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message)
+qbool NET_GetLoopPacket( netsrc_t sock, netadr_t *net_from, msg_t *net_message)
 {
-	int		i;
-	loopback_t	*loop;
-
-	loop = &loopbacks[sock];
+	loopback_t* loop = &loopbacks[sock];
 
 	if (loop->send - loop->get > MAX_LOOPBACK)
 		loop->get = loop->send - MAX_LOOPBACK;
@@ -571,19 +455,18 @@ qbool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message)
 	if (loop->get >= loop->send)
 		return qfalse;
 
-	i = loop->get & (MAX_LOOPBACK-1);
+	int i = loop->get & (MAX_LOOPBACK-1);
 	loop->get++;
 
-	Com_Memcpy (net_message->data, loop->msgs[i].data, loop->msgs[i].datalen);
+	Com_Memcpy( net_message->data, loop->msgs[i].data, loop->msgs[i].datalen );
 	net_message->cursize = loop->msgs[i].datalen;
-	Com_Memset (net_from, 0, sizeof(*net_from));
+	Com_Memset( net_from, 0, sizeof(*net_from) );
 	net_from->type = NA_LOOPBACK;
 	return qtrue;
-
 }
 
 
-static void NET_SendLoopPacket( netsrc_t sock, int length, const void *data, netadr_t to )
+static void NET_SendLoopPacket( netsrc_t sock, int length, const void* data, const netadr_t& to )
 {
 	loopback_t* loop = &loopbacks[sock^1];
 
@@ -649,7 +532,7 @@ void NET_FlushPacketQueue()
 }
 
 
-void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to )
+void NET_SendPacket( netsrc_t sock, int length, const void* data, const netadr_t& to )
 {
 	// sequenced packets are shown in netchan, so just show OOB
 	if ( showpackets->integer && *(int *)data == -1 ) {
@@ -699,17 +582,14 @@ void QDECL NET_OutOfBandPrint( netsrc_t sock, const netadr_t& adr, const char* f
 	NET_SendPacket( sock, n, string, adr );
 }
 
-/*
-===============
-NET_OutOfBandPrint
 
-Sends a data message in an out-of-band datagram (only used for "connect")
-================
-*/
-void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len ) {
-	byte		string[MAX_MSGLEN*2];
-	int			i;
-	msg_t		mbuf;
+// sends a data message in an out-of-band datagram (only used for "connect")
+
+void QDECL NET_OutOfBandData( netsrc_t sock, const netadr_t& adr, const byte* data, int len )
+{
+	assert( len+4 < MAX_MSGLEN );
+
+	byte string[MAX_MSGLEN];
 
 	// set the header
 	string[0] = 0xff;
@@ -717,46 +597,36 @@ void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len
 	string[2] = 0xff;
 	string[3] = 0xff;
 
-	for(i=0;i<len;i++) {
-		string[i+4] = format[i];
-	}
+	for (int i = 0; i < len; ++i)
+		string[i+4] = data[i];
 
+	msg_t mbuf;
 	mbuf.data = string;
 	mbuf.cursize = len+4;
-	Huff_Compress( &mbuf, 12);
-	// send the datagram
+	Huff_Compress( &mbuf, 12 );
+
 	NET_SendPacket( sock, mbuf.cursize, mbuf.data, adr );
 }
 
-/*
-=============
-NET_StringToAdr
 
-Traps "localhost" for loopback, passes everything else to system
-=============
-*/
-qbool	NET_StringToAdr( const char *s, netadr_t *a ) {
-	qbool	r;
-	char	base[MAX_STRING_CHARS];
-	char	*port;
+// traps "localhost" for loopback, passes everything else to system
 
-	if (!strcmp (s, "localhost")) {
-		Com_Memset (a, 0, sizeof(*a));
+qbool NET_StringToAdr( const char* s, netadr_t* a )
+{
+	if (!strcmp(s, "localhost")) {
+		Com_Memset( a, 0, sizeof(*a) );
 		a->type = NA_LOOPBACK;
 		return qtrue;
 	}
 
-	// look for a port number
+	char base[MAX_STRING_CHARS];
 	Q_strncpyz( base, s, sizeof( base ) );
-	port = strstr( base, ":" );
-	if ( port ) {
-		*port = 0;
-		port++;
-	}
 
-	r = Sys_StringToAdr( base, a );
+	char* port = strstr( base, ":" );
+	if (port)
+		*port++ = 0;
 
-	if ( !r ) {
+	if (!Sys_StringToAdr( base, a )) {
 		a->type = NA_BAD;
 		return qfalse;
 	}
