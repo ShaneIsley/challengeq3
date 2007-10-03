@@ -349,7 +349,7 @@ extern const vec4_t colorWhite;
 #define COLOR_MAGENTA	'6'
 #define COLOR_WHITE		'7'
 
-#define MAX_CCODES	62
+#define MAX_CCODES	(10 + 25) // id's 0-7, OSP's 8+9, CPMA's a-y
 int ColorIndex( char ccode );
 
 #define S_COLOR_BLACK	"^0"
@@ -361,10 +361,10 @@ int ColorIndex( char ccode );
 #define S_COLOR_MAGENTA	"^6"
 #define S_COLOR_WHITE	"^7"
 
-extern const vec4_t	g_color_table[MAX_CCODES];
+extern const vec4_t g_color_table[MAX_CCODES];
 
-#define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
-#define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
+#define MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
+#define MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
 
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
@@ -374,29 +374,28 @@ struct cplane_s;
 extern const vec3_t vec3_origin;
 extern const vec3_t axisDefault[3];
 
-#define	nanmask (255<<23)
+#define nanmask (255<<23)
 
-#define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
+#define IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
 #if idppc
 
 static ID_INLINE float Q_rsqrt( float number ) {
-		float x = 0.5f * number;
-                float y;
-#ifdef __GNUC__            
-                asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
+	float x = 0.5f * number;
+	float y;
+#ifdef __GNUC__
+	asm("frsqrte %0,%1" : "=f" (y) : "f" (number));
 #else
-		y = __frsqrte( number );
+	y = __frsqrte( number );
 #endif
-		return y * (1.5f - (x * y * y));
-	}
+	return y * (1.5f - (x * y * y));
+}
 
-#ifdef __GNUC__            
+#ifdef __GNUC__
 static ID_INLINE float Q_fabs(float x) {
-    float abs_x;
-    
-    asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
-    return abs_x;
+	float abs_x;
+	asm("fabs %0,%1" : "=f" (abs_x) : "f" (x));
+	return abs_x;
 }
 #else
 #define Q_fabs __fabsf
@@ -416,50 +415,26 @@ signed short ClampShort( int i );
 int DirToByte( vec3_t dir );
 void ByteToDir( int b, vec3_t dir );
 
-#if	1
-
 #define DotProduct(x,y)			((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define VectorSubtract(a,b,c)	((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
 #define VectorAdd(a,b,c)		((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
 #define VectorCopy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
-#define	VectorScale(v, s, o)	((o)[0]=(v)[0]*(s),(o)[1]=(v)[1]*(s),(o)[2]=(v)[2]*(s))
-#define	VectorMA(v, s, b, o)	((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
-
-#else
-
-#define DotProduct(x,y)			_DotProduct(x,y)
-#define VectorSubtract(a,b,c)	_VectorSubtract(a,b,c)
-#define VectorAdd(a,b,c)		_VectorAdd(a,b,c)
-#define VectorCopy(a,b)			_VectorCopy(a,b)
-#define	VectorScale(v, s, o)	_VectorScale(v,s,o)
-#define	VectorMA(v, s, b, o)	_VectorMA(v,s,b,o)
-
-#endif
+#define VectorScale(v, s, o)	((o)[0]=(v)[0]*(s),(o)[1]=(v)[1]*(s),(o)[2]=(v)[2]*(s))
+#define VectorMA(v, s, b, o)	((o)[0]=(v)[0]+(b)[0]*(s),(o)[1]=(v)[1]+(b)[1]*(s),(o)[2]=(v)[2]+(b)[2]*(s))
 
 #ifdef Q3_VM
-#ifdef VectorCopy
 #undef VectorCopy
 // this is a little hack to get more efficient copies in our interpreter
 typedef struct {
 	float	v[3];
 } vec3struct_t;
-#define VectorCopy(a,b)	(*(vec3struct_t *)b=*(vec3struct_t *)a)
-#endif
+#define VectorCopy(a,b) (*(vec3struct_t *)b=*(vec3struct_t *)a)
 #endif
 
 #define VectorClear(a)			((a)[0]=(a)[1]=(a)[2]=0)
 #define VectorNegate(a,b)		((b)[0]=-(a)[0],(b)[1]=-(a)[1],(b)[2]=-(a)[2])
 #define VectorSet(v, x, y, z)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z))
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
-
-#define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
-// just in case you do't want to use the macros
-vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
-void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
-void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out );
-void _VectorCopy( const vec3_t in, vec3_t out );
-void _VectorScale( const vec3_t in, float scale, vec3_t out );
-void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc );
 
 unsigned ColorBytes3 (float r, float g, float b);
 unsigned ColorBytes4 (float r, float g, float b, float a);
