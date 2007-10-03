@@ -35,7 +35,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <dinput.h>
 #include <dsound.h>
 #include <winsock.h>
-#include <wsipx.h>
 
 void	IN_MouseEvent (int mstate);
 

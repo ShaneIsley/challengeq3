@@ -129,8 +129,6 @@ typedef enum {
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
-	NA_IPX,
-	NA_BROADCAST_IPX
 } netadrtype_t;
 
 typedef enum {
@@ -139,38 +137,34 @@ typedef enum {
 } netsrc_t;
 
 typedef struct {
-	netadrtype_t	type;
-
-	byte	ip[4];
-	byte	ipx[10];
-
-	unsigned short	port;
+	netadrtype_t type;
+	byte ip[4];
+	unsigned short port;
 } netadr_t;
 
-void		NET_Init( void );
-void		NET_Shutdown( void );
-void		NET_Restart( void );
-void		NET_Config( qbool enableNetworking );
-void		NET_FlushPacketQueue(void);
-void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
-void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...);
-void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
+void NET_Init( void );
+void NET_Shutdown( void );
+void NET_Restart( void );
+void NET_Config( qbool enableNetworking );
+void NET_FlushPacketQueue( void );
+void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to );
+void QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ... );
+void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
-qbool	NET_CompareAdr (netadr_t a, netadr_t b);
-qbool	NET_CompareBaseAdr (netadr_t a, netadr_t b);
-qbool	NET_IsLocalAddress (netadr_t adr);
+qbool NET_CompareAdr (netadr_t a, netadr_t b);
+qbool NET_CompareBaseAdr (netadr_t a, netadr_t b);
+qbool NET_IsLocalAddress (netadr_t adr);
 const char* NET_AdrToString( const netadr_t& a );
-qbool	NET_StringToAdr ( const char *s, netadr_t *a);
-qbool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
-void		NET_Sleep(int msec);
+qbool NET_StringToAdr ( const char *s, netadr_t *a);
+qbool NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
+void NET_Sleep(int msec);
 
 
-#define	MAX_MSGLEN				16384		// max length of a message, which may
-											// be fragmented into multiple packets
+#define MAX_MSGLEN 16384 // max length of a message, which may be fragmented into multiple packets
 
-#define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
-#define MAX_DOWNLOAD_BLKSIZE		2048	// 2048 byte block chunks
- 
+#define MAX_DOWNLOAD_WINDOW		8		// max of eight download frames
+#define MAX_DOWNLOAD_BLKSIZE	2048	// 2048 byte block chunks
+
 
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression

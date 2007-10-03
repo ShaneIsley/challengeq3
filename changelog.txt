@@ -11,6 +11,10 @@ removed support for BMP and PCX
 
 removed fs_cdpath, fs_copyfiles, touchfile
 
+removed support for IPX
+
+removed in_logitechbug
+
 updated cpu detection
 
 sped up map loading 25% by rewriting ScanAndLoadShaderFiles competently
