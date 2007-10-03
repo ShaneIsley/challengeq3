@@ -228,14 +228,13 @@ main window procedure
 ====================
 */
 extern cvar_t *in_mouse;
-extern cvar_t *in_logitechbug;
+
 LONG WINAPI MainWndProc (
     HWND    hWnd,
     UINT    uMsg,
     WPARAM  wParam,
     LPARAM  lParam)
 {
-	static qbool flip = qtrue;
 	int zDelta, i;
 
 	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/winui/windowsuserinterface/userinput/mouseinput/aboutmouseinput.asp
@@ -271,39 +270,21 @@ LONG WINAPI MainWndProc (
 		if (in_mouse->integer != 1 || (!r_fullscreen->integer && (cls.keyCatchers & KEYCATCH_CONSOLE)))
 		{
 			// 120 increments, might be 240 and multiples if wheel goes too fast
-			// NOTE Logitech: logitech drivers are screwed and send the message twice?
-			//   could add a cvar to interpret the message as successive press/release events
 			zDelta = ( short ) HIWORD( wParam ) / 120;
 			if ( zDelta > 0 )
 			{
 				for(i=0; i<zDelta; i++)
 				{
-					if (!in_logitechbug->integer)
-					{
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
-					}
-					else
-					{
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELUP, flip, 0, NULL );
-						flip = !flip;
-					}
+					Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELUP, qtrue, 0, NULL );
+					Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELUP, qfalse, 0, NULL );
 				}
 			}
 			else
 			{
 				for(i=0; i<-zDelta; i++)
 				{
-					if (!in_logitechbug->integer)
-					{
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
-					}
-					else
-					{
-						Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELDOWN, flip, 0, NULL );
-						flip = !flip;
-					}
+					Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELDOWN, qtrue, 0, NULL );
+					Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MWHEELDOWN, qfalse, 0, NULL );
 				}
 			}
 			// when an application processes the WM_MOUSEWHEEL message, it must return zero

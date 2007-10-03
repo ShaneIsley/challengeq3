@@ -95,7 +95,6 @@ cvar_t	*in_midichannel;
 cvar_t	*in_mididevice;
 
 cvar_t	*in_mouse;
-cvar_t  *in_logitechbug;
 cvar_t	*in_joystick;
 cvar_t	*in_joyBallScale;
 cvar_t	*in_debugJoystick;
@@ -653,8 +652,7 @@ void IN_Init( void ) {
 	Cmd_AddCommand( "midiinfo", MidiInfo_f );
 
 	// mouse variables
-  in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE|CVAR_LATCH);
-	in_logitechbug  = Cvar_Get ("in_logitechbug", "0", CVAR_ARCHIVE);
+	in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE|CVAR_LATCH);
 
 	// joystick variables
 	in_joystick				= Cvar_Get ("in_joystick",				"0",		CVAR_ARCHIVE|CVAR_LATCH);
