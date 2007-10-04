@@ -653,11 +653,6 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps );
 
 
-// g_dmflags->integer flags
-#define	DF_NO_FALLING			8
-#define DF_FIXED_FOV			16
-#define	DF_NO_FOOTSTEPS			32
-
 // content masks
 #define	MASK_ALL				(-1)
 #define	MASK_SOLID				(CONTENTS_SOLID)
