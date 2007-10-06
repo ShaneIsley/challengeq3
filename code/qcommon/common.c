@@ -2700,7 +2700,7 @@ void Com_Shutdown(void)
 
 /*
 =====================
-KHB !!!  see if this is still qtrue - even vc might actually have a bug fixed in 8 years  :P
+KHB !!!  see if this is still true - even vc might actually have a bug fixed in 8 years  :P
 
 the msvc acos doesn't always return a value between -PI and PI:
 
@@ -2734,6 +2734,8 @@ float Q_acos(float c) {
 command line completion
 ===========================================
 */
+
+#if I_EVER_NAG_TIMBO_INTO_FIXING_THIS
 
 /*
 ==================
@@ -3036,3 +3038,143 @@ void Field_AutoComplete( field_t *field )
 
 	Field_CompleteCommand( completionField->buffer, qtrue, qtrue );
 }
+
+
+#else
+// use the id tab-completion code, which doesn't have all the cool stuff timbo did,
+// but also doesn't have the bugs he added (tho it has plenty of its own :P)
+
+void Field_Clear( field_t *edit ) {
+  memset(edit->buffer, 0, MAX_EDIT_LINE);
+	edit->cursor = 0;
+	edit->scroll = 0;
+}
+
+static const char *completionString;
+static char shortestMatch[MAX_TOKEN_CHARS];
+static int	matchCount;
+// field we are working on, passed to Field_CompleteCommand (&g_consoleCommand for instance)
+static field_t *completionField;
+
+static void FindMatches( const char *s ) {
+	int		i;
+
+	if ( Q_stricmpn( s, completionString, strlen( completionString ) ) ) {
+		return;
+	}
+	matchCount++;
+	if ( matchCount == 1 ) {
+		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
+		return;
+	}
+
+	// cut shortestMatch to the amount common with s
+	for ( i = 0 ; s[i] ; i++ ) {
+		if ( tolower(shortestMatch[i]) != tolower(s[i]) ) {
+			shortestMatch[i] = 0;
+		}
+	}
+}
+
+static void PrintMatches( const char *s ) {
+	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
+		Com_Printf( "    %s\n", s );
+	}
+}
+
+static void keyConcatArgs( void ) {
+	int		i;
+	char	*arg;
+
+	for ( i = 1 ; i < Cmd_Argc() ; i++ ) {
+		Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
+		arg = Cmd_Argv( i );
+		while (*arg) {
+			if (*arg == ' ') {
+				Q_strcat( completionField->buffer, sizeof( completionField->buffer ),  "\"");
+				break;
+			}
+			arg++;
+		}
+		Q_strcat( completionField->buffer, sizeof( completionField->buffer ),  Cmd_Argv( i ) );
+		if (*arg == ' ') {
+			Q_strcat( completionField->buffer, sizeof( completionField->buffer ),  "\"");
+		}
+	}
+}
+
+static void ConcatRemaining( const char *src, const char *start ) {
+	const char *str;
+
+	str = strstr(src, start);
+	if (!str) {
+		keyConcatArgs();
+		return;
+	}
+
+	str += strlen(start);
+	Q_strcat( completionField->buffer, sizeof( completionField->buffer ), str);
+}
+
+/*
+perform Tab expansion
+NOTE TTimo this was originally client code only
+  moved to common code when writing tty console for *nix dedicated server
+*/
+void Field_CompleteCommand( field_t *field ) {
+	field_t		temp;
+
+	completionField = field;
+
+	// only look at the first token for completion purposes
+	Cmd_TokenizeString( completionField->buffer );
+
+	completionString = Cmd_Argv(0);
+	if ( completionString[0] == '\\' || completionString[0] == '/' ) {
+		completionString++;
+	}
+	matchCount = 0;
+	shortestMatch[0] = 0;
+
+	if ( strlen( completionString ) == 0 ) {
+		return;
+	}
+
+	Cmd_CommandCompletion( FindMatches );
+	Cvar_CommandCompletion( FindMatches );
+
+	if ( matchCount == 0 ) {
+		return;	// no matches
+	}
+
+	Com_Memcpy(&temp, completionField, sizeof(field_t));
+
+	if ( matchCount == 1 ) {
+		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "\\%s", shortestMatch );
+		if ( Cmd_Argc() == 1 ) {
+			Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
+		} else {
+			ConcatRemaining( temp.buffer, completionString );
+		}
+		completionField->cursor = strlen( completionField->buffer );
+		return;
+	}
+
+	// multiple matches, complete to shortest
+	Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "\\%s", shortestMatch );
+	completionField->cursor = strlen( completionField->buffer );
+	ConcatRemaining( temp.buffer, completionString );
+
+	Com_Printf( "]%s\n", completionField->buffer );
+
+	// run through again, printing matches
+	Cmd_CommandCompletion( PrintMatches );
+	Cvar_CommandCompletion( PrintMatches );
+}
+
+void Field_AutoComplete( field_t *field )
+{
+	Field_CompleteCommand( field );
+}
+
+#endif
