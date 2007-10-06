@@ -17,8 +17,12 @@ removed in_logitechbug
 
 updated cpu detection
 
+added TTF support
+
 sped up map loading 25% by rewriting ScanAndLoadShaderFiles competently
 whoever wrote the original clusterfuck owes me about 3 weeks of life  >:(
+
+fixed the patch collision epsilon bugs of 1.34
 
 
 12 Sep 07 - released as 1.34, since it was about time we did  :P

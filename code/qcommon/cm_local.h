@@ -187,6 +187,10 @@ void CM_BoxLeafnums_r( leafList_t *ll, int nodenum );
 
 const cmodel_t* CM_ClipHandleToModel( clipHandle_t handle );
 
+qbool BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 );
+qbool BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point );
+
+
 // cm_patch.c
 
 struct patchCollide_s* CM_GeneratePatchCollide( int width, int height, const vec3_t* points );

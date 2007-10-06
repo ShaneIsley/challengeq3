@@ -676,10 +676,8 @@ static void CM_TraceThroughLeaf( traceWork_t* tw, const cLeaf_t* leaf )
 			continue;
 		}
 
-		if ( !BoundsIntersect( tw->bounds[0], tw->bounds[1],
-					b->bounds[0], b->bounds[1] ) ) {
+		if (!BoundsIntersect( tw->bounds[0], tw->bounds[1], b->bounds[0], b->bounds[1] ))
 			continue;
-		}
 
 		CM_TraceThroughBrush( tw, b );
 		if ( !tw->trace.fraction ) {
@@ -706,7 +704,7 @@ static void CM_TraceThroughLeaf( traceWork_t* tw, const cLeaf_t* leaf )
 			if ( !(patch->contents & tw->contents) ) {
 				continue;
 			}
-			
+
 			CM_TraceThroughPatch( tw, patch );
 			if ( !tw->trace.fraction ) {
 				return;

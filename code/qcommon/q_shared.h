@@ -543,13 +543,6 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] );
 void SetPlaneSignbits( struct cplane_s *out );
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
 
-qbool BoundsIntersect(const vec3_t mins, const vec3_t maxs,
-		const vec3_t mins2, const vec3_t maxs2);
-qbool BoundsIntersectSphere(const vec3_t mins, const vec3_t maxs,
-		const vec3_t origin, vec_t radius);
-qbool BoundsIntersectPoint(const vec3_t mins, const vec3_t maxs,
-		const vec3_t origin);
-
 float	AngleMod(float a);
 float	LerpAngle (float from, float to, float frac);
 float	AngleSubtract( float a1, float a2 );
