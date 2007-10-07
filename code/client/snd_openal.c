@@ -486,11 +486,8 @@ typedef struct sentity_s
 
 static sentity_t entityList[MAX_GENTITIES];
 
-/*
-=================
-S_AL_SanitiseVector
-=================
-*/
+
+/* yeah, let's not actually FIX bugs, just pretend they don't exist. ffs.
 #define S_AL_SanitiseVector(v) _S_AL_SanitiseVector(v,__LINE__)
 static void _S_AL_SanitiseVector( vec3_t v, int line )
 {
@@ -500,6 +497,12 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 				"being passed to OpenAL at %s:%d -- zeroing\n", __FILE__, line );
 		VectorClear( v );
 	}
+}
+*/
+static void S_AL_SanitiseVector( const vec3_t v )
+{
+	if (Q_isnan( v[0] ) || Q_isnan( v[1] ) || Q_isnan( v[2] ))
+		Com_Printf( S_COLOR_YELLOW "WARNING: vector with one or more NaN components" );
 }
 
 
@@ -678,7 +681,7 @@ static void S_AL_SrcKill(srcHandle_t src)
 
 	srcList[src].sfx = 0;
 	srcList[src].lastUsedTime = 0;
-	srcList[src].priority = 0;
+	srcList[src].priority = SRCPRI_AMBIENT;
 	srcList[src].entity = -1;
 	srcList[src].channel = -1;
 	srcList[src].isActive = qfalse;
@@ -1546,7 +1549,7 @@ S_AL_Respatialize
 =================
 */
 static
-void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater )
+void S_AL_Respatialize( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater )
 {
 	float		velocity[3] = {0.0f, 0.0f, 0.0f};
 	float		orientation[6];

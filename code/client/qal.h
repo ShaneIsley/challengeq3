@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ALC_NO_PROTOTYPES
 #endif
 
-#if USE_LOCAL_HEADERS
+#if USE_OPENAL_LOCALH
 #include "../AL/al.h"
 #include "../AL/alc.h"
 #else
@@ -142,7 +142,9 @@ extern LPALCCAPTURECLOSEDEVICE qalcCaptureCloseDevice;
 extern LPALCCAPTURESTART qalcCaptureStart;
 extern LPALCCAPTURESTOP qalcCaptureStop;
 extern LPALCCAPTURESAMPLES qalcCaptureSamples;
+
 #else
+
 #define qalEnable alEnable
 #define qalDisable alDisable
 #define qalIsEnabled alIsEnabled
@@ -237,6 +239,7 @@ extern LPALCCAPTURESAMPLES qalcCaptureSamples;
 #define qalcCaptureStart alcCaptureStart
 #define qalcCaptureStop alcCaptureStop
 #define qalcCaptureSamples alcCaptureSamples
+
 #endif
 
 qbool QAL_Init(const char *libname);
