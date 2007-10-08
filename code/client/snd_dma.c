@@ -306,13 +306,19 @@ void S_Base_DisableSounds( void ) {
 	s_soundMuted = qtrue;
 }
 
-/*
-==================
-S_RegisterSound
 
-Creates a default buzz sound if the file can't be loaded
-==================
-*/
+static void S_memoryLoad( sfx_t* sfx )
+{
+	if ( !S_LoadSound ( sfx ) ) {
+		//Com_Printf( S_COLOR_YELLOW "WARNING: couldn't load sound: %s\n", sfx->soundName );
+		sfx->defaultSound = qtrue;
+	}
+	sfx->inMemory = qtrue;
+}
+
+
+// creates a default buzz sound if the file can't be loaded
+
 sfxHandle_t	S_Base_RegisterSound( const char *name, qbool compressed ) {
 	sfx_t	*sfx;
 
@@ -338,7 +344,7 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, qbool compressed ) {
 	sfx->inMemory = qfalse;
 	sfx->soundCompressed = compressed;
 
-  S_memoryLoad(sfx);
+	S_memoryLoad(sfx);
 
 	if ( sfx->defaultSound ) {
 		Com_Printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
@@ -368,14 +374,6 @@ void S_Base_BeginRegistration( void ) {
 	}
 }
 
-void S_memoryLoad(sfx_t	*sfx) {
-	// load the sound file
-	if ( !S_LoadSound ( sfx ) ) {
-//		Com_Printf( S_COLOR_YELLOW "WARNING: couldn't load sound: %s\n", sfx->soundName );
-		sfx->defaultSound = qtrue;
-	}
-	sfx->inMemory = qtrue;
-}
 
 //=============================================================================
 

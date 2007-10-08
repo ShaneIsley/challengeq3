@@ -196,7 +196,6 @@ void		SND_setup( void );
 
 void S_PaintChannels(int endtime);
 
-void S_memoryLoad(sfx_t *sfx);
 portable_samplepair_t *S_GetRawSamplePointer( void );
 
 // spatializes a channel
