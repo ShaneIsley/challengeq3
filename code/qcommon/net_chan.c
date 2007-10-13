@@ -497,7 +497,7 @@ static void NET_QueuePacket( int length, const void* data, netadr_t to, int offs
 	Com_Memcpy( pq->data, data, length );
 	pq->length = length;
 	pq->to = to;
-	pq->release = Sys_Milliseconds() + max(offset, 999);
+	pq->release = Sys_Milliseconds() + min(offset, 999);
 	pq->next = NULL;
 
 	if (!packetQueue) {
