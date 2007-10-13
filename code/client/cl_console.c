@@ -50,7 +50,6 @@ typedef struct {
 
 	int		times[NUM_CON_TIMES];	// cls.realtime time the line was generated
 								// for transparent notify lines
-	vec4_t	color;
 } console_t;
 
 extern	console_t	con;
@@ -378,10 +377,6 @@ void CL_ConsolePrint( char *txt ) {
 	}
 
 	if (!con.initialized) {
-		con.color[0] = 
-		con.color[1] = 
-		con.color[2] =
-		con.color[3] = 1.0f;
 		con.linewidth = -1;
 		Con_CheckResize ();
 		con.initialized = qtrue;
@@ -481,21 +476,16 @@ static void Con_DrawInput()
 
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 
-	Con_DrawShadowedChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']', con.color );
+	Con_DrawShadowedChar( con.xadjust, y, ']', colorWhite );
 
-	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
+	Field_Draw( &g_consoleField, con.xadjust + SMALLCHAR_WIDTH, y,
 		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
 }
 
 
-/*
-================
-Con_DrawNotify
+// draws the last few lines of output transparently over the game area
 
-Draws the last few lines of output transparently over the game top
-================
-*/
-void Con_DrawNotify (void)
+static void Con_DrawNotify()
 {
 	int		x, v;
 	short	*text;
@@ -569,6 +559,7 @@ void Con_DrawNotify (void)
 
 ///////////////////////////////////////////////////////////////
 
+#if 0 // not really finished with this yet
 
 static float CPMA_HUD_DrawChar( float x, float y, int ch )
 {
@@ -675,7 +666,7 @@ static void Con_DrawSolidConsole( float frac )
 
 		text = con.text + (row % con.totallines)*con.linewidth;
 
-/* lol - this can pass the 1Kverts surface limit now if you use a small enough font...  :P
+/* grr - this can pass the 1Kverts surface limit now if you use a small enough font...  :P
 		// since fonts are now texture-per-char, minimize the glBinds rather than the glColors
 		x = 0;
 		for (int i = 0; i < con.linewidth; ++i) {
@@ -688,7 +679,7 @@ static void Con_DrawSolidConsole( float frac )
 		re.SetColor( colorBlack );
 		x = 0;
 		for (int i = 0; i < con.linewidth; ++i) {
-			x += CPMA_HUD_DrawChar( 1 + x, y + 1, (text[i] & 0xFF) );
+			x += CPMA_HUD_DrawChar( 1 + x, 1 + y, (text[i] & 0xFF) );
 		}
 
 		re.SetColor( colorWhite );
@@ -708,6 +699,106 @@ static void Con_DrawSolidConsole( float frac )
 	re.SetColor( NULL );
 }
 
+#endif
+
+///////////////////////////////////////////////////////////////
+
+
+static void Con_DrawSolidConsole( float frac )
+{
+	int		i, x, y;
+	int		rows;
+	int		row;
+	vec4_t	color;
+
+	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
+	if (scanlines <= 0)
+		return;
+
+	// on wide screens, we will center the text
+	con.xadjust = 0;
+	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
+	con.xadjust += SMALLCHAR_WIDTH;
+
+	// draw the background
+	y = frac * SCREEN_HEIGHT - 2;
+	if ( y < 1 ) {
+		y = 0;
+	}
+	else {
+		//SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
+		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
+		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
+	}
+
+	MAKERGBA( color, 0.33f, 0.33f, 0.33f, 1.0 );
+	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
+
+	i = strlen( Q3_VERSION );
+	x = cls.glconfig.vidWidth;
+	while (--i >= 0) {
+		x -= SMALLCHAR_WIDTH;
+		SCR_DrawSmallChar( x, scanlines - (SMALLCHAR_HEIGHT * 1.5), Q3_VERSION[i] );
+	}
+
+	re.SetColor( NULL );
+	con.vislines = scanlines;
+	rows = (scanlines - SMALLCHAR_HEIGHT) / SMALLCHAR_HEIGHT;
+	y = scanlines - (SMALLCHAR_HEIGHT * 3);
+
+	// draw the console text from the bottom up
+	if (con.display != con.current)
+	{
+		// draw arrows to show the buffer is backscrolled
+		re.SetColor( colorBlack );
+		for (x = 0; x < con.linewidth; x += 4)
+			SCR_DrawSmallChar( con.xadjust + (x * SMALLCHAR_WIDTH), y, '^' );
+		y -= SMALLCHAR_HEIGHT;
+		--rows;
+	}
+
+	row = con.display;
+	if ( con.x == 0 ) {
+		row--;
+	}
+
+	int colorCode = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
+	re.SetColor( g_color_table[colorCode] );
+
+	for (i = 0; i < rows; ++i, --row, y -= SMALLCHAR_HEIGHT )
+	{
+		if (row < 0)
+			break;
+		if (con.current - row >= con.totallines) {
+			// past scrollback wrap point
+			continue;
+		}
+
+		const short* text = con.text + (row % con.totallines)*con.linewidth;
+
+		re.SetColor( colorBlack );
+		for (int i = 0; i < con.linewidth; ++i) {
+			SCR_DrawSmallChar( 1 + con.xadjust + i * SMALLCHAR_WIDTH, 1 + y, (text[i] & 0xFF) );
+		}
+
+		re.SetColor( colorWhite );
+		for (int i = 0; i < con.linewidth; ++i) {
+			if ((text[i] >> 8) != colorCode) {
+				colorCode = (text[i] >> 8);
+				re.SetColor( g_color_table[colorCode] );
+			}
+			SCR_DrawSmallChar( con.xadjust + i * SMALLCHAR_WIDTH, y, (text[i] & 0xFF) );
+		}
+	}
+
+	// draw the input prompt, user text, and cursor if desired
+	Con_DrawInput();
+
+	re.SetColor( NULL );
+}
+
+
+///////////////////////////////////////////////////////////////
 
 
 /*

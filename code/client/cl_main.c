@@ -2181,10 +2181,7 @@ void CL_InitRenderer( void )
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
 	g_consoleField.widthInChars = g_console_field_width;
 
-	//re.RegisterFont( "MC360", 8, &cls.fontConsole );
-	//re.RegisterFont( "DGL_EnterSansman", 8, &cls.fontConsole );
-	re.RegisterFont( "Vera", 8, &cls.fontConsole );
-	//re.RegisterFont( "M_12pt", 4, &cls.fontConsole );
+	//re.RegisterFont( "Vera", 8, &cls.fontConsole );
 }
 
 /*
