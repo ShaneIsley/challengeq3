@@ -641,14 +641,9 @@ void Cvar_Reset_f( void ) {
 	Cvar_Reset( Cmd_Argv( 1 ) );
 }
 
-/*
-============
-Cvar_WriteVariables
 
-Appends lines containing "set variable value" for all variables
-with the archive flag set to qtrue.
-============
-*/
+// appends lines containing "seta variable value" for all cvars with the archive flag set
+
 void Cvar_WriteVariables( fileHandle_t f ) {
 	cvar_t	*var;
 	char	buffer[1024];

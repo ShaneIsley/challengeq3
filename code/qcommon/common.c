@@ -2727,40 +2727,28 @@ float Q_acos(float c) {
 }
 
 
-// KHB !!!  this is client-only crap and has no business in here
-
 /*
 ===========================================
 command line completion
 ===========================================
 */
 
-#if I_EVER_NAG_TIMBO_INTO_FIXING_THIS
 
-/*
-==================
-Field_Clear
-==================
-*/
-void Field_Clear( field_t *edit ) {
+void Field_Clear( field_t* edit )
+{
 	memset(edit->buffer, 0, MAX_EDIT_LINE);
 	edit->cursor = 0;
 	edit->scroll = 0;
 }
 
-static const char *completionString;
+static const char* completionString;
 static char shortestMatch[MAX_TOKEN_CHARS];
 static int	matchCount;
 // field we are working on, passed to Field_AutoComplete(&g_consoleCommand for instance)
-static field_t *completionField;
+static field_t* completionField;
 
-/*
-===============
-FindMatches
-
-===============
-*/
-static void FindMatches( const char *s ) {
+static void FindMatches( const char *s )
+{
 	int		i;
 
 	if ( Q_stricmpn( s, completionString, strlen( completionString ) ) ) {
@@ -2785,30 +2773,24 @@ static void FindMatches( const char *s ) {
 	}
 }
 
-/*
-===============
-PrintMatches
 
-===============
-*/
-static void PrintMatches( const char *s ) {
+static void PrintMatches( const char *s )
+{
 	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
 		Com_Printf( "    %s\n", s );
 	}
 }
 
-/*
-===============
-PrintCvarMatches
 
-===============
-*/
-static void PrintCvarMatches( const char *s ) {
-
+static void PrintCvarMatches( const char *s )
+{
 	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
 		Com_Printf( "    %s = \"%s\"\n", s, Cvar_VariableString( s ) );
 	}
 }
+
+
+#if I_EVER_NAG_TIMBO_INTO_FIXING_THIS
 
 /*
 ===============
@@ -3041,46 +3023,8 @@ void Field_AutoComplete( field_t *field )
 
 
 #else
-// use the id tab-completion code, which doesn't have all the cool stuff timbo did,
-// but also doesn't have the bugs he added (tho it has plenty of its own :P)
-
-void Field_Clear( field_t *edit ) {
-  memset(edit->buffer, 0, MAX_EDIT_LINE);
-	edit->cursor = 0;
-	edit->scroll = 0;
-}
-
-static const char *completionString;
-static char shortestMatch[MAX_TOKEN_CHARS];
-static int	matchCount;
-// field we are working on, passed to Field_CompleteCommand (&g_consoleCommand for instance)
-static field_t *completionField;
-
-static void FindMatches( const char *s ) {
-	int		i;
-
-	if ( Q_stricmpn( s, completionString, strlen( completionString ) ) ) {
-		return;
-	}
-	matchCount++;
-	if ( matchCount == 1 ) {
-		Q_strncpyz( shortestMatch, s, sizeof( shortestMatch ) );
-		return;
-	}
-
-	// cut shortestMatch to the amount common with s
-	for ( i = 0 ; s[i] ; i++ ) {
-		if ( tolower(shortestMatch[i]) != tolower(s[i]) ) {
-			shortestMatch[i] = 0;
-		}
-	}
-}
-
-static void PrintMatches( const char *s ) {
-	if ( !Q_stricmpn( s, shortestMatch, strlen( shortestMatch ) ) ) {
-		Com_Printf( "    %s\n", s );
-	}
-}
+// use the id tab-completion code, which doesn't have all the nice stuff timbo did
+// but has a "familiar" set of bugs rather than a new and thus even-more-hated set
 
 static void keyConcatArgs( void ) {
 	int		i;
@@ -3169,7 +3113,7 @@ void Field_CompleteCommand( field_t *field ) {
 
 	// run through again, printing matches
 	Cmd_CommandCompletion( PrintMatches );
-	Cvar_CommandCompletion( PrintMatches );
+	Cvar_CommandCompletion( PrintCvarMatches );
 }
 
 void Field_AutoComplete( field_t *field )
