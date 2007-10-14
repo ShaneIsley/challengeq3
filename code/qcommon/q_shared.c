@@ -437,9 +437,9 @@ int ColorIndex( char ccode )
 {
 	if ( ccode >= '0' && ccode <= '9' ) {
 		return (ccode - '0');
-	} else if ( ccode >= 'a' && ccode <= 'z' ) {
+	} else if ( ccode >= 'a' && ccode <= 'y' ) {
 		return ((ccode - 'a') + 10);
-	} else if ( ccode >= 'A' && ccode <= 'Z' ) {
+	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
 		return ((ccode - 'A') + 10);
 	}
 
