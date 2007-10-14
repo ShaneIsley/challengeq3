@@ -126,23 +126,15 @@ void EA_Gesture(int client)
 	bi = &botinputs[client];
 
 	bi->actionflags |= ACTION_GESTURE;
-} //end of the function EA_Gesture
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-void EA_Command(int client, char *command)
+}
+
+
+void EA_Command(int client, const char* command)
 {
 	botimport.BotClientCommand(client, command);
-} //end of the function EA_Command
-//===========================================================================
-//
-// Parameter:			-
-// Returns:				-
-// Changes Globals:		-
-//===========================================================================
+}
+
+
 void EA_SelectWeapon(int client, int weapon)
 {
 	bot_input_t *bi;
