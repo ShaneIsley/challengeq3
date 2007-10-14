@@ -324,10 +324,10 @@ int COM_Compress( char* p )
 
 const char* COM_ParseExt( const char** data_p, qbool allowLineBreaks )
 {
-	int c = 0;
+	int c = 0, len = 0;
 	qbool hasNewLines = qfalse;
 	const char* data = *data_p;
-	int len = 0;
+
 	com_token[0] = 0;
 
 	// make sure incoming data is valid
@@ -489,45 +489,6 @@ void SkipRestOfLine( const char** data )
 	*data = p;
 }
 
-/*
-void Parse1DMatrix (char **buf_p, int x, float *m) {
-	char	*token;
-	int		i;
-
-	COM_MatchToken( buf_p, "(" );
-
-	for (i = 0 ; i < x ; i++) {
-		token = COM_Parse(buf_p);
-		m[i] = atof(token);
-	}
-
-	COM_MatchToken( buf_p, ")" );
-}
-
-void Parse2DMatrix (char **buf_p, int y, int x, float *m) {
-	int		i;
-
-	COM_MatchToken( buf_p, "(" );
-
-	for (i = 0 ; i < y ; i++) {
-		Parse1DMatrix (buf_p, x, m + i * x);
-	}
-
-	COM_MatchToken( buf_p, ")" );
-}
-
-void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m) {
-	int		i;
-
-	COM_MatchToken( buf_p, "(" );
-
-	for (i = 0 ; i < z ; i++) {
-		Parse2DMatrix (buf_p, y, x, m + i * x*y);
-	}
-
-	COM_MatchToken( buf_p, ")" );
-}
-*/
 
 /*
 ============================================================================
@@ -760,8 +721,6 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 
 /*
 ============
-va
-
 does a varargs printf into a temp buffer, so I don't need to have
 varargs versions of all text functions.
 FIXME: make this buffer size safe someday
@@ -769,10 +728,10 @@ FIXME: make this buffer size safe someday
 */
 const char* QDECL va( const char* format, ... )
 {
-	va_list argptr;
 	static char string[2][32000];	// in case va is called by nested functions
 	static int index = 0;
 	char* buf = string[index++ & 1];
+	va_list argptr;
 
 	va_start( argptr, format );
 	vsprintf( buf, format, argptr );
@@ -853,7 +812,7 @@ char *Info_ValueForKey( const char *s, const char *key ) {
 ===================
 Info_NextPair
 
-Used to itterate through all the key/value pairs in an info string
+Used to iterate through all the key/value pairs in an info string
 ===================
 */
 void Info_NextPair( const char **head, char *key, char *value ) {
@@ -1065,8 +1024,7 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 		return;
 	}
 
-	strcat (newi, s);
-	strcpy (s, newi);
+	strcat (s, newi);
 }
 
 /*
@@ -1120,69 +1078,3 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 
 
 //====================================================================
-
-/*
-==================
-Com_CharIsOneOfCharset
-==================
-*/
-static qbool Com_CharIsOneOfCharset( char c, char *set )
-{
-	int i;
-
-	for( i = 0; i < strlen( set ); i++ )
-	{
-		if( set[ i ] == c )
-			return qtrue;
-	}
-
-	return qfalse;
-}
-
-/*
-==================
-Com_SkipCharset
-==================
-*/
-char *Com_SkipCharset( char *s, char *sep )
-{
-	char	*p = s;
-
-	while( p )
-	{
-		if( Com_CharIsOneOfCharset( *p, sep ) )
-			p++;
-		else
-			break;
-	}
-
-	return p;
-}
-
-/*
-==================
-Com_SkipTokens
-==================
-*/
-char *Com_SkipTokens( char *s, int numTokens, char *sep )
-{
-	int		sepCount = 0;
-	char	*p = s;
-
-	while( sepCount < numTokens )
-	{
-		if( Com_CharIsOneOfCharset( *p++, sep ) )
-		{
-			sepCount++;
-			while( Com_CharIsOneOfCharset( *p, sep ) )
-				p++;
-		}
-		else if( *p == '\0' )
-			break;
-	}
-
-	if( sepCount == numTokens )
-		return p;
-	else
-		return s;
-}

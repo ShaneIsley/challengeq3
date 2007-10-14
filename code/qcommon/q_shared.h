@@ -165,18 +165,17 @@ typedef int		clipHandle_t;
 #define	YAW					1		// left / right
 #define	ROLL				2		// fall over
 
-// the game guarantees that no string from the network will ever
-// exceed MAX_STRING_CHARS
+// the game guarantees that no string from the network will ever exceed MAX_STRING_CHARS
 #define	MAX_STRING_CHARS	1024	// max length of a string passed to Cmd_TokenizeString
 #define	MAX_STRING_TOKENS	1024	// max tokens resulting from Cmd_TokenizeString
 #define	MAX_TOKEN_CHARS		1024	// max length of an individual token
 
 #define	MAX_INFO_STRING		1024
-#define	MAX_INFO_KEY		  1024
+#define	MAX_INFO_KEY		1024
 #define	MAX_INFO_VALUE		1024
 
 #define	BIG_INFO_STRING		8192  // used for system info key only
-#define	BIG_INFO_KEY		  8192
+#define	BIG_INFO_KEY		8192
 #define	BIG_INFO_VALUE		8192
 
 
@@ -298,7 +297,6 @@ typedef float vec_t;
 typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
-typedef vec_t vec5_t[5];
 
 typedef	int	fixed4_t;
 typedef	int	fixed8_t;
@@ -406,6 +404,7 @@ float Q_fabs( float f );
 float Q_rsqrt( float f );		// reciprocal square root
 #endif
 
+#define Square(x) ((x)*(x))
 #define SQRTFAST( x ) ( (x) * Q_rsqrt( x ) )
 
 signed char ClampChar( int i );
@@ -610,14 +609,7 @@ void COM_MatchToken( const char** data, const char* match );
 void SkipBracedSection( const char** data );
 void SkipRestOfLine( const char** data );
 
-//void Parse1DMatrix (char **buf_p, int x, float *m);
-//void Parse2DMatrix (char **buf_p, int y, int x, float *m);
-//void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m);
-
-void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
-
-char *Com_SkipTokens( char *s, int numTokens, char *sep );
-char *Com_SkipCharset( char *s, char *sep );
+void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 // mode parm for FS_FOpenFile
 typedef enum {
@@ -1162,8 +1154,6 @@ typedef struct {
 	int pitches[GLYPHS_PER_FONT]; // the size of the glyph WITHIN that texture
 } fontInfo_t;
 
-
-#define Square(x) ((x)*(x))
 
 // real time
 //=============================================
