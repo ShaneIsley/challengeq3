@@ -1,3 +1,11 @@
+
+/* the QVM interpreter has never, ever been used by anyone
+because aside from the bugs that meant it simply didn't work, it's just a bad idea anyway
+the only time you'd ever want it is if you're on a platform that doesn't SUPPORT compiled VMs
+*/
+
+#if defined(NO_VM_COMPILED)
+
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
@@ -915,3 +923,6 @@ done:
 	// return the result
 	return *opStack;
 }
+
+
+#endif

@@ -505,8 +505,8 @@ it will attempt to load as a system dll
 
 #define	STACK_SIZE	0x20000
 
-vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *), 
-				vmInterpret_t interpret ) {
+vm_t* VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *), vmInterpret_t interpret )
+{
 	vm_t		*vm;
 	vmHeader_t	*header;
 	int			i, remaining;
@@ -541,13 +541,6 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	Q_strncpyz( vm->name, module, sizeof( vm->name ) );
 	vm->systemCall = systemCalls;
 
-	// never allow dll loading with a demo
-	if ( interpret == VMI_NATIVE ) {
-		if ( Cvar_VariableValue( "fs_restrict" ) ) {
-			interpret = VMI_COMPILED;
-		}
-	}
-
 	if ( interpret == VMI_NATIVE ) {
 		// try to load as a system dll
 		Com_Printf( "Loading dll file %s.\n", vm->name );
@@ -555,9 +548,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 		if ( vm->dllHandle ) {
 			return vm;
 		}
-
-		Com_Printf( "Failed to load dll, looking for qvm.\n" );
-		interpret = VMI_COMPILED;
+		Com_DPrintf( "Failed to load dll, looking for qvm.\n" );
 	}
 
 	// load the image
@@ -572,24 +563,17 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	// copy or compile the instructions
 	vm->codeLength = header->codeLength;
 
+#if defined(NO_VM_COMPILED)
+	Com_Printf("Architecture doesn't have a bytecode compiler, using interpreter\n");
 	vm->compiled = qfalse;
-
-#ifdef NO_VM_COMPILED
-	if(interpret >= VMI_COMPILED) {
-		Com_Printf("Architecture doesn't have a bytecode compiler, using interpreter\n");
-		interpret = VMI_BYTECODE;
-	}
+	VM_PrepareInterpreter( vm, header );
 #else
-	if ( interpret >= VMI_COMPILED ) {
-		vm->compiled = qtrue;
-		VM_Compile( vm, header );
-	}
-#endif
-	// VM_Compile may have reset vm->compiled if compilation failed
+	vm->compiled = qtrue;
+	VM_Compile( vm, header );
+	// VM_Compile will have reset vm->compiled if compilation failed
 	if (!vm->compiled)
-	{
-		VM_PrepareInterpreter( vm, header );
-	}
+		Com_Error( ERR_FATAL, "ERROR: QVM compilation failed\n" );
+#endif
 
 	// free the original file
 	FS_FreeFile( header );
@@ -742,12 +726,11 @@ intptr_t	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
                             args[8],  args[9]);
 	} else {
 #if id386 // i386 calling convention doesn't need conversion
-#ifndef NO_VM_COMPILED
-		if ( vm->compiled )
-			r = VM_CallCompiled( vm, (int*)&callnum );
-		else
+#if !defined(NO_VM_COMPILED)
+		r = VM_CallCompiled( vm, (int*)&callnum );
+#else
+		r = VM_CallInterpreted( vm, (int*)&callnum );
 #endif
-			r = VM_CallInterpreted( vm, (int*)&callnum );
 #else
 		struct {
 			int callnum;
@@ -761,17 +744,16 @@ intptr_t	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
 			a.args[i] = va_arg(ap, int);
 		}
 		va_end(ap);
-#ifndef NO_VM_COMPILED
-		if ( vm->compiled )
-			r = VM_CallCompiled( vm, &a.callnum );
-		else
+#if !defined(NO_VM_COMPILED)
+		r = VM_CallCompiled( vm, &a.callnum );
+#else
+		r = VM_CallInterpreted( vm, &a.callnum );
 #endif
-			r = VM_CallInterpreted( vm, &a.callnum );
 #endif
 	}
 
 	if ( oldVM != NULL ) // bk001220 - assert(currentVM!=NULL) for oldVM==NULL
-	  currentVM = oldVM;
+		currentVM = oldVM;
 	return r;
 }
 

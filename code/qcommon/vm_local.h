@@ -175,8 +175,10 @@ extern	int		vm_debugLevel;
 void VM_Compile( vm_t *vm, vmHeader_t *header );
 int	VM_CallCompiled( vm_t *vm, int *args );
 
+#if defined(NO_VM_COMPILED)
 void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header );
-int	VM_CallInterpreted( vm_t *vm, int *args );
+int VM_CallInterpreted( vm_t *vm, int *args );
+#endif
 
 vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value );
 int VM_SymbolToValue( vm_t *vm, const char *symbol );
@@ -185,7 +187,6 @@ void VM_LogSyscalls( int *args );
 
 intptr_t VM_ArgPtr( intptr_t intValue );
 intptr_t VM_ExplicitArgPtr( const vm_t* vm, intptr_t intValue );
-//#define VMA(x) VM_ArgPtr(args[x])
 
 static ID_INLINE float _vmf(intptr_t x)
 {
