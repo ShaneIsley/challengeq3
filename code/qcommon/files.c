@@ -87,14 +87,6 @@ trying to restrict demo / oem versions of the game with code changes.  Demo / oe
 should be exactly the same executables as release versions, but with different data that
 automatically restricts where game media can come from to prevent add-ons from working.
 
-After the paths are initialized, quake will look for the product.txt file.  If not
-found and verified, the game will run in restricted mode.  In restricted mode, only 
-files contained in demoq3/pak0.pk3 will be available for loading, and only if the zip header is
-verified to not have been modified.  A single exception is made for q3config.cfg.  Files
-can still be written out in restricted mode, so screenshots and demos are allowed.
-Restricted mode can be tested by setting "+set fs_restrict 1" on the command line, even
-if there is a valid product.txt under the basepath or cdpath.
-
 If not running in restricted mode, and a file is not found in any local filesystem,
 an attempt will be made to download it and save it under the base path.
 
@@ -243,7 +235,6 @@ static	cvar_t		*fs_homepath;
 static	cvar_t		*fs_basepath;
 static	cvar_t		*fs_basegame;
 static	cvar_t		*fs_gamedirvar;
-static	cvar_t		*fs_restrict;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
@@ -1084,8 +1075,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
       //   this test can make the search fail although the file is in the directory
       // I had the problem on https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=8
       // turned out I used FS_FileExists instead
-			if ( fs_restrict->integer || fs_numServerPaks ) {
-
+			if ( fs_numServerPaks ) {
 				if ( Q_stricmp( filename + l - 4, ".cfg" )		// for config files
 					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
@@ -1856,19 +1846,18 @@ char **FS_ListFilteredFiles( const char *path, const char *extension, char *filt
 			char	**sysFiles;
 			char	*name;
 
-			// don't scan directories for files if we are pure or restricted
-			if ( fs_restrict->integer || fs_numServerPaks ) {
+			// don't scan directories for files if we are pure
+			if ( fs_numServerPaks )
 				continue;
-			} else {
-				netpath = FS_BuildOSPath( search->dir->path, search->dir->gamedir, path );
-				sysFiles = Sys_ListFiles( netpath, extension, filter, &numSysFiles, qfalse );
-				for ( i = 0 ; i < numSysFiles ; i++ ) {
-					// unique the match
-					name = sysFiles[i];
-					nfiles = FS_AddFileToList( name, list, nfiles );
-				}
-				Sys_FreeFileList( sysFiles );
+
+			netpath = FS_BuildOSPath( search->dir->path, search->dir->gamedir, path );
+			sysFiles = Sys_ListFiles( netpath, extension, filter, &numSysFiles, qfalse );
+			for ( i = 0 ; i < numSysFiles ; i++ ) {
+				// unique the match
+				name = sysFiles[i];
+				nfiles = FS_AddFileToList( name, list, nfiles );
 			}
+			Sys_FreeFileList( sysFiles );
 		}
 	}
 
@@ -2653,8 +2642,9 @@ static void FS_ReorderPurePaks( void )
 FS_Startup
 ================
 */
-static void FS_Startup( const char *gameName ) {
-        const char *homePath;
+static void FS_Startup( const char *gameName )
+{
+	const char *homePath;
 	cvar_t	*fs;
 
 	Com_Printf( "----- FS_Startup -----\n" );
@@ -2662,20 +2652,19 @@ static void FS_Startup( const char *gameName ) {
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_Cwd(), CVAR_INIT );
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
-  homePath = Sys_DefaultHomePath();
-  if (!homePath || !homePath[0]) {
+	homePath = Sys_DefaultHomePath();
+	if (!homePath || !homePath[0]) {
 		homePath = fs_basepath->string;
 	}
 	fs_homepath = Cvar_Get ("fs_homepath", homePath, CVAR_INIT );
 	fs_gamedirvar = Cvar_Get ("fs_game", APEXGAME, CVAR_INIT|CVAR_SYSTEMINFO );
-	fs_restrict = Cvar_Get ("fs_restrict", "", CVAR_INIT );
 
 	// add search path elements in reverse priority order
 	if (fs_basepath->string[0]) {
 		FS_AddGameDirectory( fs_basepath->string, gameName );
 	}
-  // fs_homepath is somewhat particular to *nix systems, only add if relevant
-  // NOTE: same filtering below for mods and basegame
+	// fs_homepath is somewhat particular to *nix systems, only add if relevant
+	// NOTE: same filtering below for mods and basegame
 	if (fs_basepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
 		FS_AddGameDirectory ( fs_homepath->string, gameName );
 	}
@@ -3144,7 +3133,6 @@ void FS_InitFilesystem( void ) {
 	Com_StartupVariable( "fs_homepath" );
 	Com_StartupVariable( "fs_game" );
 	Com_StartupVariable( "fs_copyfiles" );
-	Com_StartupVariable( "fs_restrict" );
 
 	// try to start up normally
 	FS_Startup( BASEGAME );
@@ -3199,7 +3187,6 @@ void FS_Restart( int checksumFeed ) {
 			Cvar_Set("fs_gamedirvar", lastValidGame);
 			lastValidBase[0] = '\0';
 			lastValidGame[0] = '\0';
-			Cvar_Set( "fs_restrict", "0" );
 			FS_Restart(checksumFeed);
 			Com_Error( ERR_DROP, "Invalid game folder\n" );
 			return;
