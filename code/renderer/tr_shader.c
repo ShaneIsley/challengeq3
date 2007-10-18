@@ -2657,11 +2657,8 @@ static void ScanAndLoadShaderFiles()
 
 	s_shaderText = RI_New<char>( sum + numShaders );
 
-// this is VERY wrong: the code AFTER this depends on the shaders being in the RIGHT order
-// because it uses buffers[i] too. basically, it "works" by sheer blind luck usually
-	// free in reverse order, so the temp files are all dumped
 	char* s = s_shaderText;
-	for (i = numShaders - 1; i >= 0; --i) {
+	for ( i = 0; i < numShaders; i++ ) {
 		Com_Memcpy( s, buffers[i], len[i] );
 		ri.FS_FreeFile( buffers[i] );
 		buffers[i] = s;
