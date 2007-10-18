@@ -28,34 +28,25 @@ cvar_t		*cvar_vars;
 cvar_t		*cvar_cheats;
 int			cvar_modifiedFlags;
 
-#define	MAX_CVARS	1024
-cvar_t		cvar_indexes[MAX_CVARS];
-int			cvar_numIndexes;
+#define MAX_CVARS 1024
+cvar_t cvar_indexes[MAX_CVARS];
+int cvar_numIndexes;
 
-#define FILE_HASH_SIZE		256
-static	cvar_t*		hashTable[FILE_HASH_SIZE];
+#define CVAR_HASH_SIZE 256
+static cvar_t* hashTable[CVAR_HASH_SIZE];
 
 cvar_t *Cvar_Set2( const char *var_name, const char *value, qbool force);
 
-/*
-================
-return a hash value for the filename
-================
-*/
-static long generateHashValue( const char *fname ) {
-	int		i;
-	long	hash;
-	char	letter;
 
-	hash = 0;
-	i = 0;
-	while (fname[i] != '\0') {
-		letter = tolower(fname[i]);
-		hash+=(long)(letter)*(i+119);
-		i++;
+static long Cvar_Hash( const char* s )
+{
+	long hash = 0;
+
+	for (int i = 0; s[i]; ++i) {
+		hash += (long)(tolower(s[i])) * (i+119);
 	}
-	hash &= (FILE_HASH_SIZE-1);
-	return hash;
+
+	return (hash & (CVAR_HASH_SIZE-1));
 }
 
 /*
@@ -79,18 +70,12 @@ static qbool Cvar_ValidateString( const char *s ) {
 	return qtrue;
 }
 
-/*
-============
-Cvar_FindVar
-============
-*/
-static cvar_t *Cvar_FindVar( const char *var_name ) {
-	cvar_t	*var;
-	long hash;
 
-	hash = generateHashValue(var_name);
-	
-	for (var=hashTable[hash] ; var ; var=var->hashNext) {
+static cvar_t* Cvar_FindVar( const char* var_name )
+{
+	long hash = Cvar_Hash(var_name);
+
+	for (cvar_t* var = hashTable[hash]; var; var = var->hashNext) {
 		if (!Q_stricmp(var_name, var->name)) {
 			return var;
 		}
@@ -285,7 +270,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 
 	var->flags = flags;
 
-	hash = generateHashValue(var_name);
+	hash = Cvar_Hash(var_name);
 	var->hashNext = hashTable[hash];
 	hashTable[hash] = var;
 

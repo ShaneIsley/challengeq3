@@ -31,35 +31,11 @@ static	shader_t		shader;
 static	shaderStage_t	stages[MAX_SHADER_STAGES];
 static	texModInfo_t	texMods[MAX_SHADER_STAGES][TR_MAX_TEXMODS];
 
-#define FILE_HASH_SIZE		1024
-static	shader_t*		hashTable[FILE_HASH_SIZE];
+#define FILE_HASH_SIZE 1024
+static shader_t* hashTable[FILE_HASH_SIZE];
 
-#define MAX_SHADERTEXT_HASH		2048
+#define MAX_SHADERTEXT_HASH 2048
 static char** shaderTextHashTable[MAX_SHADERTEXT_HASH];
-
-
-#ifdef __GNUCC__
-  #warning TODO: check if long is ok here
-#endif
-static long generateHashValue( const char *fname, const int size ) {
-	int		i;
-	long	hash;
-	char	letter;
-
-	hash = 0;
-	i = 0;
-	while (fname[i] != '\0') {
-		letter = tolower(fname[i]);
-		if (letter =='.') break;				// don't include extension
-		if (letter =='\\') letter = '/';		// damn path names
-		if (letter == PATH_SEP) letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
-		i++;
-	}
-	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
-	hash &= (size-1);
-	return hash;
-}
 
 
 static qbool ParseVector( const char** text, int count, float *v )
@@ -1897,7 +1873,7 @@ static shader_t* GeneratePermanentShader()
 
 	SortNewShader();
 
-	hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
+	hash = R_Hash(newShader->name, FILE_HASH_SIZE);
 	newShader->next = hashTable[hash];
 	hashTable[hash] = newShader;
 
@@ -2185,7 +2161,7 @@ static const char* FindShaderInShaderText( const char* shadername )
 	const char* p;
 	const char* token;
 
-	int hash = generateHashValue(shadername, MAX_SHADERTEXT_HASH);
+	int hash = R_Hash(shadername, MAX_SHADERTEXT_HASH);
 
 	for (int i = 0; shaderTextHashTable[hash][i]; i++) {
 		p = shaderTextHashTable[hash][i];
@@ -2265,7 +2241,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 
 	COM_StripExtension(name, strippedName, sizeof(strippedName));
 
-	hash = generateHashValue(strippedName, FILE_HASH_SIZE);
+	hash = R_Hash(strippedName, FILE_HASH_SIZE);
 
 	//
 	// see if the shader is already loaded
@@ -2276,13 +2252,12 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 		// have to check all default shaders otherwise for every call to R_FindShader
 		// with that same strippedName a new default shader is created.
 		if ( (sh->lightmapIndex == lightmapIndex || sh->defaultShader) &&
-		     !Q_stricmp(sh->name, strippedName)) {
-			// match found
+				!Q_stricmp(sh->name, strippedName)) {
 			return sh;
 		}
 	}
 
-/* no, uploading is done by, duh, UPLOAD
+/* no, uploading is done by, duh, UPLOAD, so let that worry about it
 	// make sure the render thread is stopped, because we are probably
 	// going to have to upload an image
 	if (r_smp->integer) {
@@ -2391,7 +2366,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 }
 
 
-// KHB !!!  this code is fucking stupid
+// KHB !!!  this code is stupid
 // shaders registered from raw data should be "anonymous" and unsearchable
 // because they don't have the supercession concept of "real" shaders
 
@@ -2402,7 +2377,7 @@ qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, image
 
 	// see if the shader is already loaded
 	const shader_t* sh;
-	int hash = generateHashValue(name, FILE_HASH_SIZE);
+	int hash = R_Hash(name, FILE_HASH_SIZE);
 	for (shader_t* sh = hashTable[hash]; sh; sh = sh->next) {
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
@@ -2618,6 +2593,7 @@ void R_ShaderList_f( void )
 
 // finds and loads all .shader files, combining them into
 // a single large text block that can be scanned for shader names
+// note that this does a lot of things very badly, e.g. still loads superceded shaders
 
 static void ScanAndLoadShaderFiles()
 {
@@ -2626,7 +2602,7 @@ static void ScanAndLoadShaderFiles()
 	int len[MAX_SHADER_FILES];
 
 	int i;
-	char *p;
+	char* p;
 
 	int numShaders;
 	char** shaderFiles = ri.FS_ListFiles( "scripts", ".shader", &numShaders );
@@ -2655,16 +2631,19 @@ static void ScanAndLoadShaderFiles()
 		sum += len[i];
 	}
 
-	s_shaderText = RI_New<char>( sum + numShaders );
+	s_shaderText = RI_New<char>( sum + numShaders + 1 );
 
 	char* s = s_shaderText;
 	for ( i = 0; i < numShaders; i++ ) {
 		Com_Memcpy( s, buffers[i], len[i] );
-		ri.FS_FreeFile( buffers[i] );
-		buffers[i] = s;
 		s += len[i];
 		*s++ = '\n';
 	}
+	*s = 0;
+
+	// the files have to be freed backwards because the hunk isn't a real MM
+	for (i = numShaders - 1; i >= 0; --i)
+		ri.FS_FreeFile( buffers[i] );
 
 	ri.FS_FreeFileList( shaderFiles );
 
@@ -2674,26 +2653,15 @@ static void ScanAndLoadShaderFiles()
 	const char* token;
 	int size = 0, hash;
 
-	for ( i = 0; i < numShaders; i++ ) {
-		// pointer to the first shader file
-		p = buffers[i];
-		// look for label
-		while (qtrue) {
-			token = COM_ParseExt( (const char**)&p, qtrue );
-			if ( token[0] == 0 )
-				break;
-
-			hash = generateHashValue( token, MAX_SHADERTEXT_HASH );
-			shaderTextHashTableSizes[hash]++;
-			size++;
-			SkipBracedSection( (const char**)&p );
-			// if we passed the pointer to the next shader file
-			if ( i < numShaders - 1 ) {
-				if ( p >= buffers[i+1] ) {
-					break;
-				}
-			}
-		}
+	p = s_shaderText;
+	while (p < s) {
+		token = COM_ParseExt( (const char**)&p, qtrue );
+		if ( token[0] == 0 )
+			break;
+		hash = R_Hash( token, MAX_SHADERTEXT_HASH );
+		shaderTextHashTableSizes[hash]++;
+		size++;
+		SkipBracedSection( (const char**)&p );
 	}
 
 	size += MAX_SHADERTEXT_HASH;
@@ -2706,27 +2674,15 @@ static void ScanAndLoadShaderFiles()
 
 	Com_Memset( shaderTextHashTableSizes, 0, sizeof(shaderTextHashTableSizes) );
 
-	for ( i = 0; i < numShaders; i++ ) {
-		// pointer to the first shader file
-		p = buffers[i];
-		// look for label
-		while (qtrue) {
-			char* oldp = p;
-			token = COM_ParseExt( (const char**)&p, qtrue );
-			if ( token[0] == 0 )
-				break;
-
-			hash = generateHashValue( token, MAX_SHADERTEXT_HASH );
-			shaderTextHashTable[hash][shaderTextHashTableSizes[hash]++] = oldp;
-
-			SkipBracedSection( (const char**)&p );
-			// if we passed the pointer to the next shader file
-			if ( i < numShaders - 1 ) {
-				if ( p >= buffers[i+1] ) {
-					break;
-				}
-			}
-		}
+	p = s_shaderText;
+	while (p < s) {
+		char* oldp = p;
+		token = COM_ParseExt( (const char**)&p, qtrue );
+		if ( token[0] == 0 )
+			break;
+		hash = R_Hash( token, MAX_SHADERTEXT_HASH );
+		shaderTextHashTable[hash][shaderTextHashTableSizes[hash]++] = oldp;
+		SkipBracedSection( (const char**)&p );
 	}
 }
 

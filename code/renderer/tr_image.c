@@ -57,32 +57,28 @@ extern "C"
 };
 
 
-#define FILE_HASH_SIZE	1024
-static	image_t*		hashTable[FILE_HASH_SIZE];
+// hash a filename as a case- and OS- insensitive string with no extension
 
+long R_Hash( const char* s, int size )
+{
+	char ch;
+	long hash = 0;
 
-/*
-================
-return a hash value for the filename
-================
-*/
-static long generateHashValue( const char *fname ) {
-	int		i;
-	long	hash;
-	char	letter;
-
-	hash = 0;
-	i = 0;
-	while (fname[i] != '\0') {
-		letter = tolower(fname[i]);
-		if (letter =='.') break;				// don't include extension
-		if (letter =='\\') letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
-		i++;
+	for (int i = 0; s[i]; ++i) {
+		ch = tolower(s[i]);
+		if (ch == '.')
+			break;			// don't include extension
+		if (ch =='\\')
+			ch = '/';		// damn path names
+		hash += (long)ch * (i+119);
 	}
-	hash &= (FILE_HASH_SIZE-1);
-	return hash;
+
+	return (hash & (size-1));
 }
+
+
+#define IMAGE_HASH_SIZE 1024
+static image_t* hashTable[IMAGE_HASH_SIZE];
 
 
 static byte s_intensitytable[256];
@@ -710,7 +706,7 @@ image_t* R_CreateImage( const char* name, byte* pic, int width, int height, GLen
 	// KHB  there are times we have no interest in naming an image at all (notably, font glyphs)
 	// but atm the rest of the system is too dependent on everything being named
 	//if (name) {
-		long hash = generateHashValue(name);
+		long hash = R_Hash(name, IMAGE_HASH_SIZE);
 		image->next = hashTable[hash];
 		hashTable[hash] = image;
 	//}
@@ -1747,7 +1743,7 @@ image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int
 	if (!name)
 		return NULL;
 
-	long hash = generateHashValue(name);
+	long hash = R_Hash(name, IMAGE_HASH_SIZE);
 
 	// see if the image is already loaded
 	//

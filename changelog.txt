@@ -20,8 +20,7 @@ updated cpu detection
 
 added TTF support
 
-sped up map loading about 25% by unwrecking ScanAndLoadShaderFiles
-the original clusterfuck has wasted weeks of our lifetimes...  >:(
+fixed a bunch of stuff in ScanAndLoadShaderFiles, but it's still crap
 
 fixed the patch collision epsilon bugs of 1.34
 
