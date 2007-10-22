@@ -776,10 +776,9 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   char  *basepath;
   char  *homepath;
   char  *pwdpath;
-  char  *cdpath;
   char  *gamedir;
   const char*  err = NULL;
-	
+
   // bk001206 - let's have some paranoia
   assert( name );
 
@@ -790,7 +789,6 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   pwdpath = Sys_Cwd();
   basepath = Cvar_VariableString( "fs_basepath" );
   homepath = Cvar_VariableString( "fs_homepath" );
-  cdpath = Cvar_VariableString( "fs_cdpath" );
   gamedir = Cvar_VariableString( "fs_game" );
 
   libHandle = try_dlopen(pwdpath, gamedir, fname, fqpath);
@@ -800,9 +798,6 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
 
   if(!libHandle && basepath)
     libHandle = try_dlopen(basepath, gamedir, fname, fqpath);
-
-  if(!libHandle && cdpath)
-    libHandle = try_dlopen(cdpath, gamedir, fname, fqpath);
 
   if(!libHandle) {
 #if 0 // don't abort -- ln
@@ -1382,10 +1377,6 @@ void Sys_ParseArgs( int argc, char* argv[] ) {
   }
 }
 
-#ifndef DEFAULT_BASEDIR
-# define DEFAULT_BASEDIR Sys_DefaultCDPath()
-#endif
-
 #include "../client/client.h"
 extern clientStatic_t cls;
 
@@ -1394,15 +1385,8 @@ int main ( int argc, char* argv[] )
   // int 	oldtime, newtime; // bk001204 - unused
   int   len, i;
   char  *cmdline;
-  char cdpath[PATH_MAX] = {0};
-  void Sys_SetDefaultCDPath(const char *path);
 
   Sys_ParseArgs( argc, argv );  // bk010104 - added this for support
-
-  strncat(cdpath, Sys_BinName( argv[0] ), sizeof(cdpath)-1);
-  Sys_SetDefaultCDPath(dirname(cdpath));
-
-  Sys_SetDefaultInstallPath(DEFAULT_BASEDIR);
 
   // merge the command line, this is kinda silly
   for (len = 1, i = 1; i < argc; i++)
