@@ -75,8 +75,8 @@ typedef qbool qboolean;
 
 
 #if defined(__cplusplus) && !defined(min)
-	template <typename T> __forceinline T min( T a, T b ) { return (a < b) ? a : b; }
-	template <typename T> __forceinline T max( T a, T b ) { return (a > b) ? a : b; }
+	template <typename T> __inline T min( T a, T b ) { return (a < b) ? a : b; }
+	template <typename T> __inline T max( T a, T b ) { return (a > b) ? a : b; }
 #endif
 
 
