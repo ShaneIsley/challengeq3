@@ -1131,11 +1131,8 @@ sysEvent_t Sys_GetEvent( void ) {
   s = Sys_ConsoleInput();
   if ( s )
   {
-    char  *b;
-    int   len;
-
-    len = strlen( s ) + 1;
-    b = Z_Malloc( len );
+    int len = strlen( s ) + 1;
+    char* b = (char*)Z_Malloc( len );
     strcpy( b, s );
     Sys_QueEvent( 0, SE_CONSOLE, 0, 0, len, b );
   }
@@ -1147,12 +1144,9 @@ sysEvent_t Sys_GetEvent( void ) {
   MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
   if ( Sys_GetPacket ( &adr, &netmsg ) )
   {
-    netadr_t    *buf;
-    int       len;
-
     // copy out to a seperate buffer for qeueing
-    len = sizeof( netadr_t ) + netmsg.cursize;
-    buf = Z_Malloc( len );
+    int len = sizeof( netadr_t ) + netmsg.cursize;
+    netadr_t* buf = (netadr_t*)Z_Malloc( len );
     *buf = adr;
     memcpy( buf+1, netmsg.data, netmsg.cursize );
     Sys_QueEvent( 0, SE_PACKET, 0, 0, len, buf );
