@@ -1374,14 +1374,13 @@ int main ( int argc, char* argv[] )
 {
   // int 	oldtime, newtime; // bk001204 - unused
   int   len, i;
-  char  *cmdline;
 
   Sys_ParseArgs( argc, argv );  // bk010104 - added this for support
 
   // merge the command line, this is kinda silly
   for (len = 1, i = 1; i < argc; i++)
     len += strlen(argv[i]) + 1;
-  cmdline = malloc(len);
+  char* cmdline = (char*)malloc(len);
   *cmdline = 0;
   for (i = 1; i < argc; i++)
   {
