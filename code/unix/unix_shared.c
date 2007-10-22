@@ -34,9 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
-// Used to determine CD Path
-static char cdPath[MAX_OSPATH];
-
 // Used to determine local installation path
 static char installPath[MAX_OSPATH];
 
@@ -351,16 +348,6 @@ char *Sys_Cwd( void )
 	cwd[MAX_OSPATH-1] = 0;
 
 	return cwd;
-}
-
-void Sys_SetDefaultCDPath(const char *path)
-{
-	Q_strncpyz(cdPath, path, sizeof(cdPath));
-}
-
-char *Sys_DefaultCDPath(void)
-{
-        return cdPath;
 }
 
 void Sys_SetDefaultInstallPath(const char *path)
