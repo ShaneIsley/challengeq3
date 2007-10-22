@@ -773,10 +773,6 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   void  (*dllEntry)( intptr_t (*syscallptr)(intptr_t, ...) );
   char  curpath[MAX_OSPATH];
   char  fname[MAX_OSPATH];
-  char  *basepath;
-  char  *homepath;
-  char  *pwdpath;
-  char  *gamedir;
   const char*  err = NULL;
 
   // bk001206 - let's have some paranoia
@@ -786,10 +782,10 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   snprintf (fname, sizeof(fname), "%s" ARCH_STRING DLL_EXT, name);
 
   // TODO: use fs_searchpaths from files.c
-  pwdpath = Sys_Cwd();
-  basepath = Cvar_VariableString( "fs_basepath" );
-  homepath = Cvar_VariableString( "fs_homepath" );
-  gamedir = Cvar_VariableString( "fs_game" );
+  const char* pwdpath = Sys_Cwd();
+  const char* basepath = Cvar_VariableString( "fs_basepath" );
+  const char* homepath = Cvar_VariableString( "fs_homepath" );
+  const char* gamedir = Cvar_VariableString( "fs_game" );
 
   libHandle = try_dlopen(pwdpath, gamedir, fname, fqpath);
 
