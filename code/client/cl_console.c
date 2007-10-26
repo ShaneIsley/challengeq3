@@ -614,7 +614,6 @@ static void Con_DrawSolidConsole( float frac )
 		y = 0;
 	}
 	else {
-		//SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
 		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
 	}
@@ -726,7 +725,6 @@ static void Con_DrawSolidConsole( float frac )
 		y = 0;
 	}
 	else {
-		//SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
 		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
 	}

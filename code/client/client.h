@@ -318,7 +318,6 @@ typedef struct {
 	glconfig_t	glconfig;
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
-	qhandle_t	consoleShader;
 
 	//fontInfo_t fontConsole;
 } clientStatic_t;
