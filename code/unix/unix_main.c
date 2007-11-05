@@ -522,7 +522,7 @@ void Sys_ConsoleInputInit( void )
               characters  EOF,  EOL,  EOL2, ERASE, KILL, REPRINT,
               STATUS, and WERASE, and buffers by lines.
      ISIG: when any of the characters  INTR,  QUIT,  SUSP,  or
-              DSUSP are received, generate the corresponding sig­
+              DSUSP are received, generate the corresponding sigï¿½
               nal
     */              
     tc.c_lflag &= ~(ECHO | ICANON);
@@ -809,8 +809,8 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   dllEntry = SDL_LoadFunction( libHandle, "dllEntry" );
   *entryPoint = SDL_LoadFunction( libHandle, "vmMain" );
 #else
-  dllEntry = dlsym( libHandle, "dllEntry" );
-  *entryPoint = dlsym( libHandle, "vmMain" );
+  dllEntry = (void (*)(intptr_t (*)(intptr_t, ...)))dlsym( libHandle, "dllEntry" );
+  *entryPoint = (intptr_t (*)(int, ...))dlsym( libHandle, "vmMain" );
 #endif
 
   if ( !*entryPoint || !dllEntry )
