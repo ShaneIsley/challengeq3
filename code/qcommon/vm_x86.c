@@ -100,7 +100,7 @@ int qftol0F7F( void );
 static	int		ftolPtr = (int)qftol0F7F;
 #endif // FTOL_PTR
 
-void doAsmCall( void );
+extern "C" void doAsmCall( void );
 static	int		asmCallPtr = (int)doAsmCall;
 #endif
 
@@ -201,7 +201,8 @@ static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
 
-static void callAsmCall()
+extern "C" {
+void callAsmCall()
 {
 	vm_t	*savedVM;
 	int		*callOpStack2;
@@ -217,6 +218,7 @@ static void callAsmCall()
 
 	currentVM = savedVM;
 }
+};
 
 // Note the C space function AsmCall is never actually called, and is in fact
 // arbitrarily named (though this is not true for the MSC version).  When a vm
