@@ -152,9 +152,9 @@ systemCall:
 	neg		eax
 	dec		eax
 
-	push    ebp
-	mov     ebp, esp
-	sub     esp, __LOCAL_SIZE
+	push	ebp
+	mov		ebp, esp
+	sub		esp, __LOCAL_SIZE
 
 	mov		dword ptr syscallNum, eax	// so C code can get at it
 	mov		dword ptr programStack, esi	// so C code can get at it
@@ -181,8 +181,8 @@ _asm {
 	pop		ecx
 	add		edi, 4		// we added the return value
 
-	mov     esp, ebp
-	pop     ebp
+	mov		esp, ebp
+	pop		ebp
 
 	ret
 }
@@ -201,7 +201,7 @@ static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
 
-void callAsmCall(void)
+static void callAsmCall()
 {
 	vm_t	*savedVM;
 	int		*callOpStack2;
@@ -215,11 +215,11 @@ void callAsmCall(void)
 	//VM_LogSyscalls((int *)((byte *)currentVM->dataBase + callProgramStack + 4) );
 	*(callOpStack2+1) = currentVM->systemCall( (intptr_t *)((byte *)currentVM->dataBase + callProgramStack + 4) );
 
- 	currentVM = savedVM;
+	currentVM = savedVM;
 }
 
 // Note the C space function AsmCall is never actually called, and is in fact
-// arbitrarily named (though this is not qtrue for the MSC version).  When a vm
+// arbitrarily named (though this is not true for the MSC version).  When a vm
 // makes a system call, control jumps straight to the doAsmCall label.
 void AsmCall( void ) {
 	asm( CMANG(doAsmCall) ":				\n\t" \
