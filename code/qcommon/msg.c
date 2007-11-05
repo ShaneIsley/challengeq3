@@ -784,15 +784,15 @@ void MSG_ReportChangeVectors_f( void ) {
 }
 
 typedef struct {
-	char	*name;
+	const char* name;
 	int		offset;
 	int		bits;		// 0 = float
 } netField_t;
 
 // using the stringizing operator to save typing...
-#define	NETF(x) #x,(int)&((entityState_t*)0)->x
+#define NETF(x) #x,(int)&((entityState_t*)0)->x
 
-netField_t	entityStateFields[] = 
+static netField_t entityStateFields[] =
 {
 { NETF(pos.trTime), 32 },
 { NETF(pos.trBase[0]), 0 },
@@ -1105,11 +1105,11 @@ plyer_state_t communication
 */
 
 // using the stringizing operator to save typing...
-#define	PSF(x) #x,(int)&((playerState_t*)0)->x
+#define PSF(x) #x,(int)&((playerState_t*)0)->x
 
-netField_t	playerStateFields[] = 
+static netField_t playerStateFields[] =
 {
-{ PSF(commandTime), 32 },				
+{ PSF(commandTime), 32 },
 { PSF(origin[0]), 0 },
 { PSF(origin[1]), 0 },
 { PSF(bobCycle), 8 },
@@ -1143,7 +1143,7 @@ netField_t	playerStateFields[] =
 { PSF(damagePitch), 8 },
 { PSF(damageCount), 8 },
 { PSF(generic1), 8 },
-{ PSF(pm_type), 8 },					
+{ PSF(pm_type), 8 },
 { PSF(delta_angles[0]), 16 },
 { PSF(delta_angles[2]), 16 },
 { PSF(torsoTimer), 12 },
