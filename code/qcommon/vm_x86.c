@@ -201,8 +201,7 @@ static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
 
-extern "C" {
-void callAsmCall()
+extern "C" void callAsmCall()
 {
 	vm_t	*savedVM;
 	int		*callOpStack2;
@@ -218,7 +217,6 @@ void callAsmCall()
 
 	currentVM = savedVM;
 }
-};
 
 // Note the C space function AsmCall is never actually called, and is in fact
 // arbitrarily named (though this is not true for the MSC version).  When a vm
