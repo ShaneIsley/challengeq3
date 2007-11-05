@@ -26,11 +26,15 @@ ifeq ($(COMPILE_PLATFORM),mingw32)
   endif
 endif
 
-BUILD_CLIENT     =
-BUILD_CLIENT_SMP =
 BUILD_SERVER     =
-BUILD_GAME_SO    =
-BUILD_GAME_QVM   =
+# the client is boned ATM
+BUILD_CLIENT     = 0
+# this should probably be deleted/merged anyway
+BUILD_CLIENT_SMP = 0
+# the baseq3 vm is worthless
+BUILD_GAME_QVM   = 0
+# .so is NEVER acceptable unless you're debugging locally
+BUILD_GAME_SO    = 0
 
 #############################################################################
 #
@@ -185,7 +189,7 @@ ifeq ($(PLATFORM),linux)
   endif
   endif
 
-  BASE_CFLAGS = -Wall -Weffc++ -Wold-style-cast -fno-strict-aliasing -Wimplicit -pipe
+  BASE_CFLAGS = -Wall -Weffc++ -fno-strict-aliasing -Wimplicit -pipe
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL=1
