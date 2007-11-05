@@ -96,8 +96,6 @@ int qftol0F7F( void );
 static	int		ftolPtr = (int)qftol0F7F;
 #endif // FTOL_PTR
 
-void doAsmCall( void );
-static	int		asmCallPtr = (int)doAsmCall;
 #endif
 
 
@@ -195,6 +193,8 @@ static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
 
+extern "C" {
+
 void callAsmCall()
 {
 	vm_t	*savedVM;
@@ -212,6 +212,7 @@ void callAsmCall()
 	currentVM = savedVM;
 }
 
+void doAsmCall();
 // Note the C space function AsmCall is never actually called, and is in fact
 // arbitrarily named (though this is not true for the MSC version).  When a vm
 // makes a system call, control jumps straight to the doAsmCall label.
@@ -248,7 +249,13 @@ void AsmCall( void ) {
 		: "ax", "di", "si", "cx" \
 	);
 }
+
+};
+
+static int asmCallPtr = (int)doAsmCall;
+
 #endif
+
 
 static int Constant4()
 {
