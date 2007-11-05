@@ -176,7 +176,7 @@ char *strlwr (char *s) {
 #define	MAX_FOUND_FILES	0x1000
 
 // bk001129 - new in 1.26
-void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, char **list, int *numfiles ) {
+static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, char *filter, char **list, int *numfiles ) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	DIR			*fdir;
@@ -232,14 +232,12 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs )
 {
 	struct dirent *d;
-	// char *p; // bk001204 - unused
 	DIR		*fdir;
 	qboolean dironly = wantsubs;
 	char		search[MAX_OSPATH];
 	int			nfiles;
 	char		**listCopy;
 	char		*list[MAX_FOUND_FILES];
-	//int			flag; // bk001204 - unused
 	int			i;
 	struct stat st;
 
@@ -256,7 +254,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		if (!nfiles)
 			return NULL;
 
-		listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+		listCopy = (char**)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -317,7 +315,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		return NULL;
 	}
 
-	listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	listCopy = (char**)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -340,7 +338,7 @@ void	Sys_FreeFileList( char **list ) {
 	Z_Free( list );
 }
 
-char *Sys_Cwd( void ) 
+const char* Sys_Cwd()
 {
 	static char cwd[MAX_OSPATH];
 
@@ -355,7 +353,7 @@ void Sys_SetDefaultInstallPath(const char *path)
 	Q_strncpyz(installPath, path, sizeof(installPath));
 }
 
-char *Sys_DefaultInstallPath(void)
+const char* Sys_DefaultInstallPath()
 {
 	if (*installPath)
 		return installPath;
