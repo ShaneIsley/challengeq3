@@ -261,7 +261,7 @@ typedef enum {
 } ha_pref;
 
 #ifdef HUNK_DEBUG
-#define Hunk_Alloc( size, preference )				Hunk_AllocDebug(size, preference, #size, __FILE__, __LINE__)
+#define Hunk_Alloc( size, preference ) Hunk_AllocDebug(size, preference, #size, __FILE__, __LINE__)
 void *Hunk_AllocDebug( int size, ha_pref preference, char *label, char *file, int line );
 #else
 void *Hunk_Alloc( int size, ha_pref preference );
@@ -540,7 +540,11 @@ void AxisClear( vec3_t axis[3] );
 void AxisCopy( vec3_t in[3], vec3_t out[3] );
 
 void SetPlaneSignbits( struct cplane_s *out );
+#if !defined(__GNUC__)
 int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
+#else
+extern "C" int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
+#endif
 
 float	AngleMod(float a);
 float	LerpAngle (float from, float to, float frac);
