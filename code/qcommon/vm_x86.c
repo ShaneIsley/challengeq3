@@ -53,7 +53,7 @@ static void VM_Destroy_Compiled(vm_t* self);
 
 */
 
-// TTimo: initialised the statics, this fixes a crash when entering a compiled VM 
+// TTimo: initialised the statics, this fixes a crash when entering a compiled VM
 static	byte	*buf = NULL;
 static	byte	*jused = NULL;
 static	int		compiledOfs = 0;
@@ -81,9 +81,6 @@ int _ftol( float );
 static	int		ftolPtr = (int)_ftol;
 #endif
 
-void AsmCall( void );
-static	int		asmCallPtr = (int)AsmCall;
-
 #else // _MSC_VER
 
 #if defined( FTOL_PTR )
@@ -96,11 +93,10 @@ int qftol037F( void );
 int qftol0E7F( void ); // bk010102 - fixed bogus bits (duh)
 int qftol0F7F( void );
 
-
 static	int		ftolPtr = (int)qftol0F7F;
 #endif // FTOL_PTR
 
-extern "C" void doAsmCall( void );
+void doAsmCall( void );
 static	int		asmCallPtr = (int)doAsmCall;
 #endif
 
@@ -121,49 +117,46 @@ typedef enum
 
 static	ELastCommand	LastCommand;
 
-/*
-=================
-AsmCall
-=================
-*/
+
 #ifdef _MSC_VER
-__declspec( naked ) void AsmCall( void ) {
-int		programStack;
-int		*opStack;
-int		syscallNum;
-vm_t*	savedVM;
+__declspec( naked ) void AsmCall()
+{
+	int		programStack;
+	int		*opStack;
+	int		syscallNum;
+	vm_t*	savedVM;
 
-__asm {
-	mov		eax, dword ptr [edi]
-	sub		edi, 4
-	or		eax,eax
-	jl		systemCall
-	// calling another vm function
-	shl		eax,2
-	add		eax, dword ptr [instructionPointers]
-	call	dword ptr [eax]
-	mov		eax, dword ptr [edi]
-	and		eax, [callMask]
-	ret
-systemCall:
+	__asm {
+		mov		eax, dword ptr [edi]
+		sub		edi, 4
+		or		eax,eax
+		jl		systemCall
+		// calling another vm function
+		shl		eax,2
+		add		eax, dword ptr [instructionPointers]
+		call	dword ptr [eax]
+		mov		eax, dword ptr [edi]
+		and		eax, [callMask]
+		ret
 
-	// convert negative num to system call number
-	// and store right before the first arg
-	neg		eax
-	dec		eax
+	systemCall:
+		// convert negative num to system call number
+		// and store right before the first arg
+		neg		eax
+		dec		eax
 
-	push	ebp
-	mov		ebp, esp
-	sub		esp, __LOCAL_SIZE
+		push	ebp
+		mov		ebp, esp
+		sub		esp, __LOCAL_SIZE
 
-	mov		dword ptr syscallNum, eax	// so C code can get at it
-	mov		dword ptr programStack, esi	// so C code can get at it
-	mov		dword ptr opStack, edi
+		mov		dword ptr syscallNum, eax	// so C code can get at it
+		mov		dword ptr programStack, esi	// so C code can get at it
+		mov		dword ptr opStack, edi
 
-	push	ecx
-	push	esi							// we may call recursively, so the
-	push	edi							// statics aren't guaranteed to be around
-}
+		push	ecx
+		push	esi							// we may call recursively, so the
+		push	edi							// statics aren't guaranteed to be around
+	}
 
 	savedVM = currentVM;
 
@@ -175,19 +168,20 @@ systemCall:
 
 	currentVM = savedVM;
 
-_asm {
-	pop		edi
-	pop		esi
-	pop		ecx
-	add		edi, 4		// we added the return value
+	_asm {
+		pop		edi
+		pop		esi
+		pop		ecx
+		add		edi, 4		// we added the return value
 
-	mov		esp, ebp
-	pop		ebp
+		mov		esp, ebp
+		pop		ebp
 
-	ret
+		ret
+	}
 }
 
-}
+static int asmCallPtr = (int)AsmCall;
 
 #else //!_MSC_VER
 
@@ -201,7 +195,7 @@ static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
 
-extern "C" void callAsmCall()
+void callAsmCall()
 {
 	vm_t	*savedVM;
 	int		*callOpStack2;
@@ -256,38 +250,29 @@ void AsmCall( void ) {
 }
 #endif
 
-static int	Constant4( void ) {
-	int		v;
-
-	v = code[pc] | (code[pc+1]<<8) | (code[pc+2]<<16) | (code[pc+3]<<24);
+static int Constant4()
+{
+	int v = code[pc] | (code[pc+1]<<8) | (code[pc+2]<<16) | (code[pc+3]<<24);
 	pc += 4;
 	return v;
 }
 
-static int	Constant1( void ) {
-	int		v;
-
-	v = code[pc];
+static int Constant1()
+{
+	int v = code[pc];
 	pc += 1;
 	return v;
 }
 
-static void Emit1( int v ) 
+static void Emit1( int v )
 {
 	buf[ compiledOfs ] = v;
 	compiledOfs++;
-
 	LastCommand = LAST_COMMAND_NONE;
 }
 
-#if 0
-static void Emit2( int v ) {
-	Emit1( v & 255 );
-	Emit1( ( v >> 8 ) & 255 );
-}
-#endif
-
-static void Emit4( int v ) {
+static void Emit4( int v )
+{
 	Emit1( v & 255 );
 	Emit1( ( v >> 8 ) & 255 );
 	Emit1( ( v >> 16 ) & 255 );
@@ -309,6 +294,7 @@ static int Hex( int c ) {
 
 	return 0;
 }
+
 static void EmitString( const char *string ) {
 	int		c1, c2;
 	int		v;
@@ -326,7 +312,6 @@ static void EmitString( const char *string ) {
 		string += 3;
 	}
 }
-
 
 
 static void EmitCommand(ELastCommand command)
@@ -376,7 +361,7 @@ static void EmitMovEAXEDI(vm_t *vm) {
 	}
 	if (pop1 == OP_DIVI || pop1 == OP_DIVU || pop1 == OP_MULI || pop1 == OP_MULU ||
 		pop1 == OP_STORE4 || pop1 == OP_STORE2 || pop1 == OP_STORE1 ) 
-	{	
+	{
 		return;
 	}
 	if (pop1 == OP_CONST && buf[compiledOfs-6] == 0xC7 && buf[compiledOfs-5] == 0x07 ) 
@@ -400,7 +385,7 @@ qbool EmitMovEBXEDI(vm_t *vm, int andit) {
 	}
 	if (pop1 == OP_DIVI || pop1 == OP_DIVU || pop1 == OP_MULI || pop1 == OP_MULU ||
 		pop1 == OP_STORE4 || pop1 == OP_STORE2 || pop1 == OP_STORE1 ) 
-	{	
+	{
 		EmitString( "8B D8");		// mov bx, eax
 		return qfalse;
 	}
@@ -1147,7 +1132,7 @@ VM_CallCompiled
 This function is called directly by the generated code
 ==============
 */
-int	VM_CallCompiled( vm_t *vm, int *args ) {
+int VM_CallCompiled( vm_t *vm, int *args ) {
 	int		stack[1024];
 	int		programCounter;
 	int		programStack;
@@ -1196,7 +1181,7 @@ int	VM_CallCompiled( vm_t *vm, int *args ) {
 	opStack = &stack;
 
 #ifdef _MSC_VER
-	__asm  {
+	__asm {
 		pushad
 		mov		esi, programStack;
 		mov		edi, opStack
@@ -1211,7 +1196,7 @@ int	VM_CallCompiled( vm_t *vm, int *args ) {
 		static void *memOpStack;
 		static void *memEntryPoint;
 
-		memProgramStack	= programStack;
+		memProgramStack = programStack;
 		memOpStack      = opStack;
 		memEntryPoint   = entryPoint;
 
