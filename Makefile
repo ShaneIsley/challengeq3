@@ -686,13 +686,13 @@ endif #SunOS
 TARGETS =
 
 ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/ioq3ded.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/cq3d.$(ARCH)$(BINEXT)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/ioquake3.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/ChallengeQuake3.$(ARCH)$(BINEXT)
   ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/ioquake3-smp.$(ARCH)$(BINEXT)
+    TARGETS += $(B)/ChallengeQuake3-smp.$(ARCH)$(BINEXT)
   endif
 endif
 
@@ -1031,10 +1031,10 @@ else
     $(B)/client/sdl_glimp_smp.o
 endif
 
-$(B)/ioquake3.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/ChallengeQuake3.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(CC)  -o $@ $(Q3OBJ) $(Q3POBJ) $(CLIENT_LDFLAGS) $(LDFLAGS) $(LIBSDLMAIN)
 
-$(B)/ioquake3-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/ChallengeQuake3-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(CC)  -o $@ $(Q3OBJ) $(Q3POBJ_SMP) $(CLIENT_LDFLAGS) \
 		$(THREAD_LDFLAGS) $(LDFLAGS) $(LIBSDLMAIN)
 
@@ -1332,7 +1332,7 @@ ifeq ($(HAVE_VM_COMPILED),true)
   endif
 endif
 
-$(B)/ioq3ded.$(ARCH)$(BINEXT): $(Q3DOBJ)
+$(B)/cq3d.$(ARCH)$(BINEXT): $(Q3DOBJ)
 	$(CC) -o $@ $(Q3DOBJ) $(LDFLAGS)
 
 $(B)/ded/sv_bot.o : $(SDIR)/sv_bot.c; $(DO_DED_CC)
@@ -1744,17 +1744,17 @@ copyfiles: build_release
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 
 ifneq ($(BUILD_CLIENT),0)
-	$(INSTALL) -s -m 0755 $(BR)/ioquake3.$(ARCH)$(BINEXT) $(COPYDIR)/ioquake3.$(ARCH)$(BINEXT)
+	$(INSTALL) -s -m 0755 $(BR)/ChallengeQuake3.$(ARCH)$(BINEXT) $(COPYDIR)/ChallengeQuake3.$(ARCH)$(BINEXT)
 endif
 
 # Don't copy the SMP until it's working together with SDL.
 #ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) -s -m 0755 $(BR)/ioquake3-smp.$(ARCH)$(BINEXT) $(COPYDIR)/ioquake3-smp.$(ARCH)$(BINEXT)
+#	$(INSTALL) -s -m 0755 $(BR)/ChallengeQuake3-smp.$(ARCH)$(BINEXT) $(COPYDIR)/ChallengeQuake3-smp.$(ARCH)$(BINEXT)
 #endif
 
 ifneq ($(BUILD_SERVER),0)
-	@if [ -f $(BR)/ioq3ded.$(ARCH)$(BINEXT) ]; then \
-		$(INSTALL) -s -m 0755 $(BR)/ioq3ded.$(ARCH)$(BINEXT) $(COPYDIR)/ioq3ded.$(ARCH)$(BINEXT); \
+	@if [ -f $(BR)/cq3d.$(ARCH)$(BINEXT) ]; then \
+		$(INSTALL) -s -m 0755 $(BR)/cq3d.$(ARCH)$(BINEXT) $(COPYDIR)/cq3d.$(ARCH)$(BINEXT); \
 	fi
 endif
 
