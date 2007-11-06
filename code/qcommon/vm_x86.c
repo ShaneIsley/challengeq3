@@ -127,10 +127,10 @@ __declspec( naked ) void AsmCall()
 	__asm {
 		mov		eax, dword ptr [edi]
 		sub		edi, 4
-		or		eax,eax
+		or		eax, eax
 		jl		systemCall
 		// calling another vm function
-		shl		eax,2
+		shl		eax, 2
 		add		eax, dword ptr [instructionPointers]
 		call	dword ptr [eax]
 		mov		eax, dword ptr [edi]
