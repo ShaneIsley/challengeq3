@@ -1190,11 +1190,12 @@ int VM_CallCompiled( vm_t *vm, int *args ) {
 	opStack = &stack;
 
 #ifdef _MSC_VER
+	void* codeBase = vm->codeBase; // dunno WHY vc needs this deref'd by hand, but it does
 	__asm {
 		pushad
 		mov		esi, programStack
 		mov		edi, opStack
-		call	vm->codeBase
+		call	codeBase
 		mov		programStack, esi
 		mov		opStack, edi
 		popad
