@@ -200,6 +200,8 @@ void callAsmCall()
 	vm_t	*savedVM;
 	int		*callOpStack2;
 
+Com_Printf( "programStack is %08X - if this is NOT 001FFFD0 on the first call then g++ has corrupted ESI, gg.\n", callProgramStack );
+
 	savedVM = currentVM;
 	callOpStack2 = callOpStack;
 
@@ -1199,13 +1201,13 @@ int VM_CallCompiled( vm_t *vm, int *args ) {
 	}
 #else
 	{
-		static int memProgramStack;
-		static void *memOpStack;
-		static void *memEntryPoint;
+		//static int memProgramStack;
+		//static void *memOpStack;
 
-		memProgramStack = programStack;
-		memOpStack      = opStack;
-		memEntryPoint   = entryPoint;
+		//memProgramStack = programStack;
+		//memOpStack      = opStack;
+
+Com_Printf( "programStack is %08X\n", programStack );
 
 		__asm__("	pushal				\n" \
 				"	movl %0,%%esi		\n" \
@@ -1214,13 +1216,17 @@ int VM_CallCompiled( vm_t *vm, int *args ) {
 				"	movl %%esi,%0		\n" \
 				"	movl %%edi,%1		\n" \
 				"	popal				\n" \
+/*
 				: "=m" (memProgramStack), "=m" (memOpStack) \
-				: "m" (memEntryPoint), "m" (memProgramStack), "m" (memOpStack) \
+				: "m" (entryPoint), "m" (memProgramStack), "m" (memOpStack) \
+*/
+				: "=m" (programStack), "=m" (opStack) \
+				: "m" (entryPoint), "m" (programStack), "m" (opStack) \
 				: "si", "di" \
 		);
 
-		programStack = memProgramStack;
-		opStack      = memOpStack;
+		//programStack = memProgramStack;
+		//opStack      = memOpStack;
 	}
 #endif
 
