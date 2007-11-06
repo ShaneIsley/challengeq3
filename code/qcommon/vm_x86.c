@@ -197,19 +197,15 @@ static	int		callSyscallNum;
 
 void callAsmCall()
 {
-	vm_t	*savedVM;
-	int		*callOpStack2;
+	vm_t* savedVM = currentVM;
 
 Com_Printf( "programStack is %08X - if this is NOT 001FFFD0 on the first call then g++ has corrupted ESI, gg.\n", callProgramStack );
-
-	savedVM = currentVM;
-	callOpStack2 = callOpStack;
 
 	// save the stack to allow recursive VM entry
 	currentVM->programStack = callProgramStack - 4;
 	*(int *)((byte *)currentVM->dataBase + callProgramStack + 4) = callSyscallNum;
 	//VM_LogSyscalls((int *)((byte *)currentVM->dataBase + callProgramStack + 4) );
-	*(callOpStack2+1) = currentVM->systemCall( (intptr_t *)((byte *)currentVM->dataBase + callProgramStack + 4) );
+	*(callOpStack+1) = currentVM->systemCall( (intptr_t *)((byte *)currentVM->dataBase + callProgramStack + 4) );
 
 	currentVM = savedVM;
 }
