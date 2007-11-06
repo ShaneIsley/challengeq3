@@ -242,7 +242,7 @@ void AsmCall( void ) {
 		"	popl %%ecx				\n" \
 		"	addl $4,%%edi			\n" \
 		"	ret						\n" \
-		: "=rm" (callSyscallNum), "=rm" (callProgramStack), "=rm" (callOpStack) \
+		: "=m" (callSyscallNum), "=m" (callProgramStack), "=m" (callOpStack) \
 		: "m" (instructionPointers) \
 		: "ax", "di", "si", "cx" \
 	);
