@@ -189,11 +189,11 @@ static int asmCallPtr = (int)AsmCall;
 #define CMANG(sym) #sym
 #endif
 
+extern "C" {
+
 static	int		callProgramStack;
 static	int		*callOpStack;
 static	int		callSyscallNum;
-
-extern "C" {
 
 void callAsmCall()
 {
@@ -219,33 +219,33 @@ void doAsmCall();
 // arbitrarily named (though this is not true for the MSC version).  When a vm
 // makes a system call, control jumps straight to the doAsmCall label.
 void AsmCall( void ) {
-	asm( CMANG(doAsmCall) ":				\n\t" \
-		"	movl (%%edi),%%eax			\n\t" \
-		"	subl $4,%%edi				\n\t" \
-		"	orl %%eax,%%eax				\n\t" \
-		"	jl systemCall				\n\t" \
-		"	shll $2,%%eax				\n\t" \
-		"	addl %3,%%eax				\n\t" \
-		"	call *(%%eax)				\n\t" \
-		"	movl (%%edi),%%eax			\n\t" \
-		"	andl " CMANG(callMask) ", %%eax		\n\t" \
-		"	jmp doret				\n\t" \
-		"systemCall:					\n\t" \
-		"	negl %%eax				\n\t" \
-		"	decl %%eax				\n\t" \
-		"	movl %%eax,%0				\n\t" \
-		"	movl %%esi,%1				\n\t" \
-		"	movl %%edi,%2				\n\t" \
-		"	pushl %%ecx				\n\t" \
-		"	pushl %%esi				\n\t" \
-		"	pushl %%edi				\n\t" \
-		"	call " CMANG(callAsmCall) "		\n\t" \
-		"	popl %%edi				\n\t" \
-		"	popl %%esi				\n\t" \
-		"	popl %%ecx				\n\t" \
-		"	addl $4,%%edi				\n\t" \
-		"doret:						\n\t" \
-		"	ret					\n\t" \
+	asm volatile(
+		CMANG(doAsmCall) ":			\n" \
+		"	movl (%%edi),%%eax		\n" \
+		"	subl $4,%%edi			\n" \
+		"	orl %%eax,%%eax			\n" \
+		"	jl systemCall			\n" \
+		"	shll $2,%%eax			\n" \
+		"	addl %3,%%eax			\n" \
+		"	call *(%%eax)			\n" \
+		"	movl (%%edi),%%eax		\n" \
+		"	andl " CMANG(callMask) ", %%eax	\n" \
+		"	ret						\n" \
+		"systemCall:				\n" \
+		"	negl %%eax				\n" \
+		"	decl %%eax				\n" \
+		"	movl %%eax,%0			\n" \
+		"	movl %%esi,%1			\n" \
+		"	movl %%edi,%2			\n" \
+		"	pushl %%ecx				\n" \
+		"	pushl %%esi				\n" \
+		"	pushl %%edi				\n" \
+		"	call " CMANG(callAsmCall) "		\n" \
+		"	popl %%edi				\n" \
+		"	popl %%esi				\n" \
+		"	popl %%ecx				\n" \
+		"	addl $4,%%edi			\n" \
+		"	ret						\n" \
 		: "=rm" (callSyscallNum), "=rm" (callProgramStack), "=rm" (callOpStack) \
 		: "m" (instructionPointers) \
 		: "ax", "di", "si", "cx" \
@@ -253,6 +253,8 @@ void AsmCall( void ) {
 }
 
 };
+
+#undef CMANG
 
 static int asmCallPtr = (int)doAsmCall;
 
@@ -1147,7 +1149,6 @@ int VM_CallCompiled( vm_t *vm, int *args ) {
 	int		programStack;
 	int		stackOnEntry;
 	byte	*image;
-	void	*entryPoint;
 	void	*opStack;
 	int		*oldInstructionPointers;
 
@@ -1186,47 +1187,34 @@ int VM_CallCompiled( vm_t *vm, int *args ) {
 	*(int *)&image[ programStack ] = -1;	// will terminate the loop on return
 
 	// off we go into generated code...
-	entryPoint = vm->codeBase;
 	opStack = &stack;
 
 #ifdef _MSC_VER
 	__asm {
 		pushad
-		mov		esi, programStack;
+		mov		esi, programStack
 		mov		edi, opStack
-		call	entryPoint
+		call	vm->codeBase
 		mov		programStack, esi
 		mov		opStack, edi
 		popad
 	}
 #else
 	{
-		//static int memProgramStack;
-		//static void *memOpStack;
-
-		//memProgramStack = programStack;
-		//memOpStack      = opStack;
-
 Com_Printf( "programStack is %08X\n", programStack );
 
-		__asm__("	pushal				\n" \
-				"	movl %0,%%esi		\n" \
-				"	movl %1,%%edi		\n" \
-				"	call *%2			\n" \
-				"	movl %%esi,%0		\n" \
-				"	movl %%edi,%1		\n" \
-				"	popal				\n" \
-/*
-				: "=m" (memProgramStack), "=m" (memOpStack) \
-				: "m" (entryPoint), "m" (memProgramStack), "m" (memOpStack) \
-*/
-				: "=m" (programStack), "=m" (opStack) \
-				: "m" (entryPoint), "m" (programStack), "m" (opStack) \
-				: "si", "di" \
+		asm volatile(
+			"	pushal			\n" \
+			"	movl %0,%%esi	\n" \
+			"	movl %1,%%edi	\n" \
+			"	call *%2		\n" \
+			"	movl %%esi,%0	\n" \
+			"	movl %%edi,%1	\n" \
+			"	popal			\n" \
+			: "=m" (programStack), "=m" (opStack) \
+			: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
+			: "si", "di" \
 		);
-
-		//programStack = memProgramStack;
-		//opStack      = memOpStack;
 	}
 #endif
 
