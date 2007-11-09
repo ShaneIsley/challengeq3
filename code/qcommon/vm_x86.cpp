@@ -190,15 +190,13 @@ static int asmCallPtr = (int)AsmCall;
 
 extern "C" {
 
-static	int		callProgramStack;
-static	int		*callOpStack;
-static	int		callSyscallNum;
+static int  callProgramStack;
+static int* callOpStack;
+static int  callSyscallNum;
 
 void callAsmCall()
 {
 	vm_t* savedVM = currentVM;
-
-Com_Printf( "programStack is %08X - if this is NOT 001FFFD0 on the first call then g++ has corrupted ESI, gg.\n", callProgramStack );
 
 	// save the stack to allow recursive VM entry
 	currentVM->programStack = callProgramStack - 4;
@@ -317,22 +315,18 @@ int VM_CallCompiled( vm_t* vm, int* args )
 		popad
 	}
 #else
-	{
-Com_Printf( "programStack is %08X\n", programStack );
-
-		asm volatile(
-			"	pushal			\n" \
-			"	movl %0,%%esi	\n" \
-			"	movl %1,%%edi	\n" \
-			"	call *%2		\n" \
-			"	movl %%esi,%0	\n" \
-			"	movl %%edi,%1	\n" \
-			"	popal			\n" \
-			: "=m" (programStack), "=m" (opStack) \
-			: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
-			: "si", "di" \
-		);
-	}
+	asm volatile(
+		"	pushal			\n" \
+		"	movl %0,%%esi	\n" \
+		"	movl %1,%%edi	\n" \
+		"	call *%2		\n" \
+		"	movl %%esi,%0	\n" \
+		"	movl %%edi,%1	\n" \
+		"	popal			\n" \
+		: "=m" (programStack), "=m" (opStack) \
+		: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
+		: "si", "di" \
+	);
 #endif
 
 	if ( opStack != &stack[1] ) {
