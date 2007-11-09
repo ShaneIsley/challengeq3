@@ -2117,18 +2117,11 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 }
 
 
+////////////////////////////////////////////////////////////////
 
 
-//============================================================================
-
-/*
-================
-FS_Dir_f
-================
-*/
-void FS_Dir_f( void ) {
-	char	*path;
-	char	*extension;
+void FS_Dir_f( void )
+{
 	char	**dirnames;
 	int		ndirs;
 	int		i;
@@ -2138,13 +2131,8 @@ void FS_Dir_f( void ) {
 		return;
 	}
 
-	if ( Cmd_Argc() == 2 ) {
-		path = Cmd_Argv( 1 );
-		extension = "";
-	} else {
-		path = Cmd_Argv( 1 );
-		extension = Cmd_Argv( 2 );
-	}
+	const char* path = Cmd_Argv( 1 );
+	const char* extension = (Cmd_Argc() == 2) ? "" : Cmd_Argv( 2 );
 
 	Com_Printf( "Directory of %s %s\n", path, extension );
 	Com_Printf( "---------------\n" );
@@ -2407,28 +2395,18 @@ qbool FS_idPak( char *pak, char *base ) {
 	return qfalse;
 }
 
-/*
-================
-FS_idPak
 
-Check whether the string contains stuff like "../" to prevent directory traversal bugs
-and return qtrue if it does.
-================
-*/
+
+// check whether the string contains stuff like "../"
+// to prevent directory traversal bugs
 
 qbool FS_CheckDirTraversal(const char *checkdir)
 {
-	if(strstr(checkdir, "../") || strstr(checkdir, "..\\"))
-		return qtrue;
-	
-	return qfalse;
+	return (strstr(checkdir, "../") || strstr(checkdir, "..\\"));
 }
 
-/*
-================
-FS_ComparePaks
 
-----------------
+/*
 dlstring == qtrue
 
 Returns a list of pak files that we should download from the server. They all get stored
