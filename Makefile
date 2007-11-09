@@ -197,7 +197,7 @@ ifeq ($(PLATFORM),linux)
       BASE_CFLAGS += -DUSE_OPENAL_DLOPEN=1
     endif
   endif
-  
+
   ifeq ($(USE_CURL),1)
     BASE_CFLAGS += -DUSE_CURL=1
     ifeq ($(USE_CURL_DLOPEN),1)
@@ -239,6 +239,9 @@ ifeq ($(PLATFORM),linux)
   endif
   endif
   endif
+
+  # -fomit-frame-pointer on g++ causes crashes, ty Timbo
+  OPTIMIZE = -O3 -march=i586 -ffast-math -funroll-loops
 
   ifneq ($(HAVE_VM_COMPILED),true)
     BASE_CFLAGS += -DNO_VM_COMPILED
