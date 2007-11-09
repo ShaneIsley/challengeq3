@@ -406,14 +406,9 @@ int NET_IPSocket( char *net_interface, int port ) {
 		return 0;
 	}
 
-  //win95 & winnt4 only
-  //QoS is suxx 8-(
-  //http://support.microsoft.com/kb/248611
-  /*
 	i = 0x10;
 	if (setsockopt(newsocket, IPPROTO_IP, IP_TOS, (char *)&i, sizeof(i)) == -1)
 		Com_Printf ("WARNING: UDP_OpenSocket: setsockopt IP_TOS: %s\n", NET_ErrorString());
-		*/
 
 	if( !net_interface || !net_interface[0] || !Q_stricmp(net_interface, "localhost") ) {
 		address.sin_addr.s_addr = INADDR_ANY;

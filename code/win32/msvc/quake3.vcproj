@@ -320,7 +320,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 			>
 			<File
-				RelativePath="..\..\client\cl_avi.c"
+				RelativePath="..\..\client\cl_avi.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -348,42 +348,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_cgame.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\cl_cin.c"
+				RelativePath="..\..\client\cl_cgame.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -418,7 +383,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_console.c"
+				RelativePath="..\..\client\cl_cin.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -453,35 +418,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_curl.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\cl_input.c"
+				RelativePath="..\..\client\cl_console.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -516,7 +453,35 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_keys.c"
+				RelativePath="..\..\client\cl_curl.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\cl_input.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -551,7 +516,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_main.c"
+				RelativePath="..\..\client\cl_keys.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -586,7 +551,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_net_chan.c"
+				RelativePath="..\..\client\cl_main.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -621,7 +586,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_parse.c"
+				RelativePath="..\..\client\cl_net_chan.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -656,7 +621,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_scrn.c"
+				RelativePath="..\..\client\cl_parse.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -691,7 +656,42 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\cl_ui.c"
+				RelativePath="..\..\client\cl_scrn.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						BrowseInformation="1"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\cl_ui.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1615,7 +1615,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_bot.c"
+				RelativePath="..\..\server\sv_bot.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1650,7 +1650,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_ccmds.c"
+				RelativePath="..\..\server\sv_ccmds.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1685,7 +1685,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_client.c"
+				RelativePath="..\..\server\sv_client.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1720,7 +1720,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_game.c"
+				RelativePath="..\..\server\sv_game.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1755,7 +1755,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_init.c"
+				RelativePath="..\..\server\sv_init.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1790,7 +1790,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_main.c"
+				RelativePath="..\..\server\sv_main.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1825,7 +1825,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_net_chan.c"
+				RelativePath="..\..\server\sv_net_chan.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1860,7 +1860,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_snapshot.c"
+				RelativePath="..\..\server\sv_snapshot.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1895,7 +1895,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\server\sv_world.c"
+				RelativePath="..\..\server\sv_world.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2070,7 +2070,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_input.c"
+				RelativePath="..\..\win32\win_input.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2105,7 +2105,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_main.c"
+				RelativePath="..\..\win32\win_main.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2140,7 +2140,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_net.c"
+				RelativePath="..\..\win32\win_net.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2175,7 +2175,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_shared.c"
+				RelativePath="..\..\win32\win_shared.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2210,7 +2210,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_snd.c"
+				RelativePath="..\..\win32\win_snd.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2245,7 +2245,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_syscon.c"
+				RelativePath="..\..\win32\win_syscon.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2280,7 +2280,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\win32\win_wndproc.c"
+				RelativePath="..\..\win32\win_wndproc.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
