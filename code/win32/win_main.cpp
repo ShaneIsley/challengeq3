@@ -186,7 +186,7 @@ DIRECTORY SCANNING
 
 #define	MAX_FOUND_FILES	0x1000
 
-static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, char *filter, char **list, int *numfiles ) {
+static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, const char *filter, char **list, int *numfiles ) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	int			findhandle;
@@ -224,7 +224,7 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, cha
 			break;
 		}
 		Com_sprintf( filename, sizeof(filename), "%s\\%s", subdirs, findinfo.name );
-		if (!Com_FilterPath( filter, filename, qfalse ))
+		if (!Com_FilterPath( filter, filename ))
 			continue;
 		list[ *numfiles ] = CopyString( filename );
 		(*numfiles)++;
@@ -254,7 +254,7 @@ static qbool strgtr(const char *s0, const char *s1) {
 	return qfalse;
 }
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs ) {
+char **Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qbool wantsubs ) {
 	char		search[MAX_OSPATH];
 	int			nfiles;
 	char		**listCopy;
