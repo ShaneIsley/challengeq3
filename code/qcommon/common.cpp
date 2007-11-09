@@ -2946,7 +2946,6 @@ static void Field_CompleteCommand( char *cmd,
 		{
 			if( baseCmd[ 0 ] != '\\' && baseCmd[ 0 ] != '/' )
 				return;
-
 			baseCmd++;
 		}
 #endif
@@ -3141,9 +3140,11 @@ void Field_CompleteCommand( field_t *field ) {
 	Cmd_TokenizeString( completionField->buffer );
 
 	completionString = Cmd_Argv(0);
+#ifndef DEDICATED
 	if ( completionString[0] == '\\' || completionString[0] == '/' ) {
 		completionString++;
 	}
+#endif
 	matchCount = 0;
 	shortestMatch[0] = 0;
 
@@ -3161,7 +3162,11 @@ void Field_CompleteCommand( field_t *field ) {
 	Com_Memcpy(&temp, completionField, sizeof(field_t));
 
 	if ( matchCount == 1 ) {
+#ifndef DEDICATED
 		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "\\%s", shortestMatch );
+#else
+		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "%s", shortestMatch );
+#endif
 		if ( Cmd_Argc() == 1 ) {
 			Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
 		} else {
