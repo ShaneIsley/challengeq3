@@ -869,18 +869,6 @@ qbool FS_FilenameCompare( const char *s1, const char *s2 ) {
 }
 
 
-static const char* FS_ShiftedStrStr( const char* string, const char* substring, int shift )
-{
-	char buf[MAX_STRING_TOKENS];
-	int i;
-
-	for (i = 0; substring[i]; ++i)
-		buf[i] = substring[i] + shift;
-
-	buf[i] = '\0';
-	return strstr(string, buf);
-}
-
 /*
 ===========
 FS_FOpenFileRead
@@ -1016,19 +1004,13 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 						}
 					}
 
-					// qagame.qvm	- 13
-					// dTZT`X!di`
-					if (!(pak->referenced & FS_QAGAME_REF) && FS_ShiftedStrStr(filename, "dTZT`X!di`", 13)) {
+					if (!(pak->referenced & FS_QAGAME_REF) && strstr(filename, "qagame.qvm")) {
 						pak->referenced |= FS_QAGAME_REF;
 					}
-					// cgame.qvm	- 7
-					// \`Zf^'jof
-					if (!(pak->referenced & FS_CGAME_REF) && FS_ShiftedStrStr(filename , "\\`Zf^'jof", 7)) {
+					if (!(pak->referenced & FS_CGAME_REF) && strstr(filename , "cgame.qvm")) {
 						pak->referenced |= FS_CGAME_REF;
 					}
-					// ui.qvm		- 5
-					// pd)lqh
-					if (!(pak->referenced & FS_UI_REF) && FS_ShiftedStrStr(filename , "pd)lqh", 5)) {
+					if (!(pak->referenced & FS_UI_REF) && strstr(filename , "ui.qvm")) {
 						pak->referenced |= FS_UI_REF;
 					}
 
@@ -2376,22 +2358,15 @@ static void FS_AddGameDirectory( const char *path, const char *dir )
 	Sys_FreeFileList( pakfiles );
 }
 
-/*
-================
-FS_idPak
-================
-*/
-qbool FS_idPak( char *pak, char *base ) {
-	int i;
 
-	for (i = 0; i < NUM_ID_PAKS; i++) {
+qbool FS_idPak( const char* pak, const char* base )
+{
+	for (int i = 0; i < NUM_ID_PAKS; ++i) {
 		if ( !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
-			break;
+			return qtrue;
 		}
 	}
-	if (i < NUM_ID_PAKS) {
-		return qtrue;
-	}
+
 	return qfalse;
 }
 
@@ -2740,30 +2715,6 @@ static void FS_CheckPak0( void )
 	}
 }
 
-/*
-=====================
-FS_GamePureChecksum
-
-Returns the checksum of the pk3 from which the server loaded the qagame.qvm
-=====================
-*/
-const char *FS_GamePureChecksum( void ) {
-	static char	info[MAX_STRING_TOKENS];
-	searchpath_t *search;
-
-	info[0] = 0;
-
-	for ( search = fs_searchpaths ; search ; search = search->next ) {
-		// is the element a pak file?
-		if ( search->pack ) {
-			if (search->pack->referenced & FS_QAGAME_REF) {
-				Com_sprintf(info, sizeof(info), "%d", search->pack->checksum);
-			}
-		}
-	}
-
-	return info;
-}
 
 /*
 =====================
