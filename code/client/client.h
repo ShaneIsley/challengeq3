@@ -212,8 +212,8 @@ typedef struct {
 #endif
 
 	// demo information
-	char		demoName[MAX_QPATH];
-	qbool	spDemoRecording;
+	char	demoName[MAX_OSPATH];
+	qbool	showAnnoyingDemoRecordMessage;
 	qbool	demorecording;
 	qbool	demoplaying;
 	qbool	demowaiting;	// don't record until a non-delta message is received
@@ -388,8 +388,6 @@ void CL_StartHunkUsers( void );
 
 void CL_Disconnect_f (void);
 void CL_GetChallengePacket (void);
-void CL_Vid_Restart_f( void );
-void CL_Snd_Restart_f (void);
 void CL_StartDemoLoop( void );
 void CL_NextDemo( void );
 void CL_ReadDemoMessage( void );
@@ -403,7 +401,6 @@ void CL_ClearPing( int n );
 int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
-void CL_InitRef( void );
 qbool CL_CDKeyValidate( const char *key, const char *checksum );
 int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
 
@@ -420,21 +417,20 @@ typedef struct {
 } kbutton_t;
 
 extern	kbutton_t	in_mlook, in_klook;
-extern 	kbutton_t 	in_strafe;
-extern 	kbutton_t 	in_speed;
+extern	kbutton_t	in_strafe;
+extern	kbutton_t	in_speed;
 
-void CL_InitInput (void);
+void CL_InitInput();
 void CL_SendCmd (void);
 void CL_ClearState (void);
 void CL_ReadPackets (void);
 
 void CL_WritePacket( void );
-void IN_CenterView (void);
 
 void CL_VerifyCode( void );
 
 float CL_KeyState (kbutton_t *key);
-char *Key_KeynumToString (int keynum);
+const char* Key_KeynumToString( int keynum );
 
 //
 // cl_parse.c
@@ -450,7 +446,6 @@ void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
 void	CL_LocalServers_f( void );
 void	CL_GlobalServers_f( void );
 void	CL_FavoriteServers_f( void );
-void	CL_Ping_f( void );
 qbool CL_UpdateVisiblePings_f( int source );
 
 
@@ -499,10 +494,10 @@ void	SCR_DrawSmallChar( int x, int y, int ch );
 // cl_cin.c
 //
 
+void SCR_DrawCinematic();
+void SCR_RunCinematic();
+void SCR_StopCinematic();
 void CL_PlayCinematic_f( void );
-void SCR_DrawCinematic (void);
-void SCR_RunCinematic (void);
-void SCR_StopCinematic (void);
 int CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
 e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);

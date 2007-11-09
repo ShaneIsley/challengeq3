@@ -55,35 +55,32 @@ kbutton_t	in_up, in_down;
 kbutton_t	in_buttons[16];
 
 
-qbool	in_mlooking;
+static qbool in_mlooking;
 
 
-void IN_MLookDown( void ) {
+static void IN_MLookDown()
+{
 	in_mlooking = qtrue;
 }
 
-void IN_MLookUp( void ) {
+static void IN_MLookUp()
+{
 	in_mlooking = qfalse;
 	if ( !cl_freelook->integer ) {
-		IN_CenterView ();
+		cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 	}
 }
 
-void IN_KeyDown( kbutton_t *b ) {
-	int		k;
-	char	*c;
-	
-	c = Cmd_Argv(1);
-	if ( c[0] ) {
-		k = atoi(c);
-	} else {
-		k = -1;		// typed manually at the console for continuous down
-	}
+
+static void IN_KeyDown( kbutton_t *b )
+{
+	const char* c = Cmd_Argv(1);
+	int k = (c[0] ? atoi(c) : -1); // -1 == typed manually at the console for continuous down
 
 	if ( k == b->down[0] || k == b->down[1] ) {
 		return;		// repeating key
 	}
-	
+
 	if ( !b->down[0] ) {
 		b->down[0] = k;
 	} else if ( !b->down[1] ) {
@@ -92,7 +89,7 @@ void IN_KeyDown( kbutton_t *b ) {
 		Com_Printf ("Three keys down for a button!\n");
 		return;
 	}
-	
+
 	if ( b->active ) {
 		return;		// still down
 	}
@@ -105,12 +102,11 @@ void IN_KeyDown( kbutton_t *b ) {
 	b->wasPressed = qtrue;
 }
 
-void IN_KeyUp( kbutton_t *b ) {
-	int		k;
-	char	*c;
-	unsigned	uptime;
+static void IN_KeyUp( kbutton_t *b )
+{
+	int k;
+	const char* c = Cmd_Argv(1);
 
-	c = Cmd_Argv(1);
 	if ( c[0] ) {
 		k = atoi(c);
 	} else {
@@ -135,7 +131,7 @@ void IN_KeyUp( kbutton_t *b ) {
 
 	// save timestamp for partial frame summing
 	c = Cmd_Argv(2);
-	uptime = atoi(c);
+	unsigned uptime = atoi(c);
 	if ( uptime ) {
 		b->msec += uptime - b->downtime;
 	} else {
@@ -146,19 +142,11 @@ void IN_KeyUp( kbutton_t *b ) {
 }
 
 
+// returns the fraction of the frame that the key was down
 
-/*
-===============
-CL_KeyState
-
-Returns the fraction of the frame that the key was down
-===============
-*/
-float CL_KeyState( kbutton_t *key ) {
-	float		val;
-	int			msec;
-
-	msec = key->msec;
+float CL_KeyState( kbutton_t *key )
+{
+	int msec = key->msec;
 	key->msec = 0;
 
 	if ( key->active ) {
@@ -177,7 +165,7 @@ float CL_KeyState( kbutton_t *key ) {
 	}
 #endif
 
-	val = (float)msec / frame_msec;
+	float val = (float)msec / frame_msec;
 	if ( val < 0 ) {
 		val = 0;
 	}
@@ -253,10 +241,6 @@ void IN_ButtonDown (void) {
 	IN_KeyDown(&in_buttons[1]);}
 void IN_ButtonUp (void) {
 	IN_KeyUp(&in_buttons[1]);}
-
-void IN_CenterView (void) {
-	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
-}
 
 
 //==========================================================================
@@ -829,12 +813,9 @@ void CL_SendCmd( void ) {
 	CL_WritePacket();
 }
 
-/*
-============
-CL_InitInput
-============
-*/
-void CL_InitInput( void ) {
+
+void CL_InitInput()
+{
 	Cmd_AddCommand ("+moveup",IN_UpDown);
 	Cmd_AddCommand ("-moveup",IN_UpUp);
 	Cmd_AddCommand ("+movedown",IN_DownDown);

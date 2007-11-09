@@ -680,21 +680,15 @@ qbool Key_IsDown( int keynum ) {
 
 
 /*
-===================
-Key_StringToKeynum
-
 Returns a key number to be used to index keys[] by looking at
 the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 
 0x11 will be interpreted as raw hex, which will allow new controlers
-
 to be configured even if they don't have defined names.
-===================
 */
-int Key_StringToKeynum( char *str ) {
-	keyname_t	*kn;
-	
+static int Key_StringToKeynum( const char* str )
+{
 	if ( !str || !str[0] ) {
 		return -1;
 	}
@@ -728,7 +722,7 @@ int Key_StringToKeynum( char *str ) {
 	}
 
 	// scan for a text match
-	for ( kn=keynames ; kn->name ; kn++ ) {
+	for (const keyname_t* kn = keynames; kn->name; ++kn) {
 		if ( !Q_stricmp( str,kn->name ) )
 			return kn->keynum;
 	}
@@ -736,18 +730,13 @@ int Key_StringToKeynum( char *str ) {
 	return -1;
 }
 
-/*
-===================
-Key_KeynumToString
 
-Returns a string (either a single ascii char, a K_* name, or a 0x11 hex string) for the
-given keynum.
-===================
-*/
-char *Key_KeynumToString( int keynum ) {
-	keyname_t	*kn;	
-	static	char	tinystr[5];
-	int			i, j;
+// returns a single ascii char, a K_* name, or a 0x11 hex string
+
+const char* Key_KeynumToString( int keynum )
+{
+	static char tinystr[5];
+	int i, j;
 
 	if ( keynum == -1 ) {
 		return "<KEY NOT FOUND>";
@@ -765,7 +754,7 @@ char *Key_KeynumToString( int keynum ) {
 	}
 
 	// check for a key string
-	for ( kn=keynames ; kn->name ; kn++ ) {
+	for (const keyname_t* kn = keynames; kn->name; ++kn) {
 		if (keynum == kn->keynum) {
 			return kn->name;
 		}

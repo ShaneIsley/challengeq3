@@ -194,15 +194,9 @@ void CL_CgameError( const char *string ) {
 }
 
 
-/*
-=====================
-CL_ConfigstringModified
-=====================
-*/
-void CL_ConfigstringModified( void ) {
-	char		*old, *s;
+static void CL_ConfigstringModified()
+{
 	int			i, index;
-	char		*dup;
 	gameState_t	oldGs;
 	int			len;
 
@@ -211,9 +205,9 @@ void CL_ConfigstringModified( void ) {
 		Com_Error( ERR_DROP, "configstring > MAX_CONFIGSTRINGS" );
 	}
 	// get everything after "cs <num>"
-	s = Cmd_ArgsFrom(2);
+	const char* s = Cmd_ArgsFrom(2);
 
-	old = cl.gameState.stringData + cl.gameState.stringOffsets[ index ];
+	const char* old = cl.gameState.stringData + cl.gameState.stringOffsets[ index ];
 	if ( !strcmp( old, s ) ) {
 		return;		// unchanged
 	}
@@ -225,7 +219,8 @@ void CL_ConfigstringModified( void ) {
 
 	// leave the first 0 for uninitialized strings
 	cl.gameState.dataCount = 1;
-		
+
+	const char* dup;
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
 		if ( i == index ) {
 			dup = s;
@@ -256,18 +251,11 @@ void CL_ConfigstringModified( void ) {
 }
 
 
-/*
-===================
-CL_GetServerCommand
+// set up argc/argv for the given command
 
-Set up argc/argv for the given command
-===================
-*/
-qbool CL_GetServerCommand( int serverCommandNumber ) {
-	char	*s;
-	char	*cmd;
+static qbool CL_GetServerCommand( int serverCommandNumber )
+{
 	static char bigConfigString[BIG_INFO_STRING];
-	int argc;
 
 	// if we have irretrievably lost a reliable command, drop the connection
 	if ( serverCommandNumber <= clc.serverCommandSequence - MAX_RELIABLE_COMMANDS ) {
@@ -284,15 +272,14 @@ qbool CL_GetServerCommand( int serverCommandNumber ) {
 		return qfalse;
 	}
 
-	s = clc.serverCommands[ serverCommandNumber & ( MAX_RELIABLE_COMMANDS - 1 ) ];
+	const char* s = clc.serverCommands[ serverCommandNumber & ( MAX_RELIABLE_COMMANDS - 1 ) ];
 	clc.lastExecutedServerCommand = serverCommandNumber;
-
 	Com_DPrintf( "serverCommand: %i : %s\n", serverCommandNumber, s );
 
 rescan:
 	Cmd_TokenizeString( s );
-	cmd = Cmd_Argv(0);
-	argc = Cmd_Argc();
+	int argc = Cmd_Argc();
+	const char* cmd = Cmd_Argv(0);
 
 	if ( !strcmp( cmd, "disconnect" ) ) {
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=552
@@ -369,18 +356,14 @@ rescan:
 }
 
 
-/*
-====================
-CL_CM_LoadMap
+// just adds default parameters that cgame doesn't need to know about
 
-Just adds default parameters that cgame doesn't need to know about
-====================
-*/
-void CL_CM_LoadMap( const char *mapname ) {
-	int		checksum;
-
+static void CL_CM_LoadMap( const char* mapname )
+{
+	int checksum;
 	CM_LoadMap( mapname, qtrue, &checksum );
 }
+
 
 /*
 ====================

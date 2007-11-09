@@ -163,7 +163,7 @@ static int CIN_HandleForVideo(void) {
 }
 
 
-extern int CL_ScaledMilliseconds(void);
+extern int CL_ScaledMilliseconds();
 
 //-----------------------------------------------------------------------------
 // RllSetupTable
@@ -1496,12 +1496,6 @@ void CIN_SetLooping(int handle, qbool loop) {
 	cinTable[handle].looping = loop;
 }
 
-/*
-==================
-SCR_DrawCinematic
-
-==================
-*/
 void CIN_DrawCinematic (int handle) {
 	float	x, y, w, h;
 	byte	*buf;
@@ -1578,9 +1572,8 @@ void CIN_DrawCinematic (int handle) {
 	cinTable[handle].dirty = qfalse;
 }
 
-void CL_PlayCinematic_f(void) {
-	char	*arg, *s;
-	qbool	holdatend;
+void CL_PlayCinematic_f(void)
+{
 	int bits = CIN_system;
 
 	Com_DPrintf("CL_PlayCinematic_f\n");
@@ -1588,10 +1581,9 @@ void CL_PlayCinematic_f(void) {
 		SCR_StopCinematic();
 	}
 
-	arg = Cmd_Argv( 1 );
-	s = Cmd_Argv(2);
+	const char* arg = Cmd_Argv(1);
+	const char* s = Cmd_Argv(2);
 
-	holdatend = qfalse;
 	if ((s && s[0] == '1') || Q_stricmp(arg,"demoend.roq")==0 || Q_stricmp(arg,"end.roq")==0) {
 		bits |= CIN_hold;
 	}
@@ -1599,7 +1591,7 @@ void CL_PlayCinematic_f(void) {
 		bits |= CIN_loop;
 	}
 
-	S_StopAllSounds ();
+	S_StopAllSounds();
 
 	CL_handle = CIN_PlayCinematic( arg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, bits );
 	if (CL_handle >= 0) {
@@ -1610,26 +1602,29 @@ void CL_PlayCinematic_f(void) {
 }
 
 
-void SCR_DrawCinematic (void) {
+void SCR_DrawCinematic()
+{
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_DrawCinematic(CL_handle);
 	}
 }
 
-void SCR_RunCinematic (void)
+void SCR_RunCinematic()
 {
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_RunCinematic(CL_handle);
 	}
 }
 
-void SCR_StopCinematic(void) {
+void SCR_StopCinematic()
+{
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_StopCinematic(CL_handle);
-		S_StopAllSounds ();
+		S_StopAllSounds();
 		CL_handle = -1;
 	}
 }
+
 
 void CIN_UploadCinematic(int handle) {
 	if (handle >= 0 && handle < MAX_VIDEO_HANDLES) {
