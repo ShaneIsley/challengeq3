@@ -932,7 +932,8 @@ typedef struct {
 
 sysEvent_t	Sys_GetEvent( void );
 
-void	Sys_Init (void);
+void Sys_Init();
+void Sys_Quit();
 
 // general development dll loading for virtual machine testing
 // fqpath param added 7/20/02 by T.Ray - Sys_LoadDll is only called in vm.c at this time
@@ -949,14 +950,10 @@ void	*Sys_GetCGameAPI( void );
 void	Sys_UnloadUI( void );
 void	*Sys_GetUIAPI( void );
 
-//bot libraries
 void	Sys_UnloadBotLib( void );
 void	*Sys_GetBotLibAPI( void *parms );
 
-char	*Sys_GetCurrentUser( void );
-
 void	QDECL Sys_Error( const char *error, ...);
-void	Sys_Quit (void);
 char	*Sys_GetClipboardData( void );	// note that this isn't journaled...
 
 void	Sys_Print( const char *msg );
@@ -970,7 +967,7 @@ void	Sys_SnapVector( float *v );
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( qbool show );
 
-int		Sys_GetProcessorId( void );
+int		Sys_GetProcessorId();
 
 void	Sys_BeginStreamedFile( fileHandle_t f, int readahead );
 void	Sys_EndStreamedFile( fileHandle_t f );
@@ -992,7 +989,8 @@ void	Sys_ShowIP();
 void	Sys_Mkdir( const char *path );
 const char* Sys_Cwd();
 void	Sys_SetDefaultInstallPath(const char *path);
-char	*Sys_DefaultHomePath(void);
+const char* Sys_GetCurrentUser();
+const char* Sys_DefaultHomePath();
 
 char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs );
 void	Sys_FreeFileList( char **list );

@@ -161,7 +161,7 @@ struct CPU_FeatureBit { const char* s; int reg, bit; } CPU_FeatureBits[] =
 };
 
 
-int Sys_GetProcessorId( void )
+int Sys_GetProcessorId()
 {
 #if defined _M_ALPHA
 	return CPUID_AXP;
@@ -202,14 +202,14 @@ int Sys_GetProcessorId( void )
 #endif
 
 
-//============================================
-
-char *Sys_GetCurrentUser( void )
+const char* Sys_GetCurrentUser()
 {
 	return "player";
 }
 
-char	*Sys_DefaultHomePath(void) {
+
+const char* Sys_DefaultHomePath()
+{
 	return NULL;
 }
 

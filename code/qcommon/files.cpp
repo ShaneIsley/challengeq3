@@ -2644,18 +2644,14 @@ FS_Startup
 */
 static void FS_Startup( const char *gameName )
 {
-	const char *homePath;
-	cvar_t	*fs;
-
 	Com_Printf( "----- FS_Startup -----\n" );
 
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_Cwd(), CVAR_INIT );
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
-	homePath = Sys_DefaultHomePath();
-	if (!homePath || !homePath[0]) {
+	const char* homePath = Sys_DefaultHomePath();
+	if (!homePath || !homePath[0])
 		homePath = fs_basepath->string;
-	}
 	fs_homepath = Cvar_Get ("fs_homepath", homePath, CVAR_INIT );
 	fs_gamedirvar = Cvar_Get ("fs_game", APEXGAME, CVAR_INIT|CVAR_SYSTEMINFO );
 
@@ -2690,7 +2686,7 @@ static void FS_Startup( const char *gameName )
 	}
 
 	Com_ReadCDKey(BASEGAME);
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	cvar_t* fs = Cvar_Get( "fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	if (fs && fs->string[0] != 0) {
 		Com_AppendCDKey( fs->string );
 	}

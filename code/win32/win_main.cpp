@@ -103,17 +103,13 @@ void Sys_BeginProfiling( void ) {
 	// this is just used on the mac build
 }
 
-/*
-=============
-Sys_Error
 
-Show the early console as an error dialog
-=============
-*/
-void QDECL Sys_Error( const char *error, ... ) {
+// show the early console as an error dialog
+
+void QDECL Sys_Error( const char *error, ... )
+{
 	va_list		argptr;
 	char		text[4096];
-    MSG        msg;
 
 	va_start (argptr, error);
 	vsprintf (text, error, argptr);
@@ -130,37 +126,31 @@ void QDECL Sys_Error( const char *error, ... ) {
 	IN_Shutdown();
 
 	// wait for the user to quit
-	while ( 1 ) {
-		if (!GetMessage (&msg, NULL, 0, 0))
-			Com_Quit_f ();
-		TranslateMessage (&msg);
-      	DispatchMessage (&msg);
+	while (1) {
+		MSG msg;
+		if (!GetMessage(&msg, NULL, 0, 0))
+			Com_Quit_f();
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
 	Sys_DestroyConsole();
 
-	exit (1);
+	exit(1);
 }
 
-/*
-==============
-Sys_Quit
-==============
-*/
-void Sys_Quit( void ) {
+
+void Sys_Quit()
+{
 	timeEndPeriod( 1 );
 	IN_Shutdown();
 	Sys_DestroyConsole();
-
-	exit (0);
+	exit(0);
 }
 
-/*
-==============
-Sys_Print
-==============
-*/
-void Sys_Print( const char *msg ) {
+
+void Sys_Print( const char *msg )
+{
 	Conbuf_AppendText( msg );
 }
 
@@ -926,7 +916,7 @@ are initialized
 #define OSR2_BUILD_NUMBER 1111
 #define WIN98_BUILD_NUMBER 1998
 
-void Sys_Init( void )
+void Sys_Init()
 {
 	// make sure the timer is high precision, otherwise NT gets 18ms resolution
 	timeBeginPeriod( 1 );

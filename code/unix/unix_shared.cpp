@@ -366,14 +366,13 @@ void Sys_SetDefaultHomePath(const char *path)
 	Q_strncpyz(homePath, path, sizeof(homePath));
 }
 
-char *Sys_DefaultHomePath(void)
+const char* Sys_DefaultHomePath()
 {
-	char *p;
+	if (*homePath)
+		return homePath;
 
-        if (*homePath)
-            return homePath;
-            
-	if ((p = getenv("HOME")) != NULL) {
+	const char* p;
+	if (p = getenv("HOME")) {
 		Q_strncpyz(homePath, p, sizeof(homePath));
 #ifdef MACOS_X
 		Q_strcat(homePath, sizeof(homePath), "/Library/Application Support/Quake3");
@@ -386,12 +385,13 @@ char *Sys_DefaultHomePath(void)
 		}
 		return homePath;
 	}
+
 	return ""; // assume current dir
 }
 
 //============================================
 
-int Sys_GetProcessorId( void )
+int Sys_GetProcessorId()
 {
 	return CPUID_GENERIC;
 }
@@ -400,15 +400,16 @@ void Sys_ShowConsole( int visLevel, qboolean quitOnClose )
 {
 }
 
-char *Sys_GetCurrentUser( void )
+const char* Sys_GetCurrentUser()
 {
-	struct passwd *p;
+	const struct passwd* p;
 
-	if ( (p = getpwuid( getuid() )) == NULL ) {
+	if (!(p = getpwuid(getuid())))
 		return "player";
-	}
+
 	return p->pw_name;
 }
+
 
 #if defined(__linux__) || defined(__FreeBSD__)
 // TTimo 

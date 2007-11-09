@@ -356,10 +356,11 @@ void Sys_Exit( int ex ) {
 }
 
 
-void Sys_Quit (void) {
-  CL_Shutdown ();
-  fcntl (0, F_SETFL, fcntl (0, F_GETFL, 0) & ~FNDELAY);
-  Sys_Exit(0);
+void Sys_Quit()
+{
+	CL_Shutdown();
+	fcntl( 0, F_SETFL, fcntl (0, F_GETFL, 0) & ~FNDELAY );
+	Sys_Exit(0);
 }
 
 
@@ -405,18 +406,14 @@ qboolean Sys_DetectAltivec( void )
     return altivec;
 }
 
-void Sys_Init(void)
+
+void Sys_Init()
 {
-
-  Cmd_AddCommand ("in_restart", Sys_In_Restart_f);
-
-  Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
-
-  Cvar_Set( "username", Sys_GetCurrentUser() );
-
-  //IN_Init();   // rcg08312005 moved into glimp.
-
+	Cmd_AddCommand ("in_restart", Sys_In_Restart_f);
+	Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
+	Cvar_Set( "username", Sys_GetCurrentUser() );
 }
+
 
 void  Sys_Error( const char *error, ...)
 { 
