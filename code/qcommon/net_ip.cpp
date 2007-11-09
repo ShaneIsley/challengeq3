@@ -833,26 +833,12 @@ static void NET_Config( qboolean enableNetworking )
 	if ((enableNetworking == networkingEnabled) && !modified)
 		return;
 
-	qboolean stop, start;
+	qboolean stop;
 	if (enableNetworking == networkingEnabled) {
-		if (enableNetworking) {
-			stop = qtrue;
-			start = qtrue;
-		}
-		else {
-			stop = qfalse;
-			start = qfalse;
-		}
+		stop = enableNetworking;
 	}
 	else {
-		if (enableNetworking) {
-			stop = qfalse;
-			start = qtrue;
-		}
-		else {
-			stop = qtrue;
-			start = qfalse;
-		}
+		stop = !enableNetworking;
 		networkingEnabled = enableNetworking;
 	}
 
@@ -868,7 +854,7 @@ static void NET_Config( qboolean enableNetworking )
 		}
 	}
 
-	if (start && !net_noudp->integer) {
+	if (enableNetworking && !net_noudp->integer) {
 		NET_OpenIP();
 	}
 }
