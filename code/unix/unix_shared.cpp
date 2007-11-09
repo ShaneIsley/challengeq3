@@ -176,7 +176,7 @@ char *strlwr (char *s) {
 #define	MAX_FOUND_FILES	0x1000
 
 // bk001129 - new in 1.26
-static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, char *filter, char **list, int *numfiles ) {
+static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, const char *filter, char **list, int *numfiles ) {
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	DIR			*fdir;
@@ -227,9 +227,7 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, cha
 	closedir(fdir);
 }
 
-// bk001129 - in 1.17 this used to be
-// char **Sys_ListFiles( const char *directory, const char *extension, int *numfiles, qboolean wantsubs )
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs )
+char **Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qboolean wantsubs )
 {
 	struct dirent *d;
 	DIR		*fdir;
