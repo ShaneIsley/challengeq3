@@ -1219,8 +1219,8 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 }
 
 typedef struct {
-	char	*name;
-	void	(*func)( client_t *cl );
+	const char* name;
+	void (*func)( client_t* cl );
 } ucmd_t;
 
 static ucmd_t ucmds[] = {
@@ -1232,27 +1232,22 @@ static ucmd_t ucmds[] = {
 	{"nextdl", SV_NextDownload_f},
 	{"stopdl", SV_StopDownload_f},
 	{"donedl", SV_DoneDownload_f},
-
 	{NULL, NULL}
 };
 
-/*
-==================
-SV_ExecuteClientCommand
-
-Also called by bot code
-==================
-*/
-void SV_ExecuteClientCommand( client_t *cl, const char *s, qbool clientOK ) {
-	ucmd_t	*u;
+// also called by bot code
+void SV_ExecuteClientCommand( client_t *cl, const char *s, qbool clientOK )
+{
+	const ucmd_t* u;
 	qbool bProcessed = qfalse;
 
 	Cmd_TokenizeString( s );
 
 	// see if it is a server level command
-	for (u=ucmds ; u->name ; u++) {
+	for (u = ucmds; u->name; ++u) {
 		if (!strcmp (Cmd_Argv(0), u->name) ) {
 			u->func( cl );
+			// ??? KHB  can't we implicitly just return here?
 			bProcessed = qtrue;
 			break;
 		}
