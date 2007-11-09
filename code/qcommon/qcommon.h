@@ -19,7 +19,7 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-// qcommon.h -- definitions common between client and server, but not game.or ref modules
+// qcommon.h -- definitions common between client and server, but not game or ref modules
 #ifndef _QCOMMON_H_
 #define _QCOMMON_H_
 
@@ -145,7 +145,6 @@ typedef struct {
 void NET_Init();
 void NET_Shutdown();
 void NET_Restart();
-void NET_Config( qbool enableNetworking );
 void NET_FlushPacketQueue();
 void NET_SendPacket( netsrc_t sock, int length, const void* data, const netadr_t& to );
 void QDECL NET_OutOfBandPrint( netsrc_t sock, const netadr_t& adr, const char* format, ... );
@@ -982,13 +981,14 @@ void	Sys_StreamSeek( fileHandle_t f, int offset, int origin );
 void	Sys_ShowConsole( int level, qbool quitOnClose );
 void	Sys_SetErrorText( const char *text );
 
+qbool	Sys_GetPacket( netadr_t* net_from, msg_t* net_message );
 void	Sys_SendPacket( int length, const void *data, netadr_t to );
 
 qbool	Sys_StringToAdr( const char *s, netadr_t *a );
 //Does NOT parse port numbers, only base addresses.
 
-qbool	Sys_IsLANAddress (netadr_t adr);
-void		Sys_ShowIP(void);
+qbool	Sys_IsLANAddress( const netadr_t& adr );
+void	Sys_ShowIP();
 
 void	Sys_Mkdir( const char *path );
 const char* Sys_Cwd();
