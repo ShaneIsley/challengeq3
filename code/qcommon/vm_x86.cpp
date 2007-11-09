@@ -257,6 +257,101 @@ static int asmCallPtr = (int)doAsmCall;
 #endif
 
 
+// this function is called directly by the generated code, as well as by the VM itself
+
+int VM_CallCompiled( vm_t* vm, int* args )
+{
+	int		stack[1024];
+	int		programCounter;
+	int		programStack;
+	int		stackOnEntry;
+	byte	*image;
+	void	*opStack;
+	int		*oldInstructionPointers;
+
+	oldInstructionPointers = instructionPointers;
+
+	currentVM = vm;
+	instructionPointers = vm->instructionPointers;
+
+	// interpret the code
+	vm->currentlyInterpreting = qtrue;
+
+	callMask = vm->dataMask;
+
+	// we might be called recursively, so this might not be the very top
+	programStack = vm->programStack;
+	stackOnEntry = programStack;
+
+	// set up the stack frame 
+	image = vm->dataBase;
+
+	programCounter = 0;
+
+	programStack -= 48;
+
+	*(int *)&image[ programStack + 44] = args[9];
+	*(int *)&image[ programStack + 40] = args[8];
+	*(int *)&image[ programStack + 36] = args[7];
+	*(int *)&image[ programStack + 32] = args[6];
+	*(int *)&image[ programStack + 28] = args[5];
+	*(int *)&image[ programStack + 24] = args[4];
+	*(int *)&image[ programStack + 20] = args[3];
+	*(int *)&image[ programStack + 16] = args[2];
+	*(int *)&image[ programStack + 12] = args[1];
+	*(int *)&image[ programStack + 8 ] = args[0];
+	*(int *)&image[ programStack + 4 ] = 0;	// return stack
+	*(int *)&image[ programStack ] = -1;	// will terminate the loop on return
+
+	// off we go into generated code...
+	opStack = &stack;
+
+#ifdef _MSC_VER
+	void* codeBase = vm->codeBase; // dunno WHY vc needs this deref'd by hand, but it does
+	__asm {
+		pushad
+		mov		esi, programStack
+		mov		edi, opStack
+		call	codeBase
+		mov		programStack, esi
+		mov		opStack, edi
+		popad
+	}
+#else
+	{
+Com_Printf( "programStack is %08X\n", programStack );
+
+		asm volatile(
+			"	pushal			\n" \
+			"	movl %0,%%esi	\n" \
+			"	movl %1,%%edi	\n" \
+			"	call *%2		\n" \
+			"	movl %%esi,%0	\n" \
+			"	movl %%edi,%1	\n" \
+			"	popal			\n" \
+			: "=m" (programStack), "=m" (opStack) \
+			: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
+			: "si", "di" \
+		);
+	}
+#endif
+
+	if ( opStack != &stack[1] ) {
+		Com_Error( ERR_DROP, "opStack corrupted in compiled code" );
+	}
+	if ( programStack != stackOnEntry - 48 ) {
+		Com_Error( ERR_DROP, "programStack corrupted in compiled code" );
+	}
+
+	vm->programStack = stackOnEntry;
+
+	// in case we were recursively called by another vm
+	instructionPointers = oldInstructionPointers;
+
+	return *(int *)opStack;
+}
+
+
 static int Constant4()
 {
 	int v = code[pc] | (code[pc+1]<<8) | (code[pc+2]<<16) | (code[pc+3]<<24);
@@ -1132,100 +1227,3 @@ void VM_Destroy_Compiled(vm_t* self)
 #endif
 }
 
-/*
-==============
-VM_CallCompiled
-
-This function is called directly by the generated code
-==============
-*/
-int VM_CallCompiled( vm_t *vm, int *args ) {
-	int		stack[1024];
-	int		programCounter;
-	int		programStack;
-	int		stackOnEntry;
-	byte	*image;
-	void	*opStack;
-	int		*oldInstructionPointers;
-
-	oldInstructionPointers = instructionPointers;
-
-	currentVM = vm;
-	instructionPointers = vm->instructionPointers;
-
-	// interpret the code
-	vm->currentlyInterpreting = qtrue;
-
-	callMask = vm->dataMask;
-
-	// we might be called recursively, so this might not be the very top
-	programStack = vm->programStack;
-	stackOnEntry = programStack;
-
-	// set up the stack frame 
-	image = vm->dataBase;
-
-	programCounter = 0;
-
-	programStack -= 48;
-
-	*(int *)&image[ programStack + 44] = args[9];
-	*(int *)&image[ programStack + 40] = args[8];
-	*(int *)&image[ programStack + 36] = args[7];
-	*(int *)&image[ programStack + 32] = args[6];
-	*(int *)&image[ programStack + 28] = args[5];
-	*(int *)&image[ programStack + 24] = args[4];
-	*(int *)&image[ programStack + 20] = args[3];
-	*(int *)&image[ programStack + 16] = args[2];
-	*(int *)&image[ programStack + 12] = args[1];
-	*(int *)&image[ programStack + 8 ] = args[0];
-	*(int *)&image[ programStack + 4 ] = 0;	// return stack
-	*(int *)&image[ programStack ] = -1;	// will terminate the loop on return
-
-	// off we go into generated code...
-	opStack = &stack;
-
-#ifdef _MSC_VER
-	void* codeBase = vm->codeBase; // dunno WHY vc needs this deref'd by hand, but it does
-	__asm {
-		pushad
-		mov		esi, programStack
-		mov		edi, opStack
-		call	codeBase
-		mov		programStack, esi
-		mov		opStack, edi
-		popad
-	}
-#else
-	{
-Com_Printf( "programStack is %08X\n", programStack );
-
-		asm volatile(
-			"	pushal			\n" \
-			"	movl %0,%%esi	\n" \
-			"	movl %1,%%edi	\n" \
-			"	call *%2		\n" \
-			"	movl %%esi,%0	\n" \
-			"	movl %%edi,%1	\n" \
-			"	popal			\n" \
-			: "=m" (programStack), "=m" (opStack) \
-			: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
-			: "si", "di" \
-		);
-	}
-#endif
-
-	if ( opStack != &stack[1] ) {
-		Com_Error( ERR_DROP, "opStack corrupted in compiled code" );
-	}
-	if ( programStack != stackOnEntry - 48 ) {
-		Com_Error( ERR_DROP, "programStack corrupted in compiled code" );
-	}
-
-	vm->programStack = stackOnEntry;
-
-	// in case we were recursively called by another vm
-	instructionPointers = oldInstructionPointers;
-
-	return *(int *)opStack;
-}
