@@ -138,11 +138,11 @@ to the apropriate place.
 A raw string should NEVER be passed as fmt, because of "%f" type crashers.
 =============
 */
-void QDECL Com_Printf( const char *fmt, ... ) {
+void QDECL Com_Printf( const char *fmt, ... )
+{
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-  static qbool opening_qconsole = qfalse;
-
+	static qbool opening_qconsole = qfalse;
 
 	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
@@ -154,9 +154,6 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 			*rd_buffer = 0;
 		}
 		Q_strcat(rd_buffer, rd_buffersize, msg);
-    // TTimo nooo .. that would defeat the purpose
-		//rd_flush(rd_buffer);			
-		//*rd_buffer = 0;
 		return;
 	}
 
@@ -170,23 +167,19 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 
 	// logfile
 	if ( com_logfile && com_logfile->integer ) {
-    // TTimo: only open the qconsole.log if the filesystem is in an initialized state
-    //   also, avoid recursing in the qconsole.log opening (i.e. if fs_debug is on)
+	// TTimo: only open the qconsole.log if the filesystem is in an initialized state
+	//   also, avoid recursing in the qconsole.log opening (i.e. if fs_debug is on)
 		if ( !logfile && FS_Initialized() && !opening_qconsole) {
-			struct tm *newtime;
+			opening_qconsole = qtrue;
+
 			time_t aclock;
-
-      opening_qconsole = qtrue;
-
 			time( &aclock );
-			newtime = localtime( &aclock );
+			struct tm* newtime = localtime( &aclock );
 
 			logfile = FS_FOpenFileWrite( "qconsole.log" );
-			
 			if(logfile)
 			{
 				Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
-			
 				if ( com_logfile->integer > 1 )
 				{
 					// force it to not buffer so we get valid
@@ -200,7 +193,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 				Cvar_SetValue("logfile", 0);
 			}
 
-      opening_qconsole = qfalse;
+			opening_qconsole = qfalse;
 		}
 		if ( logfile && FS_Initialized()) {
 			FS_Write(msg, strlen(msg), logfile);
@@ -216,18 +209,19 @@ Com_DPrintf
 A Com_Printf that only shows up if the "developer" cvar is set
 ================
 */
-void QDECL Com_DPrintf( const char *fmt, ...) {
+void QDECL Com_DPrintf( const char *fmt, ...)
+{
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-		
+
 	if ( !com_developer || !com_developer->integer ) {
 		return;			// don't confuse non-developers with techie stuff...
 	}
 
-	va_start (argptr,fmt);	
+	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
-	
+
 	Com_Printf ("%s", msg);
 }
 
@@ -787,7 +781,7 @@ static void Z_ClearZone( memzone_t* zone, int size )
 }
 
 
-static int Z_AvailableZoneMemory( memzone_t* zone )
+static int Z_AvailableZoneMemory( const memzone_t* zone )
 {
 	return zone->size - zone->used;
 }
@@ -885,6 +879,62 @@ void Z_FreeTags( int tag ) {
 		zone->rover = zone->rover->next;
 	} while ( zone->rover != &zone->blocklist );
 }
+
+
+#ifdef ZONE_DEBUG
+
+static void Z_LogZoneHeap( const memzone_t* zone, const char* name )
+{
+	char dump[32], *ptr;
+	int  i, j;
+	memblock_t	*block;
+	char		buf[4096];
+	int size, allocSize, numBlocks;
+
+	if (!logfile || !FS_Initialized())
+		return;
+	size = allocSize = numBlocks = 0;
+	Com_sprintf(buf, sizeof(buf), "\r\n================\r\n%s log\r\n================\r\n", name);
+	FS_Write(buf, strlen(buf), logfile);
+	for (block = zone->blocklist.next ; block->next != &zone->blocklist; block = block->next) {
+		if (block->tag) {
+			ptr = ((char *) block) + sizeof(memblock_t);
+			j = 0;
+			for (i = 0; i < 20 && i < block->d.allocSize; i++) {
+				if (ptr[i] >= 32 && ptr[i] < 127) {
+					dump[j++] = ptr[i];
+				}
+				else {
+					dump[j++] = '_';
+				}
+			}
+			dump[j] = '\0';
+			Com_sprintf(buf, sizeof(buf), "size = %8d: %s, line: %d (%s) [%s]\r\n", block->d.allocSize, block->d.file, block->d.line, block->d.label, dump);
+			FS_Write(buf, strlen(buf), logfile);
+			allocSize += block->d.allocSize;
+			size += block->size;
+			numBlocks++;
+		}
+	}
+
+	// subtract debug memory
+	size -= numBlocks * sizeof(zonedebug_t);
+	allocSize = numBlocks * sizeof(memblock_t); // + 32 bit alignment
+
+	Com_sprintf(buf, sizeof(buf), "%d %s memory in %d blocks\r\n", size, name, numBlocks);
+	FS_Write(buf, strlen(buf), logfile);
+	Com_sprintf(buf, sizeof(buf), "%d %s memory overhead\r\n", size - allocSize, name);
+	FS_Write(buf, strlen(buf), logfile);
+}
+
+
+static void Z_LogHeap()
+{
+	Z_LogZoneHeap( mainzone, "MAIN" );
+	Z_LogZoneHeap( smallzone, "SMALL" );
+}
+
+#endif
 
 
 /*
@@ -1035,68 +1085,6 @@ void Z_CheckHeap( void ) {
 	}
 }
 
-/*
-========================
-Z_LogZoneHeap
-========================
-*/
-void Z_LogZoneHeap( memzone_t *zone, char *name ) {
-#ifdef ZONE_DEBUG
-	char dump[32], *ptr;
-	int  i, j;
-#endif
-	memblock_t	*block;
-	char		buf[4096];
-	int size, allocSize, numBlocks;
-
-	if (!logfile || !FS_Initialized())
-		return;
-	size = allocSize = numBlocks = 0;
-	Com_sprintf(buf, sizeof(buf), "\r\n================\r\n%s log\r\n================\r\n", name);
-	FS_Write(buf, strlen(buf), logfile);
-	for (block = zone->blocklist.next ; block->next != &zone->blocklist; block = block->next) {
-		if (block->tag) {
-#ifdef ZONE_DEBUG
-			ptr = ((char *) block) + sizeof(memblock_t);
-			j = 0;
-			for (i = 0; i < 20 && i < block->d.allocSize; i++) {
-				if (ptr[i] >= 32 && ptr[i] < 127) {
-					dump[j++] = ptr[i];
-				}
-				else {
-					dump[j++] = '_';
-				}
-			}
-			dump[j] = '\0';
-			Com_sprintf(buf, sizeof(buf), "size = %8d: %s, line: %d (%s) [%s]\r\n", block->d.allocSize, block->d.file, block->d.line, block->d.label, dump);
-			FS_Write(buf, strlen(buf), logfile);
-			allocSize += block->d.allocSize;
-#endif
-			size += block->size;
-			numBlocks++;
-		}
-	}
-#ifdef ZONE_DEBUG
-	// subtract debug memory
-	size -= numBlocks * sizeof(zonedebug_t);
-#else
-	allocSize = numBlocks * sizeof(memblock_t); // + 32 bit alignment
-#endif
-	Com_sprintf(buf, sizeof(buf), "%d %s memory in %d blocks\r\n", size, name, numBlocks);
-	FS_Write(buf, strlen(buf), logfile);
-	Com_sprintf(buf, sizeof(buf), "%d %s memory overhead\r\n", size - allocSize, name);
-	FS_Write(buf, strlen(buf), logfile);
-}
-
-/*
-========================
-Z_LogHeap
-========================
-*/
-void Z_LogHeap( void ) {
-	Z_LogZoneHeap( mainzone, "MAIN" );
-	Z_LogZoneHeap( smallzone, "SMALL" );
-}
 
 // static mem blocks to reduce a lot of small zone overhead
 typedef struct memstatic_s {
@@ -2268,7 +2256,9 @@ static void Com_DetectAltivec(void)
 }
 
 
+#if defined(_MSC_VER)
 #pragma warning (disable: 4611) // setjmp + destructors = bad. which it is, but...
+#endif
 
 void Com_Init( char *commandLine )
 {

@@ -788,7 +788,6 @@ void *S_Malloc( int size );			// NOT 0 filled memory only for small allocations
 void Z_Free( void *ptr );
 void Z_FreeTags( int tag );
 int Z_AvailableMemory( void );
-void Z_LogHeap( void );
 // deliberately NOT overloading global new here
 //void* operator new( size_t size ) { return Z_Malloc(size); }
 template <class T> T* Z_New() { return (T*)Z_Malloc(sizeof(T)); }
