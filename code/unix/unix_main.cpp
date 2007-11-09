@@ -1303,62 +1303,6 @@ void    Sys_ConfigureFPU( void ) { // bk001213 - divide by zero
 }
 
 
-static void Sys_PrintBinVersion( const char* name )
-{
-	const char* date = __DATE__;
-	const char* time = __TIME__;
-	const char* sep = "------------------------------------------------";
-	fprintf( stdout, "\n\n%s\n", sep );
-#ifdef DEDICATED
-	fprintf( stdout, "Linux Quake3 Dedicated Server [%s %s]\n", date, time );
-#else
-	fprintf( stdout, "Linux Quake3 Full Executable  [%s %s]\n", date, time );
-#endif
-	fprintf( stdout, " local install: %s\n", name );
-	fprintf( stdout, "%s\n\n", sep );
-}
-
-
-/*
-This resolves any symlinks to the binary. It's disabled for debug
-builds because there are situations where you are likely to want
-to symlink to binaries and /not/ have the links resolved.
-*/
-const char* Sys_BinName( const char* arg0 )
-{
-#ifdef NDEBUG
-
-#ifdef __linux__
-	static char dst[ PATH_MAX ];
-	int n = readlink( "/proc/self/exe", dst, PATH_MAX - 1 );
-	if( n >= 0 && n < PATH_MAX )
-		dst[ n ] = '\0';
-	else
-		Q_strncpyz( dst, arg0, PATH_MAX );
-	return dst;
-#else
-#warning Sys_BinName not implemented
-#endif
-
-#else
-	return arg0;
-#endif
-}
-
-
-static void Sys_ParseArgs( int argc, char* argv[] )
-{
-	if (argc == 2)
-	{
-		if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))
-		{
-			Sys_PrintBinVersion( Sys_BinName( argv[0] ) );
-			Sys_Exit(0);
-		}
-	}
-}
-
-
 #include "../client/client.h"
 extern clientStatic_t cls;
 
@@ -1366,9 +1310,7 @@ int main( int argc, char* argv[] )
 {
   int   len, i;
 
-  Sys_ParseArgs( argc, argv );
-
-  // merge the command line, this is kinda silly
+  // merge the command line: this is kinda silly
   for (len = 1, i = 1; i < argc; i++)
     len += strlen(argv[i]) + 1;
   char* cmdline = (char*)malloc(len);
@@ -1380,7 +1322,6 @@ int main( int argc, char* argv[] )
     strcat(cmdline, argv[i]);
   }
 
-  // bk000306 - clear queues
   memset( &eventQue[0], 0, MAX_QUED_EVENTS*sizeof(sysEvent_t) ); 
   memset( &sys_packetReceived[0], 0, MAX_MSGLEN*sizeof(byte) );
 
