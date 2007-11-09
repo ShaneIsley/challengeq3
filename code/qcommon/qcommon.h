@@ -359,7 +359,7 @@ then searches for a command or variable that matches the first token.
 
 typedef void (*xcommand_t) (void);
 
-void	Cmd_Init (void);
+void Cmd_Init();
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // called by the init functions of other parts of the program to
@@ -373,16 +373,15 @@ void	Cmd_RemoveCommand( const char *cmd_name );
 void	Cmd_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
-int		Cmd_Argc (void);
-char	*Cmd_Argv (int arg);
-void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
-char	*Cmd_Args (void);
-char	*Cmd_ArgsFrom( int arg );
-void	Cmd_ArgsBuffer( char *buffer, int bufferLength );
-char	*Cmd_Cmd (void);
-// The functions that execute commands get their parameters with these
-// functions. Cmd_Argv () will return an empty string, not a NULL
-// if arg > argc, so string operations are allways safe.
+// the functions that execute commands get their parameters with these
+// if arg > argc, Cmd_Argv() will return "", not NULL, so string ops are always safe
+int Cmd_Argc();
+const char* Cmd_Argv(int arg);
+const char* Cmd_Args();
+const char* Cmd_ArgsFrom( int arg );
+void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
+void Cmd_ArgsBuffer( char *buffer, int bufferLength );
+const char* Cmd_Cmd(); // note: this is NOT argv[0], it's the entire cmd as a raw string
 
 void	Cmd_TokenizeString( const char *text );
 void	Cmd_TokenizeStringIgnoreQuotes( const char *text_in );
@@ -693,8 +692,8 @@ int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length);
 int			Com_HashKey(char *string, int maxlen);
-int			Com_Filter(char *filter, char *name, int casesensitive);
-int			Com_FilterPath(char *filter, char *name, int casesensitive);
+int			Com_Filter( const char* filter, const char* name );
+int			Com_FilterPath( const char* filter, const char* name );
 int			Com_RealTime(qtime_t *qtime);
 qbool	Com_SafeMode( void );
 
@@ -825,9 +824,9 @@ void CL_InitKeyCommands( void );
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later
 
-void CL_Init( void );
+void CL_Init();
 void CL_Disconnect( qbool showMainMenu );
-void CL_Shutdown( void );
+void CL_Shutdown();
 void CL_Frame( int msec );
 qbool CL_GameCommand( void );
 void CL_KeyEvent (int key, qbool down, unsigned time);
@@ -989,7 +988,7 @@ void	Sys_SetDefaultInstallPath(const char *path);
 const char* Sys_GetCurrentUser();
 const char* Sys_DefaultHomePath();
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qbool wantsubs );
+char** Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qbool wantsubs );
 void	Sys_FreeFileList( char **list );
 
 void	Sys_BeginProfiling( void );

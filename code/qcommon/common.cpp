@@ -413,33 +413,24 @@ qbool Com_SafeMode( void ) {
 
 
 /*
-===============
-Com_StartupVariable
-
 Searches for command line parameters that are set commands.
 If match is not NULL, only that cvar will be looked for.
 That is necessary because cddir and basedir need to be set
 before the filesystem is started, but all other sets should
 be after execing the config and default.
-===============
 */
-void Com_StartupVariable( const char *match ) {
-	int		i;
-	char	*s;
-	cvar_t	*cv;
-
-	for (i=0 ; i < com_numConsoleLines ; i++) {
+void Com_StartupVariable( const char *match )
+{
+	for (int i = 0; i < com_numConsoleLines; ++i) {
 		Cmd_TokenizeString( com_consoleLines[i] );
-		if ( strcmp( Cmd_Argv(0), "set" ) ) {
+		if ( strcmp( Cmd_Argv(0), "set" ) )
 			continue;
-		}
 
-		s = Cmd_Argv(1);
+		const char* s = Cmd_Argv(1);
 		if ( !match || !strcmp( s, match ) ) {
 			Cvar_Set( s, Cmd_Argv(2) );
-			cv = Cvar_Get( s, "", 0 );
+			cvar_t* cv = Cvar_Get( s, "", 0 );
 			cv->flags |= CVAR_USER_CREATED;
-//			com_consoleLines[i] = 0;
 		}
 	}
 }
@@ -523,26 +514,16 @@ void Info_Print( const char *s ) {
 	}
 }
 
-/*
-============
-Com_StringContains
-============
-*/
-char *Com_StringContains(char *str1, char *str2, int casesensitive) {
-	int len, i, j;
 
-	len = strlen(str1) - strlen(str2);
+static const char* Com_StringContains( const char* str1, const char* str2)
+{
+	int i, j;
+
+	int len = strlen(str1) - strlen(str2);
 	for (i = 0; i <= len; i++, str1++) {
 		for (j = 0; str2[j]; j++) {
-			if (casesensitive) {
-				if (str1[j] != str2[j]) {
-					break;
-				}
-			}
-			else {
-				if (toupper(str1[j]) != toupper(str2[j])) {
-					break;
-				}
+			if (toupper(str1[j]) != toupper(str2[j])) {
+				break;
 			}
 		}
 		if (!str2[j]) {
@@ -552,18 +533,14 @@ char *Com_StringContains(char *str1, char *str2, int casesensitive) {
 	return NULL;
 }
 
-/*
-============
-Com_Filter
-============
-*/
-int Com_Filter(char *filter, char *name, int casesensitive)
+
+int Com_Filter( const char* filter, const char* name )
 {
 	char buf[MAX_TOKEN_CHARS];
-	char *ptr;
+	const char* ptr;
 	int i, found;
 
-	while(*filter) {
+	while (*filter) {
 		if (*filter == '*') {
 			filter++;
 			for (i = 0; *filter; i++) {
@@ -573,7 +550,7 @@ int Com_Filter(char *filter, char *name, int casesensitive)
 			}
 			buf[i] = '\0';
 			if (strlen(buf)) {
-				ptr = Com_StringContains(name, buf, casesensitive);
+				ptr = Com_StringContains(name, buf);
 				if (!ptr) return qfalse;
 				name = ptr + strlen(buf);
 			}
@@ -591,22 +568,13 @@ int Com_Filter(char *filter, char *name, int casesensitive)
 			while(*filter && !found) {
 				if (*filter == ']' && *(filter+1) != ']') break;
 				if (*(filter+1) == '-' && *(filter+2) && (*(filter+2) != ']' || *(filter+3) == ']')) {
-					if (casesensitive) {
-						if (*name >= *filter && *name <= *(filter+2)) found = qtrue;
-					}
-					else {
-						if (toupper(*name) >= toupper(*filter) &&
-							toupper(*name) <= toupper(*(filter+2))) found = qtrue;
-					}
+					if (toupper(*name) >= toupper(*filter) && toupper(*name) <= toupper(*(filter+2)))
+						found = qtrue;
 					filter += 3;
 				}
 				else {
-					if (casesensitive) {
-						if (*filter == *name) found = qtrue;
-					}
-					else {
-						if (toupper(*filter) == toupper(*name)) found = qtrue;
-					}
+					if (toupper(*filter) == toupper(*name))
+						found = qtrue;
 					filter++;
 				}
 			}
@@ -619,25 +587,18 @@ int Com_Filter(char *filter, char *name, int casesensitive)
 			name++;
 		}
 		else {
-			if (casesensitive) {
-				if (*filter != *name) return qfalse;
-			}
-			else {
-				if (toupper(*filter) != toupper(*name)) return qfalse;
-			}
+			if (toupper(*filter) != toupper(*name))
+				return qfalse;
 			filter++;
 			name++;
 		}
 	}
+
 	return qtrue;
 }
 
-/*
-============
-Com_FilterPath
-============
-*/
-int Com_FilterPath(char *filter, char *name, int casesensitive)
+
+int Com_FilterPath( const char* filter, const char* name )
 {
 	int i;
 	char new_filter[MAX_QPATH];
@@ -652,6 +613,7 @@ int Com_FilterPath(char *filter, char *name, int casesensitive)
 		}
 	}
 	new_filter[i] = '\0';
+
 	for (i = 0; i < MAX_QPATH-1 && name[i]; i++) {
 		if ( name[i] == '\\' || name[i] == ':' ) {
 			new_name[i] = '/';
@@ -661,7 +623,8 @@ int Com_FilterPath(char *filter, char *name, int casesensitive)
 		}
 	}
 	new_name[i] = '\0';
-	return Com_Filter(new_filter, new_name, casesensitive);
+
+	return Com_Filter( new_filter, new_name );
 }
 
 /*
@@ -3082,9 +3045,10 @@ void Field_AutoComplete( field_t *field )
 // use the id tab-completion code, which doesn't have all the nice stuff timbo did
 // but has a "familiar" set of bugs rather than a new and thus even-more-hated set
 
-static void keyConcatArgs( void ) {
+static void keyConcatArgs()
+{
 	int		i;
-	char	*arg;
+	const char* arg;
 
 	for ( i = 1 ; i < Cmd_Argc() ; i++ ) {
 		Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );

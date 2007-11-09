@@ -649,26 +649,16 @@ void Cvar_WriteVariables( fileHandle_t f ) {
 	}
 }
 
-/*
-============
-Cvar_List_f
-============
-*/
-void Cvar_List_f( void ) {
-	cvar_t	*var;
-	int		i;
-	char	*match;
 
-	if ( Cmd_Argc() > 1 ) {
-		match = Cmd_Argv( 1 );
-	} else {
-		match = NULL;
-	}
+void Cvar_List_f( void )
+{
+	const char* match = (Cmd_Argc() > 1) ? Cmd_Argv(1) : NULL;
 
-	i = 0;
-	for (var = cvar_vars ; var ; var = var->next, i++)
+	int i = 0;
+	for (const cvar_t* var = cvar_vars; var; var = var->next, ++i)
 	{
-		if (match && !Com_Filter(match, var->name, qfalse)) continue;
+		if (match && !Com_Filter(match, var->name))
+			continue;
 
 		if (var->flags & CVAR_SERVERINFO) {
 			Com_Printf("S");
@@ -706,11 +696,11 @@ void Cvar_List_f( void ) {
 			Com_Printf(" ");
 		}
 
-		Com_Printf (" %s \"%s\"\n", var->name, var->string);
+		Com_Printf(" %s \"%s\"\n", var->name, var->string);
 	}
 
-	Com_Printf ("\n%i total cvars\n", i);
-	Com_Printf ("%i cvar indexes\n", cvar_numIndexes);
+	Com_Printf("\n%i total cvars\n", i);
+	Com_Printf("%i cvar indexes\n", cvar_numIndexes);
 }
 
 /*

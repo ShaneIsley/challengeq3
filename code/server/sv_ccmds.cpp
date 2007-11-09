@@ -33,17 +33,12 @@ These commands can only be entered from stdin or by a remote operator datagram
 */
 
 
-/*
-==================
-SV_GetPlayerByHandle
+// returns the player with player id or name from Cmd_Argv(1)
 
-Returns the player with player id or name from Cmd_Argv(1)
-==================
-*/
-static client_t *SV_GetPlayerByHandle( void ) {
+static client_t* SV_GetPlayerByHandle()
+{
 	client_t	*cl;
 	int			i;
-	char		*s;
 	char		cleanName[64];
 
 	// make sure server is running
@@ -56,7 +51,7 @@ static client_t *SV_GetPlayerByHandle( void ) {
 		return NULL;
 	}
 
-	s = Cmd_Argv(1);
+	const char* s = Cmd_Argv(1);
 
 	// Check whether this is a numeric player handle
 	for(i = 0; s[i] >= '0' && s[i] <= '9'; i++);
@@ -92,22 +87,17 @@ static client_t *SV_GetPlayerByHandle( void ) {
 	}
 
 	Com_Printf( "Player %s is not on the server\n", s );
-
 	return NULL;
 }
 
-/*
-==================
-SV_GetPlayerByNum
 
-Returns the player with idnum from Cmd_Argv(1)
-==================
-*/
-static client_t *SV_GetPlayerByNum( void ) {
+// returns the player with idnum from Cmd_Argv(1)
+
+static client_t* SV_GetPlayerByNum()
+{
 	client_t	*cl;
 	int			i;
 	int			idnum;
-	char		*s;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -119,7 +109,7 @@ static client_t *SV_GetPlayerByNum( void ) {
 		return NULL;
 	}
 
-	s = Cmd_Argv(1);
+	const char* s = Cmd_Argv(1);
 
 	for (i = 0; s[i]; i++) {
 		if (s[i] < '0' || s[i] > '9') {
@@ -144,21 +134,15 @@ static client_t *SV_GetPlayerByNum( void ) {
 //=========================================================
 
 
-/*
-==================
-SV_Map_f
+// restart the server on a different map
 
-Restart the server on a different map
-==================
-*/
-static void SV_Map_f( void ) {
-	char		*cmd;
-	char		*map;
+static void SV_Map_f( void )
+{
 	qbool	killBots, cheat;
-	char		expanded[MAX_QPATH];
-	char		mapname[MAX_QPATH];
+	char	expanded[MAX_QPATH];
+	char	mapname[MAX_QPATH];
 
-	map = Cmd_Argv(1);
+	const char* map = Cmd_Argv(1);
 	if ( !map ) {
 		return;
 	}
@@ -174,7 +158,7 @@ static void SV_Map_f( void ) {
 	// force latched values to get set
 	Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
 
-	cmd = Cmd_Argv(0);
+	const char* cmd = Cmd_Argv(0);
 	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) {
 		Cvar_SetValue( "g_gametype", GT_SINGLE_PLAYER );
 		Cvar_SetValue( "g_doWarmup", 0 );
@@ -606,15 +590,9 @@ static void SV_Status_f( void ) {
 	Com_Printf ("\n");
 }
 
-/*
-==================
-SV_ConSay_f
-==================
-*/
-static void SV_ConSay_f(void) {
-	char	*p;
-	char	text[1024];
 
+static void SV_ConSay_f(void)
+{
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
 		Com_Printf( "Server is not running.\n" );
@@ -625,8 +603,11 @@ static void SV_ConSay_f(void) {
 		return;
 	}
 
-	strcpy (text, "console: ");
-	p = Cmd_Args();
+/*
+	char text[MAX_STRING_CHARS];
+	strcpy(text, "console: ");
+
+	char* p = Cmd_Args();
 
 	if ( *p == '"' ) {
 		p++;
@@ -636,6 +617,9 @@ static void SV_ConSay_f(void) {
 	strcat(text, p);
 
 	SV_SendServerCommand(NULL, "chat \"%s\n\"", text);
+*/
+
+	SV_SendServerCommand(NULL, "chat \"console:%s\n\"", Cmd_Args());
 }
 
 

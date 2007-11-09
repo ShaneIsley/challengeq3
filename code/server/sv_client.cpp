@@ -136,20 +136,15 @@ void SV_GetChallenge( netadr_t from ) {
 	}
 }
 
-/*
-====================
-SV_AuthorizeIpPacket
 
+/*
 A packet has been returned from the authorize server.
-If we have a challenge adr for that ip, send the
-challengeResponse to it
-====================
+If we have a challenge adr for that ip, send the challengeResponse to it
 */
-void SV_AuthorizeIpPacket( netadr_t from ) {
+void SV_AuthorizeIpPacket( netadr_t from )
+{
 	int		challenge;
 	int		i;
-	char	*s;
-	char	*r;
 
 	if ( !NET_CompareBaseAdr( from, svs.authorizeAddress ) ) {
 		Com_Printf( "SV_AuthorizeIpPacket: not from authorize server\n" );
@@ -170,8 +165,8 @@ void SV_AuthorizeIpPacket( netadr_t from ) {
 
 	// send a packet back to the original client
 	svs.challenges[i].pingTime = svs.time;
-	s = Cmd_Argv( 2 );
-	r = Cmd_Argv( 3 );			// reason
+	const char* s = Cmd_Argv( 2 );
+	const char* r = Cmd_Argv( 3 ); // reason
 
 	if ( !Q_stricmp( s, "accept" ) ) {
 		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr,

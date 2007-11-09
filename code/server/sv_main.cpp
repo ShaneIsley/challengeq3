@@ -447,7 +447,6 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 #define SV_OUTPUTBUF_LENGTH (1024 - 16)
 	char		sv_outputbuf[SV_OUTPUTBUF_LENGTH];
 	static unsigned int lasttime = 0;
-	char *cmd_aux;
 
 	// TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=534
 	time = Com_Milliseconds();
@@ -479,20 +478,19 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 		// get the command directly, "rcon <pass> <command>" to avoid quoting issues
 		// extract the command by walking
-		// since the cmd formatting can fuckup (amount of spaces), using a dumb step by step parsing
-		cmd_aux = Cmd_Cmd();
-		cmd_aux+=4;
+		// since the cmd formatting can fuck up (amount of spaces), using a dumb step by step parsing
+		const char* cmd_aux = Cmd_Cmd();
+		cmd_aux += 4;
 		while(cmd_aux[0]==' ')
 			cmd_aux++;
 		while(cmd_aux[0] && cmd_aux[0]!=' ') // password
 			cmd_aux++;
 		while(cmd_aux[0]==' ')
 			cmd_aux++;
-		
-		Q_strcat( remaining, sizeof(remaining), cmd_aux);
-		
-		Cmd_ExecuteString (remaining);
 
+		Q_strcat( remaining, sizeof(remaining), cmd_aux);
+
+		Cmd_ExecuteString (remaining);
 	}
 
 	Com_EndRedirect ();

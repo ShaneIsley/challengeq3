@@ -321,111 +321,69 @@ static	char		cmd_cmd[BIG_INFO_STRING]; // the original command we received (no t
 
 static	cmd_function_t	*cmd_functions;		// possible commands to execute
 
-/*
-============
-Cmd_Argc
-============
-*/
-int		Cmd_Argc( void ) {
+
+int Cmd_Argc()
+{
 	return cmd_argc;
 }
 
-/*
-============
-Cmd_Argv
-============
-*/
-char	*Cmd_Argv( int arg ) {
-	if ( (unsigned)arg >= cmd_argc ) {
+
+const char* Cmd_Argv( int arg )
+{
+	if ((unsigned)arg >= cmd_argc)
 		return "";
-	}
-	return cmd_argv[arg];	
+	return cmd_argv[arg];
 }
 
-/*
-============
-Cmd_ArgvBuffer
 
-The interpreted versions use this because
-they can't have pointers returned to them
-============
-*/
-void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) {
+// returns a single string containing argv(arg) to argv(argc()-1)
+
+const char* Cmd_ArgsFrom( int arg )
+{
+	static char cmd_args[MAX_STRING_CHARS];
+	cmd_args[0] = 0;
+
+	if (arg < 0)
+		Com_Error( ERR_FATAL, "Cmd_ArgsFrom: arg < 0" );
+
+	for (int i = arg; i < cmd_argc; ++i) {
+		strcat( cmd_args, cmd_argv[i] );
+		if (i != cmd_argc-1) {
+			strcat( cmd_args, " " );
+		}
+	}
+
+	return cmd_args;
+}
+
+
+const char* Cmd_Args()
+{
+	return Cmd_ArgsFrom(1);
+}
+
+
+// the interpreted versions use these because they can't have pointers returned to them
+
+void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Argv( arg ), bufferLength );
 }
 
-
-/*
-============
-Cmd_Args
-
-Returns a single string containing argv(1) to argv(argc()-1)
-============
-*/
-char	*Cmd_Args( void ) {
-	static	char		cmd_args[MAX_STRING_CHARS];
-	int		i;
-
-	cmd_args[0] = 0;
-	for ( i = 1 ; i < cmd_argc ; i++ ) {
-		strcat( cmd_args, cmd_argv[i] );
-		if ( i != cmd_argc-1 ) {
-			strcat( cmd_args, " " );
-		}
-	}
-
-	return cmd_args;
-}
-
-/*
-============
-Cmd_Args
-
-Returns a single string containing argv(arg) to argv(argc()-1)
-============
-*/
-char *Cmd_ArgsFrom( int arg ) {
-	static	char		cmd_args[BIG_INFO_STRING];
-	int		i;
-
-	cmd_args[0] = 0;
-	if (arg < 0)
-		arg = 0;
-	for ( i = arg ; i < cmd_argc ; i++ ) {
-		strcat( cmd_args, cmd_argv[i] );
-		if ( i != cmd_argc-1 ) {
-			strcat( cmd_args, " " );
-		}
-	}
-
-	return cmd_args;
-}
-
-/*
-============
-Cmd_ArgsBuffer
-
-The interpreted versions use this because
-they can't have pointers returned to them
-============
-*/
 void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 
-/*
-============
-Cmd_Cmd
 
+/*
 Retrieve the unmodified command string
 For rcon use when you want to transmit without altering quoting
 https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
-============
 */
-char *Cmd_Cmd(void)
+const char* Cmd_Cmd()
 {
 	return cmd_cmd;
 }
+
 
 /*
 ============
@@ -632,11 +590,11 @@ Cmd_ExecuteString
 A complete command line has been parsed, so try to execute it
 ============
 */
-void	Cmd_ExecuteString( const char *text ) {	
+void	Cmd_ExecuteString( const char *text ) {
 	cmd_function_t	*cmd, **prev;
 
 	// execute the command line
-	Cmd_TokenizeString( text );		
+	Cmd_TokenizeString( text );
 	if ( !Cmd_Argc() ) {
 		return;		// no tokens
 	}
@@ -687,43 +645,29 @@ void	Cmd_ExecuteString( const char *text ) {
 	CL_ForwardCommandToServer ( text );
 }
 
-/*
-============
-Cmd_List_f
-============
-*/
-void Cmd_List_f (void)
+
+static void Cmd_List_f()
 {
-	cmd_function_t	*cmd;
-	int				i;
-	char			*match;
+	const char* match = (Cmd_Argc() > 1) ? Cmd_Argv(1) : NULL;
 
-	if ( Cmd_Argc() > 1 ) {
-		match = Cmd_Argv( 1 );
-	} else {
-		match = NULL;
-	}
-
-	i = 0;
-	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
-		if (match && !Com_Filter(match, cmd->name, qfalse)) continue;
-
+	int i = 0;
+	for (const cmd_function_t* cmd = cmd_functions; cmd; cmd = cmd->next) {
+		if (match && !Com_Filter(match, cmd->name))
+			continue;
 		Com_Printf ("%s\n", cmd->name);
-		i++;
+		++i;
 	}
+
 	Com_Printf ("%i commands\n", i);
 }
 
-/*
-============
-Cmd_Init
-============
-*/
-void Cmd_Init (void) {
-	Cmd_AddCommand ("cmdlist",Cmd_List_f);
-	Cmd_AddCommand ("exec",Cmd_Exec_f);
-	Cmd_AddCommand ("vstr",Cmd_Vstr_f);
-	Cmd_AddCommand ("echo",Cmd_Echo_f);
-	Cmd_AddCommand ("wait", Cmd_Wait_f);
+
+void Cmd_Init()
+{
+	Cmd_AddCommand( "cmdlist",Cmd_List_f );
+	Cmd_AddCommand( "exec",Cmd_Exec_f );
+	Cmd_AddCommand( "vstr",Cmd_Vstr_f );
+	Cmd_AddCommand( "echo",Cmd_Echo_f );
+	Cmd_AddCommand( "wait", Cmd_Wait_f );
 }
 

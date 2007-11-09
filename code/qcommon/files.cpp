@@ -1726,15 +1726,13 @@ static int FS_AddFileToList( char *name, char *list[MAX_FOUND_FILES], int nfiles
 	return nfiles;
 }
 
-/*
-===============
-FS_ListFilteredFiles
 
+/*
 Returns a uniqued list of files that match the given criteria
 from all search paths
-===============
 */
-char **FS_ListFilteredFiles( const char *path, const char *extension, char *filter, int *numfiles ) {
+static char** FS_ListFilteredFiles( const char *path, const char *extension, const char* filter, int *numfiles )
+{
 	int				nfiles;
 	char			*list[MAX_FOUND_FILES];
 	searchpath_t	*search;
@@ -1791,7 +1789,7 @@ char **FS_ListFilteredFiles( const char *path, const char *extension, char *filt
 				//
 				if (filter) {
 					// case insensitive
-					if (!Com_FilterPath( filter, name, qfalse ))
+					if (!Com_FilterPath( filter, name ))
 						continue;
 					// unique the match
 					nfiles = FS_AddFileToList( name, list, nfiles );
@@ -2209,13 +2207,9 @@ void FS_SortFileList(char **filelist, int numfiles)
 	Z_Free(sortedlist);
 }
 
-/*
-================
-FS_NewDir_f
-================
-*/
-void FS_NewDir_f( void ) {
-	char	*filter;
+
+void FS_NewDir_f( void )
+{
 	char	**dirnames;
 	int		ndirs;
 	int		i;
@@ -2226,11 +2220,9 @@ void FS_NewDir_f( void ) {
 		return;
 	}
 
-	filter = Cmd_Argv( 1 );
-
 	Com_Printf( "---------------\n" );
 
-	dirnames = FS_ListFilteredFiles( "", "", filter, &ndirs );
+	dirnames = FS_ListFilteredFiles( "", "", Cmd_Argv(1), &ndirs );
 
 	FS_SortFileList(dirnames, ndirs);
 
@@ -2238,6 +2230,7 @@ void FS_NewDir_f( void ) {
 		FS_ConvertPath(dirnames[i]);
 		Com_Printf( "%s\n", dirnames[i] );
 	}
+
 	Com_Printf( "%d files listed\n", ndirs );
 	FS_FreeFileList( dirnames );
 }

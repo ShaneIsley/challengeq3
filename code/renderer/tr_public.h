@@ -112,7 +112,7 @@ typedef struct {
 
 	// milliseconds should only be used for profiling, never
 	// for anything game related.  Get time from the refdef
-	int		(*Milliseconds)( void );
+	int		(*Milliseconds)();
 
 	// stack based memory allocation for per-level things that
 	// won't be freed
@@ -135,7 +135,7 @@ typedef struct {
 	void	(*Cmd_RemoveCommand)( const char *name );
 
 	int		(*Cmd_Argc) (void);
-	char	*(*Cmd_Argv) (int i);
+	const char* (*Cmd_Argv) (int i);
 
 	void	(*Cmd_ExecuteText) (int exec_when, const char *text);
 
