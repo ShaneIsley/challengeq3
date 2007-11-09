@@ -62,7 +62,7 @@ static WSADATA	winsockdata;
 #endif
 
 typedef int SOCKET;
-const SOCKET INVALID_SOCKET = -1
+const SOCKET INVALID_SOCKET = -1;
 #define SOCKET_ERROR		-1
 #define closesocket			close
 #define ioctlsocket			ioctl
