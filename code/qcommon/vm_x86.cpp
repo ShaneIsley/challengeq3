@@ -40,7 +40,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define VM_X86_MMAP
 #endif
 
-static void VM_Destroy_Compiled(vm_t* self);
 
 /*
 
@@ -349,6 +348,18 @@ Com_Printf( "programStack is %08X\n", programStack );
 	instructionPointers = oldInstructionPointers;
 
 	return *(int *)opStack;
+}
+
+
+static void VM_Destroy_Compiled(vm_t* self)
+{
+#ifdef VM_X86_MMAP
+	munmap(self->codeBase, self->codeLength);
+#elif _WIN32
+	VirtualFree(self->codeBase, self->codeLength, MEM_RELEASE);
+#else
+	free(self->codeBase);
+#endif
 }
 
 
@@ -1215,15 +1226,3 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 		vm->instructionPointers[i] += (int)vm->codeBase;
 	}
 }
-
-void VM_Destroy_Compiled(vm_t* self)
-{
-#ifdef VM_X86_MMAP
-	munmap(self->codeBase, self->codeLength);
-#elif _WIN32
-	VirtualFree(self->codeBase, self->codeLength, MEM_RELEASE);
-#else
-	free(self->codeBase);
-#endif
-}
-
