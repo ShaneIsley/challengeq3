@@ -1272,7 +1272,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\qal.c"
+				RelativePath="..\..\client\qal.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1300,126 +1300,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_adpcm.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						PreprocessorDefinitions=""
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\snd_codec.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\snd_codec_ogg.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\snd_codec_wav.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="vector|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\client\snd_dma.c"
+				RelativePath="..\..\client\snd_adpcm.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1454,7 +1335,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_main.c"
+				RelativePath="..\..\client\snd_codec.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1482,7 +1363,63 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_mem.c"
+				RelativePath="..\..\client\snd_codec_ogg.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\snd_codec_wav.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\snd_dma.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1517,7 +1454,35 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_mix.c"
+				RelativePath="..\..\client\snd_main.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\snd_mem.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1552,7 +1517,42 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_openal.c"
+				RelativePath="..\..\client\snd_mix.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="0"
+						PreprocessorDefinitions=""
+						BrowseInformation="1"
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+						CompileAs="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="vector|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						PreprocessorDefinitions=""
+						CompileAs="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\client\snd_openal.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1580,7 +1580,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\client\snd_wavelet.c"
+				RelativePath="..\..\client\snd_wavelet.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
