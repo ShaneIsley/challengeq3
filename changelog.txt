@@ -32,6 +32,8 @@ clampmaps and nomip images use GL_CLAMP_TO_EDGE rather than GL_CLAMP
 
 disabled curl until it's brought up to standard
 
+merged platform-specific *_net.* into qcommon/net_ip.cpp, <3 timbo  :)
+
 
 12 Sep 07 - released as 1.34, since it was about time we did  :P
 
