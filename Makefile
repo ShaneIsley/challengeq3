@@ -1263,6 +1263,7 @@ Q3DOBJ = \
   $(B)/ded/md4.o \
   $(B)/ded/msg.o \
   $(B)/ded/net_chan.o \
+  $(B)/ded/net_ip.o \
   $(B)/ded/huffman.o \
   \
   $(B)/ded/q_math.o \
@@ -1303,7 +1304,6 @@ Q3DOBJ = \
   \
   $(B)/ded/linux_signals.o \
   $(B)/ded/unix_main.o \
-  $(B)/ded/unix_net.o \
   $(B)/ded/unix_shared.o \
   \
   $(B)/ded/null_client.o \
@@ -1356,6 +1356,7 @@ $(B)/ded/files.o : $(CMDIR)/files.cpp; $(DO_DED_CC)
 $(B)/ded/md4.o : $(CMDIR)/md4.cpp; $(DO_DED_CC)
 $(B)/ded/msg.o : $(CMDIR)/msg.cpp; $(DO_DED_CC)
 $(B)/ded/net_chan.o : $(CMDIR)/net_chan.cpp; $(DO_DED_CC)
+$(B)/ded/net_ip.o : $(CMDIR)/net_ip.cpp; $(DO_DED_CC)
 $(B)/ded/huffman.o : $(CMDIR)/huffman.cpp; $(DO_DED_CC)
 $(B)/ded/q_shared.o : $(CMDIR)/q_shared.cpp; $(DO_DED_CC)
 $(B)/ded/q_math.o : $(CMDIR)/q_math.cpp; $(DO_DED_CC)
@@ -1391,7 +1392,6 @@ $(B)/ded/l_struct.o : $(BLIBDIR)/l_struct.cpp; $(DO_BOT_CC)
 
 $(B)/ded/linux_signals.o : $(UDIR)/linux_signals.cpp; $(DO_DED_CC)
 $(B)/ded/unix_main.o : $(UDIR)/unix_main.cpp; $(DO_DED_CC)
-$(B)/ded/unix_net.o : $(UDIR)/unix_net.cpp; $(DO_DED_CC)
 $(B)/ded/unix_shared.o : $(UDIR)/unix_shared.cpp; $(DO_DED_CC)
 
 $(B)/ded/null_client.o : $(NDIR)/null_client.cpp; $(DO_DED_CC)
