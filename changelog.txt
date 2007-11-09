@@ -8,6 +8,10 @@ this means they'll never collide *; moviemakers won't run out;
 and the engine DOESN'T STAT 10,000 FILES EVERY FRAME
 (* except at 2am on an autumn night if you're amazingly unlucky :P)
 
+demo filename is YYYY_MM_DD-HH_MM_SS
+
+fixed demos to be MAX_OSPATH instead of MAX_QPATH, ie 256 chars now
+
 removed support for BMP and PCX
 
 removed fs_cdpath, fs_copyfiles, touchfile, fs_restrict
