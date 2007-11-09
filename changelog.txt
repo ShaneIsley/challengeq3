@@ -25,6 +25,7 @@ fixed a bunch of stuff in ScanAndLoadShaderFiles, but it's still crap
 fixed the patch collision epsilon bugs of 1.34
 
 reverted to id's tab-completion since ioq3's is so hated
+i've semi-merged them atm, will fix up when i get time
 
 interpreted vm is never used on platforms that support compiled vm
 
