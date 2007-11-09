@@ -1185,7 +1185,7 @@ char *Sys_GetClipboardData(void)
 static struct Q3ToAnsiColorTable_s
 {
   char Q3color;
-  char *ANSIcolor;
+  const char* ANSIcolor;
 } tty_colorTable[ ] =
 {
   { COLOR_BLACK,    "30" },
@@ -1198,14 +1198,13 @@ static struct Q3ToAnsiColorTable_s
   { COLOR_WHITE,    "0" }
 };
 
-static int tty_colorTableSize =
-  sizeof( tty_colorTable ) / sizeof( tty_colorTable[ 0 ] );
+static const int tty_colorTableSize = sizeof( tty_colorTable ) / sizeof( tty_colorTable[ 0 ] );
 
-void Sys_ANSIColorify( const char *msg, char *buffer, int bufferSize )
+static void Sys_ANSIColorify( const char *msg, char *buffer, int bufferSize )
 {
   int   msgLength, pos;
   int   i, j;
-  char  *escapeCode;
+  const char* escapeCode;
   char  tempBuffer[ 7 ];
 
   if( !msg || !buffer )
@@ -1306,76 +1305,71 @@ void    Sys_ConfigureFPU( void ) { // bk001213 - divide by zero
 #endif // __linux
 }
 
-void Sys_PrintBinVersion( const char* name ) {
-  char* date = __DATE__;
-  char* time = __TIME__;
-  char* sep = "==============================================================";
-  fprintf( stdout, "\n\n%s\n", sep );
+
+static void Sys_PrintBinVersion( const char* name )
+{
+	const char* date = __DATE__;
+	const char* time = __TIME__;
+	const char* sep = "------------------------------------------------";
+	fprintf( stdout, "\n\n%s\n", sep );
 #ifdef DEDICATED
-  fprintf( stdout, "Linux Quake3 Dedicated Server [%s %s]\n", date, time );  
+	fprintf( stdout, "Linux Quake3 Dedicated Server [%s %s]\n", date, time );
 #else
-  fprintf( stdout, "Linux Quake3 Full Executable  [%s %s]\n", date, time );  
+	fprintf( stdout, "Linux Quake3 Full Executable  [%s %s]\n", date, time );
 #endif
-  fprintf( stdout, " local install: %s\n", name );
-  fprintf( stdout, "%s\n\n", sep );
+	fprintf( stdout, " local install: %s\n", name );
+	fprintf( stdout, "%s\n\n", sep );
 }
 
-/*
-=================
-Sys_BinName
 
+/*
 This resolves any symlinks to the binary. It's disabled for debug
 builds because there are situations where you are likely to want
 to symlink to binaries and /not/ have the links resolved.
-=================
 */
-char *Sys_BinName( const char *arg0 )
+const char* Sys_BinName( const char* arg0 )
 {
-  static char   dst[ PATH_MAX ];
-
 #ifdef NDEBUG
 
 #ifdef __linux__
-  int n = readlink( "/proc/self/exe", dst, PATH_MAX - 1 );
-
-  if( n >= 0 && n < PATH_MAX )
-    dst[ n ] = '\0';
-  else
-    Q_strncpyz( dst, arg0, PATH_MAX );
+	static char dst[ PATH_MAX ];
+	int n = readlink( "/proc/self/exe", dst, PATH_MAX - 1 );
+	if( n >= 0 && n < PATH_MAX )
+		dst[ n ] = '\0';
+	else
+		Q_strncpyz( dst, arg0, PATH_MAX );
+	return dst;
 #else
 #warning Sys_BinName not implemented
-  Q_strncpyz( dst, arg0, PATH_MAX );
 #endif
 
 #else
-  Q_strncpyz( dst, arg0, PATH_MAX );
+	return arg0;
 #endif
-
-  return dst;
 }
 
-void Sys_ParseArgs( int argc, char* argv[] ) {
 
-  if ( argc==2 )
-  {
-    if ( (!strcmp( argv[1], "--version" ))
-         || ( !strcmp( argv[1], "-v" )) )
-    {
-      Sys_PrintBinVersion( Sys_BinName( argv[0] ) );
-      Sys_Exit(0);
-    }
-  }
+static void Sys_ParseArgs( int argc, char* argv[] )
+{
+	if (argc == 2)
+	{
+		if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v"))
+		{
+			Sys_PrintBinVersion( Sys_BinName( argv[0] ) );
+			Sys_Exit(0);
+		}
+	}
 }
+
 
 #include "../client/client.h"
 extern clientStatic_t cls;
 
-int main ( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
-  // int 	oldtime, newtime; // bk001204 - unused
   int   len, i;
 
-  Sys_ParseArgs( argc, argv );  // bk010104 - added this for support
+  Sys_ParseArgs( argc, argv );
 
   // merge the command line, this is kinda silly
   for (len = 1, i = 1; i < argc; i++)
@@ -1399,7 +1393,7 @@ int main ( int argc, char* argv[] )
   Sys_ConsoleInputInit();
 
   fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | FNDELAY);
-	
+
 #ifdef DEDICATED
 	// init here for dedicated, as we don't have GLimp_Init
 	InitSig();
