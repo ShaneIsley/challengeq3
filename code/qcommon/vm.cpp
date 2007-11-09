@@ -650,13 +650,12 @@ intptr_t VM_ArgPtr( intptr_t intValue )
 
 intptr_t VM_ExplicitArgPtr( const vm_t* vm, intptr_t intValue )
 {
-	if ( !intValue ) {
+	if (!intValue)
 		return NULL;
-	}
 
 	// bk010124 - currentVM is missing on reconnect here as well?
 	if (!currentVM)
-		NULL;
+		return NULL;
 
 	if ( vm->entryPoint ) {
 		return (intptr_t)(vm->dataBase + intValue);
