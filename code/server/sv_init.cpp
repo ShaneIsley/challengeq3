@@ -69,7 +69,7 @@ void SV_SetConfigstring (int index, const char *val) {
 			if( len >= maxChunkSize ) {
 				int		sent = 0;
 				int		remaining = len;
-				char	*cmd;
+				const char* cmd;
 				char	buf[MAX_STRING_CHARS];
 
 				while (remaining > 0 ) {
