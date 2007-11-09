@@ -417,6 +417,8 @@ void CL_ReadDemoMessage( void ) {
 }
 
 
+static const int demo_protocols[] = { 68, 67, 66, 0 };
+
 static void CL_WalkDemoExt( const char* arg, char* name, fileHandle_t* fh )
 {
 	*fh = 0;
@@ -430,7 +432,6 @@ static void CL_WalkDemoExt( const char* arg, char* name, fileHandle_t* fh )
 			Com_Printf("Demo file: %s\n", name);
 			return;
 		}
-		++i;
 	}
 
 	Com_Printf( "No match: demos/%s.dm_*\n", arg );
