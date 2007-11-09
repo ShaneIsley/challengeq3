@@ -257,6 +257,18 @@ cvar_t	*cl_run;
 cvar_t	*cl_anglespeedkey;
 
 
+static signed char ClampChar( int i )
+{
+	if ( i < -128 ) {
+		return -128;
+	}
+	if ( i > 127 ) {
+		return 127;
+	}
+	return i;
+}
+
+
 /*
 ================
 CL_AdjustAngles

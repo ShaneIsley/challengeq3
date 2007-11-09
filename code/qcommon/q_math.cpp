@@ -187,27 +187,6 @@ float	Q_crandom( int *seed ) {
 
 //=======================================================
 
-signed char ClampChar( int i ) {
-	if ( i < -128 ) {
-		return -128;
-	}
-	if ( i > 127 ) {
-		return 127;
-	}
-	return i;
-}
-
-signed short ClampShort( int i ) {
-	if ( i < -32768 ) {
-		return -32768;
-	}
-	if ( i > 0x7fff ) {
-		return 0x7fff;
-	}
-	return i;
-}
-
-
 // this isn't a real cheap function to call!
 int DirToByte( vec3_t dir ) {
 	int		i, best;
@@ -288,11 +267,11 @@ float NormalizeColor( const vec3_t in, vec3_t out ) {
 =====================
 PlaneFromPoints
 
-Returns false if the triangle is degenrate.
+Returns false if the triangle is degenerate.
 The normal will point out of the clock for clockwise ordered points
 =====================
 */
-qbool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
 	vec3_t	d1, d2;
 
 	VectorSubtract( b, a, d1 );
@@ -470,7 +449,7 @@ void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 	vec3_t n;
 	float inv_denom;
 
-	inv_denom =  DotProduct( normal, normal );
+	inv_denom = DotProduct( normal, normal );
 #ifndef Q3_VM
 	assert( Q_fabs(inv_denom) != 0.0f ); // bk010122 - zero vectors get here
 #endif
@@ -1274,26 +1253,4 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	** normalize the result
 	*/
 	VectorNormalize( dst );
-}
-
-/*
-================
-Q_isnan
-
-Don't pass doubles to this
-================
-*/
-int Q_isnan( float x )
-{
-	union
-	{
-		float f;
-		unsigned int i;
-	} t;
-
-	t.f = x;
-	t.i &= 0x7FFFFFFF;
-	t.i = 0x7F800000 - t.i;
-
-	return (int)( (unsigned int)t.i >> 31 );
 }

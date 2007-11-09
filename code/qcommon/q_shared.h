@@ -338,6 +338,10 @@ extern const vec4_t colorWhite;
 #define Q_COLOR_ESCAPE	'^'
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE )
 
+#define MAX_CCODES	(10 + 25) // id's 0-7, OSP's 8+9, CPMA's a-y
+extern const vec4_t g_color_table[MAX_CCODES];
+int ColorIndex( char ccode );
+
 #define COLOR_BLACK		'0'
 #define COLOR_RED		'1'
 #define COLOR_GREEN		'2'
@@ -346,9 +350,6 @@ extern const vec4_t colorWhite;
 #define COLOR_CYAN		'5'
 #define COLOR_MAGENTA	'6'
 #define COLOR_WHITE		'7'
-
-#define MAX_CCODES	(10 + 25) // id's 0-7, OSP's 8+9, CPMA's a-y
-int ColorIndex( char ccode );
 
 #define S_COLOR_BLACK	"^0"
 #define S_COLOR_RED		"^1"
@@ -359,10 +360,8 @@ int ColorIndex( char ccode );
 #define S_COLOR_MAGENTA	"^6"
 #define S_COLOR_WHITE	"^7"
 
-extern const vec4_t g_color_table[MAX_CCODES];
-
-#define MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
-#define MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
+#define MAKERGB( v, r, g, b ) { v[0]=r;v[1]=g;v[2]=b; }
+#define MAKERGBA( v, r, g, b, a ) { v[0]=r;v[1]=g;v[2]=b;v[3]=a; }
 
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
@@ -372,9 +371,6 @@ struct cplane_s;
 extern const vec3_t vec3_origin;
 extern const vec3_t axisDefault[3];
 
-#define nanmask (255<<23)
-
-#define IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
 #if idppc
 
@@ -404,11 +400,8 @@ float Q_fabs( float f );
 float Q_rsqrt( float f );		// reciprocal square root
 #endif
 
-#define Square(x) ((x)*(x))
-#define SQRTFAST( x ) ( (x) * Q_rsqrt( x ) )
 
-signed char ClampChar( int i );
-signed short ClampShort( int i );
+#define Square(x) ((x)*(x))
 
 // this isn't a real cheap function to call!
 int DirToByte( vec3_t dir );
@@ -509,8 +502,8 @@ vec_t VectorLengthSquared( const vec3_t v );
 vec_t Distance( const vec3_t p1, const vec3_t p2 );
 
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 );
- 
-void VectorNormalizeFast( vec3_t v );
+
+void VectorNormalizeFast( vec3_t v ); // uses rsqrt approximation and does NOT validate length
 
 void VectorInverse( vec3_t v );
 
@@ -555,7 +548,7 @@ float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
 
-qbool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
+qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
@@ -567,7 +560,6 @@ void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
-int Q_isnan( float x );
 
 
 //=============================================
@@ -683,7 +675,7 @@ void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
-qbool Info_Validate( const char *s );
+qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
@@ -731,7 +723,7 @@ typedef struct cvar_s {
 	char		*resetString;		// cvar_restart will reset to this value
 	char		*latchedString;		// for CVAR_LATCH vars
 	int			flags;
-	qbool	modified;			// set each time the cvar is changed
+	qboolean	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
 	float		value;				// atof( string )
 	int			integer;			// atoi( string )
@@ -780,7 +772,7 @@ PlaneTypeForNormal
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
 // plane_t structure
-// !!! if this is changed, it must be changed in asm code too !!!
+// ! if this is changed, it must be changed in asm code too !
 typedef struct cplane_s {
 	vec3_t	normal;
 	float	dist;
@@ -792,8 +784,8 @@ typedef struct cplane_s {
 
 // a trace is returned when a box is swept through the world
 typedef struct {
-	qbool	allsolid;	// if qtrue, plane is not valid
-	qbool	startsolid;	// if qtrue, the initial point was in a solid area
+	qboolean	allsolid;	// if true, plane is not valid
+	qboolean	startsolid;	// if true, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0 = didn't hit anything
 	vec3_t		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact, transformed to world space

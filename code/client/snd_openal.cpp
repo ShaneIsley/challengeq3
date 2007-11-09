@@ -487,6 +487,22 @@ typedef struct sentity_s
 static sentity_t entityList[MAX_GENTITIES];
 
 
+static qboolean Q_isnan( float x )
+{
+	union
+	{
+		float f;
+		unsigned int i;
+	} t;
+
+	t.f = x;
+	t.i &= 0x7FFFFFFF;
+	t.i = 0x7F800000 - t.i;
+
+	return ( (unsigned int)t.i >> 31 );
+}
+
+
 /* yeah, let's not actually FIX bugs, just pretend they don't exist. ffs.
 #define S_AL_SanitiseVector(v) _S_AL_SanitiseVector(v,__LINE__)
 static void _S_AL_SanitiseVector( vec3_t v, int line )
@@ -502,7 +518,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 static void S_AL_SanitiseVector( const vec3_t v )
 {
 	if (Q_isnan( v[0] ) || Q_isnan( v[1] ) || Q_isnan( v[2] ))
-		Com_Printf( S_COLOR_YELLOW "WARNING: vector with one or more NaN components" );
+		Com_Error( ERR_DROP, "S_AL: vector with one or more NaN components" );
 }
 
 
