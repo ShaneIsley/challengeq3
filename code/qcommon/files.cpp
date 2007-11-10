@@ -1004,13 +1004,13 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 						}
 					}
 
-					if (!(pak->referenced & FS_QAGAME_REF) && strstr(filename, "qagame.qvm")) {
+					if (!(pak->referenced & FS_QAGAME_REF) && !Q_stricmp(filename, "vm/qagame.qvm")) {
 						pak->referenced |= FS_QAGAME_REF;
 					}
-					if (!(pak->referenced & FS_CGAME_REF) && strstr(filename , "cgame.qvm")) {
+					if (!(pak->referenced & FS_CGAME_REF) && !Q_stricmp(filename, "vm/cgame.qvm")) {
 						pak->referenced |= FS_CGAME_REF;
 					}
-					if (!(pak->referenced & FS_UI_REF) && strstr(filename , "ui.qvm")) {
+					if (!(pak->referenced & FS_UI_REF) && !Q_stricmp(filename, "vm/ui.qvm")) {
 						pak->referenced |= FS_UI_REF;
 					}
 
