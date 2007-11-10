@@ -3115,10 +3115,11 @@ void Field_CompleteCommand( field_t *field ) {
 	Com_Memcpy(&temp, completionField, sizeof(field_t));
 
 	if ( matchCount == 1 ) {
+		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ),
 #ifndef DEDICATED
-		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "\\%s", shortestMatch );
+				"\\%s", shortestMatch );
 #else
-		Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "%s", shortestMatch );
+				"%s", shortestMatch );
 #endif
 		if ( Cmd_Argc() == 1 ) {
 			Q_strcat( completionField->buffer, sizeof( completionField->buffer ), " " );
@@ -3130,7 +3131,12 @@ void Field_CompleteCommand( field_t *field ) {
 	}
 
 	// multiple matches, complete to shortest
-	Com_sprintf( completionField->buffer, sizeof( completionField->buffer ), "\\%s", shortestMatch );
+	Com_sprintf( completionField->buffer, sizeof( completionField->buffer ),
+#ifndef DEDICATED
+			"\\%s", shortestMatch );
+#else
+			"%s", shortestMatch );
+#endif
 	completionField->cursor = strlen( completionField->buffer );
 	ConcatRemaining( temp.buffer, completionString );
 
