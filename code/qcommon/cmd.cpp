@@ -261,40 +261,25 @@ void Cmd_Exec_f( void ) {
 }
 
 
-/*
-===============
-Cmd_Vstr_f
+// inserts the current value of a variable as command text
 
-Inserts the current value of a variable as command text
-===============
-*/
-void Cmd_Vstr_f( void ) {
-	char	*v;
-
+void Cmd_Vstr_f( void )
+{
 	if (Cmd_Argc () != 2) {
 		Com_Printf ("vstr <variablename> : execute a variable command\n");
 		return;
 	}
-
-	v = Cvar_VariableString( Cmd_Argv( 1 ) );
-	Cbuf_InsertText( va("%s\n", v ) );
+	Cbuf_InsertText( va("%s\n", Cvar_VariableString( Cmd_Argv( 1 ) )) );
 }
 
 
-/*
-===============
-Cmd_Echo_f
+// just prints the rest of the line to the console
 
-Just prints the rest of the line to the console
-===============
-*/
-void Cmd_Echo_f (void)
+void Cmd_Echo_f( void )
 {
-	int		i;
-	
-	for (i=1 ; i<Cmd_Argc() ; i++)
-		Com_Printf ("%s ",Cmd_Argv(i));
-	Com_Printf ("\n");
+	for (int i = 1; i < Cmd_Argc(); ++i)
+		Com_Printf( "%s ",Cmd_Argv(i) );
+	Com_Printf("\n");
 }
 
 

@@ -427,7 +427,7 @@ void	Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultVa
 void	Cvar_Update( vmCvar_t *vmCvar );
 // updates an interpreted modules' version of a cvar
 
-void 	Cvar_Set( const char *var_name, const char *value );
+void	Cvar_Set( const char *var_name, const char *value );
 // will create the variable with no flags if it doesn't exist
 
 void Cvar_SetLatched( const char *var_name, const char *value);
@@ -440,25 +440,24 @@ float	Cvar_VariableValue( const char *var_name );
 int		Cvar_VariableIntegerValue( const char *var_name );
 // returns 0 if not defined or non numeric
 
-char	*Cvar_VariableString( const char *var_name );
+const char* Cvar_VariableString( const char *var_name );
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 // returns an empty string if not defined
 
-int	Cvar_Flags(const char *var_name);
+int Cvar_Flags(const char *var_name);
 // returns CVAR_NONEXISTENT if cvar doesn't exist or the flags of that particular CVAR.
 
 void	Cvar_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
-void 	Cvar_Reset( const char *var_name );
+void	Cvar_Reset( const char *var_name );
 
-void	Cvar_SetCheatState( void );
+void	Cvar_SetCheatState();
 // reset all testing vars to a safe value
 
-qbool Cvar_Command( void );
-// called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
-// command.  Returns qtrue if the command was a variable reference that
-// was handled. (print or change)
+qbool Cvar_Command();
+// called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known command
+// returns true if the command was a variable reference that was handled. (print or change)
 
 void 	Cvar_WriteVariables( fileHandle_t f );
 // writes lines containing "set variable value" for all variables

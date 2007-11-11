@@ -355,17 +355,13 @@ void SVC_Status( netadr_t from ) {
 	NET_OutOfBandPrint( NS_SERVER, from, "statusResponse\n%s\n%s", infostring, status );
 }
 
-/*
-================
-SVC_Info
 
-Responds with a short info message that should be enough to determine
-if a user is interested in a server to do a full status
-================
-*/
-void SVC_Info( netadr_t from ) {
+// responds with a short info message that should be enough to determine
+// if a user is interested in a server to do a full status
+
+static void SVC_Info( const netadr_t& from )
+{
 	int		i, count;
-	char	*gamedir;
 	char	infostring[MAX_INFO_STRING];
 
 	// ignore if we are in single player
@@ -411,7 +407,8 @@ void SVC_Info( netadr_t from ) {
 	if( sv_maxPing->integer ) {
 		Info_SetValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
 	}
-	gamedir = Cvar_VariableString( "fs_game" );
+
+	const char* gamedir = Cvar_VariableString( "fs_game" );
 	if( *gamedir ) {
 		Info_SetValueForKey( infostring, "game", gamedir );
 	}
