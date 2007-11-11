@@ -383,7 +383,6 @@ void CL_SystemInfoChanged( void ) {
 				Com_Printf("WARNING: Server sent invalid fs_game value %s\n", value);
 				continue;
 			}
-				
 			gameSet = qtrue;
 		}
 
@@ -394,10 +393,10 @@ void CL_SystemInfoChanged( void ) {
 			// If this cvar may not be modified by a server discard the value.
 			if(!(cvar_flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED)))
 				continue;
-
 			Cvar_Set(key, value);
 		}
 	}
+
 	// if game folder should not be set and it is set at the client side
 	if ( !gameSet && *Cvar_VariableString("fs_game") ) {
 		Cvar_Set( "fs_game", "" );
