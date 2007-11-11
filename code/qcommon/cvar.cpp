@@ -239,10 +239,8 @@ If the variable already exists, the value will not be set unless CVAR_ROM
 The flags will be or'ed in if the variable exists.
 ============
 */
-cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
-	cvar_t	*var;
-	long	hash;
-
+cvar_t* Cvar_Get( const char *var_name, const char *var_value, int flags )
+{
 	if ( !var_name || ! var_value ) {
 		Com_Error( ERR_FATAL, "Cvar_Get: NULL parameter" );
 	}
@@ -252,14 +250,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 		var_name = "BADNAME";
 	}
 
-#if 0		// FIXME: values with backslash happen
-	if ( !Cvar_ValidateString( var_value ) ) {
-		Com_Printf("invalid cvar value string: %s\n", var_value );
-		var_value = "BADVALUE";
-	}
-#endif
-
-	var = Cvar_FindVar (var_name);
+	cvar_t* var = Cvar_FindVar( var_name );
 	if ( var ) {
 		// if the C code is now specifying a variable that the user already
 		// set a value for, take the new value as the reset value
@@ -276,31 +267,28 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 
 		var->flags |= flags;
 		// only allow one non-empty reset string without a warning
-		if ( !var->resetString[0] ) {
-			// we don't have a reset string yet
+		// KHB 071110  no, that's wrong for several reasons, notably vm changes caused by pure
+		if ((flags & CVAR_ROM) || !var->resetString[0]) {
 			Z_Free( var->resetString );
 			var->resetString = CopyString( var_value );
 		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
 			Com_DPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
 				var_name, var->resetString, var_value );
 		}
+
 		// if we have a latched string, take that value now
 		if ( var->latchedString ) {
-			char *s;
-
-			s = var->latchedString;
+			char* s = var->latchedString;
 			var->latchedString = NULL;	// otherwise cvar_set2 would free it
 			Cvar_Set2( var_name, s, qtrue );
 			Z_Free( s );
 		}
 
-// use a CVAR_SET for rom sets, get won't override
-#if 0
 		// CVAR_ROM always overrides
-		if ( flags & CVAR_ROM ) {
+		if (flags & CVAR_ROM) {
 			Cvar_Set2( var_name, var_value, qtrue );
 		}
-#endif
+
 		return var;
 	}
 
@@ -312,11 +300,11 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	}
 	var = &cvar_indexes[cvar_numIndexes];
 	cvar_numIndexes++;
-	var->name = CopyString (var_name);
-	var->string = CopyString (var_value);
+	var->name = CopyString( var_name );
+	var->string = CopyString( var_value );
 	var->modified = qtrue;
 	var->modificationCount = 1;
-	var->value = atof (var->string);
+	var->value = atof(var->string);
 	var->integer = atoi(var->string);
 	var->resetString = CopyString( var_value );
 
@@ -326,7 +314,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 
 	var->flags = flags;
 
-	hash = Cvar_Hash(var_name);
+	long hash = Cvar_Hash(var_name);
 	var->hashNext = hashTable[hash];
 	hashTable[hash] = var;
 

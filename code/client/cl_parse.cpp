@@ -369,12 +369,12 @@ void CL_SystemInfoChanged( void ) {
 	s = systemInfo;
 	while ( s ) {
 		int cvar_flags;
-		
+
 		Info_NextPair( &s, key, value );
 		if ( !key[0] ) {
 			break;
 		}
-		
+
 		// ehw!
 		if (!Q_stricmp(key, "fs_game"))
 		{
