@@ -433,7 +433,7 @@ void SV_SpawnServer( char *server, qbool killBots ) {
 
 	// clear physics interaction links
 	SV_ClearWorld ();
-	
+
 	// media configstring setting should be done during
 	// the loading stage, so connected clients don't have
 	// to load during actual gameplay
@@ -484,12 +484,9 @@ void SV_SpawnServer( char *server, qbool killBots ) {
 					svs.clients[i].state = CS_CONNECTED;
 				}
 				else {
-					client_t		*client;
-					sharedEntity_t	*ent;
-
-					client = &svs.clients[i];
+					client_t* client = &svs.clients[i];
 					client->state = CS_ACTIVE;
-					ent = SV_GentityNum( i );
+					sharedEntity_t* ent = SV_GentityNum( i );
 					ent->s.number = i;
 					client->gentity = ent;
 
@@ -500,7 +497,7 @@ void SV_SpawnServer( char *server, qbool killBots ) {
 				}
 			}
 		}
-	}	
+	}
 
 	// run another frame to allow things to look at all the players
 	VM_Call (gvm, GAME_RUN_FRAME, sv.time);

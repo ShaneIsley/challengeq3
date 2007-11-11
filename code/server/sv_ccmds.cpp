@@ -156,7 +156,7 @@ static void SV_Map_f( void )
 	}
 
 	// force latched values to get set
-	Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
+	Cvar_Get( "g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
 
 	const char* cmd = Cmd_Argv(0);
 	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) {
@@ -192,11 +192,7 @@ static void SV_Map_f( void )
 	// if the level was started with "map <levelname>", then
 	// cheats will not be allowed.  If started with "devmap <levelname>"
 	// then cheats will be allowed
-	if ( cheat ) {
-		Cvar_Set( "sv_cheats", "1" );
-	} else {
-		Cvar_Set( "sv_cheats", "0" );
-	}
+	Cvar_Set( "sv_cheats", cheat ? "1" : "0" );
 }
 
 /*
