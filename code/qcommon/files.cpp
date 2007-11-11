@@ -283,8 +283,8 @@ static int		fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static char		*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
 
 // last valid game folder used
-char lastValidBase[MAX_OSPATH];
-char lastValidGame[MAX_OSPATH];
+static char lastValidBase[MAX_OSPATH];
+static char lastValidGame[MAX_OSPATH];
 
 #ifdef FS_MISSING
 FILE*		missingFiles = NULL;
@@ -2542,27 +2542,24 @@ void FS_Shutdown( qbool closemfp ) {
 
 void Com_AppendCDKey( const char *filename );
 void Com_ReadCDKey( const char *filename );
- 
+
 /*
-================
-FS_ReorderPurePaks
 NOTE TTimo: the reordering that happens here is not reflected in the cvars (\cvarlist *pak*)
   this can lead to misleading situations, see https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
-================
 */
-static void FS_ReorderPurePaks( void )
+static void FS_ReorderPurePaks()
 {
 	searchpath_t *s;
 	int i;
 	searchpath_t **p_insert_index, // for linked list reordering
 		**p_previous; // when doing the scan
-	
+
 	// only relevant when connected to pure server
 	if ( !fs_numServerPaks )
 		return;
-	
+
 	fs_reordered = qfalse;
-	
+
 	p_insert_index = &fs_searchpaths; // we insert in order at the beginning of the list 
 	for ( i = 0 ; i < fs_numServerPaks ; i++ ) {
 		p_previous = p_insert_index; // track the pointer-to-current-item
@@ -2583,11 +2580,7 @@ static void FS_ReorderPurePaks( void )
 	}
 }
 
-/*
-================
-FS_Startup
-================
-*/
+
 static void FS_Startup( const char *gameName )
 {
 	Com_Printf( "----- FS_Startup -----\n" );
@@ -2645,7 +2638,7 @@ static void FS_Startup( const char *gameName )
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=506
 	// reorder the pure pk3 files according to server order
 	FS_ReorderPurePaks();
-	
+
 	// print the current search paths
 	FS_Path_f();
 
@@ -2670,7 +2663,7 @@ Note: If you're building a game that doesn't depend on the
 Q3 media pak0.pk3, you'll want to remove this function
 ===================
 */
-static void FS_CheckPak0( void )
+static void FS_CheckPak0()
 {
 	searchpath_t	*path;
 	qbool			foundPak0 = qfalse;
@@ -3055,7 +3048,7 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-	FS_CheckPak0( );
+	FS_CheckPak0();
 
 	// if we can't find default.cfg, assume that the paths are
 	// busted and error out now, rather than getting an unreadable
@@ -3091,7 +3084,7 @@ void FS_Restart( int checksumFeed ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-	FS_CheckPak0( );
+	FS_CheckPak0();
 
 	// if we can't find default.cfg, assume that the paths are
 	// busted and error out now, rather than getting an unreadable
