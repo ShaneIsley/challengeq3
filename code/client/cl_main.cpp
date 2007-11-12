@@ -1021,7 +1021,7 @@ void CL_Rcon_f( void ) {
 			to.port = BigShort (PORT_SERVER);
 		}
 	}
-	
+
 	NET_SendPacket (NS_CLIENT, strlen(message)+1, message, to);
 }
 
@@ -1245,7 +1245,7 @@ void CL_NextDownload(void) {
 		if (*s == '@')
 			s++;
 		remoteName = s;
-		
+
 		if ( (s = strchr(s, '@')) == NULL ) {
 			CL_DownloadsComplete();
 			return;
@@ -1341,7 +1341,7 @@ void CL_InitDownloads(void) {
 		}
 
 	}
-		
+
 	CL_DownloadsComplete();
 }
 
@@ -1525,7 +1525,7 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 		// advance to initial token
 		do {
 			if (*buffptr++ == '\\')
-				break;		
+				break;
 		}
 		while (buffptr < buffend);
 
@@ -1795,7 +1795,7 @@ void CL_CheckTimeout( void )
 	//
 	if ( ( !cl_paused->integer || !sv_paused->integer ) 
 		&& cls.state >= CA_CONNECTED && cls.state != CA_CINEMATIC
-	    && cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
+		&& cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
 			Com_Printf ("\nServer connection timed out.\n");
 			CL_Disconnect( qtrue );
@@ -1809,13 +1809,9 @@ void CL_CheckTimeout( void )
 
 //============================================================================
 
-/*
-==================
-CL_CheckUserinfo
 
-==================
-*/
-void CL_CheckUserinfo( void ) {
+static void CL_CheckUserinfo()
+{
 	// don't add reliable commands when not yet connected
 	if ( cls.state < CA_CHALLENGING ) {
 		return;
@@ -1829,7 +1825,6 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand( va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ) );
 	}
-
 }
 
 /*
@@ -1867,7 +1862,7 @@ void CL_Frame ( int msec ) {
 		// bring up the cd error dialog if needed
 		cls.cddialog = qfalse;
 		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_CD );
-	} else	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
+	} else if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
 		&& !com_sv_running->integer ) {
 		// if disconnected, bring up the menu
 		S_StopAllSounds();
@@ -1887,7 +1882,7 @@ void CL_Frame ( int msec ) {
 			}
 		}
 	}
-	
+
 	// save the msec before checking pause
 	cls.realFrametime = msec;
 
@@ -1958,13 +1953,8 @@ void QDECL CL_RefPrintf( int print_level, const char *fmt, ...) {
 }
 
 
-
-/*
-============
-CL_ShutdownRef
-============
-*/
-void CL_ShutdownRef( void ) {
+static void CL_ShutdownRef()
+{
 	if ( !re.Shutdown ) {
 		return;
 	}
@@ -1972,13 +1962,8 @@ void CL_ShutdownRef( void ) {
 	Com_Memset( &re, 0, sizeof( re ) );
 }
 
-/*
-============
-CL_InitRenderer
-============
-*/
 
-void CL_InitRenderer( void )
+static void CL_InitRenderer()
 {
 	// this sets up the renderer and calls R_Init
 	re.BeginRegistration( &cls.glconfig );
@@ -2411,7 +2396,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].gameType = 0;
 	cls.localServers[i].netType = from.type;
 	cls.localServers[i].punkbuster = 0;
-									 
+
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
 	if (strlen(info)) {
 		if (info[strlen(info)-1] != '\n') {
@@ -2667,7 +2652,7 @@ void CL_GlobalServers_f( void ) {
 	
 	if ( Cmd_Argc() < 3) {
 		Com_Printf( "usage: globalservers <master# 0-1> <protocol> [keywords]\n");
-		return;	
+		return;
 	}
 
 	cls.masterNum = atoi( Cmd_Argv(1) );
@@ -2872,7 +2857,7 @@ static void CL_Ping_f()
 {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf( "usage: ping [server]\n");
-		return;	
+		return;
 	}
 
 	netadr_t to;
@@ -2980,7 +2965,7 @@ qbool CL_UpdateVisiblePings_f(int source) {
 				}
 			}
 		}
-	} 
+	}
 
 	if (slots) {
 		status = qtrue;
@@ -3082,7 +3067,7 @@ qbool CL_CDKeyValidate( const char *key, const char *checksum )
 	}
 
 	sprintf(chs, "%02x", sum);
-	
+
 	if (checksum && !Q_stricmp(chs, checksum)) {
 		return qtrue;
 	}
@@ -3247,7 +3232,7 @@ void CL_Shutdown()
 
 	S_Shutdown();
 	CL_ShutdownRef();
-	
+
 	CL_ShutdownUI();
 
 	Cmd_RemoveCommand ("cmd");

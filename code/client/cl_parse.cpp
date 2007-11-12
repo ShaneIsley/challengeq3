@@ -492,10 +492,9 @@ void CL_ParseGamestate( msg_t *msg ) {
 	CL_SystemInfoChanged();
 
 	// reinitialize the filesystem if the game directory has changed
-  FS_ConditionalRestart( clc.checksumFeed );
+	FS_ConditionalRestart( clc.checksumFeed );
 
-	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
-	// cgame
+	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the cgame
 	CL_InitDownloads();
 
 	// make sure the game starts
@@ -546,7 +545,7 @@ void CL_ParseDownload ( msg_t *msg ) {
 		Com_Error(ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk.", size);
 		return;
 	}
-	
+
 	MSG_ReadData(msg, data, size);
 
 	if (clc.downloadBlock != block) {
@@ -598,7 +597,7 @@ void CL_ParseDownload ( msg_t *msg ) {
 		CL_WritePacket();
 
 		// get another file if needed
-		CL_NextDownload ();
+		CL_NextDownload();
 	}
 }
 
@@ -680,7 +679,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 		switch ( cmd ) {
 		default:
 			Com_Error (ERR_DROP,"CL_ParseServerMessage: Illegible server message\n");
-			break;			
+			break;
 		case svc_nop:
 			break;
 		case svc_serverCommand:
@@ -698,5 +697,4 @@ void CL_ParseServerMessage( msg_t *msg ) {
 		}
 	}
 }
-
 
