@@ -743,7 +743,7 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 		return;	// Nothing being downloaded
 
 	if (!cl->download) {
- 		// Chop off filename extension.
+		// Chop off filename extension.
 		Com_sprintf(pakbuf, sizeof(pakbuf), "%s", cl->downloadName);
 		pakptr = Q_strrchr(pakbuf, '.');
 
@@ -790,8 +790,9 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 			else if (idPack) {
 				Com_Printf("clientDownload: %d : \"%s\" cannot download id pk3 files\n", cl - svs.clients, cl->downloadName);
 				if (missionPack) {
-					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload Team Arena file \"%s\"\n"
-									"The Team Arena mission pack can be found in your local game store.", cl->downloadName);
+					Com_sprintf(errorMessage, sizeof(errorMessage),
+						"Cannot autodownload Team Arena file \"%s\"\n"
+						"The Team Arena mission pack can be found in your local game store.", cl->downloadName);
 				}
 				else {
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload id pk3 file \"%s\"", cl->downloadName);
@@ -799,18 +800,20 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 			} else if ( !sv_allowDownload->integer ) {
 				Com_Printf("clientDownload: %d : \"%s\" download disabled", cl - svs.clients, cl->downloadName);
 				if (sv_pure->integer) {
-					Com_sprintf(errorMessage, sizeof(errorMessage), "Could not download \"%s\" because autodownloading is disabled on the server.\n\n"
-										"You will need to get this file elsewhere before you "
-										"can connect to this pure server.\n", cl->downloadName);
+					Com_sprintf(errorMessage, sizeof(errorMessage),
+						"Could not download \"%s\" because autodownloading is disabled on the server.\n\n"
+						"You will need to get this file elsewhere before you "
+						"can connect to this pure server.\n", cl->downloadName);
 				} else {
-					Com_sprintf(errorMessage, sizeof(errorMessage), "Could not download \"%s\" because autodownloading is disabled on the server.\n\n"
-                    "The server you are connecting to is not a pure server, "
-                    "set autodownload to No in your settings and you might be "
-                    "able to join the game anyway.\n", cl->downloadName);
+					Com_sprintf(errorMessage, sizeof(errorMessage),
+						"Could not download \"%s\" because autodownloading is disabled on the server.\n\n"
+						"The server you are connecting to is not a pure server, "
+						"set autodownload to No in your settings and you might be "
+						"able to join the game anyway.\n", cl->downloadName);
 				}
 			} else {
-        // NOTE TTimo this is NOT supposed to happen unless bug in our filesystem scheme?
-        //   if the pk3 is referenced, it must have been found somewhere in the filesystem
+				// NOTE TTimo this is NOT supposed to happen unless bug in our filesystem scheme?
+				//   if the pk3 is referenced, it must have been found somewhere in the filesystem
 				Com_Printf("clientDownload: %d : \"%s\" file not found on server\n", cl - svs.clients, cl->downloadName);
 				Com_sprintf(errorMessage, sizeof(errorMessage), "File \"%s\" not found on server for autodownloading.\n", cl->downloadName);
 			}
@@ -825,7 +828,6 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 
 		Com_Printf( "clientDownload: %d : beginning \"%s\"\n", cl - svs.clients, cl->downloadName );
 
-		// Init
 		cl->downloadCurrentBlock = cl->downloadClientBlock = cl->downloadXmitBlock = 0;
 		cl->downloadCount = 0;
 		cl->downloadEOF = qfalse;

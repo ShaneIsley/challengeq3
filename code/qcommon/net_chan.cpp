@@ -221,7 +221,7 @@ qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 	// XOR unscramble all data in the packet after the header
 //	Netchan_UnScramblePacket( msg );
 
-	// get sequence numbers		
+	// get sequence numbers
 	MSG_BeginReadingOOB( msg );
 	sequence = MSG_ReadLong( msg );
 
@@ -488,7 +488,7 @@ typedef struct packetQueue_s {
 	int release;
 } packetQueue_t;
 
-packetQueue_t* packetQueue = NULL;
+static packetQueue_t* packetQueue = NULL;
 
 static void NET_QueuePacket( int length, const void* data, netadr_t to, int offset )
 {
