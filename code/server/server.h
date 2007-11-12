@@ -110,8 +110,10 @@ typedef struct netchan_buffer_s {
 	struct netchan_buffer_s *next;
 } netchan_buffer_t;
 
+// KHB  these are basically WORTHLESS, because netchan will cap blocks at FRAGMENT_SIZE
+// so the best possible dl rate is essentially 1K per snap, REGARDLESS OF RATE, ie 30K/s ABSOLUTE MAX
 #define MAX_DOWNLOAD_WINDOW		8 // max number of unacked download packets
-#define MAX_DOWNLOAD_BLKSIZE	(MAX_MSGLEN >> 1)
+#define MAX_DOWNLOAD_BLKSIZE	2048
 
 typedef struct client_s {
 	clientState_t	state;

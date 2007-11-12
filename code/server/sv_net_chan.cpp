@@ -109,7 +109,7 @@ static void SV_Netchan_Decode( client_t *client, msg_t *msg ) {
 
 	string = (byte *)client->reliableCommands[ reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ];
 	index = 0;
-	//
+
 	key = client->challenge ^ serverId ^ messageAcknowledge;
 	for (i = msg->readcount + SV_DECODE_START; i < msg->cursize; i++) {
 		// modify the key with the last sent and acknowledged server command
@@ -156,8 +156,8 @@ void SV_Netchan_TransmitNextFragment( client_t *client ) {
 			else
 				Com_DPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
 			Z_Free(netbuf);
-		} 
-	}	
+		}
+	}
 }
 
 

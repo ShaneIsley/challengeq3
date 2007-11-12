@@ -534,15 +534,14 @@ to take to clear, based on the current rate
 ====================
 */
 #define	HEADER_RATE_BYTES	48		// include our header, IP header, and some overhead
-static int SV_RateMsec( client_t *client, int messageSize ) {
-	int		rate;
-	int		rateMsec;
-
+static int SV_RateMsec( client_t *client, int messageSize )
+{
 	// individual messages will never be larger than fragment size
-	if ( messageSize > 1500 ) {
+	// FIXME - use MAX_PACKETLEN or FRAGMENT_SIZE here, not random numbers...
+	if ( messageSize > 1500 )
 		messageSize = 1500;
-	}
-	rate = client->rate;
+
+	int rate = client->rate;
 	if ( sv_maxRate->integer ) {
 		if ( sv_maxRate->integer < 1000 ) {
 			Cvar_Set( "sv_MaxRate", "1000" );
@@ -558,9 +557,7 @@ static int SV_RateMsec( client_t *client, int messageSize ) {
 			rate = sv_minRate->integer;
 	}
 
-	rateMsec = ( messageSize + HEADER_RATE_BYTES ) * 1000 / rate;
-
-	return rateMsec;
+	return (( messageSize + HEADER_RATE_BYTES ) * 1000 / rate);
 }
 
 /*
@@ -586,11 +583,11 @@ void SV_SendMessageToClient( msg_t *msg, client_t *client ) {
 	// local clients get snapshots every frame
 	// TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=491
 	// added sv_lanForceRate check
-	if ( client->netchan.remoteAddress.type == NA_LOOPBACK || (sv_lanForceRate->integer && Sys_IsLANAddress (client->netchan.remoteAddress)) ) {
+	if ( client->netchan.remoteAddress.type == NA_LOOPBACK || (sv_lanForceRate->integer && Sys_IsLANAddress(client->netchan.remoteAddress)) ) {
 		client->nextSnapshotTime = svs.time - 1;
 		return;
 	}
-	
+
 	// normal rate / snapshotMsec calculation
 	rateMsec = SV_RateMsec( client, msg->cursize );
 
@@ -631,8 +628,8 @@ void SV_SendClientSnapshot( client_t *client ) {
 	// build the snapshot
 	SV_BuildClientSnapshot( client );
 
-	// bots need to have their snapshots build, but
-	// the query them directly without needing to be sent
+	// bots need to have their snapshots built, but
+	// then query them directly without needing to be sent
 	if ( client->gentity && client->gentity->r.svFlags & SVF_BOT ) {
 		return;
 	}
