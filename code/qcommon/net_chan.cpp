@@ -171,7 +171,6 @@ void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
 
 		// only send the first fragment now
 		Netchan_TransmitNextFragment( chan );
-
 		return;
 	}
 
@@ -200,26 +199,21 @@ void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
 	}
 }
 
-/*
-=================
-Netchan_Process
 
-Returns qfalse if the message should not be processed due to being
+/*
+Returns false if the message should not be processed due to being
 out of order or a fragment.
 
 Msg must be large enough to hold MAX_MSGLEN, because if this is the
 final fragment of a multi-part message, the entire thing will be
 copied out.
-=================
 */
-qbool Netchan_Process( netchan_t *chan, msg_t *msg ) {
-	int			sequence;
-	int			qport;
-	int			fragmentStart, fragmentLength;
+qbool Netchan_Process( netchan_t *chan, msg_t *msg )
+{
+	int		sequence;
+	int		qport;
+	int		fragmentStart, fragmentLength;
 	qbool	fragmented;
-
-	// XOR unscramble all data in the packet after the header
-//	Netchan_UnScramblePacket( msg );
 
 	// get sequence numbers
 	MSG_BeginReadingOOB( msg );
