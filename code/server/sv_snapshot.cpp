@@ -659,6 +659,7 @@ void SV_SendClientSnapshot( client_t *client ) {
 
 	SV_SendMessageToClient( &msg, client );
 
+/* this works fine on lan (160K/s dl, yay) and SEEMS okay over the net, but needs more testing
 #define UNSUCK_DOWNLOADS
 #if defined( UNSUCK_DOWNLOADS )
 	// KHB 071111  the whole reason Q3 dl's SUCK is that there's a "secret" artificial cap
@@ -670,6 +671,7 @@ void SV_SendClientSnapshot( client_t *client ) {
 		SV_Netchan_TransmitNextFragment( client );
 	}
 #endif
+*/
 }
 
 
