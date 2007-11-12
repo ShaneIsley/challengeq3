@@ -658,6 +658,18 @@ void SV_SendClientSnapshot( client_t *client ) {
 	}
 
 	SV_SendMessageToClient( &msg, client );
+
+#define UNSUCK_DOWNLOADS
+#if defined( UNSUCK_DOWNLOADS )
+	// KHB 071111  the whole reason Q3 dl's SUCK is that there's a "secret" artificial cap
+	// based on UDP packet sizes. so the server "sends" a 2K block each snap, but it's actually
+	// cut down to 1300 bytes, MINUS the game traffic, so the ABSOLUTE peak dl speed is roughly
+	// 1K * 30 snaps, EVEN ON LAN; and the realistic dl speed from an active server is about
+	// 400 bytes * svfps, depending on how many random newbs are spamming plasma and chat etc
+	while (client->netchan.unsentFragments) {
+		SV_Netchan_TransmitNextFragment( client );
+	}
+#endif
 }
 
 
