@@ -146,7 +146,7 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 		var_name = "BADNAME";
 	}
 
-	cvar_t* var = Cvar_FindVar (var_name);
+	cvar_t* var = Cvar_FindVar(var_name);
 	if (!var) {
 		if ( !value )
 			return NULL;
@@ -241,7 +241,7 @@ The flags will be or'ed in if the variable exists.
 */
 cvar_t* Cvar_Get( const char *var_name, const char *var_value, int flags )
 {
-	if ( !var_name || ! var_value ) {
+	if ( !var_name || !var_value ) {
 		Com_Error( ERR_FATAL, "Cvar_Get: NULL parameter" );
 	}
 
@@ -259,9 +259,7 @@ cvar_t* Cvar_Get( const char *var_name, const char *var_value, int flags )
 			var->flags &= ~CVAR_USER_CREATED;
 			Z_Free( var->resetString );
 			var->resetString = CopyString( var_value );
-
-			// ZOID--needs to be set so that cvars the game sets as 
-			// SERVERINFO get sent to clients
+			// needs to be set so that cvars the game tags as SERVERINFO get sent to clients
 			cvar_modifiedFlags |= flags;
 		}
 
@@ -322,6 +320,7 @@ breaks every single mod except CPMA otherwise, but it IS wrong, and critically s
 	cvar_vars = var;
 
 	var->flags = flags;
+	cvar_modifiedFlags |= flags; // needed so USERINFO cvars created by cgame actually get sent
 
 	long hash = Cvar_Hash(var_name);
 	var->hashNext = hashTable[hash];
