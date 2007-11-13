@@ -284,11 +284,20 @@ cvar_t* Cvar_Get( const char *var_name, const char *var_value, int flags )
 			Z_Free( s );
 		}
 
+/* KHB  note that this is #if 0'd in the 132 code, but is actually REQUIRED for correctness
+	consider a cgame that sets a CVAR_ROM client version:
+	you connect to a v1 server, load the v1 cgame, and set the ROM version to v1
+	you then connect to a v2 server and correctly load the v2 cgame, but
+	when that registers its GENUINELY "NEW" version var, the value is ignored
+	so now you have a CVAR_ROM with the wrong value in it. gg.
+i'm preserving this incorrect behavior FOR NOW for compatability, because
+game\ai_main.c(1352): trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
+breaks every single mod except CPMA otherwise, but it IS wrong, and critically so
 		// CVAR_ROM always overrides
 		if (flags & CVAR_ROM) {
 			Cvar_Set2( var_name, var_value, qtrue );
 		}
-
+*/
 		return var;
 	}
 
