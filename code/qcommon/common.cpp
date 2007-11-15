@@ -76,7 +76,6 @@ cvar_t	*cl_paused;
 cvar_t	*sv_paused;
 cvar_t	*cl_packetdelay;
 cvar_t	*sv_packetdelay;
-cvar_t	*com_cameraMode;
 #if defined(_WIN32) && defined(_DEBUG)
 cvar_t	*com_noErrorInterrupt;
 #endif
@@ -2299,7 +2298,6 @@ void Com_Init( char *commandLine )
 	com_viewlog = Cvar_Get( "viewlog", "0", CVAR_CHEAT );
 	com_speeds = Cvar_Get ("com_speeds", "0", 0);
 	com_timedemo = Cvar_Get ("timedemo", "0", CVAR_CHEAT);
-	com_cameraMode = Cvar_Get ("com_cameraMode", "0", CVAR_CHEAT);
 
 	cl_paused = Cvar_Get ("cl_paused", "0", CVAR_ROM);
 	sv_paused = Cvar_Get ("sv_paused", "0", CVAR_ROM);
@@ -2452,8 +2450,6 @@ int Com_ModifyMsec( int msec )
 	if ( com_fixedtime->integer ) {
 		msec = com_fixedtime->integer;
 	} else if ( com_timescale->value ) {
-		msec *= com_timescale->value;
-	} else if (com_cameraMode->integer) {
 		msec *= com_timescale->value;
 	}
 

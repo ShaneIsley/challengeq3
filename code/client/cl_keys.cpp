@@ -1065,11 +1065,8 @@ void CL_KeyEvent (int key, qbool down, unsigned time) {
 
 	// keys can still be used for bound actions
 	if ( down && ( key < 128 || key == K_MOUSE1 ) && ( clc.demoplaying || cls.state == CA_CINEMATIC ) && !cls.keyCatchers) {
-
-		if (Cvar_VariableValue ("com_cameraMode") == 0) {
-			Cvar_Set ("nextdemo","");
-			key = K_ESCAPE;
-		}
+		Cvar_Set ("nextdemo","");
+		key = K_ESCAPE;
 	}
 
 
