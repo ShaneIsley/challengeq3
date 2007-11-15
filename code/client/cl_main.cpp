@@ -97,8 +97,6 @@ int serverStatusCount;
 	void hA3Dg_ExportRenderGeom (refexport_t *incoming_re);
 #endif
 
-void CL_CheckForResend( void );
-void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
 
 /*
 ===============
@@ -124,7 +122,7 @@ CLIENT RELIABLE COMMAND COMMUNICATION
 ======================
 CL_AddReliableCommand
 
-The given command will be transmitted to the server, and is gauranteed to
+The given command will be transmitted to the server, and is guaranteed to
 not have future usercmd_t executed before it is executed
 ======================
 */
@@ -141,23 +139,6 @@ void CL_AddReliableCommand( const char *cmd ) {
 	Q_strncpyz( clc.reliableCommands[ index ], cmd, sizeof( clc.reliableCommands[ index ] ) );
 }
 
-/*
-======================
-CL_ChangeReliableCommand
-======================
-*/
-void CL_ChangeReliableCommand( void ) {
-	int r, index, l;
-
-	r = clc.reliableSequence - (random() * 5);
-	index = clc.reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
-	l = strlen(clc.reliableCommands[ index ]);
-	if ( l >= MAX_STRING_CHARS - 1 ) {
-		l = MAX_STRING_CHARS - 2;
-	}
-	clc.reliableCommands[ index ][ l ] = '\n';
-	clc.reliableCommands[ index ][ l+1 ] = '\0';
-}
 
 /*
 =======================================================================
@@ -167,26 +148,23 @@ CLIENT SIDE DEMO RECORDING
 =======================================================================
 */
 
-/*
-====================
-CL_WriteDemoMessage
 
-Dumps the current net message, prefixed by the length
-====================
-*/
-void CL_WriteDemoMessage ( msg_t *msg, int headerBytes ) {
-	int		len, swlen;
+// saves the current net message to file, prefixed by the length
+
+static void CL_WriteDemoMessage ( msg_t *msg, int headerBytes )
+{
+	int len, swlen;
 
 	// write the packet sequence
 	len = clc.serverMessageSequence;
 	swlen = LittleLong( len );
-	FS_Write (&swlen, 4, clc.demofile);
+	FS_Write( &swlen, 4, clc.demofile );
 
 	// skip the packet sequencing information
 	len = msg->cursize - headerBytes;
 	swlen = LittleLong(len);
-	FS_Write (&swlen, 4, clc.demofile);
-	FS_Write ( msg->data + headerBytes, len, clc.demofile );
+	FS_Write( &swlen, 4, clc.demofile );
+	FS_Write( msg->data + headerBytes, len, clc.demofile );
 }
 
 
@@ -343,16 +321,11 @@ CLIENT SIDE DEMO PLAYBACK
 =======================================================================
 */
 
-/*
-=================
-CL_DemoCompleted
-=================
-*/
-void CL_DemoCompleted( void ) {
+
+static void CL_DemoCompleted()
+{
 	if (cl_timedemo && cl_timedemo->integer) {
-		int	time;
-		
-		time = Sys_Milliseconds() - clc.timeDemoStart;
+		int time = Sys_Milliseconds() - clc.timeDemoStart;
 		if ( time > 0 ) {
 			Com_Printf ("%i frames, %3.1f seconds: %3.1f fps\n", clc.timeDemoFrames,
 			time/1000.0, clc.timeDemoFrames*1000.0 / time);
@@ -375,14 +348,14 @@ void CL_ReadDemoMessage( void ) {
 	int			s;
 
 	if ( !clc.demofile ) {
-		CL_DemoCompleted ();
+		CL_DemoCompleted();
 		return;
 	}
 
 	// get the sequence number
 	r = FS_Read( &s, 4, clc.demofile);
 	if ( r != 4 ) {
-		CL_DemoCompleted ();
+		CL_DemoCompleted();
 		return;
 	}
 	clc.serverMessageSequence = LittleLong( s );
@@ -393,12 +366,12 @@ void CL_ReadDemoMessage( void ) {
 	// get the length
 	r = FS_Read (&buf.cursize, 4, clc.demofile);
 	if ( r != 4 ) {
-		CL_DemoCompleted ();
+		CL_DemoCompleted();
 		return;
 	}
 	buf.cursize = LittleLong( buf.cursize );
 	if ( buf.cursize == -1 ) {
-		CL_DemoCompleted ();
+		CL_DemoCompleted();
 		return;
 	}
 	if ( buf.cursize > buf.maxsize ) {
@@ -407,7 +380,7 @@ void CL_ReadDemoMessage( void ) {
 	r = FS_Read( buf.data, buf.cursize, clc.demofile );
 	if ( r != buf.cursize ) {
 		Com_Printf( "Demo file was truncated.\n");
-		CL_DemoCompleted ();
+		CL_DemoCompleted();
 		return;
 	}
 
@@ -455,7 +428,7 @@ void CL_PlayDemo_f()
 
 	// open the demo file
 	const char* arg = Cmd_Argv(1);
-	
+
 	// check for an extension .dm_?? (?? is protocol)
 	const char* ext = arg + strlen(arg) - 6;
 	if ((strlen(arg) > 6) && (ext[0] == '.') && ((ext[1] == 'd') || (ext[1] == 'D')) && ((ext[2] == 'm') || (ext[2] == 'M')) && (ext[3] == '_'))
@@ -570,17 +543,155 @@ void CL_ShutdownAll(void)
 	cls.soundRegistered = qfalse;
 }
 
-/*
-=================
-CL_FlushMemory
 
-Called by CL_MapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate the only
+/*
+Authorization server protocol
+-----------------------------
+
+All commands are text in Q3 out of band packets (leading 0xff 0xff 0xff 0xff).
+
+Whenever the client tries to get a challenge from the server it wants to
+connect to, it also blindly fires off a packet to the authorize server:
+
+getKeyAuthorize <challenge> <cdkey>
+
+cdkey may be "demo"
+
+
+#OLD The authorize server returns a:
+#OLD 
+#OLD keyAthorize <challenge> <accept | deny>
+#OLD 
+#OLD A client will be accepted if the cdkey is valid and it has not been used by any other IP
+#OLD address in the last 15 minutes.
+
+
+The server sends a:
+
+getIpAuthorize <challenge> <ip>
+
+The authorize server returns a:
+
+ipAuthorize <challenge> <accept | deny | demo | unknown >
+
+A client will be accepted if a valid cdkey was sent by that ip (only) in the last 15 minutes.
+If no response is received from the authorize server after two tries, the client will be let
+in anyway.
+*/
+static void CL_RequestAuthorization()
+{
+	char key[CDKEY_LEN + 1];
+
+	if ( !cls.authorizeServer.port ) {
+		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
+		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer  ) ) {
+			Com_Printf( "Couldn't resolve address\n" );
+			return;
+		}
+
+		cls.authorizeServer.port = BigShort( PORT_AUTHORIZE );
+		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
+			cls.authorizeServer.ip[0], cls.authorizeServer.ip[1],
+			cls.authorizeServer.ip[2], cls.authorizeServer.ip[3],
+			BigShort( cls.authorizeServer.port ) );
+	}
+	if ( cls.authorizeServer.type == NA_BAD ) {
+		return;
+	}
+
+	int i;
+	for (i = 0; (i < CDKEY_LEN) && cl_cdkey[i]; ++i) {
+		// the cd key should have already been checked for validity, but just in case:
+		if ( ( cl_cdkey[i] >= '0' && cl_cdkey[i] <= '9' )
+				|| ( cl_cdkey[i] >= 'a' && cl_cdkey[i] <= 'z' )
+				|| ( cl_cdkey[i] >= 'A' && cl_cdkey[i] <= 'Z' )
+				) {
+			key[i] = cl_cdkey[i];
+		} else {
+			Com_Error( ERR_DROP, "Invalid CD Key" );
+		}
+	}
+	key[i] = 0;
+
+	const cvar_t* anon = Cvar_Get( "cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
+	NET_OutOfBandPrint( NS_CLIENT, cls.authorizeServer, va("getKeyAuthorize %i %s", anon->integer, key) );
+}
+
+
+// resend a connect message if the last one has timed out
+
+static void CL_CheckForResend()
+{
+	int		port, i;
+	char	info[MAX_INFO_STRING];
+	char	data[MAX_INFO_STRING];
+
+	// don't send anything if playing back a demo
+	if ( clc.demoplaying ) {
+		return;
+	}
+
+	// resend if we haven't gotten a reply yet
+	if ( cls.state != CA_CONNECTING && cls.state != CA_CHALLENGING ) {
+		return;
+	}
+
+	if ( cls.realtime - clc.connectTime < RETRANSMIT_TIMEOUT ) {
+		return;
+	}
+
+	clc.connectTime = cls.realtime;	// for retransmit requests
+	clc.connectPacketCount++;
+
+
+	switch ( cls.state ) {
+	case CA_CONNECTING:
+		// requesting a challenge
+		if ( !Sys_IsLANAddress( clc.serverAddress ) ) {
+			CL_RequestAuthorization();
+		}
+		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getchallenge");
+		break;
+
+	case CA_CHALLENGING:
+		// sending back the challenge
+		port = Cvar_VariableValue ("net_qport");
+
+		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
+		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
+		Info_SetValueForKey( info, "qport", va("%i", port ) );
+		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
+
+		strcpy(data, "connect ");
+		// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
+		//   (Com_TokenizeString tokenizes around spaces)
+		data[8] = '"';
+
+		for(i=0;i<strlen(info);i++) {
+			data[9+i] = info[i];	// + (clc.challenge)&0x3;
+		}
+		data[9+i] = '"';
+		data[10+i] = 0;
+
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], i+10 );
+		// the most current userinfo has been sent, so watch for any
+		// newer changes to userinfo variables
+		cvar_modifiedFlags &= ~CVAR_USERINFO;
+		break;
+
+	default:
+		Com_Error( ERR_FATAL, "CL_CheckForResend: bad cls.state" );
+	}
+}
+
+
+/*
+Called by CL_MapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate, the only
 ways a client gets into a game
 Also called by Com_Error
-=================
 */
-void CL_FlushMemory( void ) {
-
+void CL_FlushMemory( void )
+{
 	// shutdown all the client stuff
 	CL_ShutdownAll();
 
@@ -640,17 +751,12 @@ void CL_MapLoading( void ) {
 	}
 }
 
-/*
-=====================
-CL_ClearState
 
-Called before parsing a gamestate
-=====================
-*/
-void CL_ClearState (void) {
+// called before parsing a gamestate
 
-//	S_StopAllSounds();
-
+void CL_ClearState()
+{
+	//S_StopAllSounds();
 	Com_Memset( &cl, 0, sizeof( cl ) );
 }
 
@@ -787,87 +893,6 @@ static void CL_RequestMotd()
 	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
 }
 
-/*
-===================
-CL_RequestAuthorization
-
-Authorization server protocol
------------------------------
-
-All commands are text in Q3 out of band packets (leading 0xff 0xff 0xff 0xff).
-
-Whenever the client tries to get a challenge from the server it wants to
-connect to, it also blindly fires off a packet to the authorize server:
-
-getKeyAuthorize <challenge> <cdkey>
-
-cdkey may be "demo"
-
-
-#OLD The authorize server returns a:
-#OLD 
-#OLD keyAthorize <challenge> <accept | deny>
-#OLD 
-#OLD A client will be accepted if the cdkey is valid and it has not been used by any other IP
-#OLD address in the last 15 minutes.
-
-
-The server sends a:
-
-getIpAuthorize <challenge> <ip>
-
-The authorize server returns a:
-
-ipAuthorize <challenge> <accept | deny | demo | unknown >
-
-A client will be accepted if a valid cdkey was sent by that ip (only) in the last 15 minutes.
-If no response is received from the authorize server after two tries, the client will be let
-in anyway.
-===================
-*/
-void CL_RequestAuthorization( void ) {
-	char	nums[64];
-	int		i, j, l;
-	cvar_t	*fs;
-
-	if ( !cls.authorizeServer.port ) {
-		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
-		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer  ) ) {
-			Com_Printf( "Couldn't resolve address\n" );
-			return;
-		}
-
-		cls.authorizeServer.port = BigShort( PORT_AUTHORIZE );
-		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
-			cls.authorizeServer.ip[0], cls.authorizeServer.ip[1],
-			cls.authorizeServer.ip[2], cls.authorizeServer.ip[3],
-			BigShort( cls.authorizeServer.port ) );
-	}
-	if ( cls.authorizeServer.type == NA_BAD ) {
-		return;
-	}
-
-	// only grab the alphanumeric values from the cdkey, to avoid any dashes or spaces
-	j = 0;
-	l = strlen( cl_cdkey );
-	if ( l > 32 ) {
-		l = 32;
-	}
-	for ( i = 0 ; i < l ; i++ ) {
-		if ( ( cl_cdkey[i] >= '0' && cl_cdkey[i] <= '9' )
-			|| ( cl_cdkey[i] >= 'a' && cl_cdkey[i] <= 'z' )
-			|| ( cl_cdkey[i] >= 'A' && cl_cdkey[i] <= 'Z' )
-			) {
-			nums[j] = cl_cdkey[i];
-			j++;
-		}
-	}
-	nums[j] = 0;
-
-	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
-
-	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, va("getKeyAuthorize %i %s", fs->integer, nums) );
-}
 
 /*
 ======================================================================
@@ -1345,87 +1370,15 @@ void CL_InitDownloads(void) {
 	CL_DownloadsComplete();
 }
 
-/*
-=================
-CL_CheckForResend
-
-Resend a connect message if the last one has timed out
-=================
-*/
-void CL_CheckForResend( void ) {
-	int		port, i;
-	char	info[MAX_INFO_STRING];
-	char	data[MAX_INFO_STRING];
-
-	// don't send anything if playing back a demo
-	if ( clc.demoplaying ) {
-		return;
-	}
-
-	// resend if we haven't gotten a reply yet
-	if ( cls.state != CA_CONNECTING && cls.state != CA_CHALLENGING ) {
-		return;
-	}
-
-	if ( cls.realtime - clc.connectTime < RETRANSMIT_TIMEOUT ) {
-		return;
-	}
-
-	clc.connectTime = cls.realtime;	// for retransmit requests
-	clc.connectPacketCount++;
-
-
-	switch ( cls.state ) {
-	case CA_CONNECTING:
-		// requesting a challenge
-		if ( !Sys_IsLANAddress( clc.serverAddress ) ) {
-			CL_RequestAuthorization();
-		}
-		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getchallenge");
-		break;
-
-	case CA_CHALLENGING:
-		// sending back the challenge
-		port = Cvar_VariableValue ("net_qport");
-
-		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
-		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
-		Info_SetValueForKey( info, "qport", va("%i", port ) );
-		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
-
-		strcpy(data, "connect ");
-		// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-		//   (Com_TokenizeString tokenizes around spaces)
-		data[8] = '"';
-
-		for(i=0;i<strlen(info);i++) {
-			data[9+i] = info[i];	// + (clc.challenge)&0x3;
-		}
-		data[9+i] = '"';
-		data[10+i] = 0;
-
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], i+10 );
-		// the most current userinfo has been sent, so watch for any
-		// newer changes to userinfo variables
-		cvar_modifiedFlags &= ~CVAR_USERINFO;
-		break;
-
-	default:
-		Com_Error( ERR_FATAL, "CL_CheckForResend: bad cls.state" );
-	}
-}
 
 /*
-===================
-CL_DisconnectPacket
-
 Sometimes the server can drop the client and the netchan based
 disconnect can be lost.  If the client continues to send packets
 to the server, the server will send out of band disconnect packets
 to the client so it doesn't have to wait for the full timeout period.
-===================
 */
-void CL_DisconnectPacket( netadr_t from ) {
+static void CL_DisconnectPacket( const netadr_t& from )
+{
 	if ( cls.state < CA_AUTHORIZING ) {
 		return;
 	}
@@ -1467,12 +1420,9 @@ static void CL_MotdPacket( const netadr_t& from )
 	Cvar_Set( "cl_motdString", s );
 }
 
-/*
-===================
-CL_InitServerInfo
-===================
-*/
-void CL_InitServerInfo( serverInfo_t *server, serverAddress_t *address ) {
+
+static void CL_InitServerInfo( serverInfo_t *server, const serverAddress_t* address )
+{
 	server->adr.type  = NA_IP;
 	server->adr.ip[0] = address->ip[0];
 	server->adr.ip[1] = address->ip[1];
@@ -1493,12 +1443,9 @@ void CL_InitServerInfo( serverInfo_t *server, serverAddress_t *address ) {
 
 #define MAX_SERVERSPERPACKET	256
 
-/*
-===================
-CL_ServersResponsePacket
-===================
-*/
-void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
+
+static void CL_ServersResponsePacket( const netadr_t& from, msg_t *msg )
+{
 	int				i, count, max, total;
 	serverAddress_t addresses[MAX_SERVERSPERPACKET];
 	int				numservers;
@@ -1610,6 +1557,94 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 	}
 
 	Com_Printf("%d servers parsed (total %d)\n", numservers, total);
+}
+
+
+void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg )
+{
+	char	info[MAX_INFO_STRING];
+	int		i, l, score, ping;
+	int		len;
+
+	serverStatus_t* serverStatus = NULL;
+	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
+		if ( NET_CompareAdr( from, cl_serverStatusList[i].address ) ) {
+			serverStatus = &cl_serverStatusList[i];
+			break;
+		}
+	}
+	// if we didn't request this server status
+	if (!serverStatus) {
+		return;
+	}
+
+	const char* s = MSG_ReadStringLine( msg );
+
+	len = 0;
+	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "%s", s);
+
+	if (serverStatus->print) {
+		Com_Printf("Server settings:\n");
+		// print cvars
+		while (*s) {
+			for (i = 0; i < 2 && *s; i++) {
+				if (*s == '\\')
+					s++;
+				l = 0;
+				while (*s) {
+					info[l++] = *s;
+					if (l >= MAX_INFO_STRING-1)
+						break;
+					s++;
+					if (*s == '\\') {
+						break;
+					}
+				}
+				info[l] = '\0';
+				if (i) {
+					Com_Printf("%s\n", info);
+				}
+				else {
+					Com_Printf("%-24s", info);
+				}
+			}
+		}
+	}
+
+	len = strlen(serverStatus->string);
+	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
+
+	if (serverStatus->print) {
+		Com_Printf("\nPlayers:\n");
+		Com_Printf("num: score: ping: name:\n");
+	}
+	for (i = 0, s = MSG_ReadStringLine( msg ); *s; s = MSG_ReadStringLine( msg ), i++) {
+
+		len = strlen(serverStatus->string);
+		Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\%s", s);
+
+		if (serverStatus->print) {
+			score = ping = 0;
+			sscanf(s, "%d %d", &score, &ping);
+			s = strchr(s, ' ');
+			if (s)
+				s = strchr(s+1, ' ');
+			if (s)
+				s++;
+			else
+				s = "unknown";
+			Com_Printf("%-2d   %-3d    %-3d   %s\n", i, score, ping, s );
+		}
+	}
+	len = strlen(serverStatus->string);
+	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
+
+	serverStatus->time = Com_Milliseconds();
+	serverStatus->address = from;
+	serverStatus->pending = qfalse;
+	if (serverStatus->print) {
+		serverStatus->retrieved = qtrue;
+	}
 }
 
 
@@ -2502,99 +2537,6 @@ int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen )
 		return qfalse;
 	}
 	return qfalse;
-}
-
-/*
-===================
-CL_ServerStatusResponse
-===================
-*/
-void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
-	char	*s;
-	char	info[MAX_INFO_STRING];
-	int		i, l, score, ping;
-	int		len;
-	serverStatus_t *serverStatus;
-
-	serverStatus = NULL;
-	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
-		if ( NET_CompareAdr( from, cl_serverStatusList[i].address ) ) {
-			serverStatus = &cl_serverStatusList[i];
-			break;
-		}
-	}
-	// if we didn't request this server status
-	if (!serverStatus) {
-		return;
-	}
-
-	s = MSG_ReadStringLine( msg );
-
-	len = 0;
-	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "%s", s);
-
-	if (serverStatus->print) {
-		Com_Printf("Server settings:\n");
-		// print cvars
-		while (*s) {
-			for (i = 0; i < 2 && *s; i++) {
-				if (*s == '\\')
-					s++;
-				l = 0;
-				while (*s) {
-					info[l++] = *s;
-					if (l >= MAX_INFO_STRING-1)
-						break;
-					s++;
-					if (*s == '\\') {
-						break;
-					}
-				}
-				info[l] = '\0';
-				if (i) {
-					Com_Printf("%s\n", info);
-				}
-				else {
-					Com_Printf("%-24s", info);
-				}
-			}
-		}
-	}
-
-	len = strlen(serverStatus->string);
-	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
-
-	if (serverStatus->print) {
-		Com_Printf("\nPlayers:\n");
-		Com_Printf("num: score: ping: name:\n");
-	}
-	for (i = 0, s = MSG_ReadStringLine( msg ); *s; s = MSG_ReadStringLine( msg ), i++) {
-
-		len = strlen(serverStatus->string);
-		Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\%s", s);
-
-		if (serverStatus->print) {
-			score = ping = 0;
-			sscanf(s, "%d %d", &score, &ping);
-			s = strchr(s, ' ');
-			if (s)
-				s = strchr(s+1, ' ');
-			if (s)
-				s++;
-			else
-				s = "unknown";
-			Com_Printf("%-2d   %-3d    %-3d   %s\n", i, score, ping, s );
-		}
-	}
-	len = strlen(serverStatus->string);
-	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
-
-	serverStatus->time = Com_Milliseconds();
-	serverStatus->address = from;
-	serverStatus->pending = qfalse;
-	if (serverStatus->print) {
-		serverStatus->retrieved = qtrue;
-	}
 }
 
 /*

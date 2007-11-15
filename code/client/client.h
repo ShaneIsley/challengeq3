@@ -421,8 +421,7 @@ extern	kbutton_t	in_speed;
 
 void CL_InitInput();
 void CL_SendCmd();
-void CL_ClearState (void);
-void CL_ReadPackets (void);
+void CL_ClearState();
 
 void CL_WritePacket( void );
 
