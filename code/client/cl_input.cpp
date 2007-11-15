@@ -23,8 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
-unsigned	frame_msec;
-int			old_com_frameTime;
+static unsigned frame_msec;
+static int old_com_frameTime;
 
 /*
 ===============================================================================
@@ -144,7 +144,7 @@ static void IN_KeyUp( kbutton_t *b )
 
 // returns the fraction of the frame that the key was down
 
-float CL_KeyState( kbutton_t *key )
+static float CL_KeyState( kbutton_t *key )
 {
 	int msec = key->msec;
 	key->msec = 0;
@@ -237,12 +237,6 @@ void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
 void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
 void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
 
-void IN_ButtonDown (void) {
-	IN_KeyDown(&in_buttons[1]);}
-void IN_ButtonUp (void) {
-	IN_KeyUp(&in_buttons[1]);}
-
-
 //==========================================================================
 
 cvar_t	*cl_upspeed;
@@ -269,16 +263,12 @@ static signed char ClampChar( int i )
 }
 
 
-/*
-================
-CL_AdjustAngles
+// moves the local angle positions
 
-Moves the local angle positions
-================
-*/
-void CL_AdjustAngles( void ) {
+static void CL_AdjustAngles()
+{
 	float	speed;
-	
+
 	if ( in_speed.active ) {
 		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
 	} else {
@@ -294,14 +284,11 @@ void CL_AdjustAngles( void ) {
 	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
 }
 
-/*
-================
-CL_KeyMove
 
-Sets the usercmd_t based on key states
-================
-*/
-void CL_KeyMove( usercmd_t *cmd ) {
+// sets the usercmd_t based on key states
+
+static void CL_KeyMove( usercmd_t *cmd )
+{
 	int		movespeed;
 	int		forward, side, up;
 
@@ -329,7 +316,6 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	side += movespeed * CL_KeyState (&in_moveright);
 	side -= movespeed * CL_KeyState (&in_moveleft);
 
-
 	up += movespeed * CL_KeyState (&in_up);
 	up -= movespeed * CL_KeyState (&in_down);
 
@@ -341,12 +327,9 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	cmd->upmove = ClampChar( up );
 }
 
-/*
-=================
-CL_MouseEvent
-=================
-*/
-void CL_MouseEvent( int dx, int dy, int time ) {
+
+void CL_MouseEvent( int dx, int dy, int time )
+{
 	if ( cls.keyCatchers & KEYCATCH_UI ) {
 		VM_Call( uivm, UI_MOUSE_EVENT, dx, dy );
 	} else if (cls.keyCatchers & KEYCATCH_CGAME) {
@@ -357,26 +340,20 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 	}
 }
 
-/*
-=================
-CL_JoystickEvent
 
-Joystick values stay set until changed
-=================
-*/
-void CL_JoystickEvent( int axis, int value, int time ) {
+// joystick values stay set until changed
+
+void CL_JoystickEvent( int axis, int value, int time )
+{
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
 	cl.joystickAxis[axis] = value;
 }
 
-/*
-=================
-CL_JoystickMove
-=================
-*/
-void CL_JoystickMove( usercmd_t *cmd ) {
+
+static void CL_JoystickMove( usercmd_t *cmd )
+{
 	int		movespeed;
 	float	anglespeed;
 
@@ -408,12 +385,9 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	cmd->upmove = ClampChar( cmd->upmove + cl.joystickAxis[AXIS_UP] );
 }
 
-/*
-=================
-CL_MouseMove
-=================
-*/
-void CL_MouseMove( usercmd_t *cmd ) {
+
+static void CL_MouseMove( usercmd_t *cmd )
+{
 	float	mx, my;
 	float	accelSensitivity;
 	float	rate;
@@ -462,19 +436,14 @@ void CL_MouseMove( usercmd_t *cmd ) {
 }
 
 
-/*
-==============
-CL_CmdButtons
-==============
-*/
-void CL_CmdButtons( usercmd_t *cmd ) {
-	int		i;
+static void CL_CmdButtons( usercmd_t *cmd )
+{
+	int i;
 
-	//
 	// figure button bits
 	// send a button bit even if the key was pressed and released in
 	// less than a frame
-	//	
+	//
 	for (i = 0 ; i < 15 ; i++) {
 		if ( in_buttons[i].active || in_buttons[i].wasPressed ) {
 			cmd->buttons |= 1 << i;
@@ -494,14 +463,8 @@ void CL_CmdButtons( usercmd_t *cmd ) {
 }
 
 
-/*
-==============
-CL_FinishMove
-==============
-*/
-void CL_FinishMove( usercmd_t *cmd ) {
-	int		i;
-
+static void CL_FinishMove( usercmd_t *cmd )
+{
 	// copy the state that the cgame is currently sending
 	cmd->weapon = cl.cgameUserCmdValue;
 
@@ -509,25 +472,21 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	// can be determined without allowing cheating
 	cmd->serverTime = cl.serverTime;
 
-	for (i=0 ; i<3 ; i++) {
+	for (int i = 0; i < 3; ++i) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
 }
 
 
-/*
-=================
-CL_CreateCmd
-=================
-*/
-usercmd_t CL_CreateCmd( void ) {
+static usercmd_t CL_CreateCmd()
+{
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
 	VectorCopy( cl.viewangles, oldAngles );
 
 	// keyboard angle adjustment
-	CL_AdjustAngles ();
+	CL_AdjustAngles();
 	
 	Com_Memset( &cmd, 0, sizeof( cmd ) );
 
@@ -547,7 +506,7 @@ usercmd_t CL_CreateCmd( void ) {
 		cl.viewangles[PITCH] = oldAngles[PITCH] + 90;
 	} else if ( oldAngles[PITCH] - cl.viewangles[PITCH] > 90 ) {
 		cl.viewangles[PITCH] = oldAngles[PITCH] - 90;
-	} 
+	}
 
 	// store out the final values
 	CL_FinishMove( &cmd );
@@ -566,17 +525,10 @@ usercmd_t CL_CreateCmd( void ) {
 }
 
 
-/*
-=================
-CL_CreateNewCommands
+// create a new usercmd_t structure for this frame
 
-Create a new usercmd_t structure for this frame
-=================
-*/
-void CL_CreateNewCommands( void ) {
-	usercmd_t	*cmd;
-	int			cmdNum;
-
+static void CL_CreateNewCommands()
+{
 	// no need to create usercmds until we have a gamestate
 	if ( cls.state < CA_PRIMED ) {
 		return;
@@ -591,26 +543,22 @@ void CL_CreateNewCommands( void ) {
 	}
 	old_com_frameTime = com_frameTime;
 
-
 	// generate a command for this frame
 	cl.cmdNumber++;
-	cmdNum = cl.cmdNumber & CMD_MASK;
-	cl.cmds[cmdNum] = CL_CreateCmd ();
-	cmd = &cl.cmds[cmdNum];
+	int cmdNum = cl.cmdNumber & CMD_MASK;
+	cl.cmds[cmdNum] = CL_CreateCmd();
 }
 
-/*
-=================
-CL_ReadyToSendPacket
 
-Returns qfalse if we are over the maxpackets limit
+/*
+Returns false if we are over the maxpackets limit
 and should choke back the bandwidth a bit by not sending
 a packet this frame.  All the commands will still get
 delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
-=================
 */
-qbool CL_ReadyToSendPacket( void ) {
+static qbool CL_ReadyToSendPacket()
+{
 	int		oldPacketNum;
 	int		delta;
 
@@ -793,14 +741,11 @@ void CL_WritePacket( void ) {
 	}
 }
 
-/*
-=================
-CL_SendCmd
 
-Called every frame to builds and sends a command packet to the server.
-=================
-*/
-void CL_SendCmd( void ) {
+// called every frame to build and send a command packet to the server
+
+void CL_SendCmd()
+{
 	// don't send any message if not connected
 	if ( cls.state < CA_CONNECTED ) {
 		return;
@@ -884,6 +829,8 @@ void CL_InitInput()
 	Cmd_AddCommand ("-button13", IN_Button13Up);
 	Cmd_AddCommand ("+button14", IN_Button14Down);
 	Cmd_AddCommand ("-button14", IN_Button14Up);
+	Cmd_AddCommand ("+button15", IN_Button15Down);
+	Cmd_AddCommand ("-button15", IN_Button15Up);
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
 
