@@ -45,10 +45,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define false DO_NOT_WANT
 #endif
 // technically-correct form, handy for catching sloppy code that mismixes bool and int, *cough* JPVW  :P
-//typedef enum { qfalse, qtrue } qbool;
+#if defined(Q3_VM)
+typedef enum { qfalse, qtrue } qbool;
+#else
 typedef int qbool;
 const qbool qfalse = 0;
 const qbool qtrue = !0;
+#endif
 typedef qbool qboolean;
 
 
@@ -98,6 +101,7 @@ typedef qbool qboolean;
 
 #ifdef Q3_VM
 
+#define QDECL
 #include "../game/bg_lib.h"
 
 #else
@@ -112,9 +116,9 @@ typedef qbool qboolean;
 #include <ctype.h>
 #include <limits.h>
 
-#endif
+#include "../qcommon/q_platform.h"
 
-#include "q_platform.h"
+#endif
 
 //=============================================================
 
@@ -753,7 +757,7 @@ COLLISION DETECTION
 ==============================================================
 */
 
-#include "surfaceflags.h"			// shared with the q3map utility
+#include "../qcommon/surfaceflags.h"	// shared with the q3map utility
 
 // plane types are used to speed some tests
 // 0-2 are axial planes
