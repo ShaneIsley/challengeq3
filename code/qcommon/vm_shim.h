@@ -46,6 +46,7 @@ struct VM_Arg {
 
 #if defined(GAME_API_VERSION) // g_public, therefore game or cgame
 	VMA_CONVOP( sharedEntity_t );
+	VMA_CONVOP( snapshot_t );
 #else
 	VMA_CONVOP( uiClientState_t );
 #endif

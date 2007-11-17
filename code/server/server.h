@@ -59,7 +59,7 @@ typedef struct {
 	int				checksumFeed;		// the feed key that we use to compute the pure checksum strings
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 	// the serverId associated with the current checksumFeed (always <= serverId)
-	int       checksumFeedServerId;	
+	int				checksumFeedServerId;
 	int				snapshotCounter;	// incremented for each snapshot built
 	int				timeResidual;		// <= 1000 / sv_frame->value
 	int				nextFrameTime;		// when time > nextFrameTime, process world
@@ -105,8 +105,8 @@ typedef enum {
 } clientState_t;
 
 typedef struct netchan_buffer_s {
-	msg_t           msg;
-	byte            msgBuffer[MAX_MSGLEN];
+	msg_t msg;
+	byte  msgBuffer[MAX_MSGLEN];
 	struct netchan_buffer_s *next;
 } netchan_buffer_t;
 
