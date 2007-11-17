@@ -394,8 +394,7 @@ void SV_DirectConnect( netadr_t from )
 	// servers so we can play without having to kick people.
 
 	// check for privateClient password
-	const char* password = Info_ValueForKey( userinfo, "password" );
-	if ( !strcmp( password, sv_privatePassword->string ) ) {
+	if ( !strcmp( Info_ValueForKey( userinfo, "password" ), sv_privatePassword->string ) ) {
 		startIndex = 0;
 	} else {
 		// skip past the reserved slots
