@@ -9,7 +9,7 @@
 #define VMA_CONVOP(T) operator T*() const { return (T*)p; }
 
 struct VM_Arg {
-	VM_Arg( intptr_t x ) { p = x; }
+	VM_Arg( intptr_t x ) : p(x) {}
 	intptr_t p;
 
 	VMA_CONVOP( const char );
