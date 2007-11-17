@@ -26,6 +26,69 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static void SV_CloseDownload( client_t *cl );
 
+
+// pull specific info from a newly changed userinfo string into a more C friendly form
+
+static void SV_UserinfoChanged( client_t *cl )
+{
+	int i;
+	const char* val;
+
+	// name for C code
+	Q_strncpyz( cl->name, Info_ValueForKey (cl->userinfo, "name"), sizeof(cl->name) );
+
+	// rate command
+
+	// if the client is on the same subnet as the server and we aren't running an
+	// internet public server, assume they don't need a rate choke
+	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
+		cl->rate = 99999;	// lans should not rate limit
+	} else {
+		val = Info_ValueForKey (cl->userinfo, "rate");
+		if (strlen(val)) {
+			i = atoi(val);
+			cl->rate = i;
+			if (cl->rate < 1000) {
+				cl->rate = 1000;
+			} else if (cl->rate > 90000) {
+				cl->rate = 90000;
+			}
+		} else {
+			cl->rate = 3000;
+		}
+	}
+
+	// snaps command
+	val = Info_ValueForKey (cl->userinfo, "snaps");
+	if (strlen(val)) {
+		i = atoi(val);
+		if ( i < 1 ) {
+			i = 1;
+		} else if ( i > sv_fps->integer ) {
+			i = sv_fps->integer;
+		}
+		cl->snapshotMsec = 1000/i;
+	} else {
+		cl->snapshotMsec = 50;
+	}
+
+	// TTimo
+	// maintain the IP information
+	// this is set in SV_DirectConnect (directly on the server, not transmitted), may be lost when client updates it's userinfo
+	// the banning code relies on this being consistently present
+	val = Info_ValueForKey (cl->userinfo, "ip");
+	if (!val[0])
+	{
+		//Com_DPrintf("Maintain IP in userinfo for '%s'\n", cl->name);
+		if ( !NET_IsLocalAddress(cl->netchan.remoteAddress) )
+			Info_SetValueForKey( cl->userinfo, "ip", NET_AdrToString( cl->netchan.remoteAddress ) );
+		else
+			// force the "ip" info key to "localhost" for local clients
+			Info_SetValueForKey( cl->userinfo, "ip", "localhost" );
+	}
+}
+
+
 /*
 =================
 SV_GetChallenge
@@ -207,7 +270,8 @@ A "connect" OOB command has been received
 				"and Enabled in order to join this server. An updated game patch can be downloaded from " \
 				"www.idsoftware.com"
 
-void SV_DirectConnect( netadr_t from ) {
+void SV_DirectConnect( netadr_t from )
+{
 	char		userinfo[MAX_INFO_STRING];
 	int			i;
 	client_t	*cl, *newcl;
@@ -217,7 +281,6 @@ void SV_DirectConnect( netadr_t from ) {
 	int			version;
 	int			qport;
 	int			challenge;
-	char		*password;
 	int			startIndex;
 	int			count;
 
@@ -331,7 +394,7 @@ void SV_DirectConnect( netadr_t from ) {
 	// servers so we can play without having to kick people.
 
 	// check for privateClient password
-	password = Info_ValueForKey( userinfo, "password" );
+	const char* password = Info_ValueForKey( userinfo, "password" );
 	if ( !strcmp( password, sv_privatePassword->string ) ) {
 		startIndex = 0;
 	} else {
@@ -1118,80 +1181,11 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 	}
 }
 
-/*
-=================
-SV_ResetPureClient_f
-=================
-*/
-static void SV_ResetPureClient_f( client_t *cl ) {
+
+static void SV_ResetPureClient_f( client_t *cl )
+{
 	cl->pureAuthentic = 0;
 	cl->gotCP = qfalse;
-}
-
-/*
-=================
-SV_UserinfoChanged
-
-Pull specific info from a newly changed userinfo string
-into a more C friendly form.
-=================
-*/
-void SV_UserinfoChanged( client_t *cl ) {
-	char	*val;
-	int		i;
-
-	// name for C code
-	Q_strncpyz( cl->name, Info_ValueForKey (cl->userinfo, "name"), sizeof(cl->name) );
-
-	// rate command
-
-	// if the client is on the same subnet as the server and we aren't running an
-	// internet public server, assume they don't need a rate choke
-	if ( Sys_IsLANAddress( cl->netchan.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
-		cl->rate = 99999;	// lans should not rate limit
-	} else {
-		val = Info_ValueForKey (cl->userinfo, "rate");
-		if (strlen(val)) {
-			i = atoi(val);
-			cl->rate = i;
-			if (cl->rate < 1000) {
-				cl->rate = 1000;
-			} else if (cl->rate > 90000) {
-				cl->rate = 90000;
-			}
-		} else {
-			cl->rate = 3000;
-		}
-	}
-
-	// snaps command
-	val = Info_ValueForKey (cl->userinfo, "snaps");
-	if (strlen(val)) {
-		i = atoi(val);
-		if ( i < 1 ) {
-			i = 1;
-		} else if ( i > sv_fps->integer ) {
-			i = sv_fps->integer;
-		}
-		cl->snapshotMsec = 1000/i;
-	} else {
-		cl->snapshotMsec = 50;
-	}
-
-	// TTimo
-	// maintain the IP information
-	// this is set in SV_DirectConnect (directly on the server, not transmitted), may be lost when client updates it's userinfo
-	// the banning code relies on this being consistently present
-	val = Info_ValueForKey (cl->userinfo, "ip");
-	if (!val[0])
-	{
-		//Com_DPrintf("Maintain IP in userinfo for '%s'\n", cl->name);
-		if ( !NET_IsLocalAddress(cl->netchan.remoteAddress) )
-			Info_SetValueForKey( cl->userinfo, "ip", NET_AdrToString( cl->netchan.remoteAddress ) );
-		else
-			// force the "ip" info key to "localhost" for local clients
-			Info_SetValueForKey( cl->userinfo, "ip", "localhost" );
-	}
 }
 
 
