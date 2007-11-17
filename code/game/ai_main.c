@@ -427,7 +427,8 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 	char goalname[MAX_MESSAGE_SIZE];
 	char netname[MAX_MESSAGE_SIZE];
 	char action[MAX_MESSAGE_SIZE];
-	char *leader, carrying[32], *cs;
+	const char *leader, *cs;
+	char carrying[32];
 	bot_goal_t goal;
 	//
 	ClientName(bs->client, netname, sizeof(netname));
@@ -529,11 +530,11 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 			break;
 		}
 	}
-  	cs = va("l\\%s\\c\\%s\\a\\%s",
+	cs = va("l\\%s\\c\\%s\\a\\%s",
 				leader,
 				carrying,
 				action);
-  	trap_SetConfigstring (CS_BOTINFO + bs->client, cs);
+	trap_SetConfigstring (CS_BOTINFO + bs->client, cs);
 }
 
 /*

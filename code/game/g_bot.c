@@ -60,14 +60,9 @@ float trap_Cvar_VariableValue( const char *var_name ) {
 }
 
 
-
-/*
-===============
-G_ParseInfos
-===============
-*/
-int G_ParseInfos( char *buf, int max, char *infos[] ) {
-	char	*token;
+static int G_ParseInfos( const char* buf, int max, char *infos[] )
+{
+	const char* token;
 	int		count;
 	char	key[MAX_TOKEN_CHARS];
 	char	info[MAX_INFO_STRING];
@@ -103,7 +98,7 @@ int G_ParseInfos( char *buf, int max, char *infos[] ) {
 
 			token = COM_ParseExt( &buf, qfalse );
 			if ( !token[0] ) {
-				strcpy( token, "<NULL>" );
+				token = "<NULL>";
 			}
 			Info_SetValueForKey( info, key, token );
 		}
@@ -229,16 +224,14 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 	trap_SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
 }
 
-/*
-===============
-G_AddRandomBot
-===============
-*/
-void G_AddRandomBot( int team ) {
+
+static void G_AddRandomBot( int team )
+{
 	int		i, n, num;
 	float	skill;
-	char	*value, netname[36], *teamstr;
-	gclient_t	*cl;
+	char	netname[36], *teamstr;
+	const char* value;
+	const gclient_t* cl;
 
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
@@ -558,20 +551,40 @@ qboolean G_BotConnect( int clientNum, qboolean restart ) {
 }
 
 
-/*
-===============
-G_AddBot
-===============
-*/
-static void G_AddBot( const char *name, float skill, const char *team, int delay, char *altname) {
+static const char* G_GetBotInfoByNumber( int num )
+{
+	if( num < 0 || num >= g_numBots ) {
+		trap_Printf( va( S_COLOR_RED "Invalid bot number: %i\n", num ) );
+		return NULL;
+	}
+	return g_botInfos[num];
+}
+
+
+static const char* G_GetBotInfoByName( const char* name )
+{
+	int		n;
+
+	for ( n = 0; n < g_numBots ; n++ ) {
+		const char* value = Info_ValueForKey( g_botInfos[n], "name" );
+		if ( !Q_stricmp( value, name ) ) {
+			return g_botInfos[n];
+		}
+	}
+
+	return NULL;
+}
+
+
+static void G_AddBot( const char *name, float skill, const char *team, int delay, char *altname)
+{
 	int				clientNum;
-	char			*botinfo;
 	gentity_t		*bot;
-	char			*key;
-	char			*s;
-	char			*botname;
-	char			*model;
-	char			*headmodel;
+	const char* botinfo;
+	const char* key;
+	const char* s;
+	const char* botname;
+	const char* model;
 	char			userinfo[MAX_INFO_STRING];
 
 	// get the botinfo from bots.txt
@@ -615,15 +628,6 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, model );
 	key = "team_model";
 	Info_SetValueForKey( userinfo, key, model );
-
-	key = "headmodel";
-	headmodel = Info_ValueForKey( botinfo, key );
-	if ( !*headmodel ) {
-		headmodel = model;
-	}
-	Info_SetValueForKey( userinfo, key, headmodel );
-	key = "team_headmodel";
-	Info_SetValueForKey( userinfo, key, headmodel );
 
 	key = "gender";
 	s = Info_ValueForKey( botinfo, key );
@@ -793,17 +797,14 @@ void Svcmd_BotList_f( void ) {
 }
 
 
-/*
-===============
-G_SpawnBots
-===============
-*/
-static void G_SpawnBots( char *botList, int baseDelay ) {
-	char		*bot;
-	char		*p;
+static void G_SpawnBots( const char *botList, int baseDelay )
+{
+	const char	*p;
 	float		skill;
 	int			delay;
 	char		bots[MAX_INFO_VALUE];
+	char botname[MAX_NETNAME];
+	char* bot = botname;
 
 	podium1 = NULL;
 	podium2 = NULL;
@@ -831,22 +832,14 @@ static void G_SpawnBots( char *botList, int baseDelay ) {
 			break;
 		}
 
-		// mark start of bot name
-		bot = p;
+		while( *p && *p != ' ' )
+			*bot++ = *p++;
+		*bot = 0;
 
-		// skip until space of null
-		while( *p && *p != ' ' ) {
-			p++;
-		}
-		if( *p ) {
-			*p++ = 0;
-		}
-
-		// we must add the bot this way, calling G_AddBot directly at this stage
-		// does "Bad Things"
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
-
+		// we must add the bot this way, calling G_AddBot directly at this stage does "Bad Things"
+		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", botname, skill, delay) );
 		delay += BOT_BEGIN_DELAY_INCREMENT;
+		bot = botname;
 	}
 }
 
@@ -920,50 +913,12 @@ static void G_LoadBots( void ) {
 }
 
 
-
-/*
-===============
-G_GetBotInfoByNumber
-===============
-*/
-char *G_GetBotInfoByNumber( int num ) {
-	if( num < 0 || num >= g_numBots ) {
-		trap_Printf( va( S_COLOR_RED "Invalid bot number: %i\n", num ) );
-		return NULL;
-	}
-	return g_botInfos[num];
-}
-
-
-/*
-===============
-G_GetBotInfoByName
-===============
-*/
-char *G_GetBotInfoByName( const char *name ) {
-	int		n;
-	char	*value;
-
-	for ( n = 0; n < g_numBots ; n++ ) {
-		value = Info_ValueForKey( g_botInfos[n], "name" );
-		if ( !Q_stricmp( value, name ) ) {
-			return g_botInfos[n];
-		}
-	}
-
-	return NULL;
-}
-
-/*
-===============
-G_InitBots
-===============
-*/
-void G_InitBots( qboolean restart ) {
+void G_InitBots( qboolean restart )
+{
 	int			fragLimit;
 	int			timeLimit;
 	const char	*arenainfo;
-	char		*strValue;
+	const char* strValue;
 	int			basedelay;
 	char		map[MAX_QPATH];
 	char		serverinfo[MAX_INFO_STRING];

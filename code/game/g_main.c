@@ -23,23 +23,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-level_locals_t	level;
-
-typedef struct {
-	vmCvar_t	*vmCvar;
-	char		*cvarName;
-	char		*defaultString;
-	int			cvarFlags;
-	int			modificationCount;  // for tracking changes
-	qboolean	trackChange;	    // track this variable, and announce if changed
-  qboolean teamShader;        // track and if changed, update shader state
-} cvarTable_t;
-
 gentity_t		g_entities[MAX_GENTITIES];
 gclient_t		g_clients[MAX_CLIENTS];
+level_locals_t	level;
 
 vmCvar_t	g_gametype;
-vmCvar_t	g_dmflags;
 vmCvar_t	g_fraglimit;
 vmCvar_t	g_timelimit;
 vmCvar_t	g_capturelimit;
@@ -95,7 +83,15 @@ vmCvar_t	g_enableBreath;
 vmCvar_t	g_proxMineTimeout;
 #endif
 
-// bk001129 - made static to avoid aliasing
+typedef struct {
+	vmCvar_t	*vmCvar;
+	const char* cvarName;
+	const char* defaultString;
+	int			cvarFlags;
+	int			modificationCount;  // for tracking changes
+	qboolean	trackChange;        // track this variable, and announce if changed
+} cvarTable_t;
+
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, 0, qfalse },
@@ -113,7 +109,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_maxGameClients, "g_maxGameClients", "0", CVAR_SERVERINFO | CVAR_LATCH | CVAR_ARCHIVE, 0, qfalse  },
 
 	// change anytime vars
-	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_fraglimit, "fraglimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_timelimit, "timelimit", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_capturelimit, "capturelimit", "8", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
@@ -182,8 +177,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 };
 
-// bk001129 - made static to avoid aliasing
-static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
+static const int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
 
 
 void G_InitGame( int levelTime, int randomSeed, int restart );
@@ -316,44 +310,16 @@ void G_FindTeams( void ) {
 	G_Printf ("%i teams with %i entities\n", c, c2);
 }
 
-void G_RemapTeamShaders( void ) {
-#ifdef MISSIONPACK
-	char string[1024];
-	float f = level.time * 0.001;
-	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );
-	AddRemap("textures/ctf2/redteam01", string, f); 
-	AddRemap("textures/ctf2/redteam02", string, f); 
-	Com_sprintf( string, sizeof(string), "team_icon/%s_blue", g_blueteam.string );
-	AddRemap("textures/ctf2/blueteam01", string, f); 
-	AddRemap("textures/ctf2/blueteam02", string, f); 
-	trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
-#endif
-}
 
-
-/*
-=================
-G_RegisterCvars
-=================
-*/
-void G_RegisterCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
-	qboolean remapped = qfalse;
+static void G_RegisterCvars()
+{
+	int i;
+	cvarTable_t *cv;
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
-		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
-			cv->defaultString, cv->cvarFlags );
+		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar )
 			cv->modificationCount = cv->vmCvar->modificationCount;
-
-		if (cv->teamShader) {
-			remapped = qtrue;
-		}
-	}
-
-	if (remapped) {
-		G_RemapTeamShaders();
 	}
 
 	// check some things
@@ -365,15 +331,11 @@ void G_RegisterCvars( void ) {
 	level.warmupModificationCount = g_warmup.modificationCount;
 }
 
-/*
-=================
-G_UpdateCvars
-=================
-*/
-void G_UpdateCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
-	qboolean remapped = qfalse;
+
+static void G_UpdateCvars()
+{
+	int i;
+	cvarTable_t* cv;
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		if ( cv->vmCvar ) {
@@ -386,16 +348,8 @@ void G_UpdateCvars( void ) {
 					trap_SendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
 						cv->cvarName, cv->vmCvar->string ) );
 				}
-
-				if (cv->teamShader) {
-					remapped = qtrue;
-				}
 			}
 		}
-	}
-
-	if (remapped) {
-		G_RemapTeamShaders();
 	}
 }
 
@@ -503,9 +457,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		BotAILoadMap( restart );
 		G_InitBots( restart );
 	}
-
-	G_RemapTeamShaders();
-
 }
 
 
@@ -922,35 +873,33 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	ent->r.contents = 0;
 }
 
-/*
-==================
-FindIntermissionPoint
 
-This is also used for spectator spawns
-==================
-*/
-void FindIntermissionPoint( void ) {
-	gentity_t	*ent, *target;
-	vec3_t		dir;
+// this is also used for spectator spawns
+
+void FindIntermissionPoint()
+{
+	const gentity_t* ent;
 
 	// find the intermission spot
 	ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
 	if ( !ent ) {	// the map creator forgot to put in an intermission point...
-		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle );
-	} else {
-		VectorCopy (ent->s.origin, level.intermission_origin);
-		VectorCopy (ent->s.angles, level.intermission_angle);
-		// if it has a target, look towards it
-		if ( ent->target ) {
-			target = G_PickTarget( ent->target );
-			if ( target ) {
-				VectorSubtract( target->s.origin, level.intermission_origin, dir );
-				vectoangles( dir, level.intermission_angle );
-			}
-		}
+		SelectSpawnPoint( vec3_origin, level.intermission_origin, level.intermission_angle );
+		return;
 	}
 
+	VectorCopy (ent->s.origin, level.intermission_origin);
+	VectorCopy (ent->s.angles, level.intermission_angle);
+	// if it has a target, look towards it
+	if ( ent->target ) {
+		const gentity_t* target = G_PickTarget( ent->target );
+		if ( target ) {
+			vec3_t dir;
+			VectorSubtract( target->s.origin, level.intermission_origin, dir );
+			vectoangles( dir, level.intermission_angle );
+		}
+	}
 }
+
 
 /*
 ==================
@@ -1032,7 +981,7 @@ void ExitLevel (void) {
 			level.changemap = NULL;
 			level.intermissiontime = 0;
 		}
-		return;	
+		return;
 	}
 
 	trap_Cvar_VariableStringBuffer( "nextmap", nextmap, sizeof(nextmap) );
@@ -1548,12 +1497,9 @@ void CheckVote( void ) {
 
 }
 
-/*
-==================
-PrintTeam
-==================
-*/
-void PrintTeam(int team, char *message) {
+
+static void PrintTeam( int team, const char* message )
+{
 	int i;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {

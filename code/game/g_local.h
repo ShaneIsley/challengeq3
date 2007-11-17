@@ -464,11 +464,11 @@ void SaveRegisteredItems( void );
 //
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-void	G_TeamCommand( team_t team, char *cmd );
+void	G_TeamCommand( team_t team, const char* cmd );
 void	G_KillBox (gentity_t *ent);
-gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match);
+gentity_t* G_Find( const gentity_t* from, int fieldofs, const char* match );
 gentity_t *G_PickTarget (char *targetname);
-void	G_UseTargets (gentity_t *ent, gentity_t *activator);
+void	G_UseTargets( gentity_t* ent, gentity_t* activator );
 void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
 
 void	G_InitGentity( gentity_t *e );
@@ -572,7 +572,7 @@ team_t TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles );
+gentity_t* SelectSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles );
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
 void BeginIntermission (void);
@@ -583,14 +583,14 @@ void ClientSpawn( gentity_t *ent );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 void AddScore( gentity_t *ent, vec3_t origin, int score );
 void CalculateRanks( void );
-qboolean SpotWouldTelefrag( gentity_t *spot );
+qboolean SpotWouldTelefrag( const gentity_t* spot );
 
 //
 // g_svcmds.c
 //
 qboolean	ConsoleCommand( void );
 void G_ProcessIPBans(void);
-qboolean G_FilterPacket (char *from);
+qboolean G_FilterPacket( const char* from );
 
 //
 // g_weapon.c
@@ -619,7 +619,7 @@ void DeathmatchScoreboardMessage (gentity_t *client);
 //
 // g_main.c
 //
-void FindIntermissionPoint( void );
+void FindIntermissionPoint();
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
@@ -631,7 +631,7 @@ void QDECL G_Error( const char *fmt, ... );
 //
 // g_client.c
 //
-char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
+const char* ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 void ClientUserinfoChanged( int clientNum );
 void ClientDisconnect( int clientNum );
 void ClientBegin( int clientNum );
@@ -678,8 +678,6 @@ void Svcmd_AbortPodium_f( void );
 // g_bot.c
 //
 void G_InitBots( qboolean restart );
-char *G_GetBotInfoByNumber( int num );
-char *G_GetBotInfoByName( const char *name );
 void G_CheckBotSpawn( void );
 void G_RemoveQueuedBotBegin( int clientNum );
 qboolean G_BotConnect( int clientNum, qboolean restart );
@@ -721,7 +719,6 @@ extern	vmCvar_t	g_maxclients;			// allow this many total, including spectators
 extern	vmCvar_t	g_maxGameClients;		// allow this many active
 extern	vmCvar_t	g_restarted;
 
-extern	vmCvar_t	g_dmflags;
 extern	vmCvar_t	g_fraglimit;
 extern	vmCvar_t	g_timelimit;
 extern	vmCvar_t	g_capturelimit;
@@ -956,7 +953,7 @@ int		trap_BotPredictVisiblePosition(vec3_t origin, int areanum, void /* struct b
 int		trap_BotAllocMoveState(void);
 void	trap_BotFreeMoveState(int handle);
 void	trap_BotInitMoveState(int handle, void /* struct bot_initmove_s */ *initmove);
-void	trap_BotAddAvoidSpot(int movestate, vec3_t origin, float radius, int type);
+void	trap_BotAddAvoidSpot(int movestate, const vec3_t origin, float radius, int type);
 
 int		trap_BotChooseBestFightWeapon(int weaponstate, int *inventory);
 void	trap_BotGetWeaponInfo(int weaponstate, int weapon, void /* struct weaponinfo_s */ *weaponinfo);

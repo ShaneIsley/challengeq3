@@ -4,12 +4,9 @@ set INCLUDE=
 
 mkdir vm
 cd vm
-set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\ui %1
+set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\game %1
 
 %cc%  ../g_main.c
-@if errorlevel 1 goto quit
-
-%cc%  ../g_syscalls.c
 @if errorlevel 1 goto quit
 
 %cc%  ../bg_misc.c
@@ -20,9 +17,9 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 %cc%  ../bg_slidemove.c
 @if errorlevel 1 goto quit
-%cc%  ../q_math.c
+%cc%  ../../qcommon/q_math.c
 @if errorlevel 1 goto quit
-%cc%  ../q_shared.c
+%cc%  ../../qcommon/q_shared.c
 @if errorlevel 1 goto quit
 
 %cc%  ../ai_dmnet.c

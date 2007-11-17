@@ -124,15 +124,11 @@ int G_SoundIndex( char *name ) {
 //=====================================================================
 
 
-/*
-================
-G_TeamCommand
+// broadcasts a command to only a specific team
 
-Broadcasts a command to only a specific team
-================
-*/
-void G_TeamCommand( team_t team, char *cmd ) {
-	int		i;
+void G_TeamCommand( team_t team, const char* cmd )
+{
+	int i;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
@@ -156,24 +152,19 @@ NULL will be returned if the end of the list is reached.
 
 =============
 */
-gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match)
+gentity_t* G_Find( const gentity_t* from, int fieldofs, const char* match )
 {
-	char	*s;
+	const char* s;
+	gentity_t* ent = from ? (gentity_t*)++from : g_entities;
 
-	if (!from)
-		from = g_entities;
-	else
-		from++;
-
-	for ( ; from < &g_entities[level.num_entities] ; from++)
-	{
-		if (!from->inuse)
+	for (; ent < &g_entities[level.num_entities]; ent++) {
+		if (!ent->inuse)
 			continue;
-		s = *(char **) ((byte *)from + fieldofs);
+		s = *(const char **) ((byte *)ent + fieldofs);
 		if (!s)
 			continue;
-		if (!Q_stricmp (s, match))
-			return from;
+		if (!Q_stricmp(s, match))
+			return ent;
 	}
 
 	return NULL;

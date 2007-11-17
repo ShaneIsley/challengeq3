@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // g_client.c -- client functions that don't happen every frame
 
-static vec3_t	playerMins = {-15, -15, -24};
-static vec3_t	playerMaxs = {15, 15, 32};
+static const vec3_t playerMins = {-15, -15, -24};
+static const vec3_t playerMaxs = {15, 15, 32};
 
 /*QUAKED info_player_deathmatch (1 0 1) (-16 -16 -24) (16 16 32) initial
 potential spawning position for deathmatch games.
@@ -72,16 +72,11 @@ void SP_info_player_intermission( gentity_t *ent ) {
 =======================================================================
 */
 
-/*
-================
-SpotWouldTelefrag
 
-================
-*/
-qboolean SpotWouldTelefrag( gentity_t *spot ) {
+qboolean SpotWouldTelefrag( const gentity_t* spot )
+{
 	int			i, num;
 	int			touch[MAX_GENTITIES];
-	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
 	VectorAdd( spot->s.origin, playerMins, mins );
@@ -89,12 +84,11 @@ qboolean SpotWouldTelefrag( gentity_t *spot ) {
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
-		hit = &g_entities[touch[i]];
+		const gentity_t* hit = &g_entities[touch[i]];
 		//if ( hit->client && hit->client->ps.stats[STAT_HEALTH] > 0 ) {
 		if ( hit->client) {
 			return qtrue;
 		}
-
 	}
 
 	return qfalse;
@@ -165,14 +159,11 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	return spots[ selection ];
 }
 
-/*
-===========
-SelectRandomFurthestSpawnPoint
 
-Chooses a player start, deathmatch start, etc
-============
-*/
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
+// chooses a player start, deathmatch start, etc
+
+static gentity_t* SelectRandomFurthestSpawnPoint ( const vec3_t avoidPoint, vec3_t origin, vec3_t angles )
+{
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
@@ -231,14 +222,11 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	return list_spot[rnd];
 }
 
-/*
-===========
-SelectSpawnPoint
 
-Chooses a player start, deathmatch start, etc
-============
-*/
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
+// chooses a player start, deathmatch start, etc
+
+gentity_t* SelectSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles )
+{
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles );
 
 	/*
@@ -270,19 +258,14 @@ gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) 
 	*/
 }
 
-/*
-===========
-SelectInitialSpawnPoint
 
-Try to find a spawn point marked 'initial', otherwise
-use normal spawn selection.
-============
-*/
-gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
-	gentity_t	*spot;
+// try to find a spawn point marked 'initial', otherwise use normal spawn selection.
 
-	spot = NULL;
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+static gentity_t* SelectInitialSpawnPoint( vec3_t origin, vec3_t angles )
+{
+	gentity_t* spot = NULL;
+
+	while (spot = G_Find(spot, FOFS(classname), "info_player_deathmatch")) {
 		if ( spot->spawnflags & 1 ) {
 			break;
 		}
@@ -299,13 +282,9 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
 	return spot;
 }
 
-/*
-===========
-SelectSpectatorSpawnPoint
 
-============
-*/
-gentity_t *SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles ) {
+static gentity_t* SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles )
+{
 	FindIntermissionPoint();
 
 	VectorCopy( level.intermission_origin, origin );
@@ -696,10 +675,11 @@ The game can override any of the settings and call trap_SetUserinfo
 if desired.
 ============
 */
-void ClientUserinfoChanged( int clientNum ) {
+void ClientUserinfoChanged( int clientNum )
+{
 	gentity_t *ent;
 	int		teamTask, teamLeader, team, health;
-	char	*s;
+	const char* s;
 	char	model[MAX_QPATH];
 	char	headModel[MAX_QPATH];
 	char	oldname[MAX_STRING_CHARS];
@@ -900,8 +880,9 @@ to the server machine, but qfalse on map changes and tournement
 restarts.
 ============
 */
-char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
-	char		*value;
+const char* ClientConnect( int clientNum, qboolean firstTime, qboolean isBot )
+{
+	const char* value;
 //	char		*areabits;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
@@ -911,10 +892,10 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
- 	// IP filtering
- 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
- 	// recommanding PB based IP / GUID banning, the builtin system is pretty limited
- 	// check to see if they are on the banned IP list
+	// IP filtering
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
+	// recommanding PB based IP / GUID banning, the builtin system is pretty limited
+	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
 	if ( G_FilterPacket( value ) ) {
 		return "You are banned from this server.";
@@ -1048,7 +1029,8 @@ after the first ClientBegin, and after each respawn
 Initializes all non-persistant parts of playerState
 ============
 */
-void ClientSpawn(gentity_t *ent) {
+void ClientSpawn(gentity_t *ent)
+{
 	int		index;
 	vec3_t	spawn_origin, spawn_angles;
 	gclient_t	*client;
@@ -1056,7 +1038,7 @@ void ClientSpawn(gentity_t *ent) {
 	clientPersistant_t	saved;
 	clientSession_t		savedSess;
 	int		persistant[MAX_PERSISTANT];
-	gentity_t	*spawnPoint;
+	gentity_t* spawnPoint;
 	int		flags;
 	int		savedPing;
 //	char	*savedAreaBits;
@@ -1087,9 +1069,7 @@ void ClientSpawn(gentity_t *ent) {
 				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles );
 			} else {
 				// don't spawn near existing origin if possible
-				spawnPoint = SelectSpawnPoint ( 
-					client->ps.origin, 
-					spawn_origin, spawn_angles);
+				spawnPoint = SelectSpawnPoint( client->ps.origin, spawn_origin, spawn_angles );
 			}
 
 			// Tim needs to prevent bots from spawning at the initial point

@@ -169,17 +169,13 @@ static void UpdateIPBans (void)
 	trap_Cvar_Set( "g_banIPs", iplist_final );
 }
 
-/*
-=================
-G_FilterPacket
-=================
-*/
-qboolean G_FilterPacket (char *from)
+
+qboolean G_FilterPacket( const char* from )
 {
 	int		i;
 	unsigned	in;
 	byte m[4];
-	char *p;
+	const char *p;
 
 	i = 0;
 	p = from;
@@ -193,7 +189,7 @@ qboolean G_FilterPacket (char *from)
 			break;
 		i++, p++;
 	}
-	
+
 	in = *(unsigned *)m;
 
 	for (i=0 ; i<numIPFilters ; i++)

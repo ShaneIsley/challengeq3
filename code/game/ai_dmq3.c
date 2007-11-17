@@ -54,8 +54,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "syn.h"				//synonyms
 #include "match.h"				//string matching types and vars
 
-// for the voice chats
-#include "../../ui/menudef.h" // sos001205 - for q3_ui also
 
 // from aasfile.h
 #define AREACONTENTS_MOVER				1024
@@ -108,12 +106,8 @@ aas_altroutegoal_t blue_altroutegoals[MAX_ALTROUTEGOALS];
 int blue_numaltroutegoals;
 
 
-/*
-==================
-BotSetUserInfo
-==================
-*/
-void BotSetUserInfo(bot_state_t *bs, char *key, char *value) {
+void BotSetUserInfo(bot_state_t *bs, const char *key, const char *value)
+{
 	char userinfo[MAX_INFO_STRING];
 
 	trap_GetUserinfo(bs->client, userinfo, sizeof(userinfo));
