@@ -1990,13 +1990,10 @@ SHOTGUN TRACING
 ============================================================================
 */
 
-/*
-================
-CG_ShotgunPellet
-================
-*/
-static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
-	trace_t		tr;
+
+static void CG_ShotgunPellet( const vec3_t start, const vec3_t end, int skipNum )
+{
+	trace_t tr;
 	int sourceContentType, destContentType;
 
 	CG_Trace( &tr, start, NULL, NULL, end, skipNum, MASK_SHOT );
@@ -2011,17 +2008,15 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 		}
 	} else if ( sourceContentType & CONTENTS_WATER ) {
 		trace_t trace;
-
 		trap_CM_BoxTrace( &trace, end, start, NULL, NULL, 0, CONTENTS_WATER );
 		CG_BubbleTrail( start, trace.endpos, 32 );
 	} else if ( destContentType & CONTENTS_WATER ) {
 		trace_t trace;
-
 		trap_CM_BoxTrace( &trace, start, end, NULL, NULL, 0, CONTENTS_WATER );
 		CG_BubbleTrail( tr.endpos, trace.endpos, 32 );
 	}
 
-	if (  tr.surfaceFlags & SURF_NOIMPACT ) {
+	if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 		return;
 	}
 
@@ -2040,15 +2035,11 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 	}
 }
 
-/*
-================
-CG_ShotgunPattern
 
-Perform the same traces the server did to locate the
-hit splashes
-================
-*/
-static void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, int otherEntNum ) {
+// perform the same traces the server did to locate the hit splashes
+
+static void CG_ShotgunPattern( const vec3_t origin, const vec3_t origin2, int seed, int otherEntNum )
+{
 	int			i;
 	float		r, u;
 	vec3_t		end;
@@ -2067,34 +2058,27 @@ static void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, int othe
 		VectorMA( origin, 8192 * 16, forward, end);
 		VectorMA (end, r, right, end);
 		VectorMA (end, u, up, end);
-
 		CG_ShotgunPellet( origin, end, otherEntNum );
 	}
 }
 
-/*
-==============
-CG_ShotgunFire
-==============
-*/
-void CG_ShotgunFire( entityState_t *es ) {
-	vec3_t	v;
+
+void CG_ShotgunFire( const entityState_t* es )
+{
+	vec3_t	v, up;
 	int		contents;
 
 	VectorSubtract( es->origin2, es->pos.trBase, v );
 	VectorNormalize( v );
 	VectorScale( v, 32, v );
 	VectorAdd( es->pos.trBase, v, v );
-	if ( cgs.glconfig.hardwareType != GLHW_RAGEPRO ) {
-		// ragepro can't alpha fade, so don't even bother with smoke
-		vec3_t			up;
 
-		contents = trap_CM_PointContents( es->pos.trBase, 0 );
-		if ( !( contents & CONTENTS_WATER ) ) {
-			VectorSet( up, 0, 0, 8 );
-			CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
-		}
+	contents = trap_CM_PointContents( es->pos.trBase, 0 );
+	if ( !( contents & CONTENTS_WATER ) ) {
+		VectorSet( up, 0, 0, 8 );
+		CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
 	}
+
 	CG_ShotgunPattern( es->pos.trBase, es->origin2, es->eventParm, es->otherEntityNum );
 }
 

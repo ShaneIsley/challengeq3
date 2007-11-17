@@ -348,8 +348,6 @@ typedef struct {
 	char			skinName[MAX_QPATH];
 	char			headModelName[MAX_QPATH];
 	char			headSkinName[MAX_QPATH];
-	char			redTeam[MAX_TEAMNAME];
-	char			blueTeam[MAX_TEAMNAME];
 	qboolean		deferred;
 
 	qboolean		newAnims;		// true if using the new mission pack animations
@@ -736,7 +734,6 @@ typedef struct {
 	qhandle_t	noammoShader;
 
 	qhandle_t	smokePuffShader;
-	qhandle_t	smokePuffRageProShader;
 	qhandle_t	shotgunSmokePuffShader;
 	qhandle_t	plasmaBallShader;
 	qhandle_t	waterBubbleShader;
@@ -1193,7 +1190,7 @@ const char *CG_Argv( int arg );
 void QDECL CG_Printf( const char *msg, ... );
 void QDECL CG_Error( const char *msg, ... );
 
-void CG_StartMusic( void );
+void CG_StartMusic();
 
 void CG_UpdateCvars( void );
 
@@ -1238,9 +1235,9 @@ void CG_DrawString( float x, float y, const char *string,
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
 void CG_DrawBigString( int x, int y, const char *s, float alpha );
-void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color );
+void CG_DrawBigStringColor( int x, int y, const char *s, const vec4_t color );
 void CG_DrawSmallString( int x, int y, const char *s, float alpha );
-void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
+void CG_DrawSmallStringColor( int x, int y, const char *s, const vec4_t color );
 
 int CG_DrawStrlen( const char *str );
 
@@ -1250,7 +1247,7 @@ void CG_TileClear( void );
 void CG_ColorForHealth( vec4_t hcolor );
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor );
 
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vec4_t color );
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color );
 void CG_DrawSides(float x, float y, float w, float h, float size);
 void CG_DrawTopBottom(float x, float y, float w, float h, float size);
@@ -1355,7 +1352,7 @@ void CG_RegisterItemVisuals( int itemNum );
 void CG_FireWeapon( centity_t *cent );
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
-void CG_ShotgunFire( entityState_t *es );
+void CG_ShotgunFire( const entityState_t* es );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
 
 void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
@@ -1397,7 +1394,7 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 				   int fadeInTime,
 				   int leFlags,
 				   qhandle_t hShader );
-void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing );
+void CG_BubbleTrail( const vec3_t start, const vec3_t end, float spacing );
 void CG_SpawnEffect( vec3_t org );
 #ifdef MISSIONPACK
 void CG_KamikazeEffect( vec3_t org );
@@ -1434,7 +1431,7 @@ void CG_DrawInformation( void );
 //
 // cg_scoreboard.c
 //
-qboolean CG_DrawOldScoreboard( void );
+qboolean CG_DrawOldScoreboard();
 void CG_DrawOldTourneyScoreboard( void );
 
 //
@@ -1447,9 +1444,9 @@ void CG_InitConsoleCommands( void );
 // cg_servercmds.c
 //
 void CG_ExecuteNewServerCommands( int latestSequence );
-void CG_ParseServerinfo( void );
+void CG_ParseServerinfo();
 void CG_SetConfigValues( void );
-void CG_LoadVoiceChats( void );
+void CG_LoadVoiceChats();
 void CG_ShaderStateChanged(void);
 void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd );
 void CG_PlayBufferedVoiceChats( void );

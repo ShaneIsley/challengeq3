@@ -73,22 +73,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static qboolean localClient; // true if local client has been displayed
 
 
-							 /*
-=================
-CG_DrawScoreboard
-=================
-*/
-static void CG_DrawClientScore( int y, score_t *score, float *color, float fade, qboolean largeFormat ) {
+static void CG_DrawClientScore( int y, const score_t* score, const float* color, float fade, qboolean largeFormat )
+{
 	char	string[1024];
 	vec3_t	headAngles;
-	clientInfo_t	*ci;
+	const clientInfo_t* ci;
 	int iconx, headx;
 
 	if ( score->client < 0 || score->client >= cgs.maxclients ) {
 		Com_Printf( "Bad score->client: %i\n", score->client );
 		return;
 	}
-	
+
 	ci = &cgs.clientinfo[score->client];
 
 	iconx = SB_BOTICON_X + (SB_RATING_WIDTH / 2);
@@ -256,18 +252,15 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 	return count;
 }
 
-/*
-=================
-CG_DrawScoreboard
 
-Draw the normal in-game scoreboard
-=================
-*/
-qboolean CG_DrawOldScoreboard( void ) {
+// draw the normal in-game scoreboard
+
+qboolean CG_DrawOldScoreboard()
+{
 	int		x, y, w, i, n1, n2;
 	float	fade;
-	float	*fadeColor;
-	char	*s;
+	const float* fadeColor;
+	const char* s;
 	int maxClients;
 	int lineHeight;
 	int topBorderSize, bottomBorderSize;
@@ -289,12 +282,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 	}
 
 	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD ||
-		 cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+			cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		fade = 1.0;
 		fadeColor = colorWhite;
 	} else {
 		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
-		
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;

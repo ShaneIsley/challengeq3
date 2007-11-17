@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // be a valid snapshot this frame
 
 #include "cg_local.h"
-#include "../../ui/menudef.h" // bk001205 - for Q3_ui as well
 
 typedef struct {
 	const char *order;
@@ -133,17 +132,13 @@ static void CG_ParseTeamInfo( void ) {
 }
 
 
-/*
-================
-CG_ParseServerinfo
+// this is called explicitly when the gamestate is first received,
+// and whenever the server updates any serverinfo flagged cvars
 
-This is called explicitly when the gamestate is first received,
-and whenever the server updates any serverinfo flagged cvars
-================
-*/
-void CG_ParseServerinfo( void ) {
-	const char	*info;
-	char	*mapname;
+void CG_ParseServerinfo()
+{
+	const char* info;
+	const char* mapname;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
@@ -156,10 +151,12 @@ void CG_ParseServerinfo( void ) {
 	cgs.maxclients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
+#ifdef MISSIONPACK
 	Q_strncpyz( cgs.redTeam, Info_ValueForKey( info, "g_redTeam" ), sizeof(cgs.redTeam) );
 	trap_Cvar_Set("g_redTeam", cgs.redTeam);
 	Q_strncpyz( cgs.blueTeam, Info_ValueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
 	trap_Cvar_Set("g_blueTeam", cgs.blueTeam);
+#endif
 }
 
 /*
@@ -507,17 +504,14 @@ typedef struct headModelVoiceChat_s
 voiceChatList_t voiceChatLists[MAX_VOICEFILES];
 headModelVoiceChat_t headModelVoiceChat[MAX_HEADMODELS];
 
-/*
-=================
-CG_ParseVoiceChats
-=================
-*/
-int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, int maxVoiceChats ) {
-	int	len, i;
+
+static int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, int maxVoiceChats )
+{
+	int len, i;
 	fileHandle_t f;
 	char buf[MAX_VOICEFILESIZE];
-	char **p, *ptr;
-	char *token;
+	const char **p, *ptr;
+	const char* token;
 	voiceChat_t *voiceChats;
 	qboolean compress;
 	sfxHandle_t sound;
@@ -608,15 +602,10 @@ int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, in
 	return qtrue;
 }
 
-/*
-=================
-CG_LoadVoiceChats
-=================
-*/
-void CG_LoadVoiceChats( void ) {
-	int size;
 
-	size = trap_MemoryRemaining();
+void CG_LoadVoiceChats()
+{
+	int size = trap_MemoryRemaining();
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female2.voice", &voiceChatLists[1], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female3.voice", &voiceChatLists[2], MAX_VOICECHATS );
@@ -628,17 +617,14 @@ void CG_LoadVoiceChats( void ) {
 	CG_Printf("voice chat memory size = %d\n", size - trap_MemoryRemaining());
 }
 
-/*
-=================
-CG_HeadModelVoiceChats
-=================
-*/
-int CG_HeadModelVoiceChats( char *filename ) {
-	int	len, i;
+
+static int CG_HeadModelVoiceChats( const char* filename )
+{
+	int len, i;
 	fileHandle_t f;
 	char buf[MAX_VOICEFILESIZE];
-	char **p, *ptr;
-	char *token;
+	const char **p, *ptr;
+	const char* token;
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) {

@@ -222,7 +222,7 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
 	CG_DrawStringExt( x, y, s, color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
-void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color ) {
+void CG_DrawBigStringColor( int x, int y, const char *s, const vec4_t color ) {
 	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
@@ -234,7 +234,7 @@ void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 	CG_DrawStringExt( x, y, s, color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
-void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
+void CG_DrawSmallStringColor( int x, int y, const char *s, const vec4_t color ) {
 	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
@@ -701,7 +701,8 @@ int UI_ProportionalStringWidth( const char* str ) {
 	return width;
 }
 
-static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset )
+
+static void UI_DrawProportionalString2( int x, int y, const char* str, const vec4_t color, float sizeScale, qhandle_t charset )
 {
 	const char* s;
 	unsigned char	ch; // bk001204 - unsigned
@@ -759,12 +760,8 @@ float UI_ProportionalSizeScale( int style ) {
 }
 
 
-/*
-=================
-UI_DrawProportionalString
-=================
-*/
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) {
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vec4_t color )
+{
 	vec4_t	drawcolor;
 	int		width;
 	float	sizeScale;

@@ -745,13 +745,10 @@ static float CG_DrawAttacker( float y ) {
 	return y + BIGCHAR_HEIGHT + 2;
 }
 
-/*
-==================
-CG_DrawSnapshot
-==================
-*/
-static float CG_DrawSnapshot( float y ) {
-	char		*s;
+
+static float CG_DrawSnapshot( float y )
+{
+	const char* s;
 	int			w;
 
 	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime, 
@@ -763,14 +760,11 @@ static float CG_DrawSnapshot( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
-/*
-==================
-CG_DrawFPS
-==================
-*/
+
 #define	FPS_FRAMES	4
-static float CG_DrawFPS( float y ) {
-	char		*s;
+static float CG_DrawFPS( float y )
+{
+	const char* s;
 	int			w;
 	static int	previousTimes[FPS_FRAMES];
 	static int	index;
@@ -807,13 +801,10 @@ static float CG_DrawFPS( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
-/*
-=================
-CG_DrawTimer
-=================
-*/
-static float CG_DrawTimer( float y ) {
-	char		*s;
+
+static float CG_DrawTimer( float y )
+{
+	const char* s;
 	int			w;
 	int			mins, seconds, tens;
 	int			msec;
@@ -2065,14 +2056,11 @@ static void CG_DrawSpectator(void) {
 	}
 }
 
-/*
-=================
-CG_DrawVote
-=================
-*/
-static void CG_DrawVote(void) {
-	char	*s;
-	int		sec;
+
+static void CG_DrawVote()
+{
+	int sec;
+	const char* s;
 
 	if ( !cgs.voteTime ) {
 		return;
@@ -2099,14 +2087,11 @@ static void CG_DrawVote(void) {
 #endif
 }
 
-/*
-=================
-CG_DrawTeamVote
-=================
-*/
-static void CG_DrawTeamVote(void) {
-	char	*s;
+
+static void CG_DrawTeamVote()
+{
 	int		sec, cs_offset;
+	const char* s;
 
 	if ( cgs.clientinfo->team == TEAM_RED )
 		cs_offset = 0;

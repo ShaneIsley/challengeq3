@@ -26,14 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "cg_local.h"
 
 
-/*
-==================
-CG_BubbleTrail
+// bullets and projectiles shot underwater
 
-Bullets shot underwater
-==================
-*/
-void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
+void CG_BubbleTrail( const vec3_t start, const vec3_t end, float spacing )
+{
 	vec3_t		move;
 	vec3_t		vec;
 	float		len;
@@ -142,19 +138,10 @@ localEntity_t *CG_SmokePuff( const vec3_t p, const vec3_t vel,
 	VectorCopy( p, re->origin );
 	re->customShader = hShader;
 
-	// rage pro can't alpha fade, so use a different shader
-	if ( cgs.glconfig.hardwareType == GLHW_RAGEPRO ) {
-		re->customShader = cgs.media.smokePuffRageProShader;
-		re->shaderRGBA[0] = 0xff;
-		re->shaderRGBA[1] = 0xff;
-		re->shaderRGBA[2] = 0xff;
-		re->shaderRGBA[3] = 0xff;
-	} else {
-		re->shaderRGBA[0] = le->color[0] * 0xff;
-		re->shaderRGBA[1] = le->color[1] * 0xff;
-		re->shaderRGBA[2] = le->color[2] * 0xff;
-		re->shaderRGBA[3] = 0xff;
-	}
+	re->shaderRGBA[0] = le->color[0] * 0xff;
+	re->shaderRGBA[1] = le->color[1] * 0xff;
+	re->shaderRGBA[2] = le->color[2] * 0xff;
+	re->shaderRGBA[3] = 0xff;
 
 	re->reType = RT_SPRITE;
 	re->radius = le->radius;

@@ -483,17 +483,11 @@ static int CG_CalcFov( void ) {
 		// if in intermission, use a fixed value
 		fov_x = 90;
 	} else {
-		// user selectable
-		if ( cgs.dmflags & DF_FIXED_FOV ) {
-			// dmflag to prevent wide fov for all clients
-			fov_x = 90;
-		} else {
-			fov_x = cg_fov.value;
-			if ( fov_x < 1 ) {
-				fov_x = 1;
-			} else if ( fov_x > 160 ) {
-				fov_x = 160;
-			}
+		fov_x = cg_fov.value;
+		if ( fov_x < 1 ) {
+			fov_x = 1;
+		} else if ( fov_x > 160 ) {
+			fov_x = 160;
 		}
 
 		// account for zooms
@@ -572,11 +566,6 @@ static void CG_DamageBlendBlob( void ) {
 	//if (cg.cameraMode) {
 	//	return;
 	//}
-
-	// ragePro systems can't fade blends, so don't obscure the screen
-	if ( cgs.glconfig.hardwareType == GLHW_RAGEPRO ) {
-		return;
-	}
 
 	maxTime = DAMAGE_TIME;
 	t = cg.time - cg.damageTime;

@@ -79,19 +79,16 @@ CLIENT INFO
 =============================================================================
 */
 
-/*
-======================
-CG_ParseAnimationFile
 
-Read a configuration file containing animation coutns and rates
-models/players/visor/animation.cfg, etc
-======================
-*/
-static qboolean	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci ) {
-	char		*text_p, *prev;
+// read a configuration file containing animation counts and rates
+// models/players/visor/animation.cfg, etc
+
+static qboolean	CG_ParseAnimationFile( const char *filename, clientInfo_t *ci )
+{
+	const char *text_p, *prev;
 	int			len;
 	int			i;
-	char		*token;
+	const char* token;
 	float		fps;
 	int			skip;
 	char		text[20000];
@@ -778,15 +775,11 @@ static qboolean CG_ScanForExistingClientInfo( clientInfo_t *ci ) {
 			&& !Q_stricmp( ci->skinName, match->skinName )
 			&& !Q_stricmp( ci->headModelName, match->headModelName )
 			&& !Q_stricmp( ci->headSkinName, match->headSkinName ) 
-			&& !Q_stricmp( ci->blueTeam, match->blueTeam ) 
-			&& !Q_stricmp( ci->redTeam, match->redTeam )
 			&& (cgs.gametype < GT_TEAM || ci->team == match->team) ) {
-			// this clientinfo is identical, so use it's handles
+			// this clientinfo is identical, so use its handles
 
 			ci->deferred = qfalse;
-
 			CG_CopyClientInfoModel( match, ci );
-
 			return qtrue;
 		}
 	}
@@ -930,12 +923,6 @@ void CG_NewClientInfo( int clientNum ) {
 	// team leader
 	v = Info_ValueForKey( configstring, "tl" );
 	newInfo.teamLeader = atoi(v);
-
-	v = Info_ValueForKey( configstring, "g_redteam" );
-	Q_strncpyz(newInfo.redTeam, v, MAX_TEAMNAME);
-
-	v = Info_ValueForKey( configstring, "g_blueteam" );
-	Q_strncpyz(newInfo.blueTeam, v, MAX_TEAMNAME);
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );

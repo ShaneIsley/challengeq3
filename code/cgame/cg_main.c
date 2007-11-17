@@ -849,7 +849,6 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.scoreboardTime = trap_R_RegisterShaderNoMip( "menu/tab/time.tga" );
 
 	cgs.media.smokePuffShader = trap_R_RegisterShader( "smokePuff" );
-	cgs.media.smokePuffRageProShader = trap_R_RegisterShader( "smokePuffRagePro" );
 	cgs.media.shotgunSmokePuffShader = trap_R_RegisterShader( "shotgunSmokePuff" );
 #ifdef MISSIONPACK
 	cgs.media.nailPuffShader = trap_R_RegisterShader( "nailtrail" );
@@ -1169,23 +1168,21 @@ const char *CG_ConfigString( int index ) {
 
 //==================================================================
 
-/*
-======================
-CG_StartMusic
 
-======================
-*/
-void CG_StartMusic( void ) {
-	char	*s;
+void CG_StartMusic()
+{
+	const char* s;
 	char	parm1[MAX_QPATH], parm2[MAX_QPATH];
 
 	// start the background music
-	s = (char *)CG_ConfigString( CS_MUSIC );
+	s = CG_ConfigString( CS_MUSIC );
 	Q_strncpyz( parm1, COM_Parse( &s ), sizeof( parm1 ) );
 	Q_strncpyz( parm2, COM_Parse( &s ), sizeof( parm2 ) );
 
 	trap_S_StartBackgroundTrack( parm1, parm2 );
 }
+
+
 #ifdef MISSIONPACK
 char *CG_GetMenuBuffer(const char *filename) {
 	int	len;

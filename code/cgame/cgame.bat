@@ -14,10 +14,11 @@ set cc=lcc -DQ3_VM -DCGAME -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\ga
 @if errorlevel 1 goto quit
 %cc% ../../game/bg_lib.c
 @if errorlevel 1 goto quit
-%cc% ../../game/q_math.c
+%cc% ../../qcommon/q_math.c
 @if errorlevel 1 goto quit
-%cc% ../../game/q_shared.c
+%cc% ../../qcommon/q_shared.c
 @if errorlevel 1 goto quit
+
 %cc% ../cg_consolecmds.c
 @if errorlevel 1 goto quit
 %cc% ../cg_draw.c

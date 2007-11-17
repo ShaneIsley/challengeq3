@@ -30,16 +30,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 //==========================================================================
 
-/*
-===================
-CG_PlaceString
 
-Also called by scoreboard drawing
-===================
-*/
-const char	*CG_PlaceString( int rank ) {
-	static char	str[64];
-	char	*s, *t;
+// also called by scoreboard drawing
+
+const char* CG_PlaceString( int rank )
+{
+	static char str[64];
+	const char *s, *t;
 
 	if ( rank & RANK_TIED_FLAG ) {
 		rank &= ~RANK_TIED_FLAG;
@@ -74,12 +71,9 @@ const char	*CG_PlaceString( int rank ) {
 	return str;
 }
 
-/*
-=============
-CG_Obituary
-=============
-*/
-static void CG_Obituary( entityState_t *ent ) {
+
+static void CG_Obituary( const entityState_t* es )
+{
 	int			mod;
 	int			target, attacker;
 	char		*message;
@@ -89,11 +83,11 @@ static void CG_Obituary( entityState_t *ent ) {
 	char		targetName[32];
 	char		attackerName[32];
 	gender_t	gender;
-	clientInfo_t	*ci;
+	const clientInfo_t* ci;
 
-	target = ent->otherEntityNum;
-	attacker = ent->otherEntityNum2;
-	mod = ent->eventParm;
+	target = es->otherEntityNum;
+	attacker = es->otherEntityNum2;
+	mod = es->eventParm;
 
 	if ( target < 0 || target >= MAX_CLIENTS ) {
 		CG_Error( "CG_Obituary: target out of range" );
@@ -212,7 +206,7 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	// check for kill messages from the current clientNum
 	if ( attacker == cg.snap->ps.clientNum ) {
-		char	*s;
+		const char* s;
 
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You fragged %s\n%s place with %i", targetName, 
