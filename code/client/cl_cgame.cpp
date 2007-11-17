@@ -641,11 +641,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 
 	case CG_REAL_TIME:
 		return Com_RealTime( VMA(1) );
-/*
-	case CG_SNAPVECTOR:
-		Sys_SnapVector( VMA(1) );
-		return 0;
-*/
+
 	case CG_CIN_PLAYCINEMATIC:
 		return CIN_PlayCinematic(VMA(1), args[2], args[3], args[4], args[5], args[6]);
 
@@ -663,8 +659,13 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		CIN_SetExtents(args[1], args[2], args[3], args[4], args[5]);
 		return 0;
 
+/*
+	case CG_SNAPVECTOR:
+		return 0;
+
 	case CG_R_REMAP_SHADER:
 		return 0;
+*/
 
 /*
 	case CG_LOADCAMERA:

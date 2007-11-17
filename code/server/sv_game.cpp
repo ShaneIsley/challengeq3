@@ -378,7 +378,6 @@ intptr_t SV_GameSystemCalls( intptr_t* args )
 		BotImport_DebugPolygonDelete( args[1] );
 		return 0;
 	case G_SNAPVECTOR:
-		Sys_SnapVector( VMA(1) );
 		return 0;
 */
 	case BOTLIB_SETUP:
