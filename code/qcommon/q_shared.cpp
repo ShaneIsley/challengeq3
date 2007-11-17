@@ -21,9 +21,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 // q_shared.c -- stateless support routines that are included in each code dll
+
 #include "q_shared.h"
 
-float Com_Clamp( float min, float max, float value ) {
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
+float Com_Clamp( float min, float max, float value )
+{
 	if ( value < min ) {
 		return min;
 	}
@@ -758,7 +766,8 @@ key and returns the associated value, or an empty string.
 FIXME: overflow check?
 ===============
 */
-char *Info_ValueForKey( const char *s, const char *key ) {
+const char* Info_ValueForKey( const char *s, const char *key )
+{
 	char	pkey[BIG_INFO_KEY];
 	static	char value[2][BIG_INFO_VALUE];	// use two buffers so compares
 											// work without stomping on each other
@@ -1075,6 +1084,6 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 }
 
 
-
-
-//====================================================================
+#if defined(__cplusplus)
+};
+#endif

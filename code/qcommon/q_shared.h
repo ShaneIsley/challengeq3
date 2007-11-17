@@ -33,26 +33,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define BASEGAME			"baseq3"
 #define APEXGAME			"cpma"
 
+
 #if defined(_DEBUG)
 #define COMPILE_TIME_ASSERT( pred ) switch(0) { case 0: case pred: ; }
 #else
 #define COMPILE_TIME_ASSERT( pred )
 #endif
-
-#if defined(__cplusplus) || defined(bool)
-#define bool DO_NOT_WANT
-#define true DO_NOT_WANT
-#define false DO_NOT_WANT
-#endif
-// technically-correct form, handy for catching sloppy code that mismixes bool and int, *cough* JPVW  :P
-#if defined(Q3_VM)
-typedef enum { qfalse, qtrue } qbool;
-#else
-typedef int qbool;
-const qbool qfalse = 0;
-const qbool qtrue = !0;
-#endif
-typedef qbool qboolean;
 
 
 #ifdef _MSC_VER
@@ -83,6 +69,35 @@ typedef qbool qboolean;
 #endif
 
 
+#if defined(__cplusplus) || defined(bool)
+#define bool DO_NOT_WANT
+#define true DO_NOT_WANT
+#define false DO_NOT_WANT
+#endif
+
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
+// technically-correct form, handy for catching sloppy code that mismixes bool and int, *cough* JPVW  :P
+//typedef enum { qfalse, qtrue } qbool;
+#if defined(Q3_VM)
+#define assert(x) { if (!x) Com_Error(ERR_FATAL, "ASSERT "__FILE__"(%d): %s", __LINE__, #x); }
+typedef enum { qfalse, qtrue } qbool;
+#else
+// this is a shitty shitty hack - the offending code should be cleaned up so we CAN use the typedef
+typedef int qbool;
+// and we can't even do this, because of vanilla C's multiple definition rule  :(
+//const qbool qfalse = 0;
+//const qbool qtrue = !0;
+#define qfalse (qbool)(0)
+#define qtrue (qbool)(!0)
+#endif
+typedef qbool qboolean;
+
+
 /**********************************************************************
   VM Considerations
 
@@ -102,6 +117,7 @@ typedef qbool qboolean;
 #ifdef Q3_VM
 
 #define QDECL
+#define ID_INLINE
 #include "../game/bg_lib.h"
 
 #else
@@ -373,7 +389,6 @@ int ColorIndex( char ccode );
 struct cplane_s;
 
 extern const vec3_t vec3_origin;
-extern const vec3_t axisDefault[3];
 
 
 #if idppc
@@ -534,7 +549,13 @@ void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
 
 void AxisClear( vec3_t axis[3] );
+#if defined(Q3_VM) // lcc can't cope with "const vec3_t []"
+extern vec3_t axisDefault[3];
 void AxisCopy( vec3_t in[3], vec3_t out[3] );
+#else
+extern const vec3_t axisDefault[3];
+void AxisCopy( const vec3_t in[3], vec3_t out[3] );
+#endif
 
 void SetPlaneSignbits( struct cplane_s *out );
 #if !defined(__GNUC__)
@@ -674,7 +695,7 @@ const char* QDECL va( const char* format, ... );
 //
 // key / value info strings
 //
-char *Info_ValueForKey( const char *s, const char *key );
+const char* Info_ValueForKey( const char *s, const char *key );
 void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );
@@ -1213,5 +1234,9 @@ typedef enum _flag_status {
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
 
+
+#if defined(__cplusplus)
+};
+#endif
 
 #endif	// __Q_SHARED_H

@@ -22,6 +22,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // q_math.c -- stateless support routines that are included in each code module
 
+#include "q_shared.h"
+
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
 // Some of the vector functions are static inline in q_shared.h. q3asm
 // doesn't understand static functions though, so we only want them in
 // one file. That's what this is about.
@@ -29,10 +37,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __Q3_VM_MATH
 #endif
 
-#include "q_shared.h"
 
 const vec3_t vec3_origin = { 0, 0, 0 };
+#if defined(Q3_VM) // lcc can't cope with "const vec3_t []"
+vec3_t axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+#else
 const vec3_t axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+#endif
 
 
 const vec4_t colorBlack  = { 0, 0, 0, 1 };
@@ -437,7 +448,12 @@ void AxisClear( vec3_t axis[3] ) {
 	axis[2][2] = 1;
 }
 
-void AxisCopy( vec3_t in[3], vec3_t out[3] ) {
+#if defined(Q3_VM) // lcc can't cope with "const vec3_t []"
+void AxisCopy( vec3_t in[3], vec3_t out[3] )
+#else
+void AxisCopy( const vec3_t in[3], vec3_t out[3] )
+#endif
+{
 	VectorCopy( in[0], out[0] );
 	VectorCopy( in[1], out[1] );
 	VectorCopy( in[2], out[2] );
@@ -1254,3 +1270,8 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	*/
 	VectorNormalize( dst );
 }
+
+
+#if defined(__cplusplus)
+};
+#endif
