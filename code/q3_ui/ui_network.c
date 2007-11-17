@@ -147,7 +147,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.banner.generic.x			= 320;
 	networkOptionsInfo.banner.generic.y			= 16;
 	networkOptionsInfo.banner.string			= "SYSTEM SETUP";
-	networkOptionsInfo.banner.color				= color_white;
+	networkOptionsInfo.banner.color				= colorWhite;
 	networkOptionsInfo.banner.style				= UI_CENTER;
 
 	networkOptionsInfo.framel.generic.type		= MTYPE_BITMAP;
@@ -174,7 +174,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.graphics.generic.y			= 240 - 2 * PROP_HEIGHT;
 	networkOptionsInfo.graphics.string				= "GRAPHICS";
 	networkOptionsInfo.graphics.style				= UI_RIGHT;
-	networkOptionsInfo.graphics.color				= color_red;
+	networkOptionsInfo.graphics.color				= colorRed;
 
 	networkOptionsInfo.display.generic.type			= MTYPE_PTEXT;
 	networkOptionsInfo.display.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -184,7 +184,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.display.generic.y			= 240 - PROP_HEIGHT;
 	networkOptionsInfo.display.string				= "DISPLAY";
 	networkOptionsInfo.display.style				= UI_RIGHT;
-	networkOptionsInfo.display.color				= color_red;
+	networkOptionsInfo.display.color				= colorRed;
 
 	networkOptionsInfo.sound.generic.type			= MTYPE_PTEXT;
 	networkOptionsInfo.sound.generic.flags			= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -194,7 +194,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.sound.generic.y				= 240;
 	networkOptionsInfo.sound.string					= "SOUND";
 	networkOptionsInfo.sound.style					= UI_RIGHT;
-	networkOptionsInfo.sound.color					= color_red;
+	networkOptionsInfo.sound.color					= colorRed;
 
 	networkOptionsInfo.network.generic.type			= MTYPE_PTEXT;
 	networkOptionsInfo.network.generic.flags		= QMF_RIGHT_JUSTIFY;
@@ -204,7 +204,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.network.generic.y			= 240 + PROP_HEIGHT;
 	networkOptionsInfo.network.string				= "NETWORK";
 	networkOptionsInfo.network.style				= UI_RIGHT;
-	networkOptionsInfo.network.color				= color_red;
+	networkOptionsInfo.network.color				= colorRed;
 
 	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.rate.generic.type		= MTYPE_SPINCONTROL;

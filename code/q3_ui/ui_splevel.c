@@ -159,16 +159,13 @@ static qhandle_t PlayerIconHandle( const char *modelAndSkin ) {
 }
 
 
-/*
-=================
-UI_SPLevelMenu_SetBots
-=================
-*/
-static void UI_SPLevelMenu_SetBots( void ) {
-	char	*p;
-	char	*bot;
-	char	*botInfo;
-	char	bots[MAX_INFO_STRING];
+static void UI_SPLevelMenu_SetBots()
+{
+	const char* p;
+	const char* botInfo;
+	char bots[MAX_INFO_STRING];
+	char botname[MAX_NAME_LENGTH];
+	char* bot = botname;
 
 	levelMenuInfo.numBots = 0;
 	if ( selectedArenaSet > currentSet ) {
@@ -187,16 +184,9 @@ static void UI_SPLevelMenu_SetBots( void ) {
 			break;
 		}
 
-		// mark start of bot name
-		bot = p;
-
-		// skip until space of null
-		while( *p && *p != ' ' ) {
-			p++;
-		}
-		if( *p ) {
-			*p++ = 0;
-		}
+		while( *p && *p != ' ' )
+			*bot++ = *p++;
+		*bot = 0;
 
 		botInfo = UI_GetBotInfoByName( bot );
 		if( botInfo ) {
@@ -209,6 +199,8 @@ static void UI_SPLevelMenu_SetBots( void ) {
 		}
 		Q_CleanStr( levelMenuInfo.botNames[levelMenuInfo.numBots] );
 		levelMenuInfo.numBots++;
+
+		bot = botname;
 	}
 }
 
@@ -344,17 +336,14 @@ static void UI_SPLevelMenu_SetMenuItems( void ) {
 }
 
 
-/*
-=================
-UI_SPLevelMenu_ResetEvent
-=================
-*/
-static void UI_SPLevelMenu_ResetDraw( void ) {
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This resets all of the", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 1, "single player game variables.", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 2, "Do this only if you want to", UI_CENTER|UI_SMALLFONT, color_yellow );
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 3, "start over from the beginning.", UI_CENTER|UI_SMALLFONT, color_yellow );
+static void UI_SPLevelMenu_ResetDraw()
+{
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This resets all of the", UI_CENTER|UI_SMALLFONT, colorYellow );
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 1, "single player game variables.", UI_CENTER|UI_SMALLFONT, colorYellow );
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 2, "Do this only if you want to", UI_CENTER|UI_SMALLFONT, colorYellow );
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 3, "start over from the beginning.", UI_CENTER|UI_SMALLFONT, colorYellow );
 }
+
 
 static void UI_SPLevelMenu_ResetAction( qboolean result ) {
 	if( !result ) {
@@ -592,7 +581,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 				Com_sprintf( string, sizeof(string), "%i", level );
 			}
 
-			UI_DrawString( x + 24, y + 48, string, UI_CENTER, color_yellow );
+			UI_DrawString( x + 24, y + 48, string, UI_CENTER, colorYellow );
 		}
 	}
 
@@ -601,16 +590,16 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	for ( n = 0; n < levelMenuInfo.numMaps; n++ ) {
 		x = levelMenuInfo.item_maps[n].generic.x;
 		y = levelMenuInfo.item_maps[n].generic.y;
-		UI_FillRect( x, y + 96, 128, 18, color_black );
+		UI_FillRect( x, y + 96, 128, 18, colorBlack );
 	}
 
 	if ( selectedArenaSet > currentSet ) {
-		UI_DrawProportionalString( 320, 216, "ACCESS DENIED", UI_CENTER|UI_BIGFONT, color_red );
+		UI_DrawProportionalString( 320, 216, "ACCESS DENIED", UI_CENTER|UI_BIGFONT, colorRed );
 		return;
 	}
 
 	// show levelshots for levels of current tier
-	Vector4Copy( color_white, color );
+	Vector4Copy( colorWhite, color );
 	color[3] = 0.5+0.5*sin(uis.realtime/PULSE_DIVISOR);
 	for ( n = 0; n < levelMenuInfo.numMaps; n++ ) {
 		x = levelMenuInfo.item_maps[n].generic.x;
@@ -655,7 +644,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 			UI_DrawHandlePic( x, y, 64, 64, levelMenuInfo.botPics[n]);
 		}
 		else {
-			UI_FillRect( x, y, 64, 64, color_black );
+			UI_FillRect( x, y, 64, 64, colorBlack );
 			UI_DrawProportionalString( x+22, y+18, "?", UI_BIGFONT, color_orange );
 		}
 		UI_DrawString( x, y + 64, levelMenuInfo.botNames[n], UI_SMALLFONT|UI_LEFT, color_orange );
@@ -734,7 +723,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_banner.generic.x				= 320;
 	levelMenuInfo.item_banner.generic.y				= 16;
 	levelMenuInfo.item_banner.string				= "CHOOSE LEVEL";
-	levelMenuInfo.item_banner.color					= color_red;
+	levelMenuInfo.item_banner.color					= colorRed;
 	levelMenuInfo.item_banner.style					= UI_CENTER;
 
 	levelMenuInfo.item_leftarrow.generic.type		= MTYPE_BITMAP;

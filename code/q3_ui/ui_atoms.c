@@ -159,25 +159,18 @@ void UI_ForceMenuOff (void)
 	trap_Cvar_Set( "cl_paused", "0" );
 }
 
-/*
-=================
-UI_LerpColor
-=================
-*/
-void UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t)
+
+static void UI_LerpColor( const vec4_t a, const vec4_t b, vec4_t out, float t )
 {
 	int i;
 
 	// lerp and clamp each component
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; ++i)
 	{
-		c[i] = a[i] + t*(b[i]-a[i]);
-		if (c[i] < 0)
-			c[i] = 0;
-		else if (c[i] > 1.0)
-			c[i] = 1.0;
+		out[i] = Com_Clamp( 0, 1, a[i] + t*(b[i]-a[i]) );
 	}
 }
+
 
 /*
 =================
@@ -330,14 +323,11 @@ static int propMapB[26][3] = {
 #define PROPB_SPACE_WIDTH	12
 #define PROPB_HEIGHT		36
 
+
 // bk001205 - code below duplicated in cgame/cg_drawtools.c
 // bk001205 - FIXME: does this belong in ui_shared.c?
-/*
-=================
-UI_DrawBannerString
-=================
-*/
-static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
+
+static void UI_DrawBannerString2( int x, int y, const char* str, const vec4_t color )
 {
 	const char* s;
 	unsigned char	ch; // bk001204 - unsigned
@@ -380,11 +370,12 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	trap_R_SetColor( NULL );
 }
 
-void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color ) {
-	const char *	s;
-	int				ch;
-	int				width;
-	vec4_t			drawcolor;
+void UI_DrawBannerString( int x, int y, const char* str, int style, const vec4_t color )
+{
+	const char* s;
+	int			ch;
+	int			width;
+	vec4_t		drawcolor;
 
 	// find the width of the drawn text
 	s = str;
@@ -447,7 +438,7 @@ int UI_ProportionalStringWidth( const char* str ) {
 	return width;
 }
 
-static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset )
+static void UI_DrawProportionalString2( int x, int y, const char* str, const vec4_t color, float sizeScale, qhandle_t charset )
 {
 	const char* s;
 	unsigned char	ch; // bk001204 - unsigned
@@ -509,7 +500,7 @@ float UI_ProportionalSizeScale( int style ) {
 UI_DrawProportionalString
 =================
 */
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) {
+void UI_DrawProportionalString( int x, int y, const char* str, int style, const vec4_t color ) {
 	vec4_t	drawcolor;
 	int		width;
 	float	sizeScale;
@@ -634,7 +625,7 @@ void UI_DrawProportionalString_AutoWrapped( int x, int y, int xmax, int ystep, c
 UI_DrawString2
 =================
 */
-static void UI_DrawString2( int x, int y, const char* str, vec4_t color, int charw, int charh )
+static void UI_DrawString2( int x, int y, const char* str, const vec4_t color, int charw, int charh )
 {
 	const char* s;
 	char	ch;
@@ -694,14 +685,14 @@ static void UI_DrawString2( int x, int y, const char* str, vec4_t color, int cha
 UI_DrawString
 =================
 */
-void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
+void UI_DrawString( int x, int y, const char* str, int style, const vec4_t color )
 {
 	int		len;
 	int		charw;
 	int		charh;
 	vec4_t	newcolor;
 	vec4_t	lowlight;
-	float	*drawcolor;
+	const float* drawcolor;
 	vec4_t	dropcolor;
 
 	if( !str ) {
@@ -733,9 +724,9 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 		lowlight[1] = 0.8*color[1];
 		lowlight[2] = 0.8*color[2];
 		lowlight[3] = 0.8*color[3];
-		UI_LerpColor(color,lowlight,newcolor,0.5+0.5*sin(uis.realtime/PULSE_DIVISOR));
+		UI_LerpColor( color, lowlight, newcolor, 0.5+0.5*sin(uis.realtime/PULSE_DIVISOR) );
 		drawcolor = newcolor;
-	}	
+	}
 	else
 		drawcolor = color;
 
@@ -768,20 +759,17 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 	UI_DrawString2(x,y,str,drawcolor,charw,charh);
 }
 
-/*
-=================
-UI_DrawChar
-=================
-*/
-void UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
+
+void UI_DrawChar( int x, int y, int ch, int style, const vec4_t color )
 {
-	char	buff[2];
+	char buf[2];
 
-	buff[0] = ch;
-	buff[1] = '\0';
+	buf[0] = ch;
+	buf[1] = '\0';
 
-	UI_DrawString( x, y, buff, style, color );
+	UI_DrawString( x, y, buf, style, color );
 }
+
 
 qboolean UI_IsFullscreen( void ) {
 	if ( uis.activemenu && ( trap_Key_GetCatcher() & KEYCATCH_UI ) ) {

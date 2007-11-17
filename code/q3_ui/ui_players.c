@@ -919,16 +919,12 @@ static qboolean UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, 
 }
 
 
-/*
-======================
-UI_ParseAnimationFile
-======================
-*/
-static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animations ) {
-	char		*text_p, *prev;
+static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animations )
+{
+	const char	*text_p, *prev;
 	int			len;
 	int			i;
-	char		*token;
+	const char* token;
 	float		fps;
 	int			skip;
 	char		text[20000];
@@ -1132,12 +1128,8 @@ void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
 }
 
 
-/*
-===============
-UI_PlayerInfo_SetInfo
-===============
-*/
-void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNumber, qboolean chat ) {
+void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, const vec3_t viewAngles, const vec3_t moveAngles, weapon_t weaponNumber, qboolean chat )
+{
 	int			currentAnim;
 	weapon_t	weaponNum;
 

@@ -231,7 +231,7 @@ static void UI_SPPostgameMenu_DrawAwardsMedals( int max ) {
 			Com_sprintf( buf, sizeof(buf), "%i", amount );
 		}
 
-		UI_DrawString( x + 24, y + 52, buf, UI_CENTER, color_yellow );
+		UI_DrawString( x + 24, y + 52, buf, UI_CENTER, colorYellow );
 	}
 }
 
@@ -277,14 +277,14 @@ static void UI_SPPostgameMenu_MenuDrawScoreLine( int n, int y ) {
 
 	rank = postgameMenuInfo.ranks[n];
 	if( rank & RANK_TIED_FLAG ) {
-		UI_DrawString( 640 - 31 * SMALLCHAR_WIDTH, y, "(tie)", UI_LEFT|UI_SMALLFONT, color_white );
+		UI_DrawString( 640 - 31 * SMALLCHAR_WIDTH, y, "(tie)", UI_LEFT|UI_SMALLFONT, colorWhite );
 		rank &= ~RANK_TIED_FLAG;
 	}
 	trap_GetConfigString( CS_PLAYERS + postgameMenuInfo.clientNums[n], info, MAX_INFO_STRING );
 	Q_strncpyz( name, Info_ValueForKey( info, "n" ), sizeof(name) );
 	Q_CleanStr( name );
 
-	UI_DrawString( 640 - 25 * SMALLCHAR_WIDTH, y, va( "#%i: %-16s %2i", rank + 1, name, postgameMenuInfo.scores[n] ), UI_LEFT|UI_SMALLFONT, color_white );
+	UI_DrawString( 640 - 25 * SMALLCHAR_WIDTH, y, va( "#%i: %-16s %2i", rank + 1, name, postgameMenuInfo.scores[n] ), UI_LEFT|UI_SMALLFONT, colorWhite );
 }
 
 
@@ -308,10 +308,10 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 	// phase 1
 	if ( postgameMenuInfo.numClients > 2 ) {
-		UI_DrawProportionalString( 510, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[2], UI_CENTER, color_white );
+		UI_DrawProportionalString( 510, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[2], UI_CENTER, colorWhite );
 	}
-	UI_DrawProportionalString( 130, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[1], UI_CENTER, color_white );
-	UI_DrawProportionalString( 320, 480 - 64 - 2 * PROP_HEIGHT, postgameMenuInfo.placeNames[0], UI_CENTER, color_white );
+	UI_DrawProportionalString( 130, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[1], UI_CENTER, colorWhite );
+	UI_DrawProportionalString( 320, 480 - 64 - 2 * PROP_HEIGHT, postgameMenuInfo.placeNames[0], UI_CENTER, colorWhite );
 
 	if( postgameMenuInfo.phase == 1 ) {
 		timer = uis.realtime - postgameMenuInfo.starttime;

@@ -161,7 +161,7 @@ static void PlayerSettings_DrawName( void *self ) {
 		style &= ~UI_PULSE;
 		style |= UI_BLINK;
 
-		UI_DrawChar( basex + f->field.cursor * SMALLCHAR_WIDTH, y, c, style, color_white );
+		UI_DrawChar( basex + f->field.cursor * SMALLCHAR_WIDTH, y, c, style, colorWhite );
 	}
 
 	// draw at bottom also using proportional font
@@ -365,7 +365,7 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.banner.generic.x     = 320;
 	s_playersettings.banner.generic.y     = 16;
 	s_playersettings.banner.string        = "PLAYER SETTINGS";
-	s_playersettings.banner.color         = color_white;
+	s_playersettings.banner.color         = colorWhite;
 	s_playersettings.banner.style         = UI_CENTER;
 
 	s_playersettings.framel.generic.type  = MTYPE_BITMAP;

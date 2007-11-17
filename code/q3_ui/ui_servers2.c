@@ -531,7 +531,7 @@ static void ArenaServers_UpdateMenu( void ) {
 
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "%s", 
 			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
- 			servernodeptr->maxclients, servernodeptr->gamename,
+			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
 		j++;
 	}
@@ -580,7 +580,7 @@ static void ArenaServers_Remove( void )
 			memcpy( &g_arenaservers.favoriteaddresses[i], &g_arenaservers.favoriteaddresses[i+1], (g_arenaservers.numfavoriteaddresses - i - 1)*sizeof(MAX_ADDRESSLENGTH));
 		}
 		g_arenaservers.numfavoriteaddresses--;
-	}	
+	}
 
 	// find address in server list
 	for (i=0; i<g_numfavoriteservers; i++)
@@ -596,7 +596,7 @@ static void ArenaServers_Remove( void )
 			memcpy( &g_favoriteserverlist[i], &g_favoriteserverlist[i+1], (g_numfavoriteservers - i - 1)*sizeof(servernode_t));
 		}
 		g_numfavoriteservers--;
-	}	
+	}
 
 	g_arenaservers.numqueriedservers = g_arenaservers.numfavoriteaddresses;
 	g_arenaservers.currentping       = g_arenaservers.numfavoriteaddresses;
@@ -611,7 +611,7 @@ ArenaServers_Insert
 static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 {
 	servernode_t*	servernodeptr;
-	char*			s;
+	const char*		s;
 	int				i;
 
 
@@ -1346,7 +1346,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.banner.generic.y	    = 16;
 	g_arenaservers.banner.string  		= "ARENA SERVERS";
 	g_arenaservers.banner.style  	    = UI_CENTER;
-	g_arenaservers.banner.color  	    = color_white;
+	g_arenaservers.banner.color  	    = colorWhite;
 
 	y = 80;
 	g_arenaservers.master.generic.type			= MTYPE_SPINCONTROL;

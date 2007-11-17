@@ -98,9 +98,9 @@ static void UI_DisplayDownloadInfo( const char *downloadName ) {
 	if (width > leftWidth) leftWidth = width;
 	leftWidth += 16;
 
-	UI_DrawProportionalString( 8, 128, dlText, style, color_white );
-	UI_DrawProportionalString( 8, 160, etaText, style, color_white );
-	UI_DrawProportionalString( 8, 224, xferText, style, color_white );
+	UI_DrawProportionalString( 8, 128, dlText, style, colorWhite );
+	UI_DrawProportionalString( 8, 160, etaText, style, colorWhite );
+	UI_DrawProportionalString( 8, 224, xferText, style, colorWhite );
 
 	if (downloadSize > 0) {
 		s = va( "%s (%d%%)", downloadName, downloadCount * 100 / downloadSize );
@@ -108,15 +108,15 @@ static void UI_DisplayDownloadInfo( const char *downloadName ) {
 		s = downloadName;
 	}
 
-	UI_DrawProportionalString( leftWidth, 128, s, style, color_white );
+	UI_DrawProportionalString( leftWidth, 128, s, style, colorWhite );
 
 	UI_ReadableSize( dlSizeBuf,		sizeof dlSizeBuf,		downloadCount );
 	UI_ReadableSize( totalSizeBuf,	sizeof totalSizeBuf,	downloadSize );
 
 	if (downloadCount < 4096 || !downloadTime) {
-		UI_DrawProportionalString( leftWidth, 160, "estimating", style, color_white );
+		UI_DrawProportionalString( leftWidth, 160, "estimating", style, colorWhite );
 		UI_DrawProportionalString( leftWidth, 192, 
-			va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, color_white );
+			va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, colorWhite );
 	} else {
 	  // bk010108
 	  //float elapsedTime = (float)(uis.realtime - downloadTime); // current - start (msecs)
@@ -145,46 +145,43 @@ static void UI_DisplayDownloadInfo( const char *downloadName ) {
 				//(n - (((downloadCount/1024) * n) / (downloadSize/1024))) * 1000);
 
 			UI_DrawProportionalString( leftWidth, 160, 
-				dlTimeBuf, style, color_white );
+				dlTimeBuf, style, colorWhite );
 			UI_DrawProportionalString( leftWidth, 192, 
-				va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, color_white );
+				va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, colorWhite );
 		} else {
 			UI_DrawProportionalString( leftWidth, 160, 
-				"estimating", style, color_white );
+				"estimating", style, colorWhite );
 			if (downloadSize) {
 				UI_DrawProportionalString( leftWidth, 192, 
-					va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, color_white );
+					va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), style, colorWhite );
 			} else {
 				UI_DrawProportionalString( leftWidth, 192, 
-					va("(%s copied)", dlSizeBuf), style, color_white );
+					va("(%s copied)", dlSizeBuf), style, colorWhite );
 			}
 		}
 
 		if (xferRate) {
 			UI_DrawProportionalString( leftWidth, 224, 
-				va("%s/Sec", xferRateBuf), style, color_white );
+				va("%s/Sec", xferRateBuf), style, colorWhite );
 		}
 	}
 }
 
-/*
-========================
-UI_DrawConnectScreen
 
-This will also be overlaid on the cgame info screen during loading
-to prevent it from blinking away too rapidly on local or lan games.
-========================
-*/
-void UI_DrawConnectScreen( qboolean overlay ) {
-	char			*s;
-	uiClientState_t	cstate;
-	char			info[MAX_INFO_VALUE];
+// this will also be overlaid on the cgame info screen during loading
+// to prevent it from blinking away too rapidly on local or lan games.
+
+void UI_DrawConnectScreen( qboolean overlay )
+{
+	const char* s;
+	uiClientState_t cstate;
+	char info[MAX_INFO_VALUE];
 
 	Menu_Cache();
 
 	if ( !overlay ) {
 		// draw the dialog background
-		UI_SetColor( color_white );
+		UI_SetColor( colorWhite );
 		UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
 	}
 
@@ -193,7 +190,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 
 	info[0] = '\0';
 	if( trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) ) ) {
-		UI_DrawProportionalString( 320, 16, va( "Loading %s", Info_ValueForKey( info, "mapname" ) ), UI_BIGFONT|UI_CENTER|UI_DROPSHADOW, color_white );
+		UI_DrawProportionalString( 320, 16, va( "Loading %s", Info_ValueForKey( info, "mapname" ) ), UI_BIGFONT|UI_CENTER|UI_DROPSHADOW, colorWhite );
 	}
 
 	UI_DrawProportionalString( 320, 64, va("Connecting to %s", cstate.servername), UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
@@ -263,7 +260,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 		return;
 	}
 
-	UI_DrawProportionalString( 320, 128, s, UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, color_white );
+	UI_DrawProportionalString( 320, 128, s, UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 
 	// password required / connection rejected information goes here
 }

@@ -1,4 +1,4 @@
--o "\quake3\baseq3\vm\ui"
+-o "ui"
 ui_main
 ..\..\ui\ui_syscalls
 ui_gameinfo

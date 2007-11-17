@@ -35,15 +35,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define LOW_MEMORY			(5 * 1024 * 1024)
 
-static char* playermodel_artlist[] =
+static const char* playermodel_artlist[] =
 {
-	MODEL_BACK0,	
-	MODEL_BACK1,	
+	MODEL_BACK0,
+	MODEL_BACK1,
 	MODEL_SELECT,
 	MODEL_SELECTED,
 	MODEL_FRAMEL,
 	MODEL_FRAMER,
-	MODEL_PORTS,	
+	MODEL_PORTS,
 	MODEL_ARROWS,
 	MODEL_ARROWSL,
 	MODEL_ARROWSR,
@@ -373,7 +373,7 @@ static void PlayerModel_DrawPlayer( void *self )
 	b = (menubitmap_s*) self;
 
 	if( trap_MemoryRemaining() <= LOW_MEMORY ) {
-		UI_DrawProportionalString( b->generic.x, b->generic.y + b->height / 2, "LOW MEMORY", UI_LEFT, color_red );
+		UI_DrawProportionalString( b->generic.x, b->generic.y + b->height / 2, "LOW MEMORY", UI_LEFT, colorRed );
 		return;
 	}
 
@@ -536,7 +536,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.banner.generic.x     = 320;
 	s_playermodel.banner.generic.y     = 16;
 	s_playermodel.banner.string        = "PLAYER MODEL";
-	s_playermodel.banner.color         = color_white;
+	s_playermodel.banner.color         = colorWhite;
 	s_playermodel.banner.style         = UI_CENTER;
 
 	s_playermodel.framel.generic.type  = MTYPE_BITMAP;

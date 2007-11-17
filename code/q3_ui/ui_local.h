@@ -237,13 +237,13 @@ typedef struct
 typedef struct
 {
 	menucommon_s	generic;
-	char*			focuspic;	
+	char*			focuspic;
 	char*			errorpic;
 	qhandle_t		shader;
 	qhandle_t		focusshader;
 	int				width;
 	int				height;
-	float*			focuscolor;
+	const float*	focuscolor;
 } menubitmap_s;
 
 typedef struct
@@ -251,7 +251,7 @@ typedef struct
 	menucommon_s	generic;
 	char*			string;
 	int				style;
-	float*			color;
+	const float*	color;
 } menutext_s;
 
 extern void			Menu_Cache( void );
@@ -281,19 +281,17 @@ extern vec4_t		menu_highlight_color;
 extern vec4_t		menu_red_color;
 extern vec4_t		menu_black_color;
 extern vec4_t		menu_dim_color;
-extern vec4_t		color_black;
-extern vec4_t		color_white;
-extern vec4_t		color_yellow;
-extern vec4_t		color_blue;
 extern vec4_t		color_orange;
-extern vec4_t		color_red;
 extern vec4_t		color_dim;
 extern vec4_t		name_color;
 extern vec4_t		list_color;
 extern vec4_t		listbar_color;
-extern vec4_t		text_color_disabled; 
+extern vec4_t		text_color_disabled;
 extern vec4_t		text_color_normal;
 extern vec4_t		text_color_highlight;
+extern const vec4_t colorLtGrey;
+extern const vec4_t colorMdGrey;
+extern const vec4_t colorDkGrey;
 
 extern char	*ui_medalNames[];
 extern char	*ui_medalPicNames[];
@@ -521,7 +519,7 @@ typedef struct {
 
 void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int time );
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model );
-void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNum, qboolean chat );
+void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, const vec3_t viewAngles, const vec3_t moveAngles, weapon_t weaponNum, qboolean chat );
 qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName );
 
 //
@@ -567,14 +565,13 @@ extern void			UI_FillRect( float x, float y, float width, float height, const fl
 extern void			UI_DrawRect( float x, float y, float width, float height, const float *color );
 extern void			UI_UpdateScreen( void );
 extern void			UI_SetColor( const float *rgba );
-extern void			UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t);
-extern void			UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color );
+extern void			UI_DrawBannerString( int x, int y, const char* str, int style, const vec4_t color );
 extern float		UI_ProportionalSizeScale( int style );
-extern void			UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
+extern void			UI_DrawProportionalString( int x, int y, const char* str, int style, const vec4_t color );
 extern void			UI_DrawProportionalString_AutoWrapped( int x, int ystart, int xmax, int ystep, const char* str, int style, vec4_t color );
 extern int			UI_ProportionalStringWidth( const char* str );
-extern void			UI_DrawString( int x, int y, const char* str, int style, vec4_t color );
-extern void			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
+extern void			UI_DrawString( int x, int y, const char* str, int style, const vec4_t color );
+extern void			UI_DrawChar( int x, int y, int ch, int style, const vec4_t color );
 extern qboolean 	UI_CursorInRect (int x, int y, int width, int height);
 extern void			UI_AdjustFrom640( float *x, float *y, float *w, float *h );
 extern void			UI_DrawTextBox (int x, int y, int width, int lines);
@@ -750,9 +747,9 @@ int UI_GetNumArenas( void );
 int UI_GetNumSPArenas( void );
 int UI_GetNumSPTiers( void );
 
-char *UI_GetBotInfoByNumber( int num );
-char *UI_GetBotInfoByName( const char *name );
-int UI_GetNumBots( void );
+const char* UI_GetBotInfoByNumber( int num );
+const char* UI_GetBotInfoByName( const char* name );
+int UI_GetNumBots();
 
 void UI_GetBestScore( int level, int *score, int *skill );
 void UI_SetBestScore( int level, int score );

@@ -133,7 +133,7 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 	qboolean		focus;
 	int				style;
 	char			c;
-	float			*color;
+	const float* color;
 	int				x, y;
 	int				val;
 
@@ -143,7 +143,7 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 
 	style = UI_LEFT;
 	if( focus ) {
-		color = color_yellow;
+		color = colorYellow;
 	}
 	else {
 		color = color_orange;
@@ -165,18 +165,18 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 		style &= ~UI_PULSE;
 		style |= UI_BLINK;
 
-		UI_DrawChar( x + f->field.cursor * BIGCHAR_WIDTH, y, c, style, color_white );
+		UI_DrawChar( x + f->field.cursor * BIGCHAR_WIDTH, y, c, style, colorWhite );
 	}
 
 	val = UI_CDKeyMenu_PreValidateKey( f->field.buffer );
 	if( val == 1 ) {
-		UI_DrawProportionalString( 320, 376, "Please enter your CD Key", UI_CENTER|UI_SMALLFONT, color_yellow );
+		UI_DrawProportionalString( 320, 376, "Please enter your CD Key", UI_CENTER|UI_SMALLFONT, colorYellow );
 	}
 	else if ( val == 0 ) {
-		UI_DrawProportionalString( 320, 376, "The CD Key appears to be valid, thank you", UI_CENTER|UI_SMALLFONT, color_white );
+		UI_DrawProportionalString( 320, 376, "The CD Key appears to be valid, thank you", UI_CENTER|UI_SMALLFONT, colorWhite );
 	}
 	else {
-		UI_DrawProportionalString( 320, 376, "The CD Key is not valid", UI_CENTER|UI_SMALLFONT, color_red );
+		UI_DrawProportionalString( 320, 376, "The CD Key is not valid", UI_CENTER|UI_SMALLFONT, colorRed );
 	}
 }
 
@@ -199,7 +199,7 @@ static void UI_CDKeyMenu_Init( void ) {
 	cdkeyMenuInfo.banner.generic.x					= 320;
 	cdkeyMenuInfo.banner.generic.y					= 16;
 	cdkeyMenuInfo.banner.string						= "CD KEY";
-	cdkeyMenuInfo.banner.color						= color_white;
+	cdkeyMenuInfo.banner.color						= colorWhite;
 	cdkeyMenuInfo.banner.style						= UI_CENTER;
 
 	cdkeyMenuInfo.frame.generic.type				= MTYPE_BITMAP;

@@ -123,7 +123,7 @@ static void UI_RemoveBotsMenu_BotEvent( void* ptr, int event ) {
 
 	removeBotsMenuInfo.bots[removeBotsMenuInfo.selectedBotNum].color = color_orange;
 	removeBotsMenuInfo.selectedBotNum = ((menucommon_s*)ptr)->id - ID_BOTNAME0;
-	removeBotsMenuInfo.bots[removeBotsMenuInfo.selectedBotNum].color = color_white;
+	removeBotsMenuInfo.bots[removeBotsMenuInfo.selectedBotNum].color = colorWhite;
 }
 
 
@@ -241,7 +241,7 @@ static void UI_RemoveBotsMenu_Init( void ) {
 	removeBotsMenuInfo.banner.generic.x			= 320;
 	removeBotsMenuInfo.banner.generic.y			= 16;
 	removeBotsMenuInfo.banner.string			= "REMOVE BOTS";
-	removeBotsMenuInfo.banner.color				= color_white;
+	removeBotsMenuInfo.banner.color				= colorWhite;
 	removeBotsMenuInfo.banner.style				= UI_CENTER;
 
 	removeBotsMenuInfo.background.generic.type	= MTYPE_BITMAP;
@@ -327,7 +327,7 @@ static void UI_RemoveBotsMenu_Init( void ) {
 
 	removeBotsMenuInfo.baseBotNum = 0;
 	removeBotsMenuInfo.selectedBotNum = 0;
-	removeBotsMenuInfo.bots[0].color = color_white;
+	removeBotsMenuInfo.bots[0].color = colorWhite;
 }
 
 

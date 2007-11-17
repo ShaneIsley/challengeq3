@@ -76,7 +76,8 @@ typedef struct {
 static skillMenuInfo_t	skillMenuInfo;
 
 
-static void SetSkillColor( int skill, vec4_t color ) {
+static void SetSkillColor( int skill, const vec4_t color )
+{
 	switch( skill ) {
 	case 1:
 		skillMenuInfo.item_baby.color = color;
@@ -111,13 +112,13 @@ static void UI_SPSkillMenu_SkillEvent( void *ptr, int notification ) {
 	if (notification != QM_ACTIVATED)
 		return;
 
-	SetSkillColor( (int)trap_Cvar_VariableValue( "g_spSkill" ), color_red );
+	SetSkillColor( (int)trap_Cvar_VariableValue( "g_spSkill" ), colorRed );
 
 	id = ((menucommon_s*)ptr)->id;
 	skill = id - ID_BABY + 1;
 	trap_Cvar_SetValue( "g_spSkill", skill );
 
-	SetSkillColor( skill, color_white );
+	SetSkillColor( skill, colorWhite );
 	skillMenuInfo.art_skillPic.shader = skillMenuInfo.skillpics[skill - 1];
 
 	if( id == ID_NIGHTMARE ) {
@@ -219,7 +220,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.art_banner.generic.x			= 320;
 	skillMenuInfo.art_banner.generic.y			= 16;
 	skillMenuInfo.art_banner.string				= "DIFFICULTY";
-	skillMenuInfo.art_banner.color				= color_white;
+	skillMenuInfo.art_banner.color				= colorWhite;
 	skillMenuInfo.art_banner.style				= UI_CENTER;
 
 	skillMenuInfo.item_baby.generic.type		= MTYPE_PTEXT;
@@ -229,7 +230,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_baby.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_baby.generic.id			= ID_BABY;
 	skillMenuInfo.item_baby.string				= "I Can Win";
-	skillMenuInfo.item_baby.color				= color_red;
+	skillMenuInfo.item_baby.color				= colorRed;
 	skillMenuInfo.item_baby.style				= UI_CENTER;
 
 	skillMenuInfo.item_easy.generic.type		= MTYPE_PTEXT;
@@ -239,7 +240,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_easy.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_easy.generic.id			= ID_EASY;
 	skillMenuInfo.item_easy.string				= "Bring It On";
-	skillMenuInfo.item_easy.color				= color_red;
+	skillMenuInfo.item_easy.color				= colorRed;
 	skillMenuInfo.item_easy.style				= UI_CENTER;
 
 	skillMenuInfo.item_medium.generic.type		= MTYPE_PTEXT;
@@ -249,7 +250,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_medium.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_medium.generic.id		= ID_MEDIUM;
 	skillMenuInfo.item_medium.string			= "Hurt Me Plenty";
-	skillMenuInfo.item_medium.color				= color_red;
+	skillMenuInfo.item_medium.color				= colorRed;
 	skillMenuInfo.item_medium.style				= UI_CENTER;
 
 	skillMenuInfo.item_hard.generic.type		= MTYPE_PTEXT;
@@ -259,7 +260,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_hard.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_hard.generic.id			= ID_HARD;
 	skillMenuInfo.item_hard.string				= "Hardcore";
-	skillMenuInfo.item_hard.color				= color_red;
+	skillMenuInfo.item_hard.color				= colorRed;
 	skillMenuInfo.item_hard.style				= UI_CENTER;
 
 	skillMenuInfo.item_nightmare.generic.type		= MTYPE_PTEXT;
@@ -269,7 +270,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_nightmare.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_nightmare.generic.id			= ID_NIGHTMARE;
 	skillMenuInfo.item_nightmare.string				= "NIGHTMARE!";
-	skillMenuInfo.item_nightmare.color				= color_red;
+	skillMenuInfo.item_nightmare.color				= colorRed;
 	skillMenuInfo.item_nightmare.style				= UI_CENTER;
 
 	skillMenuInfo.item_back.generic.type		= MTYPE_BITMAP;
@@ -313,7 +314,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	Menu_AddItem( &skillMenuInfo.menu, ( void * )&skillMenuInfo.item_fight );
 
 	skill = (int)Com_Clamp( 1, 5, trap_Cvar_VariableValue( "g_spSkill" ) );
-	SetSkillColor( skill, color_white );
+	SetSkillColor( skill, colorWhite );
 	skillMenuInfo.art_skillPic.shader = skillMenuInfo.skillpics[skill - 1];
 	if( skill == 5 ) {
 		trap_S_StartLocalSound( skillMenuInfo.nightmareSound, CHAN_ANNOUNCER );

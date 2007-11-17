@@ -40,14 +40,12 @@ static qhandle_t	sliderButton_1;
 
 vec4_t menu_text_color	    = {1.0f, 1.0f, 1.0f, 1.0f};
 vec4_t menu_dim_color       = {0.0f, 0.0f, 0.0f, 0.75f};
-vec4_t color_black	    = {0.00f, 0.00f, 0.00f, 1.00f};
-vec4_t color_white	    = {1.00f, 1.00f, 1.00f, 1.00f};
-vec4_t color_yellow	    = {1.00f, 1.00f, 0.00f, 1.00f};
-vec4_t color_blue	    = {0.00f, 0.00f, 1.00f, 1.00f};
 vec4_t color_lightOrange    = {1.00f, 0.68f, 0.00f, 1.00f };
 vec4_t color_orange	    = {1.00f, 0.43f, 0.00f, 1.00f};
-vec4_t color_red	    = {1.00f, 0.00f, 0.00f, 1.00f};
 vec4_t color_dim	    = {0.00f, 0.00f, 0.00f, 0.25f};
+const vec4_t colorLtGrey = {0.75, 0.75, 0.75, 1};
+const vec4_t colorMdGrey = {0.5, 0.5, 0.5, 1};
+const vec4_t colorDkGrey = {0.25, 0.25, 0.25, 1};
 
 // current color scheme
 vec4_t pulse_color          = {1.00f, 1.00f, 1.00f, 1.00f};
@@ -76,43 +74,23 @@ static void	SpinControl_Init( menulist_s *s );
 static void	SpinControl_Draw( menulist_s *s );
 static sfxHandle_t SpinControl_Key( menulist_s *l, int key );
 
-// text widget
-static void Text_Init( menutext_s *b );
-static void Text_Draw( menutext_s *b );
-
 // scrolllist widget
 static void	ScrollList_Init( menulist_s *l );
 sfxHandle_t ScrollList_Key( menulist_s *l, int key );
 
-// proportional text widget
-static void PText_Init( menutext_s *b );
-static void PText_Draw( menutext_s *b );
 
-// proportional banner text widget
-static void BText_Init( menutext_s *b );
-static void BText_Draw( menutext_s *b );
-
-/*
-=================
-Text_Init
-=================
-*/
 static void Text_Init( menutext_s *t )
 {
 	t->generic.flags |= QMF_INACTIVE;
 }
 
-/*
-=================
-Text_Draw
-=================
-*/
-static void Text_Draw( menutext_s *t )
+
+static void Text_Draw( const menutext_s* t )
 {
 	int		x;
 	int		y;
-	char	buff[512];	
-	float*	color;
+	char	buff[512];
+	const float* color;
 
 	x = t->generic.x;
 	y = t->generic.y;
@@ -126,7 +104,7 @@ static void Text_Draw( menutext_s *t )
 	// possible value
 	if (t->string)
 		strcat(buff,t->string);
-		
+
 	if (t->generic.flags & QMF_GRAYED)
 		color = text_color_disabled;
 	else
@@ -135,26 +113,18 @@ static void Text_Draw( menutext_s *t )
 	UI_DrawString( x, y, buff, t->style, color );
 }
 
-/*
-=================
-BText_Init
-=================
-*/
+
 static void BText_Init( menutext_s *t )
 {
 	t->generic.flags |= QMF_INACTIVE;
 }
 
-/*
-=================
-BText_Draw
-=================
-*/
-static void BText_Draw( menutext_s *t )
+
+static void BText_Draw( const menutext_s* t )
 {
 	int		x;
 	int		y;
-	float*	color;
+	const float* color;
 
 	x = t->generic.x;
 	y = t->generic.y;
@@ -167,11 +137,7 @@ static void BText_Draw( menutext_s *t )
 	UI_DrawBannerString( x, y, t->string, t->style, color );
 }
 
-/*
-=================
-PText_Init
-=================
-*/
+
 static void PText_Init( menutext_s *t )
 {
 	int	x;
@@ -200,17 +166,13 @@ static void PText_Init( menutext_s *t )
 	t->generic.bottom = y + h;
 }
 
-/*
-=================
-PText_Draw
-=================
-*/
-static void PText_Draw( menutext_s *t )
+
+static void PText_Draw( const menutext_s* t )
 {
 	int		x;
 	int		y;
-	float *	color;
 	int		style;
+	const float* color;
 
 	x = t->generic.x;
 	y = t->generic.y;
@@ -291,7 +253,7 @@ void Bitmap_Draw( menubitmap_s *b )
 	x = b->generic.x;
 	y = b->generic.y;
 	w = b->width;
-	h =	b->height;
+	h = b->height;
 
 	if (b->generic.flags & QMF_RIGHT_JUSTIFY)
 	{
@@ -327,17 +289,15 @@ void Bitmap_Draw( menubitmap_s *b )
 		if (b->shader)
 			UI_DrawHandlePic( x, y, w, h, b->shader );
 
-		// bk001204 - parentheses
-		if (  ( (b->generic.flags & QMF_PULSE) 
-			|| (b->generic.flags & QMF_PULSEIFFOCUS) )
-		      && (Menu_ItemAtCursor( b->generic.parent ) == b))
-		{	
-			if (b->focuscolor)			
+		if ( ( (b->generic.flags & QMF_PULSE) || (b->generic.flags & QMF_PULSEIFFOCUS) )
+			&& (Menu_ItemAtCursor( b->generic.parent ) == b))
+		{
+			if (b->focuscolor)
 			{
 				tempcolor[0] = b->focuscolor[0];
 				tempcolor[1] = b->focuscolor[1];
 				tempcolor[2] = b->focuscolor[2];
-				color        = tempcolor;	
+				color        = tempcolor;
 			}
 			else
 				color = pulse_color;
@@ -348,7 +308,7 @@ void Bitmap_Draw( menubitmap_s *b )
 			trap_R_SetColor( NULL );
 		}
 		else if ((b->generic.flags & QMF_HIGHLIGHT) || ((b->generic.flags & QMF_HIGHLIGHT_IF_FOCUS) && (Menu_ItemAtCursor( b->generic.parent ) == b)))
-		{	
+		{
 			if (b->focuscolor)
 			{
 				trap_R_SetColor( b->focuscolor );
@@ -1722,12 +1682,7 @@ void Menu_Cache( void )
 	uis.rb_off          = trap_R_RegisterShaderNoMip( "menu/art/switch_off" );
 
 	uis.whiteShader = trap_R_RegisterShaderNoMip( "white" );
-	if ( uis.glconfig.hardwareType == GLHW_RAGEPRO ) {
-		// the blend effect turns to shit with the normal 
-		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menubackRagePro" );
-	} else {
-		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
-	}
+	uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
 
 	menu_in_sound	= trap_S_RegisterSound( "sound/misc/menu1.wav", qfalse );

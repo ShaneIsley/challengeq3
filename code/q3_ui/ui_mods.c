@@ -142,16 +142,12 @@ static void UI_Mods_LoadModsFromFile( char *filename ) {
 #endif
 
 
-/*
-===============
-UI_Mods_LoadMods
-===============
-*/
-static void UI_Mods_LoadMods( void ) {
+static void UI_Mods_LoadMods()
+{
 	int		numdirs;
 	char	dirlist[2048];
 	char	*dirptr;
-  char  *descptr;
+	char	*descptr;
 	int		i;
 	int		dirlen;
 
@@ -168,9 +164,9 @@ static void UI_Mods_LoadMods( void ) {
 	dirptr  = dirlist;
 	for( i = 0; i < numdirs; i++ ) {
 		dirlen = strlen( dirptr ) + 1;
-    descptr = dirptr + dirlen;
-  	UI_Mods_ParseInfos( dirptr, descptr);
-    dirptr += dirlen + strlen(descptr) + 1;
+		descptr = dirptr + dirlen;
+		UI_Mods_ParseInfos( dirptr, descptr);
+		dirptr += dirlen + strlen(descptr) + 1;
 	}
 
 	trap_Print( va( "%i mods parsed\n", s_mods.list.numitems ) );
@@ -180,12 +176,8 @@ static void UI_Mods_LoadMods( void ) {
 }
 
 
-/*
-===============
-UI_Mods_MenuInit
-===============
-*/
-static void UI_Mods_MenuInit( void ) {
+static void UI_Mods_MenuInit()
+{
 	UI_ModsMenu_Cache();
 
 	memset( &s_mods, 0 ,sizeof(mods_t) );
@@ -196,13 +188,13 @@ static void UI_Mods_MenuInit( void ) {
 	s_mods.banner.generic.x			= 320;
 	s_mods.banner.generic.y			= 16;
 	s_mods.banner.string			= "MODS";
-	s_mods.banner.color				= color_white;
+	s_mods.banner.color				= colorWhite;
 	s_mods.banner.style				= UI_CENTER;
 
 	s_mods.framel.generic.type		= MTYPE_BITMAP;
 	s_mods.framel.generic.name		= ART_FRAMEL;
 	s_mods.framel.generic.flags		= QMF_INACTIVE;
-	s_mods.framel.generic.x			= 0;  
+	s_mods.framel.generic.x			= 0;
 	s_mods.framel.generic.y			= 78;
 	s_mods.framel.width				= 256;
 	s_mods.framel.height			= 329;

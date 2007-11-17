@@ -208,17 +208,13 @@ sfxHandle_t UI_TeamOrdersMenu_Key( int key ) {
 }
 
 
-/*
-=================
-UI_TeamOrdersMenu_ListDraw
-=================
-*/
-static void UI_TeamOrdersMenu_ListDraw( void *self ) {
+static void UI_TeamOrdersMenu_ListDraw( void *self )
+{
 	menulist_s	*l;
 	int			x;
 	int			y;
 	int			i;
-	float		*color;
+	const float* color;
 	qboolean	hasfocus;
 	int			style;
 
@@ -231,7 +227,7 @@ static void UI_TeamOrdersMenu_ListDraw( void *self ) {
 	for( i = 0; i < l->numitems; i++ ) {
 		style = UI_LEFT|UI_SMALLFONT|UI_CENTER;
 		if( i == l->curvalue ) {
-			color = color_yellow;
+			color = colorYellow;
 			if( hasfocus ) {
 				style |= UI_PULSE;
 			}
@@ -357,7 +353,7 @@ static void UI_TeamOrdersMenu_Init( void ) {
 	teamOrdersMenuInfo.banner.generic.x			= 320;
 	teamOrdersMenuInfo.banner.generic.y			= 16;
 	teamOrdersMenuInfo.banner.string			= "TEAM ORDERS";
-	teamOrdersMenuInfo.banner.color				= color_white;
+	teamOrdersMenuInfo.banner.color				= colorWhite;
 	teamOrdersMenuInfo.banner.style				= UI_CENTER;
 
 	teamOrdersMenuInfo.frame.generic.type		= MTYPE_BITMAP;

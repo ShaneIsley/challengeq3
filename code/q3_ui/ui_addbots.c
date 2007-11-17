@@ -114,7 +114,7 @@ static void UI_AddBotsMenu_BotEvent( void* ptr, int event ) {
 
 	addBotsMenuInfo.bots[addBotsMenuInfo.selectedBotNum].color = color_orange;
 	addBotsMenuInfo.selectedBotNum = ((menucommon_s*)ptr)->id - ID_BOTNAME0;
-	addBotsMenuInfo.bots[addBotsMenuInfo.selectedBotNum].color = color_white;
+	addBotsMenuInfo.bots[addBotsMenuInfo.selectedBotNum].color = colorWhite;
 }
 
 
@@ -222,7 +222,7 @@ UI_AddBotsMenu_Draw
 =================
 */
 static void UI_AddBotsMenu_Draw( void ) {
-	UI_DrawBannerString( 320, 16, "ADD BOTS", UI_CENTER, color_white );
+	UI_DrawBannerString( 320, 16, "ADD BOTS", UI_CENTER, colorWhite );
 	UI_DrawNamedPic( 320-233, 240-166, 466, 332, ART_BACKGROUND );
 
 	// standard menu drawing
@@ -365,7 +365,7 @@ static void UI_AddBotsMenu_Init( void ) {
 
 	addBotsMenuInfo.baseBotNum = 0;
 	addBotsMenuInfo.selectedBotNum = 0;
-	addBotsMenuInfo.bots[0].color = color_white;
+	addBotsMenuInfo.bots[0].color = colorWhite;
 
 	UI_AddBotsMenu_GetSortedBotNums();
 	UI_AddBotsMenu_SetBotNames();

@@ -110,20 +110,13 @@ extern const char* punkbuster_items[];
 static void UI_ServerOptionsMenu( qboolean multiplayer );
 
 
-/*
-=================
-GametypeBits
-=================
-*/
-static int GametypeBits( char *string ) {
-	int		bits;
-	char	*p;
-	char	*token;
+static int GametypeBits( const char* string )
+{
+	int bits = 0;
+	const char* p = string;
 
-	bits = 0;
-	p = string;
 	while( 1 ) {
-		token = COM_ParseExt( &p, qfalse );
+		const char* token = COM_ParseExt( &p, qfalse );
 		if( token[0] == 0 ) {
 			break;
 		}
@@ -398,13 +391,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.banner.generic.x	   = 320;
 	s_startserver.banner.generic.y	   = 16;
 	s_startserver.banner.string        = "GAME SERVER";
-	s_startserver.banner.color         = color_white;
+	s_startserver.banner.color         = colorWhite;
 	s_startserver.banner.style         = UI_CENTER;
 
 	s_startserver.framel.generic.type  = MTYPE_BITMAP;
 	s_startserver.framel.generic.name  = GAMESERVER_FRAMEL;
 	s_startserver.framel.generic.flags = QMF_INACTIVE;
-	s_startserver.framel.generic.x	   = 0;  
+	s_startserver.framel.generic.x	   = 0;
 	s_startserver.framel.generic.y	   = 78;
 	s_startserver.framel.width  	   = 256;
 	s_startserver.framel.height  	   = 329;
@@ -1028,13 +1021,14 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 }
 
 
-static void ServerOptions_InitBotNames( void ) {
+static void ServerOptions_InitBotNames()
+{
 	int			count;
 	int			n;
 	const char	*arenaInfo;
 	const char	*botInfo;
 	char		*p;
-	char		*bot;
+	const char* bot;
 	char		bots[MAX_INFO_STRING];
 
 	if( s_serveroptions.gametype >= GT_TEAM ) {
@@ -1243,7 +1237,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.banner.generic.x			= 320;
 	s_serveroptions.banner.generic.y			= 16;
 	s_serveroptions.banner.string  				= "GAME SERVER";
-	s_serveroptions.banner.color  				= color_white;
+	s_serveroptions.banner.color  				= colorWhite;
 	s_serveroptions.banner.style  				= UI_CENTER;
 
 	s_serveroptions.mappic.generic.type			= MTYPE_BITMAP;
@@ -1624,15 +1618,11 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 }
 
 
-/*
-=================
-UI_BotSelectMenu_UpdateGrid
-=================
-*/
-static void UI_BotSelectMenu_UpdateGrid( void ) {
+static void UI_BotSelectMenu_UpdateGrid()
+{
 	const char	*info;
 	int			i;
-    int			j;
+	int			j;
 
 	j = botSelectInfo.modelpage * MAX_MODELSPERPAGE;
 	for( i = 0; i < (PLAYERGRID_ROWS * PLAYERGRID_COLS); i++, j++) {
@@ -1641,9 +1631,9 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 			ServerPlayerIcon( Info_ValueForKey( info, "model" ), botSelectInfo.boticons[i], MAX_QPATH );
 			Q_strncpyz( botSelectInfo.botnames[i], Info_ValueForKey( info, "name" ), 16 );
 			Q_CleanStr( botSelectInfo.botnames[i] );
- 			botSelectInfo.pics[i].generic.name = botSelectInfo.boticons[i];
+			botSelectInfo.pics[i].generic.name = botSelectInfo.boticons[i];
 			if( BotAlreadySelected( botSelectInfo.botnames[i] ) ) {
-				botSelectInfo.picnames[i].color = color_red;
+				botSelectInfo.picnames[i].color = colorRed;
 			}
 			else {
 				botSelectInfo.picnames[i].color = color_orange;
@@ -1652,14 +1642,14 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 		}
 		else {
 			// dead slot
- 			botSelectInfo.pics[i].generic.name         = NULL;
+			botSelectInfo.pics[i].generic.name         = NULL;
 			botSelectInfo.picbuttons[i].generic.flags |= QMF_INACTIVE;
 			botSelectInfo.botnames[i][0] = 0;
 		}
 
- 		botSelectInfo.pics[i].generic.flags       &= ~QMF_HIGHLIGHT;
- 		botSelectInfo.pics[i].shader               = 0;
- 		botSelectInfo.picbuttons[i].generic.flags |= QMF_PULSEIFFOCUS;
+		botSelectInfo.pics[i].generic.flags       &= ~QMF_HIGHLIGHT;
+		botSelectInfo.pics[i].shader               = 0;
+		botSelectInfo.picbuttons[i].generic.flags |= QMF_PULSEIFFOCUS;
 	}
 
 	// set selected model
@@ -1847,7 +1837,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.banner.generic.x		= 320;
 	botSelectInfo.banner.generic.y		= 16;
 	botSelectInfo.banner.string			= "SELECT BOT";
-	botSelectInfo.banner.color			= color_white;
+	botSelectInfo.banner.color			= colorWhite;
 	botSelectInfo.banner.style			= UI_CENTER;
 
 	y =	80;

@@ -76,13 +76,10 @@ void UI_InitMemory( void ) {
 	outOfMemory = qfalse;
 }
 
-/*
-===============
-UI_ParseInfos
-===============
-*/
-int UI_ParseInfos( char *buf, int max, char *infos[] ) {
-	char	*token;
+
+static int UI_ParseInfos( const char* buf, int max, char *infos[] )
+{
+	const char* token;
 	int		count;
 	char	key[MAX_TOKEN_CHARS];
 	char	info[MAX_INFO_STRING];
@@ -118,7 +115,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] ) {
 
 			token = COM_ParseExt( &buf, qfalse );
 			if ( !token[0] ) {
-				strcpy( token, "<NULL>" );
+				token = "<NULL>";
 			}
 			Info_SetValueForKey( info, key, token );
 		}
@@ -160,12 +157,9 @@ static void UI_LoadArenasFromFile( char *filename ) {
 	ui_numArenas += UI_ParseInfos( buf, MAX_ARENAS - ui_numArenas, &ui_arenaInfos[ui_numArenas] );
 }
 
-/*
-===============
-UI_LoadArenas
-===============
-*/
-static void UI_LoadArenas( void ) {
+
+static void UI_LoadArenas()
+{
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];
@@ -173,8 +167,8 @@ static void UI_LoadArenas( void ) {
 	char*		dirptr;
 	int			i, n;
 	int			dirlen;
-	char		*type;
-	char		*tag;
+	const char* type;
+	const char* tag;
 	int			singlePlayerNum, specialNum, otherNum;
 
 	ui_numArenas = 0;
@@ -261,14 +255,11 @@ static void UI_LoadArenas( void ) {
 	}
 }
 
-/*
-===============
-UI_GetArenaInfoByNumber
-===============
-*/
-const char *UI_GetArenaInfoByNumber( int num ) {
+
+const char *UI_GetArenaInfoByNumber( int num )
+{
 	int		n;
-	char	*value;
+	const char* value;
 
 	if( num < 0 || num >= ui_numArenas ) {
 		trap_Print( va( S_COLOR_RED "Invalid arena number: %i\n", num ) );
@@ -387,12 +378,8 @@ static void UI_LoadBots( void ) {
 }
 
 
-/*
-===============
-UI_GetBotInfoByNumber
-===============
-*/
-char *UI_GetBotInfoByNumber( int num ) {
+const char* UI_GetBotInfoByNumber( int num )
+{
 	if( num < 0 || num >= ui_numBots ) {
 		trap_Print( va( S_COLOR_RED "Invalid bot number: %i\n", num ) );
 		return NULL;
@@ -401,17 +388,12 @@ char *UI_GetBotInfoByNumber( int num ) {
 }
 
 
-/*
-===============
-UI_GetBotInfoByName
-===============
-*/
-char *UI_GetBotInfoByName( const char *name ) {
-	int		n;
-	char	*value;
+const char* UI_GetBotInfoByName( const char* name )
+{
+	int n;
 
 	for ( n = 0; n < ui_numBots ; n++ ) {
-		value = Info_ValueForKey( ui_botInfos[n], "name" );
+		const char* value = Info_ValueForKey( ui_botInfos[n], "name" );
 		if ( !Q_stricmp( value, name ) ) {
 			return ui_botInfos[n];
 		}
@@ -735,12 +717,8 @@ int UI_GetNumSPTiers( void ) {
 }
 
 
-/*
-===============
-UI_GetNumBots
-===============
-*/
-int UI_GetNumBots( void ) {
+int UI_GetNumBots()
+{
 	return ui_numBots;
 }
 

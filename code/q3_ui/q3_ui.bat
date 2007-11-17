@@ -7,91 +7,88 @@ cd vm
 
 set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui %1
 
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_main.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_cdkey.c
+%cc% ../../game/bg_misc.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_ingame.c
+%cc% ../../game/bg_lib.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_serverinfo.c
+%cc% ../../qcommon/q_math.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_confirm.c
+%cc% ../../qcommon/q_shared.c
+
+%cc% ../ui_main.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_setup.c
+%cc% ../ui_cdkey.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../../game/bg_misc.c
+%cc% ../ui_ingame.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../../game/bg_lib.c
+%cc% ../ui_serverinfo.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../../game/q_math.c
+%cc% ../ui_confirm.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../../game/q_shared.c
+%cc% ../ui_setup.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_gameinfo.c
+%cc% ../ui_gameinfo.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_atoms.c
+%cc% ../ui_atoms.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_connect.c
+%cc% ../ui_connect.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_controls2.c
+%cc% ../ui_controls2.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_demo2.c
+%cc% ../ui_demo2.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_mfield.c
+%cc% ../ui_mfield.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_credits.c
+%cc% ../ui_credits.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_menu.c
+%cc% ../ui_menu.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_options.c
+%cc% ../ui_options.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_display.c
+%cc% ../ui_display.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_sound.c
+%cc% ../ui_sound.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_network.c
+%cc% ../ui_network.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_playermodel.c
+%cc% ../ui_playermodel.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_players.c
+%cc% ../ui_players.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_playersettings.c
+%cc% ../ui_playersettings.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_preferences.c
+%cc% ../ui_preferences.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_qmenu.c
+%cc% ../ui_qmenu.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_servers2.c
+%cc% ../ui_servers2.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_sparena.c
+%cc% ../ui_sparena.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_specifyserver.c
+%cc% ../ui_specifyserver.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_splevel.c
+%cc% ../ui_splevel.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_sppostgame.c
+%cc% ../ui_sppostgame.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_startserver.c
+%cc% ../ui_startserver.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_team.c
+%cc% ../ui_team.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_video.c
+%cc% ../ui_video.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_cinematics.c
+%cc% ../ui_cinematics.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_spskill.c
+%cc% ../ui_spskill.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_addbots.c
+%cc% ../ui_addbots.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_removebots.c
+%cc% ../ui_removebots.c
 @if errorlevel 1 goto quit
-rem lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_loadconfig.c
-rem @if errorlevel 1 goto quit
-rem lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_saveconfig.c
-rem @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_teamorders.c
+%cc% ../ui_teamorders.c
 @if errorlevel 1 goto quit
-lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\q3_ui ../ui_mods.c
+%cc% ../ui_mods.c
 @if errorlevel 1 goto quit
 
 
