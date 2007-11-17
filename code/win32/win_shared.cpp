@@ -45,35 +45,6 @@ int Sys_Milliseconds(void)
 }
 
 
-#ifndef __GNUC__ //see snapvectora.s
-/*
-================
-Sys_SnapVector
-================
-*/
-void Sys_SnapVector( float *v )
-{
-	int i;
-	float f;
-
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-	v++;
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-	v++;
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-}
-#endif
-
-
 // disable all optimizations temporarily so this code works correctly!
 #ifdef _MSC_VER
 #pragma optimize( "", off )
