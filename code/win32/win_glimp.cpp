@@ -1122,9 +1122,7 @@ static qbool GLW_LoadOpenGL( const char *drivername )
 			// try it again but with a 16-bit desktop
 			if ( glConfig.driverType == GLDRV_ICD )
 			{
-				if ( r_colorbits->integer != 16 ||
-					 cdsFullscreen != qtrue ||
-					 r_mode->integer != 3 )
+				if ( r_colorbits->integer != 16 || !cdsFullscreen || r_mode->integer != 3 )
 				{
 					if ( !GLW_StartDriverAndSetMode( 3, 16, qtrue ) )
 					{
