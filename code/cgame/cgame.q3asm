@@ -1,4 +1,4 @@
--o "cgame"
+-o "../../vm/cgame"
 cg_main
 ..\cg_syscalls
 cg_consolecmds

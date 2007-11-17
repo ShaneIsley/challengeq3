@@ -1,4 +1,4 @@
--o "qagame"
+-o "../../vm/qagame"
 g_main
 ../g_syscalls
 bg_misc

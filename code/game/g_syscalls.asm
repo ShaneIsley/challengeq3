@@ -42,7 +42,7 @@ equ	trap_FS_GetFileList		-39
 equ trap_DebugPolygonCreate	-40
 equ trap_DebugPolygonDelete	-41
 equ trap_RealTime			-42
-equ trap_SnapVector			-43
+equ RETARDED_trap_SnapVector			-43
 equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
 equ trap_FS_Seek -46

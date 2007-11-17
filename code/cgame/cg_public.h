@@ -22,13 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
 
-#define	CMD_BACKUP			64	
-#define	CMD_MASK			(CMD_BACKUP - 1)
-// allow a lot of command backups for very fast systems
-// multiple commands may be combined into a single packet, so this
-// needs to be larger than PACKET_BACKUP
-
-
 #define	MAX_ENTITIES_IN_SNAPSHOT	256
 
 // snapshots are a view of the server at a given time
@@ -136,14 +129,14 @@ typedef enum {
 	CG_KEY_GETCATCHER,
 	CG_KEY_SETCATCHER,
 	CG_KEY_GETKEY,
- 	CG_PC_ADD_GLOBAL_DEFINE,
+	CG_PC_ADD_GLOBAL_DEFINE,
 	CG_PC_LOAD_SOURCE,
 	CG_PC_FREE_SOURCE,
 	CG_PC_READ_TOKEN,
 	CG_PC_SOURCE_FILE_AND_LINE,
 	CG_S_STOPBACKGROUNDTRACK,
 	CG_REAL_TIME,
-	CG_SNAPVECTOR,
+	RETARDED_CG_SNAPVECTOR,
 	CG_REMOVECOMMAND,
 	CG_R_LIGHTFORPOINT,
 	CG_CIN_PLAYCINEMATIC,

@@ -1,4 +1,4 @@
--o "ui"
+-o "../../vm/ui"
 ui_main
 ..\..\ui\ui_syscalls
 ui_gameinfo

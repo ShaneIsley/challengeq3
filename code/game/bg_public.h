@@ -606,6 +606,10 @@ typedef enum {
 
 //---------------------------------------------------------
 
+
+extern void SnapVector( vec3_t v );
+
+
 // gitem_t->type
 typedef enum {
 	IT_BAD,
@@ -695,12 +699,10 @@ void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 
 void	BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
+void	BG_PlayerStateToEntityState( playerState_t* ps, entityState_t* es, qboolean snap );
 void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap );
 
 qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
-
-#define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
 
 
 #define ARENAS_PER_TIER		4
