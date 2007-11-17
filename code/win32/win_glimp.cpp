@@ -434,7 +434,7 @@ static qbool GLW_InitDriver( int colorbits )
 	//
 	if ( !glw_state.pixelFormatSet )
 	{
-		GLW_CreatePFD( &pfd, colorbits, depthbits, stencilbits, r_stereo->integer );
+		GLW_CreatePFD( &pfd, colorbits, depthbits, stencilbits, (qbool)r_stereo->integer );
 		if ( ( tpfd = GLW_MakeContext( &pfd ) ) != TRY_PFD_SUCCESS )
 		{
 			if ( tpfd == TRY_PFD_FAIL_HARD )
@@ -460,7 +460,7 @@ static qbool GLW_InitDriver( int colorbits )
 			if ( colorbits > glw_state.desktopBPP )
 				colorbits = glw_state.desktopBPP;
 
-			GLW_CreatePFD( &pfd, colorbits, depthbits, 0, r_stereo->integer );
+			GLW_CreatePFD( &pfd, colorbits, depthbits, 0, (qbool)r_stereo->integer );
 			if ( GLW_MakeContext( &pfd ) != TRY_PFD_SUCCESS )
 			{
 				if ( glw_state.hDC )
@@ -468,26 +468,22 @@ static qbool GLW_InitDriver( int colorbits )
 					ReleaseDC( g_wv.hWnd, glw_state.hDC );
 					glw_state.hDC = NULL;
 				}
-
 				ri.Printf( PRINT_ALL, "...failed to find an appropriate PIXELFORMAT\n" );
-
 				return qfalse;
 			}
 		}
 
-		/*
-		** report if stereo is desired but unavailable
-		*/
-		if ( !( pfd.dwFlags & PFD_STEREO ) && ( r_stereo->integer != 0 ) ) 
+		// report if stereo is desired but unavailable
+		//
+		if ( r_stereo->integer && !( pfd.dwFlags & PFD_STEREO ) )
 		{
 			ri.Printf( PRINT_ALL, "...failed to select stereo pixel format\n" );
 			glConfig.stereoEnabled = qfalse;
 		}
 	}
 
-	/*
-	** store PFD specifics 
-	*/
+	// store PFD specifics
+	//
 	glConfig.colorBits = ( int ) pfd.cColorBits;
 	glConfig.depthBits = ( int ) pfd.cDepthBits;
 	glConfig.stencilBits = ( int ) pfd.cStencilBits;
@@ -1088,7 +1084,7 @@ static qbool GLW_CheckOSVersion()
 {
 	OSVERSIONINFO vinfo;
 	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
-	return GetVersionEx( &vinfo );
+	return (qbool)GetVersionEx( &vinfo );
 }
 
 /*
@@ -1114,10 +1110,10 @@ static qbool GLW_LoadOpenGL( const char *drivername )
 
 	//
 	// load the driver and bind our function pointers to it
-	// 
-	if ( QGL_Init( buffer ) ) 
+	//
+	if ( QGL_Init( buffer ) )
 	{
-		cdsFullscreen = r_fullscreen->integer;
+		cdsFullscreen = (qbool)r_fullscreen->integer;
 
 		// create the window and set up the context
 		if ( !GLW_StartDriverAndSetMode( r_mode->integer, r_colorbits->integer, cdsFullscreen ) )
@@ -1177,7 +1173,7 @@ void GLimp_EndFrame (void)
 	}
 
 	// check logging
-	QGL_EnableLogging( r_logFile->integer );
+	QGL_EnableLogging( (qbool)r_logFile->integer );
 }
 
 
