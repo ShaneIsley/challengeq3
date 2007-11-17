@@ -1220,7 +1220,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\.\qcommon\q_math.cpp"
+				RelativePath="..\..\qcommon\q_math.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -1248,7 +1248,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\.\qcommon\q_shared.cpp"
+				RelativePath="..\..\qcommon\q_shared.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
