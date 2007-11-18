@@ -122,8 +122,6 @@ struct gentity_s {
 	char		*target;
 	char		*targetname;
 	char		*team;
-	char		*targetShaderName;
-	char		*targetShaderNewName;
 	gentity_t	*target_ent;
 
 	float		speed;
@@ -489,8 +487,6 @@ float vectoyaw( const vec3_t vec );
 void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
 void G_AddEvent( gentity_t *ent, int event, int eventParm );
 void G_SetOrigin( gentity_t *ent, vec3_t origin );
-void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
-const char *BuildShaderStateConfig( void );
 
 //
 // g_combat.c
@@ -558,7 +554,6 @@ void DropPortalDestination( gentity_t *ent );
 // g_weapon.c
 //
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
-void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
 qboolean CheckGauntletAttack( gentity_t *ent );
 void Weapon_HookFree (gentity_t *ent);
@@ -746,6 +741,11 @@ extern	vmCvar_t	g_teamAutoJoin;
 extern	vmCvar_t	g_teamForceBalance;
 extern	vmCvar_t	g_banIPs;
 extern	vmCvar_t	g_filterBan;
+extern	vmCvar_t	g_smoothClients;
+extern	vmCvar_t	pmove_fixed;
+extern	vmCvar_t	pmove_msec;
+
+#ifdef MISSIONPACK
 extern	vmCvar_t	g_obeliskHealth;
 extern	vmCvar_t	g_obeliskRegenPeriod;
 extern	vmCvar_t	g_obeliskRegenAmount;
@@ -753,14 +753,12 @@ extern	vmCvar_t	g_obeliskRespawnDelay;
 extern	vmCvar_t	g_cubeTimeout;
 extern	vmCvar_t	g_redteam;
 extern	vmCvar_t	g_blueteam;
-extern	vmCvar_t	g_smoothClients;
-extern	vmCvar_t	pmove_fixed;
-extern	vmCvar_t	pmove_msec;
 extern	vmCvar_t	g_rankings;
 extern	vmCvar_t	g_enableDust;
 extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;
 extern	vmCvar_t	g_proxMineTimeout;
+#endif
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
