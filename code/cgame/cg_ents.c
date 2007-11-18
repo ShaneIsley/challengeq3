@@ -448,9 +448,7 @@ static void CG_Missile( centity_t *cent ) {
 	// add missile sound
 	if ( weapon->missileSound ) {
 		vec3_t	velocity;
-
 		BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
-
 		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
 	}
 
@@ -461,7 +459,7 @@ static void CG_Missile( centity_t *cent ) {
 
 	if ( cent->currentState.weapon == WP_PLASMAGUN ) {
 		ent.reType = RT_SPRITE;
-		ent.radius = 16;
+		ent.radius = 8;
 		ent.rotation = 0;
 		ent.customShader = cgs.media.plasmaBallShader;
 		trap_R_AddRefEntityToScene( &ent );

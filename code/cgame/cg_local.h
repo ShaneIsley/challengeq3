@@ -1190,12 +1190,13 @@ extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
 #endif
 
-extern vmCvar_t cg_viewAdjustments;
+extern vmCvar_t cg_muzzleFlash;
 extern vmCvar_t cg_railCoreWidth;
 extern vmCvar_t cg_railRingStep;
 extern vmCvar_t cg_railRingWidth;
 extern vmCvar_t cg_railStyle;
 extern vmCvar_t cg_railTrailTime;
+extern vmCvar_t cg_viewAdjustments;
 
 //
 // cg_main.c

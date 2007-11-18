@@ -186,6 +186,7 @@ vmCvar_t	cg_noTaunt;
 vmCvar_t	cg_noProjectileTrail;
 vmCvar_t	cg_trueLightning;
 
+vmCvar_t cg_muzzleFlash;
 vmCvar_t cg_railCoreWidth;
 vmCvar_t cg_railRingStep;
 vmCvar_t cg_railRingWidth;
@@ -317,6 +318,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
 
+	{ &cg_muzzleFlash, "cg_muzzleFlash", "1", CVAR_ARCHIVE },
 	{ &cg_railCoreWidth, "cg_railCoreWidth", "2", CVAR_ARCHIVE },
 	{ &cg_railRingStep, "cg_railRingStep", "32", CVAR_ARCHIVE },
 	{ &cg_railRingWidth, "cg_railRingWidth", "8", CVAR_ARCHIVE },

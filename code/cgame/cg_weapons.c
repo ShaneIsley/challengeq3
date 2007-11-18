@@ -1130,20 +1130,18 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// set custom shading for railgun refire rate
 	if ( ps ) {
-		if ( cg.predictedPlayerState.weapon == WP_RAILGUN 
-			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING ) {
-			float	f;
-
-			f = (float)cg.predictedPlayerState.weaponTime / 1500;
-			gun.shaderRGBA[1] = 0;
-			gun.shaderRGBA[0] = 
-			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
+		if ( cg.predictedPlayerState.weapon == WP_RAILGUN ) {
+			float f = (ps->weaponstate == WEAPON_FIRING) ? (1.0 - ((float)ps->weaponTime / 1500)) : 1.0;
+			const clientInfo_t* ci = &cgs.clientinfo[ ps->clientNum ];
+			gun.shaderRGBA[0] = 255 * f * ci->color1[0];
+			gun.shaderRGBA[1] = 255 * f * ci->color1[1];
+			gun.shaderRGBA[2] = 255 * f * ci->color1[2];
 		} else {
 			gun.shaderRGBA[0] = 255;
 			gun.shaderRGBA[1] = 255;
 			gun.shaderRGBA[2] = 255;
-			gun.shaderRGBA[3] = 255;
 		}
+		gun.shaderRGBA[3] = 255;
 	}
 
 	gun.hModel = weapon->weaponModel;
@@ -1181,7 +1179,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		AnglesToAxis( angles, barrel.axis );
 
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
-
 		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
 	}
 
@@ -1223,26 +1220,23 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// colorize the railgun blast
 	if ( weaponNum == WP_RAILGUN ) {
-		clientInfo_t	*ci;
-
-		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+		const clientInfo_t* ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 		flash.shaderRGBA[0] = 255 * ci->color1[0];
 		flash.shaderRGBA[1] = 255 * ci->color1[1];
 		flash.shaderRGBA[2] = 255 * ci->color1[2];
 	}
 
 	CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
-	trap_R_AddRefEntityToScene( &flash );
+	if ((cg_muzzleFlash.integer && cg_drawGun.integer) || !ps || (cent->currentState.clientNum != ps->clientNum))
+		trap_R_AddRefEntityToScene( &flash );
 
-	if ( ps || cg.renderingThirdPerson ||
-		cent->currentState.number != cg.predictedPlayerState.clientNum ) {
-		// add lightning bolt
+	if ( ps || cg.renderingThirdPerson || cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 		CG_LightningBolt( nonPredictedCent, flash.origin );
-
-		// add rail trail
 		CG_SpawnRailTrail( cent, flash.origin );
 
-		if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
+		// disable dlights for your own weapon if muzzleflash is off: MG/PG are headache-inducing at that size
+		if ((weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2])
+				&& (!ps || cg_muzzleFlash.integer)) {
 			trap_R_AddLightToScene( flash.origin, 300 + (rand()&31), weapon->flashDlightColor[0],
 				weapon->flashDlightColor[1], weapon->flashDlightColor[2] );
 		}
