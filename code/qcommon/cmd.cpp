@@ -174,7 +174,7 @@ void Cbuf_Execute (void)
 
 	while (cmd_text.cursize)
 	{
-		if ( cmd_wait )	{
+		if ( cmd_wait ) {
 			// skip out while text still remains in buffer, leaving it
 			// for next frame
 			cmd_wait--;
@@ -189,19 +189,19 @@ void Cbuf_Execute (void)
 		{
 			if (text[i] == '"')
 				quotes++;
-			if ( !(quotes&1) &&  text[i] == ';')
+			if (!(quotes&1) && text[i] == ';')
 				break;	// don't break if inside a quoted string
-			if (text[i] == '\n' || text[i] == '\r' )
+			if (text[i] == '\n' || text[i] == '\r')
 				break;
 		}
 
 		if( i >= (MAX_CMD_LINE - 1)) {
 			i = MAX_CMD_LINE - 1;
 		}
-				
+
 		Com_Memcpy (line, text, i);
 		line[i] = 0;
-		
+
 // delete the text from the command buffer and move remaining commands down
 // this is necessary because commands (exec) can insert data at the
 // beginning of the text buffer
@@ -217,7 +217,7 @@ void Cbuf_Execute (void)
 
 // execute the command line
 
-		Cmd_ExecuteString (line);		
+		Cmd_ExecuteString (line);
 	}
 }
 
@@ -254,7 +254,7 @@ void Cmd_Exec_f( void ) {
 		return;
 	}
 	Com_Printf ("execing %s\n",Cmd_Argv(1));
-	
+
 	Cbuf_InsertText (f);
 
 	FS_FreeFile (f);
