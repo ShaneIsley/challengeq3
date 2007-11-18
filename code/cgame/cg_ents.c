@@ -595,30 +595,26 @@ static void CG_Mover( centity_t *cent ) {
 
 }
 
-/*
-===============
-CG_Beam
 
-Also called as an event
-===============
-*/
-void CG_Beam( centity_t *cent ) {
-	refEntity_t			ent;
-	entityState_t		*s1;
+// for lasers, but also called as an event by EV_DEBUG_LINE
 
-	s1 = &cent->currentState;
+void CG_Beam( const centity_t* cent )
+{
+	refEntity_t re;
+	const entityState_t* es = &cent->currentState;
 
-	// create the render entity
-	memset (&ent, 0, sizeof(ent));
-	VectorCopy( s1->pos.trBase, ent.origin );
-	VectorCopy( s1->origin2, ent.oldorigin );
-	AxisClear( ent.axis );
-	ent.reType = RT_BEAM;
+	memset( &re, 0, sizeof(re) );
+	VectorCopy( es->pos.trBase, re.origin );
+	VectorCopy( es->origin2, re.oldorigin );
+	re.radius = 8;
 
-	ent.renderfx = RF_NOSHADOW;
+	re.customShader = cgs.media.railCoreShader;
+	re.shaderRGBA[0] = 255 * es->angles[0];
+	re.shaderRGBA[1] = 255 * es->angles[1];
+	re.shaderRGBA[2] = 255 * es->angles[2];
+	re.shaderRGBA[3] = 255;
 
-	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	CG_DrawBeam( &re );
 }
 
 

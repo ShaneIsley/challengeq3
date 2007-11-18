@@ -207,115 +207,98 @@ static void CG_NailgunEjectBrass( centity_t *cent ) {
 #endif
 
 
-/*
-==========================
-CG_RailTrail
-==========================
-*/
-void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
-	vec3_t axis[36], move, move2, next_move, vec, temp;
-	float  len;
-	int    i, j, skip;
- 
-	localEntity_t *le;
-	refEntity_t   *re;
- 
-#define RADIUS   4
-#define ROTATION 1
-#define SPACING  5
- 
-	start[2] -= 4;
-	VectorCopy (start, move);
-	VectorSubtract (end, start, vec);
-	len = VectorNormalize (vec);
-	PerpendicularVector(temp, vec);
-	for (i = 0 ; i < 36; i++) {
-		RotatePointAroundVector(axis[i], vec, temp, i * 10);//banshee 2.4 was 10
+void CG_RailTrail( const clientInfo_t* ci, const vec3_t start, const vec3_t end )
+{
+	int i, step;
+	float len;
+	vec3_t pos, v;
+
+	if (cg_railStyle.integer & 1) { // core
+		localEntity_t* le = CG_AllocLocalEntity();
+		refEntity_t* re = &le->refEntity;
+
+		le->leType = LE_BEAM_FADE_ALPHA;
+		le->startTime = cg.time;
+		le->endTime = cg.time + cg_railTrailTime.value;
+		le->lifeRate = 1.0 / (le->endTime - le->startTime);
+
+		VectorCopy( ci->color1, le->color );
+		le->color[3] = 1.0f;
+		re->radius = 0.5 * Cvar_VariableIntegerValue("cg_railCoreWidth");
+		re->customShader = cgs.media.railCoreShader;
+
+		VectorCopy( start, re->origin );
+		VectorCopy( end, re->oldorigin );
 	}
- 
-	le = CG_AllocLocalEntity();
-	re = &le->refEntity;
- 
-	le->leType = LE_FADE_RGB;
-	le->startTime = cg.time;
-	le->endTime = cg.time + cg_railTrailTime.value;
-	le->lifeRate = 1.0 / (le->endTime - le->startTime);
- 
-	re->shaderTime = cg.time / 1000.0f;
-	re->reType = RT_RAIL_CORE;
-	re->customShader = cgs.media.railCoreShader;
- 
-	VectorCopy(start, re->origin);
-	VectorCopy(end, re->oldorigin);
- 
-	re->shaderRGBA[0] = ci->color1[0] * 255;
-    re->shaderRGBA[1] = ci->color1[1] * 255;
-    re->shaderRGBA[2] = ci->color1[2] * 255;
-    re->shaderRGBA[3] = 255;
 
-	le->color[0] = ci->color1[0] * 0.75;
-	le->color[1] = ci->color1[1] * 0.75;
-	le->color[2] = ci->color1[2] * 0.75;
-	le->color[3] = 1.0f;
+	step = Cvar_VariableIntegerValue("cg_railRingStep");
+	if (step && (cg_railStyle.integer & 4)) { // rings
+		float radius = 0.5 * Cvar_VariableIntegerValue("cg_railRingWidth");
 
-	AxisClear( re->axis );
- 
-	VectorMA(move, 20, vec, move);
-	VectorCopy(move, next_move);
-	VectorScale (vec, SPACING, vec);
+		VectorSubtract( end, start, v );
+		len = VectorNormalize( v );
 
-	if (cg_oldRail.integer != 0) {
-		// nudge down a bit so it isn't exactly in center
-		re->origin[2] -= 8;
-		re->oldorigin[2] -= 8;
-		return;
-	}
-	skip = -1;
- 
-	j = 18;
-    for (i = 0; i < len; i += SPACING) {
-		if (i != skip) {
-			skip = i + SPACING;
-			le = CG_AllocLocalEntity();
-            re = &le->refEntity;
-            le->leFlags = LEF_PUFF_DONT_SCALE;
-			le->leType = LE_MOVE_SCALE_FADE;
-            le->startTime = cg.time;
-            le->endTime = cg.time + (i>>1) + 600;
-            le->lifeRate = 1.0 / (le->endTime - le->startTime);
+		VectorScale( v, step, v );
+		VectorAdd( start, v, pos );
 
-            re->shaderTime = cg.time / 1000.0f;
-            re->reType = RT_SPRITE;
-            re->radius = 1.1f;
-			re->customShader = cgs.media.railRingsShader;
+		for (i = 0; i < len; i += step) {
+			particle_t* p = Particle_Alloc();
+			if (!p)
+				return;
 
-            re->shaderRGBA[0] = ci->color2[0] * 255;
-            re->shaderRGBA[1] = ci->color2[1] * 255;
-            re->shaderRGBA[2] = ci->color2[2] * 255;
-            re->shaderRGBA[3] = 255;
+			p->time = cg.time;
+			p->endtime = cg.time + cg_railTrailTime.value;
 
-            le->color[0] = ci->color2[0] * 0.75;
-            le->color[1] = ci->color2[1] * 0.75;
-            le->color[2] = ci->color2[2] * 0.75;
-            le->color[3] = 1.0f;
+			p->radius = radius;
+			VectorCopy( ci->color2, p->color );
+			p->color[3] = 1.0f;
 
-            le->pos.trType = TR_LINEAR;
-            le->pos.trTime = cg.time;
+			VectorCopy( pos, p->pos );
+			VectorClear( p->vel );
 
-			VectorCopy( move, move2);
-            VectorMA(move2, RADIUS , axis[j], move2);
-            VectorCopy(move2, le->pos.trBase);
-
-            le->pos.trDelta[0] = axis[j][0]*6;
-            le->pos.trDelta[1] = axis[j][1]*6;
-            le->pos.trDelta[2] = axis[j][2]*6;
+			VectorAdd( pos, v, pos );
 		}
+	}
 
-        VectorAdd (move, vec, move);
+	#define SPIRAL_STEP 1
 
-        j = j + ROTATION < 36 ? j + ROTATION : (j + ROTATION) % 36;
+	if (cg_railStyle.integer & 2) { // spiral
+		float d = 0, s, c;
+		vec3_t right, up, rot;
+
+		VectorSubtract( end, start, v );
+		len = VectorNormalize( v );
+
+		PerpendicularVector( right, v );
+		CrossProduct( v, right, up );
+
+		VectorCopy( start, pos );
+
+		for (i = 0; i < len; i += SPIRAL_STEP) {
+			particle_t* p = Particle_Alloc();
+			if (!p)
+				return;
+
+			p->time = cg.time;
+			p->endtime = cg.time + cg_railTrailTime.value;
+
+			p->radius = 1.0;
+			VectorCopy( ci->color2, p->color );
+			p->color[3] = 1.0f;
+
+			d += DEG2RAD(15);
+			s = sin(d);
+			c = cos(d);
+
+			VectorSet( rot, right[0]*c + up[0]*s, right[1]*c + up[1]*s, right[2]*c + up[2]*s );
+			VectorMA( pos, 2, rot, p->pos );
+			VectorScale( rot, 8, p->vel );
+
+			VectorMA( pos, SPIRAL_STEP, v, pos );
+		}
 	}
 }
+
 
 /*
 ==========================
@@ -453,101 +436,7 @@ static void CG_NailTrail( centity_t *ent, const weaponInfo_t *wi ) {
 }
 #endif
 
-/*
-==========================
-CG_NailTrail
-==========================
-*/
-static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi ) {
-	localEntity_t	*le;
-	refEntity_t		*re;
-	entityState_t	*es;
-	vec3_t			velocity, xvelocity, origin;
-	vec3_t			offset, xoffset;
-	vec3_t			v[3];
-	int				t, startTime, step;
 
-	float	waterScale = 1.0f;
-
-	if ( cg_noProjectileTrail.integer || cg_oldPlasma.integer ) {
-		return;
-	}
-
-	step = 50;
-
-	es = &cent->currentState;
-	startTime = cent->trailTime;
-	t = step * ( (startTime + step) / step );
-
-	BG_EvaluateTrajectory( &es->pos, cg.time, origin );
-
-	le = CG_AllocLocalEntity();
-	re = &le->refEntity;
-
-	velocity[0] = 60 - 120 * crandom();
-	velocity[1] = 40 - 80 * crandom();
-	velocity[2] = 100 - 200 * crandom();
-
-	le->leType = LE_MOVE_SCALE_FADE;
-	le->leFlags = LEF_TUMBLE;
-	le->leBounceSoundType = LEBS_NONE;
-	le->leMarkType = LEMT_NONE;
-
-	le->startTime = cg.time;
-	le->endTime = le->startTime + 600;
-
-	le->pos.trType = TR_GRAVITY;
-	le->pos.trTime = cg.time;
-
-	AnglesToAxis( cent->lerpAngles, v );
-
-	offset[0] = 2;
-	offset[1] = 2;
-	offset[2] = 2;
-
-	xoffset[0] = offset[0] * v[0][0] + offset[1] * v[1][0] + offset[2] * v[2][0];
-	xoffset[1] = offset[0] * v[0][1] + offset[1] * v[1][1] + offset[2] * v[2][1];
-	xoffset[2] = offset[0] * v[0][2] + offset[1] * v[1][2] + offset[2] * v[2][2];
-
-	VectorAdd( origin, xoffset, re->origin );
-	VectorCopy( re->origin, le->pos.trBase );
-
-	if ( CG_PointContents( re->origin, -1 ) & CONTENTS_WATER ) {
-		waterScale = 0.10f;
-	}
-
-	xvelocity[0] = velocity[0] * v[0][0] + velocity[1] * v[1][0] + velocity[2] * v[2][0];
-	xvelocity[1] = velocity[0] * v[0][1] + velocity[1] * v[1][1] + velocity[2] * v[2][1];
-	xvelocity[2] = velocity[0] * v[0][2] + velocity[1] * v[1][2] + velocity[2] * v[2][2];
-	VectorScale( xvelocity, waterScale, le->pos.trDelta );
-
-	AxisCopy( axisDefault, re->axis );
-    re->shaderTime = cg.time / 1000.0f;
-    re->reType = RT_SPRITE;
-    re->radius = 0.25f;
-	re->customShader = cgs.media.railRingsShader;
-	le->bounceFactor = 0.3f;
-
-    re->shaderRGBA[0] = wi->flashDlightColor[0] * 63;
-    re->shaderRGBA[1] = wi->flashDlightColor[1] * 63;
-    re->shaderRGBA[2] = wi->flashDlightColor[2] * 63;
-    re->shaderRGBA[3] = 63;
-
-    le->color[0] = wi->flashDlightColor[0] * 0.2;
-    le->color[1] = wi->flashDlightColor[1] * 0.2;
-    le->color[2] = wi->flashDlightColor[2] * 0.2;
-    le->color[3] = 0.25f;
-
-	le->angles.trType = TR_LINEAR;
-	le->angles.trTime = cg.time;
-	le->angles.trBase[0] = rand()&31;
-	le->angles.trBase[1] = rand()&31;
-	le->angles.trBase[2] = rand()&31;
-	le->angles.trDelta[0] = 1;
-	le->angles.trDelta[1] = 0.5;
-	le->angles.trDelta[2] = 0;
-
-}
 /*
 ==========================
 CG_GrappleTrail
@@ -791,7 +680,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 	case WP_PLASMAGUN:
 //		weaponInfo->missileModel = cgs.media.invulnerabilityPowerupModel;
-		weaponInfo->missileTrailFunc = CG_PlasmaTrail;
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/plasma/lasfly.wav", qfalse );
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/plasma/hyprbf1a.wav", qfalse );
@@ -1839,13 +1727,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
-		if (cg_oldRocket.integer == 0) {
-			// explosion sprite animation
-			VectorMA( origin, 24, dir, sprOrg );
-			VectorScale( dir, 64, sprVel );
-
-			CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-		}
 		break;
 	case WP_RAILGUN:
 		mod = cgs.media.ringFlashModel;

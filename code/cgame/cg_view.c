@@ -290,44 +290,21 @@ static void CG_OffsetThirdPersonView( void ) {
 }
 
 
-// this causes a compiler bug on mac MrC compiler
-static void CG_StepOffset( void ) {
-	int		timeDelta;
-	
-	// smooth out stair climbing
-	timeDelta = cg.time - cg.stepTime;
-	if ( timeDelta < STEP_TIME ) {
-		cg.refdef.vieworg[2] -= cg.stepChange 
-			* (STEP_TIME - timeDelta) / STEP_TIME;
-	}
-}
+static const enum { RUN_PITCH, RUN_ROLL, BOB_PITCH, BOB_ROLL, BOB_UP };
+static const float aViewAdjustments[] = { 0.002f, 0.005f, 0.002f, 0.002f, 0.005f };
 
-/*
-===============
-CG_OffsetFirstPersonView
+static void CG_OffsetFirstPersonView()
+{
+	float* origin = cg.refdef.vieworg;
+	float* angles = cg.refdefViewAngles;
+	float delta;
+	int timeDelta;
 
-===============
-*/
-static void CG_OffsetFirstPersonView( void ) {
-	float			*origin;
-	float			*angles;
-	float			bob;
-	float			ratio;
-	float			delta;
-	float			speed;
-	float			f;
-	vec3_t			predictedVelocity;
-	int				timeDelta;
-	
-	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+	if (cg.snap->ps.pm_type == PM_INTERMISSION)
 		return;
-	}
-
-	origin = cg.refdef.vieworg;
-	angles = cg.refdefViewAngles;
 
 	// if dead, fix the angle and don't add any kick
-	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) {
+	if (cg.snap->ps.eFlags & EF_DEAD) {
 		angles[ROLL] = 40;
 		angles[PITCH] = -15;
 		angles[YAW] = cg.snap->ps.stats[STAT_DEAD_YAW];
@@ -335,12 +312,33 @@ static void CG_OffsetFirstPersonView( void ) {
 		return;
 	}
 
-	// add angles based on weapon kick
-	VectorAdd (angles, cg.kick_angles, angles);
+	// vomit-inducing retarded "camera sway" effects
+	if (cg_viewAdjustments.integer) {
+		vec3_t predictedVelocity;
+		float speed = cg.bobfracsin * Com_Clamp( 200, cg.xyspeed, cg.xyspeed );
+
+		VectorCopy( cg.predictedPlayerState.velocity, predictedVelocity );
+
+		delta = DotProduct( predictedVelocity, cg.refdef.viewaxis[0] );
+		angles[PITCH] += delta * aViewAdjustments[RUN_PITCH];
+		delta = DotProduct( predictedVelocity, cg.refdef.viewaxis[1] );
+		angles[ROLL] -= delta * aViewAdjustments[RUN_ROLL];
+
+		if (cg.predictedPlayerState.pm_flags & PMF_DUCKED)
+			speed *= 2;
+		delta = aViewAdjustments[BOB_PITCH] * speed;
+		angles[PITCH] += delta;
+		delta = aViewAdjustments[BOB_ROLL] * speed;
+		if (cg.bobcycle & 1)
+			delta = -delta;
+		angles[ROLL] += delta;
+
+		origin[2] += Com_Clamp(0, 5, aViewAdjustments[BOB_UP] * speed);
+	}
 
 	// add angles based on damage kick
 	if ( cg.damageTime ) {
-		ratio = cg.time - cg.damageTime;
+		float ratio = cg.time - cg.damageTime;
 		if ( ratio < DAMAGE_DEFLECT_TIME ) {
 			ratio /= DAMAGE_DEFLECT_TIME;
 			angles[PITCH] += ratio * cg.v_dmg_pitch;
@@ -354,90 +352,33 @@ static void CG_OffsetFirstPersonView( void ) {
 		}
 	}
 
-	// add pitch based on fall kick
-#if 0
-	ratio = ( cg.time - cg.landTime) / FALL_TIME;
-	if (ratio < 0)
-		ratio = 0;
-	angles[PITCH] += ratio * cg.fall_value;
-#endif
-
-	// add angles based on velocity
-	VectorCopy( cg.predictedPlayerState.velocity, predictedVelocity );
-
-	delta = DotProduct ( predictedVelocity, cg.refdef.viewaxis[0]);
-	angles[PITCH] += delta * cg_runpitch.value;
-	
-	delta = DotProduct ( predictedVelocity, cg.refdef.viewaxis[1]);
-	angles[ROLL] -= delta * cg_runroll.value;
-
-	// add angles based on bob
-
-	// make sure the bob is visible even at low speeds
-	speed = cg.xyspeed > 200 ? cg.xyspeed : 200;
-
-	delta = cg.bobfracsin * cg_bobpitch.value * speed;
-	if (cg.predictedPlayerState.pm_flags & PMF_DUCKED)
-		delta *= 3;		// crouching
-	angles[PITCH] += delta;
-	delta = cg.bobfracsin * cg_bobroll.value * speed;
-	if (cg.predictedPlayerState.pm_flags & PMF_DUCKED)
-		delta *= 3;		// crouching accentuates roll
-	if (cg.bobcycle & 1)
-		delta = -delta;
-	angles[ROLL] += delta;
-
-//===================================
-
 	// add view height
 	origin[2] += cg.predictedPlayerState.viewheight;
 
 	// smooth out duck height changes
 	timeDelta = cg.time - cg.duckTime;
 	if ( timeDelta < DUCK_TIME) {
-		cg.refdef.vieworg[2] -= cg.duckChange 
-			* (DUCK_TIME - timeDelta) / DUCK_TIME;
+		cg.refdef.vieworg[2] -= cg.duckChange * (DUCK_TIME - timeDelta) / DUCK_TIME;
 	}
-
-	// add bob height
-	bob = cg.bobfracsin * cg.xyspeed * cg_bobup.value;
-	if (bob > 6) {
-		bob = 6;
-	}
-
-	origin[2] += bob;
-
 
 	// add fall height
 	delta = cg.time - cg.landTime;
-	if ( delta < LAND_DEFLECT_TIME ) {
-		f = delta / LAND_DEFLECT_TIME;
-		cg.refdef.vieworg[2] += cg.landChange * f;
-	} else if ( delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME ) {
+	if (delta < LAND_DEFLECT_TIME) {
+		cg.refdef.vieworg[2] += cg.landChange * (delta / LAND_DEFLECT_TIME);
+	} else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
 		delta -= LAND_DEFLECT_TIME;
-		f = 1.0 - ( delta / LAND_RETURN_TIME );
-		cg.refdef.vieworg[2] += cg.landChange * f;
+		cg.refdef.vieworg[2] += cg.landChange * (1.0 - (delta / LAND_RETURN_TIME));
 	}
 
-	// add step offset
-	CG_StepOffset();
+	// smooth out stair climbing
+	timeDelta = cg.time - cg.stepTime;
+	if (timeDelta < STEP_TIME) {
+		cg.refdef.vieworg[2] -= cg.stepChange * (STEP_TIME - timeDelta) / STEP_TIME;
+	}
 
 	// add kick offset
-
-	VectorAdd (origin, cg.kick_origin, origin);
-
-	// pivot the eye based on a neck length
-#if 0
-	{
-#define	NECK_LENGTH		8
-	vec3_t			forward, up;
- 
-	cg.refdef.vieworg[2] -= NECK_LENGTH;
-	AngleVectors( cg.refdefViewAngles, forward, NULL, up );
-	VectorMA( cg.refdef.vieworg, 3, forward, cg.refdef.vieworg );
-	VectorMA( cg.refdef.vieworg, NECK_LENGTH, up, cg.refdef.vieworg );
-	}
-#endif
+	VectorAdd(origin, cg.kick_origin, origin);
+	VectorAdd(angles, cg.kick_angles, angles);
 }
 
 //======================================================================
@@ -802,10 +743,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// build the render lists
 	if ( !cg.hyperspace ) {
-		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
-		CG_AddMarks();
-		CG_AddParticles ();
+		CG_AddPacketEntities();		// after calcViewValues, so predicted player state is correct
 		CG_AddLocalEntities();
+		CG_AddMarks();
+		Particles_Render();
 	}
 	CG_AddViewWeapon( &cg.predictedPlayerState );
 

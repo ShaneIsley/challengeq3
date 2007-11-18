@@ -216,45 +216,6 @@ void CG_SetConfigValues( void ) {
 	cg.warmup = atoi( CG_ConfigString( CS_WARMUP ) );
 }
 
-/*
-=====================
-CG_ShaderStateChanged
-=====================
-*/
-void CG_ShaderStateChanged(void) {
-	char originalShader[MAX_QPATH];
-	char newShader[MAX_QPATH];
-	char timeOffset[16];
-	const char *o;
-	char *n,*t;
-
-	o = CG_ConfigString( CS_SHADERSTATE );
-	while (o && *o) {
-		n = strstr(o, "=");
-		if (n && *n) {
-			strncpy(originalShader, o, n-o);
-			originalShader[n-o] = 0;
-			n++;
-			t = strstr(n, ":");
-			if (t && *t) {
-				strncpy(newShader, n, t-n);
-				newShader[t-n] = 0;
-			} else {
-				break;
-			}
-			t++;
-			o = strstr(t, "@");
-			if (o) {
-				strncpy(timeOffset, t, o-t);
-				timeOffset[o-t] = 0;
-				o++;
-				trap_R_RemapShader( originalShader, newShader, timeOffset );
-			}
-		} else {
-			break;
-		}
-	}
-}
 
 /*
 ================
@@ -339,10 +300,6 @@ static void CG_ConfigStringModified( void ) {
 		}
 #endif
 	}
-	else if ( num == CS_SHADERSTATE ) {
-		CG_ShaderStateChanged();
-	}
-		
 }
 
 
@@ -430,14 +387,15 @@ A tournement restart will clear everything, but doesn't
 require a reload of all the media
 ===============
 */
-static void CG_MapRestart( void ) {
+static void CG_MapRestart()
+{
 	if ( cg_showmiss.integer ) {
 		CG_Printf( "CG_MapRestart\n" );
 	}
 
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
-	CG_ClearParticles ();
+	Particles_Init();
 
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;
@@ -1041,24 +999,6 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "map_restart" ) ) {
 		CG_MapRestart();
-		return;
-	}
-
-	if ( Q_stricmp (cmd, "remapShader") == 0 )
-	{
-		if (trap_Argc() == 4)
-		{
-			char shader1[MAX_QPATH];
-			char shader2[MAX_QPATH];
-			char shader3[MAX_QPATH];
-
-			Q_strncpyz(shader1, CG_Argv(1), sizeof(shader1));
-			Q_strncpyz(shader2, CG_Argv(2), sizeof(shader2));
-			Q_strncpyz(shader3, CG_Argv(3), sizeof(shader3));
-
-			trap_R_RemapShader(shader1, shader2, shader3);
-		}
-		
 		return;
 	}
 

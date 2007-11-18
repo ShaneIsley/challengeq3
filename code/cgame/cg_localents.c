@@ -798,6 +798,69 @@ void CG_AddScorePlum( localEntity_t *le ) {
 }
 
 
+///////////////////////////////////////////////////////////////
+
+
+// note: this DOESN'T use AddRefEntity, it just uses the refent to hold the endpoint
+// because RT_BEAM and RT_RAIL_CORE are both unusable for any "general" effect
+
+void CG_DrawBeam( const refEntity_t* re )
+{
+	float s;
+	vec3_t v, viewR, start, end;
+	polyVert_t verts[4];
+	unsigned long color = *(unsigned long*)re->shaderRGBA;
+
+	// needs "special" billboarding - it's a line remember, not a point
+	VectorSubtract( re->origin, cg.refdef.vieworg, start );
+	VectorNormalize( start );
+	VectorSubtract( re->oldorigin, cg.refdef.vieworg, end );
+	VectorNormalize( end );
+	CrossProduct( start, end, viewR );
+	VectorNormalize( viewR );
+
+	// scale s by the beam length, or LG will distort into a pulsing line, rather than a line with pulses
+	s = Distance( re->origin, re->oldorigin ) / 256;
+
+	VectorMA( re->origin, re->radius, viewR, v );
+	VectorCopy( v, verts[0].xyz );
+	verts[0].st[0] = 0;
+	verts[0].st[1] = 0;
+	*(unsigned long*)&verts[0].modulate = color;
+
+	VectorMA( re->origin, -re->radius, viewR, v );
+	VectorCopy( v, verts[1].xyz );
+	verts[1].st[0] = 0;
+	verts[1].st[1] = 1;
+	*(unsigned long*)&verts[1].modulate = color;
+
+	VectorMA( re->oldorigin, -re->radius, viewR, v );
+	VectorCopy( v, verts[2].xyz );
+	verts[2].st[0] = s;
+	verts[2].st[1] = 1;
+	*(unsigned long*)&verts[2].modulate = color;
+
+	VectorMA( re->oldorigin, re->radius, viewR, v );
+	VectorCopy( v, verts[3].xyz );
+	verts[3].st[0] = s;
+	verts[3].st[1] = 0;
+	*(unsigned long*)&verts[3].modulate = color;
+
+	trap_R_AddPolyToScene( re->customShader, 4, verts );
+}
+
+
+static void CG_AddBeamFadeAlpha( localEntity_t* le )
+{
+	refEntity_t* re = &le->refEntity;
+
+	re->shaderRGBA[0] = 255 * le->color[0];
+	re->shaderRGBA[1] = 255 * le->color[1];
+	re->shaderRGBA[2] = 255 * le->color[2];
+	re->shaderRGBA[3] = 255 * le->color[3] * (le->endTime - cg.time) * le->lifeRate;
+
+	CG_DrawBeam( re );
+}
 
 
 //==============================================================================
@@ -847,7 +910,7 @@ void CG_AddLocalEntities( void ) {
 			CG_AddMoveScaleFade( le );
 			break;
 
-		case LE_FADE_RGB:				// teleporters, railtrails
+		case LE_FADE_RGB:				// teleporters
 			CG_AddFadeRGB( le );
 			break;
 
@@ -877,6 +940,10 @@ void CG_AddLocalEntities( void ) {
 			CG_AddRefEntity( le );
 			break;
 #endif
+
+		case LE_BEAM_FADE_ALPHA:
+			CG_AddBeamFadeAlpha( le );
+			break;
 		}
 	}
 }

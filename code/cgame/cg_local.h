@@ -62,7 +62,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	MAX_STEP_CHANGE		32
 
 #define	MAX_VERTS_ON_POLY	10
-#define	MAX_MARK_POLYS		256
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
 
@@ -232,6 +231,7 @@ typedef enum {
 	LE_INVULJUICED,
 	LE_SHOWREFENTITY
 #endif
+	LE_BEAM_FADE_ALPHA,
 } leType_t;
 
 typedef enum {
@@ -975,6 +975,8 @@ typedef struct {
 	sfxHandle_t	wstbimpdSound;
 	sfxHandle_t	wstbactvSound;
 
+	qhandle_t particleShader;
+
 } cgMedia_t;
 
 
@@ -1067,21 +1069,35 @@ typedef struct {
 
 } cgs_t;
 
-//==============================================================================
+
+///////////////////////////////////////////////////////////////
+
+
+typedef struct particle_s {
+	struct particle_s* next;
+	long time, endtime;
+	vec3_t pos;
+	vec3_t vel;
+	vec4_t color;
+	float radius;
+} particle_t;
+
+
+extern void Particles_Init();
+extern void Particles_Render();
+extern particle_t* Particle_Alloc();
+
+
+///////////////////////////////////////////////////////////////
+
 
 extern	cgs_t			cgs;
 extern	cg_t			cg;
 extern	centity_t		cg_entities[MAX_GENTITIES];
 extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
-extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 extern	vmCvar_t		cg_centertime;
-extern	vmCvar_t		cg_runpitch;
-extern	vmCvar_t		cg_runroll;
-extern	vmCvar_t		cg_bobup;
-extern	vmCvar_t		cg_bobpitch;
-extern	vmCvar_t		cg_bobroll;
 extern	vmCvar_t		cg_swingSpeed;
 extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_gibs;
@@ -1106,7 +1122,6 @@ extern	vmCvar_t		cg_animSpeed;
 extern	vmCvar_t		cg_debugAnim;
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
-extern	vmCvar_t		cg_railTrailTime;
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
 extern	vmCvar_t		cg_noPlayerAnims;
@@ -1124,7 +1139,6 @@ extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 extern	vmCvar_t		cg_autoswitch;
-extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
 extern	vmCvar_t		cg_zoomFov;
@@ -1138,8 +1152,8 @@ extern	vmCvar_t		cg_synchronousClients;
 extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
 extern	vmCvar_t		cg_stats;
-extern	vmCvar_t 		cg_forceModel;
-extern	vmCvar_t 		cg_buildScript;
+extern	vmCvar_t		cg_forceModel;
+extern	vmCvar_t		cg_buildScript;
 extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
@@ -1163,9 +1177,6 @@ extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
 extern	vmCvar_t		cg_noProjectileTrail;
-extern	vmCvar_t		cg_oldRail;
-extern	vmCvar_t		cg_oldRocket;
-extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
 #ifdef MISSIONPACK
 extern	vmCvar_t		cg_redTeamName;
@@ -1180,6 +1191,13 @@ extern  vmCvar_t		cg_recordSPDemo;
 extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
 #endif
+
+extern vmCvar_t cg_viewAdjustments;
+extern vmCvar_t cg_railCoreWidth;
+extern vmCvar_t cg_railRingStep;
+extern vmCvar_t cg_railRingWidth;
+extern vmCvar_t cg_railStyle;
+extern vmCvar_t cg_railTrailTime;
 
 //
 // cg_main.c
@@ -1204,6 +1222,8 @@ void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore( void );
 void CG_BuildSpectatorString( void );
+
+int Cvar_VariableIntegerValue(const char* s);	// the trap_ version is missing from cgame, sigh
 
 
 //
@@ -1329,7 +1349,7 @@ void CG_PainEvent( centity_t *cent, int health );
 //
 void CG_SetEntitySoundPosition( centity_t *cent );
 void CG_AddPacketEntities( void );
-void CG_Beam( centity_t *cent );
+void CG_Beam( const centity_t* cent );
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
@@ -1355,7 +1375,7 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 void CG_ShotgunFire( const entityState_t* es );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
 
-void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
+void CG_RailTrail( const clientInfo_t* ci, const vec3_t start, const vec3_t end );
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team );
@@ -1381,6 +1401,7 @@ void	CG_ImpactMark( qhandle_t markShader,
 void	CG_InitLocalEntities( void );
 localEntity_t	*CG_AllocLocalEntity( void );
 void	CG_AddLocalEntities( void );
+void CG_DrawBeam( const refEntity_t* re );
 
 //
 // cg_effects.c
@@ -1447,7 +1468,6 @@ void CG_ExecuteNewServerCommands( int latestSequence );
 void CG_ParseServerinfo();
 void CG_SetConfigValues( void );
 void CG_LoadVoiceChats();
-void CG_ShaderStateChanged(void);
 void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd );
 void CG_PlayBufferedVoiceChats( void );
 
@@ -1579,7 +1599,6 @@ void		trap_R_DrawStretchPic( float x, float y, float w, float h,
 void		trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
 int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, 
 					   float frac, const char *tagName );
-void		trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
 
 // The glconfig_t will not change during the life of a cgame.
 // If it needs to change, the entire cgame will be restarted, because
@@ -1647,6 +1666,7 @@ qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 
+/*
 void	CG_ClearParticles (void);
 void	CG_AddParticles (void);
 void	CG_ParticleSnow (qhandle_t pshader, vec3_t origin, vec3_t origin2, int turb, float range, int snum);
@@ -1660,5 +1680,5 @@ void	CG_ParticleMisc (qhandle_t pshader, vec3_t origin, int size, int duration, 
 void	CG_ParticleExplosion (char *animStr, vec3_t origin, vec3_t vel, int duration, int sizeStart, int sizeEnd);
 extern qboolean		initparticles;
 int CG_NewParticleArea ( int num );
-
+*/
 

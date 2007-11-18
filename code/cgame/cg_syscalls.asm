@@ -79,7 +79,7 @@ equ trap_CIN_StopCinematic				-76
 equ trap_CIN_RunCinematic 				-77
 equ trap_CIN_DrawCinematic				-78
 equ trap_CIN_SetExtents					-79
-equ trap_R_RemapShader					-80
+equ DO_NOT_WANT_trap_R_RemapShader					-80
 equ	trap_S_AddRealLoopingSound			-81
 equ trap_S_StopLoopingSound				-82
 equ trap_CM_TempCapsuleModel			-83

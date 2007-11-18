@@ -82,6 +82,19 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 }
 
 
+// the trap_ version is missing from cgame, sigh
+
+int Cvar_VariableIntegerValue(const char* s)
+{
+	//char buf[32];
+	//trap_Cvar_VariableStringBuffer( s, buf, 32 );
+	//return atoi(buf);
+	vmCvar_t cv;
+	trap_Cvar_Register( &cv, s, "", 0 );
+	return cv.integer;
+}
+
+
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
@@ -89,13 +102,7 @@ weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
 
-vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
-vmCvar_t	cg_runpitch;
-vmCvar_t	cg_runroll;
-vmCvar_t	cg_bobup;
-vmCvar_t	cg_bobpitch;
-vmCvar_t	cg_bobroll;
 vmCvar_t	cg_swingSpeed;
 vmCvar_t	cg_shadows;
 vmCvar_t	cg_gibs;
@@ -135,7 +142,6 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 vmCvar_t	cg_autoswitch;
-vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
 vmCvar_t	cg_fov;
 vmCvar_t	cg_zoomFov;
@@ -146,11 +152,11 @@ vmCvar_t	cg_stereoSeparation;
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
 vmCvar_t	cg_synchronousClients;
-vmCvar_t 	cg_teamChatTime;
-vmCvar_t 	cg_teamChatHeight;
-vmCvar_t 	cg_stats;
-vmCvar_t 	cg_buildScript;
-vmCvar_t 	cg_forceModel;
+vmCvar_t	cg_teamChatTime;
+vmCvar_t	cg_teamChatHeight;
+vmCvar_t	cg_stats;
+vmCvar_t	cg_buildScript;
+vmCvar_t	cg_forceModel;
 vmCvar_t	cg_paused;
 vmCvar_t	cg_blood;
 vmCvar_t	cg_predictItems;
@@ -162,8 +168,8 @@ vmCvar_t	cg_teamChatsOnly;
 vmCvar_t	cg_noVoiceChats;
 vmCvar_t	cg_noVoiceText;
 vmCvar_t	cg_hudFiles;
-vmCvar_t 	cg_scorePlum;
-vmCvar_t 	cg_smoothClients;
+vmCvar_t	cg_scorePlum;
+vmCvar_t	cg_smoothClients;
 vmCvar_t	pmove_fixed;
 //vmCvar_t	cg_pmove_fixed;
 vmCvar_t	pmove_msec;
@@ -178,10 +184,14 @@ vmCvar_t	cg_smallFont;
 vmCvar_t	cg_bigFont;
 vmCvar_t	cg_noTaunt;
 vmCvar_t	cg_noProjectileTrail;
-vmCvar_t	cg_oldRail;
-vmCvar_t	cg_oldRocket;
-vmCvar_t	cg_oldPlasma;
 vmCvar_t	cg_trueLightning;
+
+vmCvar_t cg_railCoreWidth;
+vmCvar_t cg_railRingStep;
+vmCvar_t cg_railRingWidth;
+vmCvar_t cg_railStyle;
+vmCvar_t cg_railTrailTime;
+vmCvar_t cg_viewAdjustments;
 
 #ifdef MISSIONPACK
 vmCvar_t 	cg_redTeamName;
@@ -198,30 +208,29 @@ vmCvar_t	cg_obeliskRespawnDelay;
 #endif
 
 typedef struct {
-	vmCvar_t	*vmCvar;
-	char		*cvarName;
-	char		*defaultString;
-	int			cvarFlags;
+	vmCvar_t* vmCvar;
+	const char* cvarName;
+	const char* defaultString;
+	int cvarFlags;
 } cvarTable_t;
 
-static cvarTable_t cvarTable[] = { // bk001129
-	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
-	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
+static cvarTable_t cvarTable[] = {
+	{ &cg_autoswitch, "cg_autoswitch", "0", CVAR_ARCHIVE },
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
-	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
-	{ &cg_fov, "cg_fov", "90", CVAR_ARCHIVE },
+	{ &cg_zoomFov, "cg_zoomfov", "25.5", CVAR_ARCHIVE },
+	{ &cg_fov, "cg_fov", "102", CVAR_ARCHIVE },
 	{ &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE },
-	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.4", CVAR_ARCHIVE  },
-	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
-	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE  },
-	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
-	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
-	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
-	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
-	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
-	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
-	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
-	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
+	{ &cg_stereoSeparation, "cg_stereoSeparation", "0.4", CVAR_ARCHIVE },
+	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE },
+	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE },
+	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE },
+	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE },
+	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE },
+	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE },
+	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE },
+	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },
+	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE },
+	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE },
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
@@ -234,16 +243,10 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
-	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
-	{ &cg_gun_x, "cg_gunX", "0", CVAR_CHEAT },
-	{ &cg_gun_y, "cg_gunY", "0", CVAR_CHEAT },
-	{ &cg_gun_z, "cg_gunZ", "0", CVAR_CHEAT },
+	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
+	{ &cg_gun_y, "cg_gunY", "0", CVAR_ARCHIVE },
+	{ &cg_gun_z, "cg_gunZ", "0", CVAR_ARCHIVE },
 	{ &cg_centertime, "cg_centertime", "3", CVAR_CHEAT },
-	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
-	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
-	{ &cg_bobup , "cg_bobup", "0.005", CVAR_CHEAT },
-	{ &cg_bobpitch, "cg_bobpitch", "0.002", CVAR_ARCHIVE },
-	{ &cg_bobroll, "cg_bobroll", "0.002", CVAR_ARCHIVE },
 	{ &cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT },
 	{ &cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT },
 	{ &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT },
@@ -260,8 +263,8 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
-	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
-	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
+	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE },
+	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE },
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
 #ifdef MISSIONPACK
@@ -311,43 +314,43 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
-	{ &cg_oldRail, "cg_oldRail", "1", CVAR_ARCHIVE},
-	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
-	{ &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
-	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE}
-//	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
+	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
+//	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE },
+
+	{ &cg_railCoreWidth, "cg_railCoreWidth", "2", CVAR_ARCHIVE },
+	{ &cg_railRingStep, "cg_railRingStep", "32", CVAR_ARCHIVE },
+	{ &cg_railRingWidth, "cg_railRingWidth", "8", CVAR_ARCHIVE },
+	{ &cg_railStyle, "cg_railStyle", "6", CVAR_ARCHIVE },
+	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE },
+	{ &cg_viewAdjustments, "cg_viewAdjustments", "0", CVAR_ARCHIVE },
 };
 
 static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 
-/*
-=================
-CG_RegisterCvars
-=================
-*/
-void CG_RegisterCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
-	char		var[MAX_TOKEN_CHARS];
+
+static void CG_RegisterCvars()
+{
+	int i;
+	const cvarTable_t* cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
-			cv->defaultString, cv->cvarFlags );
+		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
 
 	// see if we are also running the server on this machine
-	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
-	cgs.localServer = atoi( var );
+	cgs.localServer = Cvar_VariableIntegerValue( "sv_running" );
 
 	forceModelModificationCount = cg_forceModel.modificationCount;
 
-	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "color1", "n", CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "color2", "y", CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register( NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
 }
 
-/*																																			
+/*
 ===================
 CG_ForceModelChange
 ===================
@@ -508,7 +511,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 		len = s-start;
 		if (len >= MAX_QPATH || len < 5) {
-			CG_Error( "PrecacheItem: %s has bad precache string", 
+			CG_Error( "PrecacheItem: %s has bad precache string",
 				item->classname);
 			return;
 		}
@@ -794,17 +797,13 @@ static void CG_RegisterSounds( void ) {
 //===================================================================================
 
 
-/*
-=================
-CG_RegisterGraphics
+// this function may execute for a couple of minutes on a REALLY old machine
 
-This function may execute for a couple of minutes with a slow disk.
-=================
-*/
-static void CG_RegisterGraphics( void ) {
+static void CG_RegisterGraphics()
+{
 	int			i;
 	char		items[MAX_ITEMS+1];
-	static char		*sb_nums[11] = {
+	static const char* sb_nums[11] = {
 		"gfx/2d/numbers/zero_32b",
 		"gfx/2d/numbers/one_32b",
 		"gfx/2d/numbers/two_32b",
@@ -1085,24 +1084,13 @@ static void CG_RegisterGraphics( void ) {
 	trap_R_RegisterModel( "models/players/heads/janet/janet.md3" );
 
 #endif
-	CG_ClearParticles ();
-/*
-	for (i=1; i<MAX_PARTICLES_AREAS; i++)
-	{
-		{
-			int rval;
 
-			rval = CG_NewParticleArea ( CS_PARTICLES + i);
-			if (!rval)
-				break;
-		}
-	}
-*/
+	cgs.media.particleShader = trap_R_RegisterShaderNoMip( "sprites/particleblob" );
+	Particles_Init();
 }
 
 
-
-/*																																			
+/*
 =======================
 CG_BuildSpectatorString
 
@@ -1124,7 +1112,7 @@ void CG_BuildSpectatorString(void) {
 }
 
 
-/*																																			
+/*
 ===================
 CG_RegisterClients
 ===================
@@ -1221,7 +1209,7 @@ qboolean CG_Asset_Parse(int handle) {
 	if (Q_stricmp(token.string, "{") != 0) {
 		return qfalse;
 	}
-    
+
 	while ( 1 ) {
 		if (!trap_PC_ReadToken(handle, &token))
 			return qfalse;
@@ -1417,7 +1405,7 @@ qboolean CG_Load_Menu(char **p) {
 	while ( 1 ) {
 
 		token = COM_ParseExt(p, qtrue);
-    
+
 		if (Q_stricmp(token, "}") == 0) {
 			return qtrue;
 		}
@@ -1426,7 +1414,7 @@ qboolean CG_Load_Menu(char **p) {
 			return qfalse;
 		}
 
-		CG_ParseMenu(token); 
+		CG_ParseMenu(token);
 	}
 	return qfalse;
 }
@@ -1460,7 +1448,7 @@ void CG_LoadMenus(const char *menuFile) {
 	trap_FS_Read( buf, len, f );
 	buf[len] = 0;
 	trap_FS_FCloseFile( f );
-	
+
 	COM_Compress(buf);
 
 	Menu_Reset();
@@ -1657,7 +1645,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 			case 6:
 				if ( sp->ping == -1 ) {
 					return "connecting";
-				} 
+				}
 				return va("%4i", sp->ping);
 			break;
 		}
@@ -1762,7 +1750,7 @@ void CG_LoadHudMenu( void ) {
 	cgDC.registerModel = &trap_R_RegisterModel;
 	cgDC.modelBounds = &trap_R_ModelBounds;
 	cgDC.fillRect = &CG_FillRect;
-	cgDC.drawRect = &CG_DrawRect;   
+	cgDC.drawRect = &CG_DrawRect;
 	cgDC.drawSides = &CG_DrawSides;
 	cgDC.drawTopBottom = &CG_DrawTopBottom;
 	cgDC.clearScene = &trap_R_ClearScene;
@@ -1790,8 +1778,8 @@ void CG_LoadHudMenu( void ) {
 	//cgDC.getBindingBuf = &trap_Key_GetBindingBuf;
 	//cgDC.keynumToStringBuf = &trap_Key_KeynumToStringBuf;
 	//cgDC.executeText = &trap_Cmd_ExecuteText;
-	cgDC.Error = &Com_Error; 
-	cgDC.Print = &Com_Printf; 
+	cgDC.Error = &Com_Error;
+	cgDC.Print = &Com_Printf;
 	cgDC.ownerDrawWidth = &CG_OwnerDrawWidth;
 	//cgDC.Pause = &CG_Pause;
 	cgDC.registerSound = &trap_S_RegisterSound;
@@ -1801,11 +1789,11 @@ void CG_LoadHudMenu( void ) {
 	cgDC.stopCinematic = &CG_StopCinematic;
 	cgDC.drawCinematic = &CG_DrawCinematic;
 	cgDC.runCinematicFrame = &CG_RunCinematicFrame;
-	
+
 	Init_Display(&cgDC);
 
 	Menu_Reset();
-	
+
 	trap_Cvar_VariableStringBuffer("cg_hudFiles", buff, sizeof(buff));
 	hudSet = buff;
 	if (hudSet[0] == '\0') {
@@ -1946,8 +1934,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 #ifdef MISSIONPACK
 	CG_InitTeamChat();
 #endif
-
-	CG_ShaderStateChanged();
 
 	trap_S_ClearLoopingSounds( qtrue );
 }
