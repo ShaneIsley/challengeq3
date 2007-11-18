@@ -346,8 +346,6 @@ typedef struct {
 	// gameplay
 	char			modelName[MAX_QPATH];
 	char			skinName[MAX_QPATH];
-	char			headModelName[MAX_QPATH];
-	char			headSkinName[MAX_QPATH];
 	qboolean		deferred;
 
 	qboolean		newAnims;		// true if using the new mission pack animations

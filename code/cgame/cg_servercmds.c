@@ -643,7 +643,9 @@ int CG_GetVoiceChat( voiceChatList_t *voiceChatList, const char *id, sfxHandle_t
 CG_VoiceChatListForClient
 =================
 */
-voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
+voiceChatList_t *CG_VoiceChatListForClient( int clientNum )
+{
+/* jeez, what a trainwreck...
 	clientInfo_t *ci;
 	int voiceChatNum, i, j, k, gender;
 	char filename[MAX_QPATH], headModelName[MAX_QPATH];
@@ -652,7 +654,6 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 		clientNum = 0;
 	}
 	ci = &cgs.clientinfo[ clientNum ];
-
 	for ( k = 0; k < 2; k++ ) {
 		if ( k == 0 ) {
 			if (ci->headModelName[0] == '*') {
@@ -726,6 +727,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 			break;
 		}
 	}
+*/
 	// just return the first voice chat list
 	return &voiceChatLists[0];
 }

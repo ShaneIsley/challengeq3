@@ -320,7 +320,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_railCoreWidth, "cg_railCoreWidth", "2", CVAR_ARCHIVE },
 	{ &cg_railRingStep, "cg_railRingStep", "32", CVAR_ARCHIVE },
 	{ &cg_railRingWidth, "cg_railRingWidth", "8", CVAR_ARCHIVE },
-	{ &cg_railStyle, "cg_railStyle", "6", CVAR_ARCHIVE },
+	{ &cg_railStyle, "cg_railStyle", "5", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE },
 	{ &cg_viewAdjustments, "cg_viewAdjustments", "0", CVAR_ARCHIVE },
 };
@@ -345,9 +345,7 @@ static void CG_RegisterCvars()
 	trap_Cvar_Register( NULL, "color1", "n", CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "color2", "y", CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register( NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register( NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
 }
 
 /*
