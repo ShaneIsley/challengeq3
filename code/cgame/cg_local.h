@@ -150,8 +150,8 @@ typedef struct {
 	int				lightningFiring;
 
 	// railgun trail spawning
-	vec3_t			railgunImpact;
-	qboolean		railgunFlash;
+	vec3_t			railImpact;
+	qboolean		railTrail;
 
 	// machinegun spinning
 	float			barrelAngle;

@@ -1019,18 +1019,16 @@ Origin will be the exact tag point, which is slightly
 different than the muzzle point used for determining hits.
 ===============
 */
-static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin ) {
-	clientInfo_t	*ci;
+static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin )
+{
+	const clientInfo_t* ci;
 
-	if ( cent->currentState.weapon != WP_RAILGUN ) {
+	if ((cent->currentState.weapon != WP_RAILGUN) || !cent->pe.railTrail)
 		return;
-	}
-	if ( !cent->pe.railgunFlash ) {
-		return;
-	}
-	cent->pe.railgunFlash = qtrue;
+
+	cent->pe.railTrail = qfalse;
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-	CG_RailTrail( ci, origin, cent->pe.railgunImpact );
+	CG_RailTrail( ci, origin, cent->pe.railImpact );
 }
 
 
@@ -1115,7 +1113,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weapon_t	weaponNum;
 	weaponInfo_t	*weapon;
 	centity_t	*nonPredictedCent;
-//	int	col;
+	qboolean fDrawFlash = qtrue;
 
 	weaponNum = cent->currentState.weapon;
 
@@ -1197,9 +1195,15 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		&& ( nonPredictedCent->currentState.eFlags & EF_FIRING ) ) 
 	{
 		// continuous flash
-	} else {
+	}
+	else if ((weaponNum == WP_RAILGUN) && nonPredictedCent->pe.railTrail) {
+		// if this is another player as a generic cent, we want the flash as well
+		// if it's US as a cent tho we've already drawn the flash, but we need to draw the trail now
+		fDrawFlash = (cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME);
+	}
+	else {
 		// impulse flash
-		if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME && !cent->pe.railgunFlash ) {
+		if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME ) {
 			return;
 		}
 	}
@@ -1217,22 +1221,23 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	angles[PITCH] = 0;
 	angles[ROLL] = crandom() * 10;
 	AnglesToAxis( angles, flash.axis );
-
-	// colorize the railgun blast
-	if ( weaponNum == WP_RAILGUN ) {
-		const clientInfo_t* ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-		flash.shaderRGBA[0] = 255 * ci->color1[0];
-		flash.shaderRGBA[1] = 255 * ci->color1[1];
-		flash.shaderRGBA[2] = 255 * ci->color1[2];
-	}
-
 	CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
-	if ((cg_muzzleFlash.integer && cg_drawGun.integer) || !ps || (cent->currentState.clientNum != ps->clientNum))
-		trap_R_AddRefEntityToScene( &flash );
+
+	if (fDrawFlash) {
+		// colorize the railgun blast
+		if ( weaponNum == WP_RAILGUN ) {
+			const clientInfo_t* ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+			flash.shaderRGBA[0] = 255 * ci->color1[0];
+			flash.shaderRGBA[1] = 255 * ci->color1[1];
+			flash.shaderRGBA[2] = 255 * ci->color1[2];
+		}
+		if ((cg_muzzleFlash.integer && cg_drawGun.integer) || !ps || (cent->currentState.clientNum != ps->clientNum))
+			trap_R_AddRefEntityToScene( &flash );
+	}
 
 	if ( ps || cg.renderingThirdPerson || cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 		CG_LightningBolt( nonPredictedCent, flash.origin );
-		CG_SpawnRailTrail( cent, flash.origin );
+		CG_SpawnRailTrail( nonPredictedCent, flash.origin );
 
 		// disable dlights for your own weapon if muzzleflash is off: MG/PG are headache-inducing at that size
 		if ((weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2])

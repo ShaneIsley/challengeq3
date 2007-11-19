@@ -916,9 +916,15 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
-		cent->currentState.weapon = WP_RAILGUN;
-		// if the end was on a nomark surface, don't make an explosion
-		CG_RailTrail( ci, es->origin2, es->pos.trBase );
+		if (cg_entities[es->clientNum].currentValid || (clientNum == cg.predictedPlayerState.clientNum)) {
+			cent = &cg_entities[clientNum];
+			cent->pe.railTrail = qtrue;
+			VectorCopy( es->pos.trBase, cent->pe.railImpact );
+		} else {
+			//cent->currentState.weapon = WP_RAILGUN;
+			CG_RailTrail( ci, es->origin2, es->pos.trBase );
+		}
+		// make an explosion unless the end was on a nomark surface
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );
 			CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
