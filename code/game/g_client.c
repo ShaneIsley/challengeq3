@@ -681,7 +681,6 @@ void ClientUserinfoChanged( int clientNum )
 	int		teamTask, teamLeader, team, health;
 	const char* s;
 	char	model[MAX_QPATH];
-	char	headModel[MAX_QPATH];
 	char	oldname[MAX_STRING_CHARS];
 	gclient_t	*client;
 	char	c1[MAX_INFO_STRING];
@@ -752,11 +751,9 @@ void ClientUserinfoChanged( int clientNum )
 
 	// set model
 	if( g_gametype.integer >= GT_TEAM ) {
-		Q_strncpyz( model, Info_ValueForKey (userinfo, "team_model"), sizeof( model ) );
-		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "team_headmodel"), sizeof( headModel ) );
+		Q_strncpyz( model, Info_ValueForKey(userinfo, "team_model"), sizeof( model ) );
 	} else {
-		Q_strncpyz( model, Info_ValueForKey (userinfo, "model"), sizeof( model ) );
-		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "headmodel"), sizeof( headModel ) );
+		Q_strncpyz( model, Info_ValueForKey(userinfo, "model"), sizeof( model ) );
 	}
 
 	// bots set their team a few frames later
@@ -774,27 +771,6 @@ void ClientUserinfoChanged( int clientNum )
 	else {
 		team = client->sess.sessionTeam;
 	}
-
-/*	NOTE: all client side now
-
-	// team
-	switch( team ) {
-	case TEAM_RED:
-		ForceClientSkin(client, model, "red");
-//		ForceClientSkin(client, headModel, "red");
-		break;
-	case TEAM_BLUE:
-		ForceClientSkin(client, model, "blue");
-//		ForceClientSkin(client, headModel, "blue");
-		break;
-	}
-	// don't ever use a default skin in teamplay, it would just waste memory
-	// however bots will always join a team but they spawn in as spectator
-	if ( g_gametype.integer >= GT_TEAM && team == TEAM_SPECTATOR) {
-		ForceClientSkin(client, model, "red");
-//		ForceClientSkin(client, headModel, "red");
-	}
-*/
 
 #ifdef MISSIONPACK
 	if (g_gametype.integer >= GT_TEAM) {
@@ -838,13 +814,13 @@ void ClientUserinfoChanged( int clientNum )
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	if ( ent->r.svFlags & SVF_BOT ) {
-		s = va("n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d",
-			client->pers.netname, team, model, headModel, c1, c2, 
+		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d",
+			client->pers.netname, team, model, c1, c2,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
 			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader );
 	} else {
-		s = va("n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
-			client->pers.netname, client->sess.sessionTeam, model, headModel, c1, c2, 
+		s = va("n\\%s\\t\\%i\\model\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
+			client->pers.netname, client->sess.sessionTeam, model, c1, c2,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader);
 	}
 
