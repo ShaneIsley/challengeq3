@@ -1005,7 +1005,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	// loaddeferred can be both a servercmd and a consolecmd
-	if ( !strcmp( cmd, "loaddefered" ) ) {	// FIXME: spelled wrong, but not changing for demo
+	if ( !strcmp( cmd, "loaddeferred" ) ) {
 		CG_LoadDeferredPlayers();
 		return;
 	}

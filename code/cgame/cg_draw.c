@@ -761,43 +761,28 @@ static float CG_DrawSnapshot( float y )
 }
 
 
-#define	FPS_FRAMES	4
 static float CG_DrawFPS( float y )
 {
+	static int fps = 0, timer = 1000, lastfps = 0, tPrev = 0;
 	const char* s;
-	int			w;
-	static int	previousTimes[FPS_FRAMES];
-	static int	index;
-	int		i, total;
-	int		fps;
-	static	int	previous;
-	int		t, frameTime;
 
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
-	t = trap_Milliseconds();
-	frameTime = t - previous;
-	previous = t;
+	int t = trap_Milliseconds();
+	int tFrame = t - tPrev;
+	tPrev = t;
 
-	previousTimes[index % FPS_FRAMES] = frameTime;
-	index++;
-	if ( index > FPS_FRAMES ) {
-		// average multiple frames together to smooth changes out a bit
-		total = 0;
-		for ( i = 0 ; i < FPS_FRAMES ; i++ ) {
-			total += previousTimes[i];
-		}
-		if ( !total ) {
-			total = 1;
-		}
-		fps = 1000 * FPS_FRAMES / total;
-
-		s = va( "%ifps", fps );
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-
-		CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
+	++fps;
+	if ((timer -= tFrame) <= 0) {
+		timer += 1000;		// update once per second
+		if (timer < 0)
+			timer = 1000;	// sometimes the timer screws up (like on a map load or model change)
+		lastfps = fps;
+		fps = 0;
 	}
 
+	s = va( "%ifps", lastfps );
+	CG_DrawBigString( 635 - (CG_DrawStrlen( s ) * BIGCHAR_WIDTH), y + 2, s, 1.0F);
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
@@ -2159,7 +2144,7 @@ static qboolean CG_DrawScoreboard( void ) {
 			return qfalse;
 		}
 		fade = *fadeColor;
-	}																					  
+	}
 
 
 	if (menuScoreboard == NULL) {

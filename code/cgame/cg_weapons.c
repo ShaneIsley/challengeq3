@@ -765,14 +765,9 @@ VIEW WEAPON
 ========================================================================================
 */
 
-/*
-=================
-CG_MapTorsoToWeaponFrame
 
-=================
-*/
-static int CG_MapTorsoToWeaponFrame( clientInfo_t *ci, int frame ) {
-
+static int CG_MapTorsoToWeaponFrame( const clientInfo_t* ci, int frame )
+{
 	// change weapon
 	if ( frame >= ci->animations[TORSO_DROP].firstFrame 
 		&& frame < ci->animations[TORSO_DROP].firstFrame + 9 ) {
@@ -790,7 +785,7 @@ static int CG_MapTorsoToWeaponFrame( clientInfo_t *ci, int frame ) {
 		&& frame < ci->animations[TORSO_ATTACK2].firstFrame + 6 ) {
 		return 1 + frame - ci->animations[TORSO_ATTACK2].firstFrame;
 	}
-	
+
 	return 0;
 }
 
@@ -1097,23 +1092,26 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 
 
 /*
-=============
-CG_AddPlayerWeapon
-
 Used for both the view weapon (ps is valid) and the world modelother character models (ps is NULL)
 The main player will have this called for BOTH cases, so effects like light and
 sound should only be done on the world model case.
-=============
+it's critical that this is called regardless of cg_drawgun, PW_INVIS, etc
+because railtrails and LG beams MUST have a muzzle reference point, whether it's drawn or not
 */
-void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team ) {
+void CG_AddPlayerWeapon( refEntity_t *parent, const playerState_t* ps, centity_t *cent, int team )
+{
 	refEntity_t	gun;
 	refEntity_t	barrel;
 	refEntity_t	flash;
 	vec3_t		angles;
 	weapon_t	weaponNum;
-	weaponInfo_t	*weapon;
+	const weaponInfo_t* weapon;
 	centity_t	*nonPredictedCent;
 	qboolean fDrawFlash = qtrue;
+	qboolean fShowWeapon = (ps || !(cent->currentState.powerups & (1 << PW_INVIS)));
+
+	if (ps && !cg.renderingThirdPerson && !cg_drawGun.integer)
+		fShowWeapon = qfalse;
 
 	weaponNum = cent->currentState.weapon;
 
@@ -1161,10 +1159,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
 
-	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
+	if (fShowWeapon)
+		CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 
 	// add the spinning barrel
-	if ( weapon->barrelModel ) {
+	if (fShowWeapon && weapon->barrelModel) {
 		memset( &barrel, 0, sizeof( barrel ) );
 		VectorCopy( parent->lightingOrigin, barrel.lightingOrigin );
 		barrel.shadowPlane = parent->shadowPlane;
@@ -1255,13 +1254,14 @@ CG_AddViewWeapon
 Add the weapon, and flash for the player's view
 ==============
 */
-void CG_AddViewWeapon( playerState_t *ps ) {
+void CG_AddViewWeapon( const playerState_t* ps )
+{
 	refEntity_t	hand;
 	centity_t	*cent;
-	clientInfo_t	*ci;
 	float		fovOffset;
 	vec3_t		angles;
-	weaponInfo_t	*weapon;
+	const clientInfo_t* ci;
+	const weaponInfo_t* weapon;
 
 	if ( ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		return;
@@ -1274,20 +1274,6 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	// no gun if in third person view or a camera is active
 	//if ( cg.renderingThirdPerson || cg.cameraMode) {
 	if ( cg.renderingThirdPerson ) {
-		return;
-	}
-
-
-	// allow the gun to be completely removed
-	if ( !cg_drawGun.integer ) {
-		vec3_t		origin;
-
-		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
-			// special hack for lightning gun...
-			VectorCopy( cg.refdef.vieworg, origin );
-			VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
-			CG_LightningBolt( &cg_entities[ps->clientNum], origin );
-		}
 		return;
 	}
 
