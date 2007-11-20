@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../qcommon/q_shared.h"
 #include "bg_public.h"
-#include "bg_local.h"
 
 // all of these locals will be zeroed before each pmove
 // just to make damn sure we don't have any differences when running on client or server
@@ -48,44 +47,46 @@ typedef struct {
 } pml_t;
 
 static pml_t pml;
-pmove_t		*pm;
+static pmove_t* pm;
+static int c_pmove = 0;
 
 // movement parameters
-float	pm_stopspeed = 100.0f;
-float	pm_duckScale = 0.25f;
-float	pm_swimScale = 0.50f;
-float	pm_wadeScale = 0.70f;
+static const float pm_stopspeed = 100.0f;
+static const float pm_duckScale = 0.25f;
+static const float pm_swimScale = 0.50f;
+static const float pm_wadeScale = 0.70f;
 
-float	pm_accelerate = 10.0f;
-float	pm_airaccelerate = 1.0f;
-float	pm_wateraccelerate = 4.0f;
-float	pm_flyaccelerate = 8.0f;
+static const float pm_accelerate = 10.0f;
+static const float pm_airaccelerate = 1.0f;
+static const float pm_wateraccelerate = 4.0f;
+static const float pm_flyaccelerate = 8.0f;
 
-float	pm_friction = 6.0f;
-float	pm_waterfriction = 1.0f;
-float	pm_flightfriction = 3.0f;
-float	pm_spectatorfriction = 5.0f;
+static const float pm_friction = 6.0f;
+static const float pm_waterfriction = 1.0f;
+static const float pm_flightfriction = 3.0f;
+static const float pm_spectatorfriction = 5.0f;
 
-int		c_pmove = 0;
+static const float MIN_WALK_NORMAL = 0.7f; // can't walk on slopes steeper than this
+static const float STEPSIZE = 18;
+static const float JUMP_VELOCITY = 275;
+
+static const float WATER_SINK_SPEED = 60.0f;
+
+static const float TIMER_LAND = 130;
+static const float TIMER_GESTURE = (34*66+50);
+
+static const float OVERCLIP = 1.001f;
 
 
-/*
-===============
-PM_AddEvent
-
-===============
-*/
-void PM_AddEvent( int newEvent ) {
+static void PM_AddEvent( int newEvent )
+{
 	BG_AddPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
 
-/*
-===============
-PM_AddTouchEnt
-===============
-*/
-void PM_AddTouchEnt( int entityNum ) {
-	int		i;
+
+static void PM_AddTouchEnt( int entityNum )
+{
+	int i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
 		return;
@@ -101,10 +102,26 @@ void PM_AddTouchEnt( int entityNum ) {
 		}
 	}
 
-	// add it
 	pm->touchents[pm->numtouch] = entityNum;
 	pm->numtouch++;
 }
+
+
+// slide off of the impacting surface
+
+static void PM_ClipVelocity( const vec3_t in, const vec3_t normal, vec3_t out, float overbounce )
+{
+	float backoff = DotProduct(in, normal);
+
+	if (backoff < 0) {
+		backoff *= overbounce;
+	} else {
+		backoff /= overbounce;
+	}
+
+	VectorMA( in, -backoff, normal, out );
+}
+
 
 /*
 ===================
@@ -152,33 +169,6 @@ static void PM_ContinueTorsoAnim( int anim ) {
 static void PM_ForceLegsAnim( int anim ) {
 	pm->ps->legsTimer = 0;
 	PM_StartLegsAnim( anim );
-}
-
-
-/*
-==================
-PM_ClipVelocity
-
-Slide off of the impacting surface
-==================
-*/
-void PM_ClipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce ) {
-	float	backoff;
-	float	change;
-	int		i;
-	
-	backoff = DotProduct (in, normal);
-	
-	if ( backoff < 0 ) {
-		backoff *= overbounce;
-	} else {
-		backoff /= overbounce;
-	}
-
-	for ( i=0 ; i<3 ; i++ ) {
-		change = normal[i]*backoff;
-		out[i] = in[i] - change;
-	}
 }
 
 
@@ -792,7 +782,7 @@ static void PM_WaterMove( void ) {
 	if ( !scale ) {
 		wishvel[0] = 0;
 		wishvel[1] = 0;
-		wishvel[2] = -60;		// sink towards bottom
+		wishvel[2] = -WATER_SINK_SPEED;
 	} else {
 		for (i=0 ; i<3 ; i++)
 			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
