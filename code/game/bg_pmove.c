@@ -27,8 +27,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bg_public.h"
 #include "bg_local.h"
 
+// all of these locals will be zeroed before each pmove
+// just to make damn sure we don't have any differences when running on client or server
+
+typedef struct {
+	vec3_t		forward, right, up;
+	float		frametime;
+
+	int			msec;
+
+	qboolean	walking;
+	qboolean	groundPlane;
+	trace_t		groundTrace;
+
+	float		impactSpeed;
+
+	vec3_t		previous_origin;
+	vec3_t		previous_velocity;
+	int			previous_waterlevel;
+} pml_t;
+
+static pml_t pml;
 pmove_t		*pm;
-pml_t		pml;
 
 // movement parameters
 float	pm_stopspeed = 100.0f;
