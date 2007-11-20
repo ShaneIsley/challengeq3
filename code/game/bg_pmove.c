@@ -1898,6 +1898,8 @@ void Pmove( pmove_t* pmove )
 
 	pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount+1) & ((1<<PS_PMOVEFRAMECOUNTBITS)-1);
 
+	PM_UpdateViewAngles( pmove->ps, &pmove->cmd );
+
 	// chop the move up if it is too long, to prevent framerate-dependent behavior
 	while ( pmove->ps->commandTime != finalTime ) {
 		int msec = finalTime - pmove->ps->commandTime;
