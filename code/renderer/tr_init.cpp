@@ -345,18 +345,18 @@ static void RB_TakeScreenshotTGA( int x, int y, int width, int height, const cha
 	byte* pRGB = p + sizeof(TargaHeader);
 	qglReadPixels( x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, pRGB );
 
-	// swap rgb to bgr
-	for (int i = sizeof(TargaHeader); i < c + sizeof(TargaHeader); i += 3)
+	// swap RGB to BGR
+	for (int i = 0; i < c; i += 3)
 	{
-		byte b = pRGB[i];
+		byte r = pRGB[i];
 		pRGB[i] = pRGB[i+2];
-		pRGB[i+2] = b;
+		pRGB[i+2] = r;
 	}
 
 	if ( ( tr.overbrightBits > 0 ) && glConfig.deviceSupportsGamma )
-		R_GammaCorrect( sizeof(TargaHeader) + (byte*)p, width * height * 3 );
+		R_GammaCorrect( pRGB, c );
 
-	ri.FS_WriteFile( fileName, p, c );
+	ri.FS_WriteFile( fileName, p, sizeof(TargaHeader) + c );
 }
 
 
