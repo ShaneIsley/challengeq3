@@ -1704,7 +1704,7 @@ void PM_UpdateViewAngles( playerState_t* ps, const usercmd_t* cmd )
 }
 
 
-void PmoveSingle( pmove_t* pmove )
+static void PmoveSingle( pmove_t* pmove )
 {
 	pm = pmove;
 

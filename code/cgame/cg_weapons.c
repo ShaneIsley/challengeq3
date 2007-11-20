@@ -1635,8 +1635,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
-	vec3_t			sprOrg;
-	vec3_t			sprVel;
 
 	mark = 0;
 	radius = 32;
