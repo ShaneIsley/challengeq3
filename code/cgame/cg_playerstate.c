@@ -144,7 +144,6 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 		}
 
 		cg.v_dmg_roll = kick * left;
-		
 		cg.v_dmg_pitch = -kick * front;
 
 		if ( front <= 0.1 ) {

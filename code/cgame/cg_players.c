@@ -928,6 +928,11 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 	}
 
+	// force PM skins in FFA, because e.g. daemia is actually "major/daemia"
+	if (cgs.gametype < GT_TEAM) {
+		Q_strncpyz( newInfo.skinName, "pm", sizeof( newInfo.skinName ) );
+	}
+
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible
 	if ( !CG_ScanForExistingClientInfo( &newInfo ) ) {
@@ -2215,6 +2220,11 @@ void CG_Player( centity_t *cent ) {
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
 
+	legs.shaderRGBA[0] = 0;
+	legs.shaderRGBA[1] = 255;
+	legs.shaderRGBA[2] = 0;
+	legs.shaderRGBA[3] = 255;
+
 	CG_AddRefEntityWithPowerups( &legs, &cent->currentState, ci->team );
 
 	// if the model failed, allow the default nullmodel to be displayed
@@ -2238,6 +2248,11 @@ void CG_Player( centity_t *cent ) {
 
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
+
+	torso.shaderRGBA[0] = 0;
+	torso.shaderRGBA[1] = 255;
+	torso.shaderRGBA[2] = 0;
+	torso.shaderRGBA[3] = 255;
 
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 
@@ -2460,6 +2475,11 @@ void CG_Player( centity_t *cent ) {
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
+
+	head.shaderRGBA[0] = 0;
+	head.shaderRGBA[1] = 255;
+	head.shaderRGBA[2] = 0;
+	head.shaderRGBA[3] = 255;
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
 

@@ -336,6 +336,7 @@ static void CG_OffsetFirstPersonView()
 		origin[2] += Com_Clamp(0, 5, aViewAdjustments[BOB_UP] * speed);
 	}
 
+/* this is fucking RETARDED
 	// add angles based on damage kick
 	if ( cg.damageTime ) {
 		float ratio = cg.time - cg.damageTime;
@@ -351,7 +352,7 @@ static void CG_OffsetFirstPersonView()
 			}
 		}
 	}
-
+*/
 	// add view height
 	origin[2] += cg.predictedPlayerState.viewheight;
 
