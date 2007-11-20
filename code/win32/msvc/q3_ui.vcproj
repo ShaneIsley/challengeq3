@@ -308,6 +308,7 @@
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="2"
+			BuildLogFile=""
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -359,9 +360,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(OutDir)\uix86.dll"
-				LinkIncremental="1"
+				OutputFile="../../../../baseq3/uix86.dll"
+				LinkIncremental="0"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="q3_ui.def"
 				GenerateDebugInformation="true"
