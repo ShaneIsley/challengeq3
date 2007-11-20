@@ -4,7 +4,6 @@ g_main
 bg_misc
 bg_lib
 bg_pmove
-bg_slidemove
 q_math
 q_shared
 ai_dmnet

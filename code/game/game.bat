@@ -15,8 +15,6 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\game %1
 @if errorlevel 1 goto quit
 %cc%  ../bg_pmove.c
 @if errorlevel 1 goto quit
-%cc%  ../bg_slidemove.c
-@if errorlevel 1 goto quit
 %cc%  ../../qcommon/q_math.c
 @if errorlevel 1 goto quit
 %cc%  ../../qcommon/q_shared.c
