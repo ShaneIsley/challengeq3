@@ -46,10 +46,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	VOTE_TIME			30000	// 30 seconds before vote times out
 
-#define	MINS_Z				-24
 #define	DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
+
+const enum {
+	WATERLEVEL_NONE = 0,
+	WATERLEVEL_SHALLOW,	// playerMins.z < water < player.origin, i.e. from feet to mid-thigh
+	WATERLEVEL_DEEP,	// player.origin < water < player.viewheight, i.e. from mid-thigh to eyes
+	WATERLEVEL_DROWN,	// player.viewheight < water
+};
+
 
 //
 // config strings are a general means of communicating variable length strings
@@ -155,6 +162,9 @@ typedef enum {
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
+
+extern const vec3_t playerMins, playerMaxs;
+
 
 #define	MAXTOUCH	32
 typedef struct {
