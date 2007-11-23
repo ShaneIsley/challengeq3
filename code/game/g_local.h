@@ -65,7 +65,6 @@ typedef enum {
 //============================================================================
 
 typedef struct gentity_s gentity_t;
-typedef struct gclient_s gclient_t;
 
 struct gentity_s {
 	entityState_t	s;				// communicated by server to clients
@@ -131,7 +130,7 @@ struct gentity_s {
 	void		(*think)(gentity_t *self);
 	void		(*reached)(gentity_t *self);	// movers call this when hitting endpoint
 	void		(*blocked)(gentity_t *self, gentity_t *other);
-	void		(*touch)(gentity_t *self, gentity_t *other, trace_t *trace);
+	void		(*touch)(gentity_t *self, gentity_t *other);
 	void		(*use)(gentity_t *self, gentity_t *other, gentity_t *activator);
 	void		(*pain)(gentity_t *self, gentity_t *attacker, int damage);
 	void		(*die)(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
@@ -255,7 +254,7 @@ typedef struct {
 
 // this structure is cleared on each ClientSpawn(),
 // except for 'client->pers' and 'client->sess'
-struct gclient_s {
+typedef struct gclient_s {
 	// ps MUST be the first element, because the server expects it
 	playerState_t	ps;				// communicated by server to clients
 
@@ -301,6 +300,7 @@ struct gclient_s {
 	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
 
 	int			airOutTime;
+	int			tNextLava;			// debouncer for lava/slime hits
 
 	int			lastKillTime;		// for multiple kill rewards
 
@@ -320,8 +320,8 @@ struct gclient_s {
 	int			invulnerabilityTime;
 #endif
 
-	char		*areabits;
-};
+	//char		*areabits;
+} gclient_t;
 
 
 //
@@ -451,7 +451,7 @@ void FinishSpawningItem( gentity_t *ent );
 void Think_Weapon (gentity_t *ent);
 int ArmorIndex (gentity_t *ent);
 void	Add_Ammo (gentity_t *ent, int weapon, int count);
-void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace);
+void Touch_Item (gentity_t *ent, gentity_t *other);
 
 void ClearRegisteredItems( void );
 void RegisterItem( gitem_t *item );
@@ -476,7 +476,6 @@ void	G_Sound( gentity_t *ent, int channel, int soundIndex );
 void	G_FreeEntity( gentity_t *e );
 qboolean	G_EntitiesFree( void );
 
-void	G_TouchTriggers (gentity_t *ent);
 void	G_TouchSolids (gentity_t *ent);
 
 float	*tv (float x, float y, float z);
@@ -532,12 +531,7 @@ gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
 // g_mover.c
 //
 void G_RunMover( gentity_t *ent );
-void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
-
-//
-// g_trigger.c
-//
-void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace );
+void Touch_DoorTrigger( gentity_t *ent, gentity_t *other );
 
 
 //
@@ -721,8 +715,6 @@ extern	vmCvar_t	g_friendlyFire;
 extern	vmCvar_t	g_password;
 extern	vmCvar_t	g_needpass;
 extern	vmCvar_t	g_gravity;
-extern	vmCvar_t	g_speed;
-extern	vmCvar_t	g_knockback;
 extern	vmCvar_t	g_quadfactor;
 extern	vmCvar_t	g_forcerespawn;
 extern	vmCvar_t	g_inactivity;

@@ -828,7 +828,7 @@ void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 Touch_DoorTriggerSpectator
 ================
 */
-static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_t *trace ) {
+static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other ) {
 	int i, axis;
 	vec3_t origin, dir, angles;
 
@@ -856,12 +856,12 @@ static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_
 Touch_DoorTrigger
 ================
 */
-void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace ) {
+void Touch_DoorTrigger( gentity_t *ent, gentity_t *other ) {
 	if ( other->client && other->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		// if the door is not open and not opening
 		if ( ent->parent->moverState != MOVER_1TO2 &&
 			ent->parent->moverState != MOVER_POS2) {
-			Touch_DoorTriggerSpectator( ent, other, trace );
+			Touch_DoorTriggerSpectator( ent, other );
 		}
 	}
 	else if ( ent->parent->moverState != MOVER_1TO2 ) {
@@ -1028,7 +1028,7 @@ Touch_Plat
 Don't allow decent if a living player is on it
 ===============
 */
-void Touch_Plat( gentity_t *ent, gentity_t *other, trace_t *trace ) {
+void Touch_Plat( gentity_t *ent, gentity_t *other ) {
 	if ( !other->client || other->client->ps.stats[STAT_HEALTH] <= 0 ) {
 		return;
 	}
@@ -1046,7 +1046,7 @@ Touch_PlatCenterTrigger
 If the plat is at the bottom position, start it going up
 ===============
 */
-void Touch_PlatCenterTrigger(gentity_t *ent, gentity_t *other, trace_t *trace ) {
+void Touch_PlatCenterTrigger(gentity_t *ent, gentity_t *other ) {
 	if ( !other->client ) {
 		return;
 	}
@@ -1171,7 +1171,7 @@ Touch_Button
 
 ===============
 */
-void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace ) {
+void Touch_Button(gentity_t *ent, gentity_t *other ) {
 	if ( !other->client ) {
 		return;
 	}

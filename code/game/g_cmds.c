@@ -233,7 +233,6 @@ void Cmd_Give_f (gentity_t *ent)
 	int			i;
 	qboolean	give_all;
 	gentity_t		*it_ent;
-	trace_t		trace;
 
 	if ( !CheatsOk( ent ) ) {
 		return;
@@ -311,8 +310,7 @@ void Cmd_Give_f (gentity_t *ent)
 		it_ent->classname = it->classname;
 		G_SpawnItem (it_ent, it);
 		FinishSpawningItem(it_ent );
-		memset( &trace, 0, sizeof( trace ) );
-		Touch_Item (it_ent, ent, &trace);
+		Touch_Item (it_ent, ent);
 		if (it_ent->inuse) {
 			G_FreeEntity( it_ent );
 		}

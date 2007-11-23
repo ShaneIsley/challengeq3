@@ -29,7 +29,6 @@ Gives the activator all the items pointed to.
 */
 void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	gentity_t	*t;
-	trace_t		trace;
 
 	if ( !activator->client ) {
 		return;
@@ -39,13 +38,12 @@ void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		return;
 	}
 
-	memset( &trace, 0, sizeof( trace ) );
 	t = NULL;
 	while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
 		if ( !t->item ) {
 			continue;
 		}
-		Touch_Item( t, activator, &trace );
+		Touch_Item( t, activator );
 
 		// make sure it isn't going to respawn or show any events
 		t->nextthink = 0;

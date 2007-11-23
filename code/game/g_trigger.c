@@ -77,7 +77,7 @@ void Use_Multi( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	multi_trigger( ent, activator );
 }
 
-void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace ) {
+void Touch_Multi( gentity_t *self, gentity_t *other ) {
 	if( !other->client ) {
 		return;
 	}
@@ -140,7 +140,7 @@ trigger_push
 ==============================================================================
 */
 
-void trigger_push_touch (gentity_t *self, gentity_t *other, trace_t *trace ) {
+void trigger_push_touch (gentity_t *self, gentity_t *other ) {
 
 	if ( !other->client ) {
 		return;
@@ -268,8 +268,9 @@ trigger_teleport
 ==============================================================================
 */
 
-void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace ) {
-	gentity_t	*dest;
+static void trigger_teleporter_touch( gentity_t* self, gentity_t* other )
+{
+	gentity_t* dest;
 
 	if ( !other->client ) {
 		return;
@@ -283,8 +284,7 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 		return;
 	}
 
-
-	dest = 	G_PickTarget( self->target );
+	dest = G_PickTarget( self->target );
 	if (!dest) {
 		G_Printf ("Couldn't find teleporter destination\n");
 		return;
@@ -351,8 +351,10 @@ void hurt_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	}
 }
 
-void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
-	int		dflags;
+
+static void hurt_touch( gentity_t* self, gentity_t* other )
+{
+	int dflags = 0;
 
 	if ( !other->takedamage ) {
 		return;
@@ -375,8 +377,7 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	if (self->spawnflags & 8)
 		dflags = DAMAGE_NO_PROTECTION;
-	else
-		dflags = 0;
+
 	G_Damage (other, self, self, NULL, NULL, self->damage, dflags, MOD_TRIGGER_HURT);
 }
 

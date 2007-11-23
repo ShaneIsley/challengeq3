@@ -415,7 +415,7 @@ void RespawnItem( gentity_t *ent ) {
 Touch_Item
 ===============
 */
-void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
+void Touch_Item (gentity_t *ent, gentity_t *other) {
 	int			respawn;
 	qboolean	predict;
 
