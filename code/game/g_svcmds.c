@@ -431,7 +431,6 @@ void	Svcmd_ForceTeam_f( void ) {
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
-char	*ConcatArgs( int start );
 
 /*
 =================

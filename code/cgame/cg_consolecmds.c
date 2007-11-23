@@ -572,6 +572,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("vote");
 	trap_AddCommand ("callteamvote");
 	trap_AddCommand ("teamvote");
-	trap_AddCommand ("stats");
 	trap_AddCommand ("teamtask");
 }

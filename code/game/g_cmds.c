@@ -23,13 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 
 
-/*
-==================
-DeathmatchScoreboardMessage
-
-==================
-*/
-void DeathmatchScoreboardMessage( gentity_t *ent ) {
+void DeathmatchScoreboardMessage( const gentity_t* ent )
+{
 	char		entry[1024];
 	char		string[1400];
 	int			stringlength;
@@ -87,25 +82,16 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 }
 
 
-/*
-==================
-Cmd_Score_f
+// request current scoreboard information
 
-Request current scoreboard information
-==================
-*/
-void Cmd_Score_f( gentity_t *ent ) {
+void Cmd_Score_f( const gentity_t* ent )
+{
 	DeathmatchScoreboardMessage( ent );
 }
 
 
-
-/*
-==================
-CheatsOk
-==================
-*/
-qboolean	CheatsOk( gentity_t *ent ) {
+static qboolean CheatsOk( const gentity_t* ent )
+{
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -118,12 +104,8 @@ qboolean	CheatsOk( gentity_t *ent ) {
 }
 
 
-/*
-==================
-ConcatArgs
-==================
-*/
-char	*ConcatArgs( int start ) {
+const char* ConcatArgs( int start )
+{
 	int		i, c, tlen;
 	static char	line[MAX_STRING_CHARS];
 	int		len;
@@ -146,18 +128,14 @@ char	*ConcatArgs( int start ) {
 	}
 
 	line[len] = 0;
-
 	return line;
 }
 
-/*
-==================
-SanitizeString
 
-Remove case and control characters
-==================
-*/
-void SanitizeString( char *in, char *out ) {
+// remove case and control characters
+
+static void SanitizeString( const char* in, char* out )
+{
 	while ( *in ) {
 		if ( *in == 27 ) {
 			in += 2;		// skip color code
@@ -173,15 +151,12 @@ void SanitizeString( char *in, char *out ) {
 	*out = 0;
 }
 
-/*
-==================
-ClientNumberFromString
 
-Returns a player number for either a number or name string
-Returns -1 if invalid
-==================
-*/
-int ClientNumberFromString( gentity_t *to, char *s ) {
+// returns a player number for either a number or name string
+// returns -1 if invalid
+
+static int ClientNumberFromString( const gentity_t* to, const char* s )
+{
 	gclient_t	*cl;
 	int			idnum;
 	char		s2[MAX_STRING_CHARS];
@@ -196,7 +171,7 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 		}
 
 		cl = &level.clients[idnum];
-		if ( cl->pers.connected != CON_CONNECTED ) {
+		if ( cl->pers.connected == CON_DISCONNECTED ) {
 			trap_SendServerCommand( to-g_entities, va("print \"Client %i is not active\n\"", idnum));
 			return -1;
 		}
@@ -206,7 +181,7 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	// check for a name match
 	SanitizeString( s, s2 );
 	for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
-		if ( cl->pers.connected != CON_CONNECTED ) {
+		if ( cl->pers.connected == CON_DISCONNECTED ) {
 			continue;
 		}
 		SanitizeString( cl->pers.netname, n2 );
@@ -219,16 +194,12 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	return -1;
 }
 
-/*
-==================
-Cmd_Give_f
 
-Give items to a client
-==================
-*/
-void Cmd_Give_f (gentity_t *ent)
+// give items to a client
+
+static void Cmd_Give_f( gentity_t* ent )
 {
-	char		*name;
+	const char* name;
 	gitem_t		*it;
 	int			i;
 	qboolean	give_all;
@@ -240,10 +211,7 @@ void Cmd_Give_f (gentity_t *ent)
 
 	name = ConcatArgs( 1 );
 
-	if (Q_stricmp(name, "all") == 0)
-		give_all = qtrue;
-	else
-		give_all = qfalse;
+	give_all = (Q_stricmp(name, "all") == 0);
 
 	if (give_all || Q_stricmp( name, "health") == 0)
 	{
@@ -318,95 +286,47 @@ void Cmd_Give_f (gentity_t *ent)
 }
 
 
-/*
-==================
-Cmd_God_f
-
-Sets client to godmode
-
-argv(0) god
-==================
-*/
-void Cmd_God_f (gentity_t *ent)
+static void Cmd_God_f( gentity_t* ent )
 {
-	char	*msg;
-
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
 
 	ent->flags ^= FL_GODMODE;
-	if (!(ent->flags & FL_GODMODE) )
-		msg = "godmode OFF\n";
-	else
-		msg = "godmode ON\n";
-
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities, va("print \"godmode %s\"", (ent->flags & FL_GODMODE) ? "ON" : "OFF") );
 }
 
 
-/*
-==================
-Cmd_Notarget_f
-
-Sets client to notarget
-
-argv(0) notarget
-==================
-*/
-void Cmd_Notarget_f( gentity_t *ent ) {
-	char	*msg;
-
+static void Cmd_Notarget_f( gentity_t* ent )
+{
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
 
 	ent->flags ^= FL_NOTARGET;
-	if (!(ent->flags & FL_NOTARGET) )
-		msg = "notarget OFF\n";
-	else
-		msg = "notarget ON\n";
-
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities, va("print \"notarget %s\"", (ent->flags & FL_NOTARGET) ? "ON" : "OFF") );
 }
 
 
-/*
-==================
-Cmd_Noclip_f
-
-argv(0) noclip
-==================
-*/
-void Cmd_Noclip_f( gentity_t *ent ) {
-	char	*msg;
-
+static void Cmd_Noclip_f( gentity_t* ent )
+{
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
 
-	if ( ent->client->noclip ) {
-		msg = "noclip OFF\n";
-	} else {
-		msg = "noclip ON\n";
-	}
 	ent->client->noclip = !ent->client->noclip;
-
-	trap_SendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	trap_SendServerCommand( ent-g_entities, va("print \"noclip %s\"", ent->client->noclip ? "ON" : "OFF") );
 }
 
 
 /*
-==================
-Cmd_LevelShot_f
-
 This is just to help generate the level pictures
 for the menus.  It goes to the intermission immediately
 and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
-==================
 */
-void Cmd_LevelShot_f( gentity_t *ent ) {
+static void Cmd_LevelShot_f( gentity_t* ent )
+{
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
@@ -423,19 +343,24 @@ void Cmd_LevelShot_f( gentity_t *ent ) {
 }
 
 
-/*
-==================
-Cmd_LevelShot_f
+static void Cmd_Kill_f( gentity_t* ent )
+{
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		return;
+	}
+	if (ent->health <= 0) {
+		return;
+	}
+	ent->flags &= ~FL_GODMODE;
+	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
+	player_die(ent, ent, ent, 100000, MOD_SUICIDE);
+}
 
-This is just to help generate the level pictures
-for the menus.  It goes to the intermission immediately
-and sends over a command to the client to resize the view,
-hide the scoreboard, and take a special screenshot
-==================
-*/
-void Cmd_TeamTask_f( gentity_t *ent ) {
+
+static void Cmd_TeamTask_f( gentity_t* ent )
+{
 	char userinfo[MAX_INFO_STRING];
-	char		arg[MAX_TOKEN_CHARS];
+	char arg[MAX_TOKEN_CHARS];
 	int task;
 	int client = ent->client - level.clients;
 
@@ -452,36 +377,13 @@ void Cmd_TeamTask_f( gentity_t *ent ) {
 }
 
 
+// let everyone know about a team change
 
-/*
-=================
-Cmd_Kill_f
-=================
-*/
-void Cmd_Kill_f( gentity_t *ent ) {
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		return;
-	}
-	if (ent->health <= 0) {
-		return;
-	}
-	ent->flags &= ~FL_GODMODE;
-	ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
-	player_die (ent, ent, ent, 100000, MOD_SUICIDE);
-}
-
-/*
-=================
-BroadCastTeamChange
-
-Let everyone know about a team change
-=================
-*/
-void BroadcastTeamChange( gclient_t *client, int oldTeam )
+void BroadcastTeamChange( const gclient_t* client, int oldTeam )
 {
 	if ( client->sess.sessionTeam == TEAM_RED ) {
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the red team.\n\"",
-			client->pers.netname) );
+		client->pers.netname) );
 	} else if ( client->sess.sessionTeam == TEAM_BLUE ) {
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the blue team.\n\"",
 		client->pers.netname));
@@ -494,12 +396,9 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 	}
 }
 
-/*
-=================
-SetTeam
-=================
-*/
-void SetTeam( gentity_t *ent, char *s ) {
+
+void SetTeam( gentity_t* ent, const char* s )
+{
 	int					team, oldTeam;
 	gclient_t			*client;
 	int					clientNum;
@@ -507,9 +406,6 @@ void SetTeam( gentity_t *ent, char *s ) {
 	int					specClient;
 	int					teamLeader;
 
-	//
-	// see what change is requested
-	//
 	client = ent->client;
 
 	clientNum = client - level.clients;
@@ -599,7 +495,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-		player_die (ent, ent, ent, 100000, MOD_SUICIDE);
+		player_die(ent, ent, ent, 100000, MOD_SUICIDE);
 
 	}
 	// they go to the end of the line for tournements
@@ -632,35 +528,27 @@ void SetTeam( gentity_t *ent, char *s ) {
 	ClientBegin( clientNum );
 }
 
-/*
-=================
-StopFollowing
 
-If the client being followed leaves the game, or you just want to drop
-to free floating spectator mode
-=================
-*/
-void StopFollowing( gentity_t *ent ) {
-	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;	
-	ent->client->sess.sessionTeam = TEAM_SPECTATOR;	
+// if the client being followed leaves the game
+// or you just want to drop to free floating spectator mode
+
+void StopFollowing( gentity_t* ent )
+{
+	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;
+	ent->client->sess.sessionTeam = TEAM_SPECTATOR;
 	ent->client->sess.spectatorState = SPECTATOR_FREE;
 	ent->client->ps.pm_flags &= ~PMF_FOLLOW;
-	ent->r.svFlags &= ~SVF_BOT;
 	ent->client->ps.clientNum = ent - g_entities;
 }
 
-/*
-=================
-Cmd_Team_f
-=================
-*/
-void Cmd_Team_f( gentity_t *ent ) {
-	int			oldTeam;
-	char		s[MAX_TOKEN_CHARS];
+
+static void Cmd_Team_f( gentity_t* ent )
+{
+	char s[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() != 2 ) {
-		oldTeam = ent->client->sess.sessionTeam;
-		switch ( oldTeam ) {
+		team_t team = ent->client->sess.sessionTeam;
+		switch (team) {
 		case TEAM_BLUE:
 			trap_SendServerCommand( ent-g_entities, "print \"Blue team\n\"" );
 			break;
@@ -682,7 +570,7 @@ void Cmd_Team_f( gentity_t *ent ) {
 		return;
 	}
 
-	// if they are playing a tournement game, count as a loss
+	// if they are playing a tournament game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
@@ -696,12 +584,8 @@ void Cmd_Team_f( gentity_t *ent ) {
 }
 
 
-/*
-=================
-Cmd_Follow_f
-=================
-*/
-void Cmd_Follow_f( gentity_t *ent ) {
+static void Cmd_Follow_f( gentity_t* ent )
+{
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
 
@@ -728,7 +612,7 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		return;
 	}
 
-	// if they are playing a tournement game, count as a loss
+	// if they are playing a tournament game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
@@ -743,16 +627,13 @@ void Cmd_Follow_f( gentity_t *ent ) {
 	ent->client->sess.spectatorClient = i;
 }
 
-/*
-=================
-Cmd_FollowCycle_f
-=================
-*/
-void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
+
+void Cmd_FollowCycle_f( gentity_t* ent, int dir )
+{
 	int		clientnum;
 	int		original;
 
-	// if they are playing a tournement game, count as a loss
+	// if they are playing a tournament game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
@@ -797,13 +678,8 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 }
 
 
-/*
-==================
-G_Say
-==================
-*/
-
-static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
+static void G_SayTo( gentity_t* ent, const gentity_t* other, int mode, int color, const char* name, const char* message )
+{
 	if (!other) {
 		return;
 	}
@@ -819,23 +695,24 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 	if ( mode == SAY_TEAM  && !OnSameTeam(ent, other) ) {
 		return;
 	}
-	// no chatting to players in tournements
+	// no chatting to players in tournaments
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& other->client->sess.sessionTeam == TEAM_FREE
 		&& ent->client->sess.sessionTeam != TEAM_FREE ) {
 		return;
 	}
 
-	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"", 
+	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"",
 		mode == SAY_TEAM ? "tchat" : "chat",
-		name, Q_COLOR_ESCAPE, color, message));
+		name, Q_COLOR_ESCAPE, color, message) );
 }
+
 
 #define EC		"\x19"
 
-void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
-	int			j;
-	gentity_t	*other;
+static void G_Say( gentity_t* ent, const gentity_t* target, int mode, const char* message )
+{
+	int i;
 	int			color;
 	char		name[64];
 	// don't let text be too long for malicious reasons
@@ -849,17 +726,17 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	switch ( mode ) {
 	default:
 	case SAY_ALL:
-		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, message );
+		Com_sprintf( name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_GREEN;
 		break;
 	case SAY_TEAM:
-		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
+		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, message );
 		if (Team_GetLocationMsg(ent, location, sizeof(location)))
-			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC") (%s)"EC": ", 
+			Com_sprintf( name, sizeof(name), EC"(%s%c%c"EC") (%s)"EC": ",
 				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location);
 		else
-			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ", 
+			Com_sprintf( name, sizeof(name), EC"(%s%c%c"EC")"EC": ",
 				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_CYAN;
 		break;
@@ -867,14 +744,14 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		if (target && g_gametype.integer >= GT_TEAM &&
 			target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
 			Team_GetLocationMsg(ent, location, sizeof(location)))
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"] (%s)"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location );
+			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"] (%s)"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location );
 		else
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_MAGENTA;
 		break;
 	}
 
-	Q_strncpyz( text, chatText, sizeof(text) );
+	Q_strncpyz( text, message, sizeof(text) );
 
 	if ( target ) {
 		G_SayTo( ent, target, mode, color, name, text );
@@ -886,47 +763,32 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_Printf( "%s%s\n", name, text);
 	}
 
-	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
-		other = &g_entities[j];
-		G_SayTo( ent, other, mode, color, name, text );
+	// send it to all the appropriate clients
+	for (i = 0; i < level.maxclients; ++i) {
+		G_SayTo( ent, &g_entities[i], mode, color, name, text );
 	}
 }
 
 
-/*
-==================
-Cmd_Say_f
-==================
-*/
-static void Cmd_Say_f( gentity_t *ent, int mode, qboolean arg0 ) {
-	char		*p;
+static void Cmd_Say_f( gentity_t* ent, int mode, qboolean arg0 )
+{
+	const char* p;
 
 	if ( trap_Argc () < 2 && !arg0 ) {
 		return;
 	}
 
-	if (arg0)
-	{
-		p = ConcatArgs( 0 );
-	}
-	else
-	{
-		p = ConcatArgs( 1 );
-	}
+	p = ConcatArgs( arg0 ? 0 : 1 );
 
 	G_Say( ent, NULL, mode, p );
 }
 
-/*
-==================
-Cmd_Tell_f
-==================
-*/
-static void Cmd_Tell_f( gentity_t *ent ) {
+
+static void Cmd_Tell_f( gentity_t* ent )
+{
 	int			targetNum;
-	gentity_t	*target;
-	char		*p;
+	const gentity_t* target;
+	const char* p;
 	char		arg[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc () < 2 ) {
@@ -956,9 +818,13 @@ static void Cmd_Tell_f( gentity_t *ent ) {
 }
 
 
-static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly ) {
+///////////////////////////////////////////////////////////////
+
+
+static void G_VoiceTo( gentity_t* ent, const gentity_t* other, int mode, const char* id, qboolean voiceonly )
+{
 	int color;
-	char *cmd;
+	const char* cmd;
 
 	if (!other) {
 		return;
@@ -972,7 +838,7 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	if ( mode == SAY_TEAM && !OnSameTeam(ent, other) ) {
 		return;
 	}
-	// no chatting to players in tournements
+	// no chatting to players in tournaments
 	if ( (g_gametype.integer == GT_TOURNAMENT )) {
 		return;
 	}
@@ -990,12 +856,13 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 		cmd = "vchat";
 	}
 
-	trap_SendServerCommand( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent->s.number, color, id));
+	trap_SendServerCommand( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent->s.number, color, id) );
 }
 
-void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly ) {
-	int			j;
-	gentity_t	*other;
+
+static void G_Voice( gentity_t* ent, const gentity_t* target, int mode, const char* id, qboolean voiceonly )
+{
+	int i;
 
 	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
@@ -1011,46 +878,32 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 		G_Printf( "voice: %s %s\n", ent->client->pers.netname, id);
 	}
 
-	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
-		other = &g_entities[j];
-		G_VoiceTo( ent, other, mode, id, voiceonly );
+	// send it to all the appropriate clients
+	for (i = 0; i < level.maxclients; ++i) {
+		G_VoiceTo( ent, &g_entities[i], mode, id, voiceonly );
 	}
 }
 
-/*
-==================
-Cmd_Voice_f
-==================
-*/
-static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voiceonly ) {
-	char		*p;
+
+static void Cmd_Voice_f( gentity_t* ent, int mode, qboolean arg0, qboolean voiceonly )
+{
+	const char* p;
 
 	if ( trap_Argc () < 2 && !arg0 ) {
 		return;
 	}
 
-	if (arg0)
-	{
-		p = ConcatArgs( 0 );
-	}
-	else
-	{
-		p = ConcatArgs( 1 );
-	}
+	p = ConcatArgs( arg0 ? 0 : 1 );
 
 	G_Voice( ent, NULL, mode, p, voiceonly );
 }
 
-/*
-==================
-Cmd_VoiceTell_f
-==================
-*/
-static void Cmd_VoiceTell_f( gentity_t *ent, qboolean voiceonly ) {
+
+static void Cmd_VoiceTell_f( gentity_t* ent, qboolean voiceonly )
+{
 	int			targetNum;
-	gentity_t	*target;
-	char		*id;
+	const gentity_t* target;
+	const char* p;
 	char		arg[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc () < 2 ) {
@@ -1068,26 +921,22 @@ static void Cmd_VoiceTell_f( gentity_t *ent, qboolean voiceonly ) {
 		return;
 	}
 
-	id = ConcatArgs( 2 );
+	p = ConcatArgs( 2 );
 
-	G_LogPrintf( "vtell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, id );
-	G_Voice( ent, target, SAY_TELL, id, voiceonly );
+	G_LogPrintf( "vtell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
+	G_Voice( ent, target, SAY_TELL, p, voiceonly );
 	// don't tell to the player self if it was already directed to this player
 	// also don't send the chat back to a bot
 	if ( ent != target && !(ent->r.svFlags & SVF_BOT)) {
-		G_Voice( ent, ent, SAY_TELL, id, voiceonly );
+		G_Voice( ent, ent, SAY_TELL, p, voiceonly );
 	}
 }
 
 
-/*
-==================
-Cmd_VoiceTaunt_f
-==================
-*/
-static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
-	gentity_t *who;
+static void Cmd_VoiceTaunt_f( gentity_t* ent )
+{
 	int i;
+	const gentity_t* who;
 
 	if (!ent->client) {
 		return;
@@ -1153,8 +1002,10 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 }
 
 
+///////////////////////////////////////////////////////////////
 
-static char	*gc_orders[] = {
+
+static const char* gc_orders[] = {
 	"hold your position",
 	"hold this position",
 	"come here",
@@ -1164,7 +1015,8 @@ static char	*gc_orders[] = {
 	"report"
 };
 
-void Cmd_GameCommand_f( gentity_t *ent ) {
+static void Cmd_GameCommand_f( gentity_t* ent )
+{
 	int		player;
 	int		order;
 	char	str[MAX_TOKEN_CHARS];
@@ -1184,16 +1036,14 @@ void Cmd_GameCommand_f( gentity_t *ent ) {
 	G_Say( ent, ent, SAY_TELL, gc_orders[order] );
 }
 
-/*
-==================
-Cmd_Where_f
-==================
-*/
-void Cmd_Where_f( gentity_t *ent ) {
+
+static void Cmd_Where_f( gentity_t* ent )
+{
 	trap_SendServerCommand( ent-g_entities, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
 }
 
-static const char *gameNames[] = {
+
+static const char* gameNames[] = {
 	"Free For All",
 	"Tournament",
 	"Single Player",
@@ -1204,12 +1054,9 @@ static const char *gameNames[] = {
 	"Harvester"
 };
 
-/*
-==================
-Cmd_CallVote_f
-==================
-*/
-void Cmd_CallVote_f( gentity_t *ent ) {
+
+static void Cmd_CallVote_f( gentity_t* ent )
+{
 	int		i;
 	char	arg1[MAX_STRING_TOKENS];
 	char	arg2[MAX_STRING_TOKENS];
@@ -1317,12 +1164,9 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	trap_SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );	
 }
 
-/*
-==================
-Cmd_Vote_f
-==================
-*/
-void Cmd_Vote_f( gentity_t *ent ) {
+
+static void Cmd_Vote_f( gentity_t* ent )
+{
 	char		msg[64];
 
 	if ( !level.voteTime ) {
@@ -1349,19 +1193,16 @@ void Cmd_Vote_f( gentity_t *ent ) {
 		trap_SetConfigstring( CS_VOTE_YES, va("%i", level.voteYes ) );
 	} else {
 		level.voteNo++;
-		trap_SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );	
+		trap_SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );
 	}
 
 	// a majority will be determined in CheckVote, which will also account
 	// for players entering or leaving
 }
 
-/*
-==================
-Cmd_CallTeamVote_f
-==================
-*/
-void Cmd_CallTeamVote_f( gentity_t *ent ) {
+
+static void Cmd_CallTeamVote_f( gentity_t* ent )
+{
 	int		i, team, cs_offset;
 	char	arg1[MAX_STRING_TOKENS];
 	char	arg2[MAX_STRING_TOKENS];
@@ -1483,12 +1324,9 @@ void Cmd_CallTeamVote_f( gentity_t *ent ) {
 	trap_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", level.teamVoteNo[cs_offset] ) );
 }
 
-/*
-==================
-Cmd_TeamVote_f
-==================
-*/
-void Cmd_TeamVote_f( gentity_t *ent ) {
+
+static void Cmd_TeamVote_f( gentity_t* ent )
+{
 	int			team, cs_offset;
 	char		msg[64];
 
@@ -1532,12 +1370,8 @@ void Cmd_TeamVote_f( gentity_t *ent ) {
 }
 
 
-/*
-=================
-Cmd_SetViewpos_f
-=================
-*/
-void Cmd_SetViewpos_f( gentity_t *ent ) {
+static void Cmd_SetViewpos_f( gentity_t* ent )
+{
 	vec3_t		origin, angles;
 	char		buffer[MAX_TOKEN_CHARS];
 	int			i;
@@ -1546,6 +1380,7 @@ void Cmd_SetViewpos_f( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return;
 	}
+
 	if ( trap_Argc() != 5 ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"usage: setviewpos x y z yaw\n\""));
 		return;
@@ -1564,43 +1399,14 @@ void Cmd_SetViewpos_f( gentity_t *ent ) {
 }
 
 
+void ClientCommand( int clientNum )
+{
+	char cmd[MAX_TOKEN_CHARS];
+	gentity_t* ent = g_entities + clientNum;
 
-/*
-=================
-Cmd_Stats_f
-=================
-*/
-void Cmd_Stats_f( gentity_t *ent ) {
-/*
-	int max, n, i;
-
-	max = trap_AAS_PointReachabilityAreaIndex( NULL );
-
-	n = 0;
-	for ( i = 0; i < max; i++ ) {
-		if ( ent->client->areabits[i >> 3] & (1 << (i & 7)) )
-			n++;
-	}
-
-	//trap_SendServerCommand( ent-g_entities, va("print \"visited %d of %d areas\n\"", n, max));
-	trap_SendServerCommand( ent-g_entities, va("print \"%d%% level coverage\n\"", n * 100 / max));
-*/
-}
-
-/*
-=================
-ClientCommand
-=================
-*/
-void ClientCommand( int clientNum ) {
-	gentity_t *ent;
-	char	cmd[MAX_TOKEN_CHARS];
-
-	ent = g_entities + clientNum;
 	if ( !ent->client ) {
 		return;		// not fully in game yet
 	}
-
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
@@ -1649,6 +1455,15 @@ void ClientCommand( int clientNum ) {
 		return;
 	}
 
+	if (Q_stricmp (cmd, "callvote") == 0) {
+		Cmd_CallVote_f (ent);
+		return;
+	}
+	if (Q_stricmp (cmd, "vote") == 0) {
+		Cmd_Vote_f (ent);
+		return;
+	}
+
 	// ignore all other commands when at intermission
 	if (level.intermissiontime) {
 		Cmd_Say_f (ent, qfalse, qtrue);
@@ -1679,10 +1494,6 @@ void ClientCommand( int clientNum ) {
 		Cmd_Team_f (ent);
 	else if (Q_stricmp (cmd, "where") == 0)
 		Cmd_Where_f (ent);
-	else if (Q_stricmp (cmd, "callvote") == 0)
-		Cmd_CallVote_f (ent);
-	else if (Q_stricmp (cmd, "vote") == 0)
-		Cmd_Vote_f (ent);
 	else if (Q_stricmp (cmd, "callteamvote") == 0)
 		Cmd_CallTeamVote_f (ent);
 	else if (Q_stricmp (cmd, "teamvote") == 0)
@@ -1691,8 +1502,6 @@ void ClientCommand( int clientNum ) {
 		Cmd_GameCommand_f( ent );
 	else if (Q_stricmp (cmd, "setviewpos") == 0)
 		Cmd_SetViewpos_f( ent );
-	else if (Q_stricmp (cmd, "stats") == 0)
-		Cmd_Stats_f( ent );
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }

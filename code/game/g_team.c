@@ -167,12 +167,9 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 	level.teamScores[ team ] += score;
 }
 
-/*
-==============
-OnSameTeam
-==============
-*/
-qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
+
+qboolean OnSameTeam( const gentity_t* ent1, const gentity_t* ent2 )
+{
 	if ( !ent1->client || !ent2->client ) {
 		return qfalse;
 	}

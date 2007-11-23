@@ -428,11 +428,11 @@ char *G_NewString( const char *string );
 //
 // g_cmds.c
 //
-void Cmd_Score_f (gentity_t *ent);
-void StopFollowing( gentity_t *ent );
-void BroadcastTeamChange( gclient_t *client, int oldTeam );
-void SetTeam( gentity_t *ent, char *s );
-void Cmd_FollowCycle_f( gentity_t *ent, int dir );
+void Cmd_Score_f( const gentity_t* ent );
+void StopFollowing( gentity_t* ent );
+void BroadcastTeamChange( const gclient_t* client, int oldTeam );
+void SetTeam( gentity_t* ent, const char* s );
+void Cmd_FollowCycle_f( gentity_t* ent, int dir );
 
 //
 // g_items.c
@@ -557,17 +557,17 @@ void Weapon_HookThink (gentity_t *ent);
 //
 // g_client.c
 //
-team_t TeamCount( int ignoreClientNum, int team );
+int TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
-void SetClientViewAngle( gentity_t *ent, vec3_t angle );
+void SetClientViewAngle( gentity_t* ent, const vec3_t angle );
 gentity_t* SelectSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles );
-void CopyToBodyQue( gentity_t *ent );
-void respawn (gentity_t *ent);
+void CopyToBodyQue( gentity_t* ent );
+void RespawnPlayer( gentity_t* ent );
 void BeginIntermission (void);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
-void InitBodyQue (void);
+void InitBodyQue();
 void ClientSpawn( gentity_t *ent );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 void AddScore( gentity_t *ent, vec3_t origin, int score );
@@ -592,13 +592,13 @@ void G_StartKamikaze( gentity_t *ent );
 //
 // p_hud.c
 //
-void MoveClientToIntermission (gentity_t *client);
-void G_SetStats (gentity_t *ent);
-void DeathmatchScoreboardMessage (gentity_t *client);
+void MoveClientToIntermission( gentity_t* client );
+void DeathmatchScoreboardMessage( const gentity_t* client );
 
 //
 // g_cmds.c
 //
+const char* ConcatArgs( int start );
 
 //
 // g_pweapon.c
@@ -636,7 +636,7 @@ void G_RunClient( gentity_t *ent );
 //
 // g_team.c
 //
-qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
+qboolean OnSameTeam( const gentity_t* ent1, const gentity_t* ent2 );
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 

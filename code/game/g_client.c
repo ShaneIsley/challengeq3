@@ -299,18 +299,14 @@ BODYQUE
 =======================================================================
 */
 
-/*
-===============
-InitBodyQue
-===============
-*/
-void InitBodyQue (void) {
-	int		i;
-	gentity_t	*ent;
+
+void InitBodyQue()
+{
+	int i;
 
 	level.bodyQueIndex = 0;
-	for (i=0; i<BODY_QUEUE_SIZE ; i++) {
-		ent = G_Spawn();
+	for (i = 0; i < BODY_QUEUE_SIZE; ++i) {
+		gentity_t* ent = G_Spawn();
 		ent->classname = "bodyque";
 		ent->neverFree = qtrue;
 		level.bodyQue[i] = ent;
@@ -335,45 +331,40 @@ void BodySink( gentity_t *ent ) {
 	ent->s.pos.trBase[2] -= 1;
 }
 
-/*
-=============
-CopyToBodyQue
 
-A player is respawning, so make an entity that looks
-just like the existing corpse to leave behind.
-=============
-*/
-void CopyToBodyQue( gentity_t *ent ) {
-#ifdef MISSIONPACK
-	gentity_t	*e;
-	int i;
-#endif
-	gentity_t		*body;
-	int			contents;
+// a player is respawning, so make an entity that looks
+// just like the existing corpse to leave behind.
 
-	trap_UnlinkEntity (ent);
+void CopyToBodyQue( gentity_t* ent )
+{
+	gentity_t* body;
+
+	trap_UnlinkEntity(ent);
 
 	// if client is in a nodrop area, don't leave the body
-	contents = trap_PointContents( ent->s.origin, -1 );
-	if ( contents & CONTENTS_NODROP ) {
+	if (trap_PointContents( ent->s.origin, -1 ) & CONTENTS_NODROP)
 		return;
-	}
+
+	if (ent->health <= GIB_HEALTH)
+		return;
 
 	// grab a body que and cycle to the next one
 	body = level.bodyQue[ level.bodyQueIndex ];
 	level.bodyQueIndex = (level.bodyQueIndex + 1) % BODY_QUEUE_SIZE;
 
-	trap_UnlinkEntity (body);
+	trap_UnlinkEntity(body);
 
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
+
 #ifdef MISSIONPACK
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
+		int i;
 		body->s.eFlags |= EF_KAMIKAZE;
 
 		// check if there is a kamikaze timer around for this owner
 		for (i = 0; i < MAX_GENTITIES; i++) {
-			e = &g_entities[i];
+			gentity_t* e = &g_entities[i];
 			if (!e->inuse)
 				continue;
 			if (e->activator != ent)
@@ -385,6 +376,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 		}
 	}
 #endif
+
 	body->s.powerups = 0;	// clear powerups
 	body->s.loopSound = 0;	// clear lava burning
 	body->s.number = body - g_entities;
@@ -419,10 +411,10 @@ void CopyToBodyQue( gentity_t *ent ) {
 	}
 
 	body->r.svFlags = ent->r.svFlags;
-	VectorCopy (ent->r.mins, body->r.mins);
-	VectorCopy (ent->r.maxs, body->r.maxs);
-	VectorCopy (ent->r.absmin, body->r.absmin);
-	VectorCopy (ent->r.absmax, body->r.absmax);
+	VectorCopy( ent->r.mins, body->r.mins );
+	VectorCopy( ent->r.maxs, body->r.maxs );
+	VectorCopy( ent->r.absmin, body->r.absmin );
+	VectorCopy( ent->r.absmax, body->r.absmax );
 
 	body->clipmask = CONTENTS_SOLID | CONTENTS_PLAYERCLIP;
 	body->r.contents = CONTENTS_CORPSE;
@@ -432,51 +424,33 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body->think = BodySink;
 
 	body->die = body_die;
+	body->takedamage = qtrue;
 
-	// don't take more damage if already gibbed
-	if ( ent->health <= GIB_HEALTH ) {
-		body->takedamage = qfalse;
-	} else {
-		body->takedamage = qtrue;
-	}
-
-
-	VectorCopy ( body->s.pos.trBase, body->r.currentOrigin );
-	trap_LinkEntity (body);
+	VectorCopy( body->s.pos.trBase, body->r.currentOrigin );
+	trap_LinkEntity(body);
 }
 
-//======================================================================
 
-
-/*
-==================
-SetClientViewAngle
-
-==================
-*/
-void SetClientViewAngle( gentity_t *ent, vec3_t angle ) {
-	int			i;
+void SetClientViewAngle( gentity_t* ent, const vec3_t angle )
+{
+	int i;
 
 	// set the delta angle
-	for (i=0 ; i<3 ; i++) {
-		int		cmdAngle;
-
-		cmdAngle = ANGLE2SHORT(angle[i]);
+	for (i = 0; i < 3; i++) {
+		int cmdAngle = ANGLE2SHORT(angle[i]);
 		ent->client->ps.delta_angles[i] = cmdAngle - ent->client->pers.cmd.angles[i];
 	}
+
 	VectorCopy( angle, ent->s.angles );
-	VectorCopy (ent->s.angles, ent->client->ps.viewangles);
+	VectorCopy( ent->s.angles, ent->client->ps.viewangles );
 }
 
-/*
-================
-respawn
-================
-*/
-void respawn( gentity_t *ent ) {
-	gentity_t	*tent;
 
-	CopyToBodyQue (ent);
+void RespawnPlayer( gentity_t* ent )
+{
+	gentity_t* tent;
+
+	CopyToBodyQue(ent);
 	ClientSpawn(ent);
 
 	// add a teleportation effect
@@ -484,14 +458,13 @@ void respawn( gentity_t *ent ) {
 	tent->s.clientNum = ent->s.clientNum;
 }
 
-/*
-================
-TeamCount
 
-Returns number of players on a team
-================
-*/
-team_t TeamCount( int ignoreClientNum, int team ) {
+// !!! this stuff belongs in g_team, not here
+
+// returns number of players on a team
+
+int TeamCount( int ignoreClientNum, int team )
+{
 	int		i;
 	int		count = 0;
 
@@ -510,14 +483,11 @@ team_t TeamCount( int ignoreClientNum, int team ) {
 	return count;
 }
 
-/*
-================
-TeamLeader
 
-Returns the client number of the team leader
-================
-*/
-int TeamLeader( int team ) {
+// returns the client number of the team leader
+
+int TeamLeader( int team )
+{
 	int		i;
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
@@ -534,13 +504,8 @@ int TeamLeader( int team ) {
 }
 
 
-/*
-================
-PickTeam
-
-================
-*/
-team_t PickTeam( int ignoreClientNum ) {
+team_t PickTeam( int ignoreClientNum )
+{
 	int		counts[TEAM_NUM_TEAMS];
 
 	counts[TEAM_BLUE] = TeamCount( ignoreClientNum, TEAM_BLUE );
@@ -559,32 +524,9 @@ team_t PickTeam( int ignoreClientNum ) {
 	return TEAM_BLUE;
 }
 
-/*
-===========
-ForceClientSkin
 
-Forces a client's skin (for teamplay)
-===========
-*/
-/*
-static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
-	char *p;
-
-	if ((p = Q_strrchr(model, '/')) != 0) {
-		*p = 0;
-	}
-
-	Q_strcat(model, MAX_QPATH, "/");
-	Q_strcat(model, MAX_QPATH, skin);
-}
-*/
-
-/*
-===========
-ClientCheckName
-============
-*/
-static void ClientCleanName( const char *in, char *out, int outSize ) {
+static void ClientCleanName( const char *in, char *out, int outSize )
+{
 	int		len, colorlessLen;
 	char	ch;
 	char	*p;
@@ -663,30 +605,22 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 
 
 /*
-===========
-ClientUserInfoChanged
-
 Called from ClientConnect when the player first connects and
 directly by the server system when the player updates a userinfo variable.
-
-The game can override any of the settings and call trap_SetUserinfo
-if desired.
-============
+The game can override any of the settings and call trap_SetUserinfo if desired.
 */
 void ClientUserinfoChanged( int clientNum )
 {
-	gentity_t *ent;
 	int		teamTask, teamLeader, team, health;
 	const char* s;
 	char	model[MAX_QPATH];
 	char	oldname[MAX_STRING_CHARS];
-	gclient_t	*client;
 	char	c1[MAX_INFO_STRING];
 	char	c2[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
 
-	ent = g_entities + clientNum;
-	client = ent->client;
+	gentity_t* ent = g_entities + clientNum;
+	gclient_t* client = ent->client;
 
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
@@ -702,12 +636,7 @@ void ClientUserinfoChanged( int clientNum )
 	}
 
 	// check the item prediction
-	s = Info_ValueForKey( userinfo, "cg_predictItems" );
-	if ( !atoi( s ) ) {
-		client->pers.predictItemPickup = qfalse;
-	} else {
-		client->pers.predictItemPickup = qtrue;
-	}
+	client->pers.predictItemPickup = (qboolean)atoi( Info_ValueForKey( userinfo, "cg_predictItems" ) );
 
 	// set name
 	Q_strncpyz ( oldname, client->pers.netname, sizeof( oldname ) );
@@ -790,15 +719,6 @@ void ClientUserinfoChanged( int clientNum )
 		client->pers.teamInfo = qfalse;
 	}
 #endif
-	/*
-	s = Info_ValueForKey( userinfo, "cg_pmove_fixed" );
-	if ( !*s || atoi( s ) == 0 ) {
-		client->pers.pmoveFixed = qfalse;
-	}
-	else {
-		client->pers.pmoveFixed = qtrue;
-	}
-	*/
 
 	// team task (0 = none, 1 = offence, 2 = defence)
 	teamTask = atoi(Info_ValueForKey(userinfo, "teamtask"));
@@ -830,11 +750,8 @@ void ClientUserinfoChanged( int clientNum )
 
 
 /*
-===========
-ClientConnect
-
 Called when a player begins connecting to the server.
-Called again for every map change or tournement restart.
+Called again for every map change or map_restart.
 
 The session information will be valid after exit.
 
@@ -844,35 +761,31 @@ a string with the reason for denial.
 Otherwise, the client will be sent the current gamestate
 and will eventually get to ClientBegin.
 
-firstTime will be qtrue the very first time a client connects
-to the server machine, but qfalse on map changes and tournement
-restarts.
-============
+firstTime will be true the very first time a client connects
+to the server machine, but false on map changes and restarts.
 */
+
 const char* ClientConnect( int clientNum, qboolean firstTime, qboolean isBot )
 {
 	const char* value;
-//	char		*areabits;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
-	gentity_t	*ent;
-
-	ent = &g_entities[ clientNum ];
+	gentity_t* ent = &g_entities[ clientNum ];
 
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// IP filtering
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
-	// recommanding PB based IP / GUID banning, the builtin system is pretty limited
+	// recommending PB based IP / GUID banning, the builtin system is pretty limited
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
 	if ( G_FilterPacket( value ) ) {
 		return "You are banned from this server.";
 	}
 
-  // we don't check password for bots and local client
-  // NOTE: local client <-> "ip" "localhost"
-  //   this means this client is not running in our current process
+	// we don't check password for bots and local client
+	// NOTE: local client <-> "ip" "localhost"
+	//   this means this client is not running in our current process
 	if ( !isBot && (strcmp(value, "localhost") != 0)) {
 		// check for a password
 		value = Info_ValueForKey (userinfo, "password");
@@ -885,8 +798,6 @@ const char* ClientConnect( int clientNum, qboolean firstTime, qboolean isBot )
 	// they can connect
 	ent->client = level.clients + clientNum;
 	client = ent->client;
-
-//	areabits = client->areabits;
 
 	memset( client, 0, sizeof(*client) );
 
@@ -923,32 +834,21 @@ const char* ClientConnect( int clientNum, qboolean firstTime, qboolean isBot )
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
-	// for statistics
-//	client->areabits = areabits;
-//	if ( !client->areabits )
-//		client->areabits = G_Alloc( (trap_AAS_PointReachabilityAreaIndex( NULL ) + 7) / 8 );
-
 	return NULL;
 }
 
-/*
-===========
-ClientBegin
 
+/*
 called when a client has finished connecting, and is ready
 to be placed into the level.  This will happen every level load,
 and on transition between teams, but doesn't happen on respawns
-============
 */
-void ClientBegin( int clientNum ) {
-	gentity_t	*ent;
-	gclient_t	*client;
-	gentity_t	*tent;
-	int			flags;
 
-	ent = g_entities + clientNum;
-
-	client = level.clients + clientNum;
+void ClientBegin( int clientNum )
+{
+	int flags;
+	gentity_t* ent = g_entities + clientNum;
+	gclient_t* client = level.clients + clientNum;
 
 	if ( ent->r.linked ) {
 		trap_UnlinkEntity( ent );
@@ -976,7 +876,7 @@ void ClientBegin( int clientNum ) {
 
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		// send event
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
+		gentity_t* tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
 		tent->s.clientNum = ent->s.clientNum;
 
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
@@ -989,28 +889,25 @@ void ClientBegin( int clientNum ) {
 	CalculateRanks();
 }
 
-/*
-===========
-ClientSpawn
 
+/*
 Called every time a client is placed fresh in the world:
 after the first ClientBegin, and after each respawn
 Initializes all non-persistant parts of playerState
-============
 */
+
 void ClientSpawn(gentity_t *ent)
 {
 	int		index;
 	vec3_t	spawn_origin, spawn_angles;
 	gclient_t	*client;
 	int		i;
-	clientPersistant_t	saved;
+	clientPersistant_t	savedPers;
 	clientSession_t		savedSess;
 	int		persistant[MAX_PERSISTANT];
 	gentity_t* spawnPoint;
 	int		flags;
 	int		savedPing;
-//	char	*savedAreaBits;
 	int		accuracy_hits, accuracy_shots;
 	int		eventSequence;
 	char	userinfo[MAX_INFO_STRING];
@@ -1067,10 +964,9 @@ void ClientSpawn(gentity_t *ent)
 
 	// clear everything but the persistant data
 
-	saved = client->pers;
+	savedPers = client->pers;
 	savedSess = client->sess;
 	savedPing = client->ps.ping;
-//	savedAreaBits = client->areabits;
 	accuracy_hits = client->accuracy_hits;
 	accuracy_shots = client->accuracy_shots;
 	for ( i = 0 ; i < MAX_PERSISTANT ; i++ ) {
@@ -1078,12 +974,11 @@ void ClientSpawn(gentity_t *ent)
 	}
 	eventSequence = client->ps.eventSequence;
 
-	memset (client, 0, sizeof(*client)); // bk FIXME: Com_Memset?
+	memset( client, 0, sizeof(*client) );
 
-	client->pers = saved;
+	client->pers = savedPers;
 	client->sess = savedSess;
 	client->ps.ping = savedPing;
-//	client->areabits = savedAreaBits;
 	client->accuracy_hits = accuracy_hits;
 	client->accuracy_shots = accuracy_shots;
 	client->lastkilled_client = -1;
@@ -1119,18 +1014,14 @@ void ClientSpawn(gentity_t *ent)
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags = 0;
-	
-	VectorCopy (playerMins, ent->r.mins);
-	VectorCopy (playerMaxs, ent->r.maxs);
+
+	VectorCopy( playerMins, ent->r.mins );
+	VectorCopy( playerMaxs, ent->r.maxs );
 
 	client->ps.clientNum = index;
 
 	client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MACHINEGUN );
-	if ( g_gametype.integer == GT_TEAM ) {
-		client->ps.ammo[WP_MACHINEGUN] = 50;
-	} else {
-		client->ps.ammo[WP_MACHINEGUN] = 100;
-	}
+	client->ps.ammo[WP_MACHINEGUN] = 50;
 
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GAUNTLET );
 	client->ps.ammo[WP_GAUNTLET] = -1;
@@ -1148,16 +1039,12 @@ void ClientSpawn(gentity_t *ent)
 	trap_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-
-	} else {
+	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		G_KillBox( ent );
 		trap_LinkEntity (ent);
-
 		// force the base weapon up
 		client->ps.weapon = WP_MACHINEGUN;
 		client->ps.weaponstate = WEAPON_READY;
-
 	}
 
 	// don't allow full run speed for a bit
@@ -1211,24 +1098,19 @@ void ClientSpawn(gentity_t *ent)
 
 
 /*
-===========
-ClientDisconnect
-
 Called when a player drops from the server.
 Will not be called between levels.
 
 This should NOT be called directly by any game logic,
 call trap_DropClient(), which will call this and do
 server system housekeeping.
-============
 */
-void ClientDisconnect( int clientNum ) {
+void ClientDisconnect( int clientNum )
+{
 	gentity_t	*ent;
-	gentity_t	*tent;
 	int			i;
 
-	// cleanup if we are kicking a bot that
-	// hasn't spawned yet
+	// clean up if we are kicking a bot that hasn't spawned yet
 	G_RemoveQueuedBotBegin( clientNum );
 
 	ent = g_entities + clientNum;
@@ -1245,10 +1127,10 @@ void ClientDisconnect( int clientNum ) {
 		}
 	}
 
-	// send effect if they were completely connected
+	// send effect if they were in the game
 	if ( ent->client->pers.connected == CON_CONNECTED 
 		&& ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
+		gentity_t* tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
 		tent->s.clientNum = ent->s.clientNum;
 
 		// They don't get to take powerups with them!
@@ -1260,7 +1142,6 @@ void ClientDisconnect( int clientNum ) {
 			TossClientCubes( ent );
 		}
 #endif
-
 	}
 
 	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
@@ -1283,7 +1164,7 @@ void ClientDisconnect( int clientNum ) {
 		level.intermissiontime = 0;
 	}
 
-	trap_UnlinkEntity (ent);
+	trap_UnlinkEntity(ent);
 	ent->s.modelindex = 0;
 	ent->inuse = qfalse;
 	ent->classname = "disconnected";
@@ -1291,7 +1172,7 @@ void ClientDisconnect( int clientNum ) {
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_FREE;
 	ent->client->sess.sessionTeam = TEAM_FREE;
 
-	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
+	trap_SetConfigstring( CS_PLAYERS + clientNum, "" );
 
 	CalculateRanks();
 
@@ -1299,5 +1180,4 @@ void ClientDisconnect( int clientNum ) {
 		BotAIShutdownClient( clientNum, qfalse );
 	}
 }
-
 

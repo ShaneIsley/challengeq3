@@ -871,8 +871,7 @@ static void ClientThink_real( gentity_t* ent )
 	}
 	if (g_smoothClients.integer) {
 		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
-	}
-	else {
+	} else {
 		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
 	}
 	SendPendingPredictableEvents( &ent->client->ps );
@@ -925,13 +924,13 @@ static void ClientThink_real( gentity_t* ent )
 			// forcerespawn is to prevent users from waiting out powerups
 			if ( g_forcerespawn.integer > 0 && 
 				( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
-				respawn( ent );
+				RespawnPlayer( ent );
 				return;
 			}
 		
 			// pressing attack or use is the normal respawn method
 			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
-				respawn( ent );
+				RespawnPlayer( ent );
 			}
 		}
 		return;
