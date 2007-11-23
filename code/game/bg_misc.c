@@ -1285,7 +1285,9 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 	}
 }
 
-char *eventnames[] = {
+
+#ifdef _DEBUG
+const char* eventnames[] = {
 	"EV_NONE",
 
 	"EV_FOOTSTEP",
@@ -1384,19 +1386,15 @@ char *eventnames[] = {
 	"EV_TAUNT"
 
 };
+#endif
 
-/*
-===============
-BG_AddPredictableEventToPlayerstate
 
-Handles the sequence numbers
-===============
-*/
+// handles the sequence numbers
 
-void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+extern void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
-void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
-
+void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps )
+{
 #ifdef _DEBUG
 	{
 		char buf[256];
@@ -1410,17 +1408,15 @@ void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 		}
 	}
 #endif
+
 	ps->events[ps->eventSequence & (MAX_PS_EVENTS-1)] = newEvent;
 	ps->eventParms[ps->eventSequence & (MAX_PS_EVENTS-1)] = eventParm;
 	ps->eventSequence++;
 }
 
-/*
-========================
-BG_TouchJumpPad
-========================
-*/
-void BG_TouchJumpPad( playerState_t *ps, entityState_t *jumppad ) {
+
+void BG_TouchJumpPad( playerState_t* ps, const entityState_t* jumppad )
+{
 	vec3_t	angles;
 	float p;
 	int effectNum;
@@ -1538,74 +1534,13 @@ This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
-	int		i;
+void BG_PlayerStateToEntityStateExtraPolate( playerState_t* ps, entityState_t* es, int time, qboolean snap )
+{
+	BG_PlayerStateToEntityState( ps, es, snap );
 
-	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
-		s->eType = ET_INVISIBLE;
-	} else if ( ps->stats[STAT_HEALTH] <= GIB_HEALTH ) {
-		s->eType = ET_INVISIBLE;
-	} else {
-		s->eType = ET_PLAYER;
-	}
-
-	s->number = ps->clientNum;
-
-	s->pos.trType = TR_LINEAR_STOP;
-	VectorCopy( ps->origin, s->pos.trBase );
-	if ( snap ) {
-		SnapVector( s->pos.trBase );
-	}
-	// set the trDelta for flag direction and linear prediction
-	VectorCopy( ps->velocity, s->pos.trDelta );
+	es->apos.trType = TR_INTERPOLATE;
 	// set the time for linear prediction
-	s->pos.trTime = time;
-	// set maximum extra polation time
-	s->pos.trDuration = 50; // 1000 / sv_fps (default = 20)
-
-	s->apos.trType = TR_INTERPOLATE;
-	VectorCopy( ps->viewangles, s->apos.trBase );
-	if ( snap ) {
-		SnapVector( s->apos.trBase );
-	}
-
-	s->angles2[YAW] = ps->movementDir;
-	s->legsAnim = ps->legsAnim;
-	s->torsoAnim = ps->torsoAnim;
-	s->clientNum = ps->clientNum;		// ET_PLAYER looks here instead of at number
-										// so corpses can also reference the proper config
-	s->eFlags = ps->eFlags;
-	if ( ps->stats[STAT_HEALTH] <= 0 ) {
-		s->eFlags |= EF_DEAD;
-	} else {
-		s->eFlags &= ~EF_DEAD;
-	}
-
-	if ( ps->externalEvent ) {
-		s->event = ps->externalEvent;
-		s->eventParm = ps->externalEventParm;
-	} else if ( ps->entityEventSequence < ps->eventSequence ) {
-		int		seq;
-
-		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS) {
-			ps->entityEventSequence = ps->eventSequence - MAX_PS_EVENTS;
-		}
-		seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
-		s->event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
-		s->eventParm = ps->eventParms[ seq ];
-		ps->entityEventSequence++;
-	}
-
-	s->weapon = ps->weapon;
-	s->groundEntityNum = ps->groundEntityNum;
-
-	s->powerups = 0;
-	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
-		if ( ps->powerups[ i ] ) {
-			s->powerups |= 1 << i;
-		}
-	}
-
-	s->loopSound = ps->loopSound;
-	s->generic1 = ps->generic1;
+	es->pos.trTime = time;
+	// set maximum extrapolation time
+	es->pos.trDuration = 50; // 1000 / sv_fps (default = 20)
 }
