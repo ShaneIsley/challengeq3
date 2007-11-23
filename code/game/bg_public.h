@@ -236,7 +236,7 @@ typedef enum {
 	PERS_SPAWN_COUNT,				// incremented every respawn
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 	PERS_ATTACKER,					// clientnum of last damage inflicter
-	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
+	PERS_UNUSED,
 	PERS_KILLED,					// count of the number of times you died
 	// player awards tracking
 	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
@@ -261,7 +261,9 @@ typedef enum {
 #define	EF_AWARD_GAUNTLET	0x00000040		// draw a gauntlet sprite
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
 #define	EF_FIRING			0x00000100		// for lightning gun
+#ifdef MISSIONPACK
 #define	EF_KAMIKAZE			0x00000200
+#endif
 #define	EF_MOVER_STOP		0x00000400		// will push otherwise
 #define EF_AWARD_CAP		0x00000800		// draw the capture sprite
 #define	EF_TALK				0x00001000		// draw a talk balloon
@@ -272,6 +274,8 @@ typedef enum {
 #define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
 #define EF_AWARD_DENIED		0x00040000		// denied
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
+
+#define EF_AWARD_ALL		(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP)
 
 // NOTE: may not have more than 16
 typedef enum {

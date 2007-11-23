@@ -1136,12 +1136,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
+#ifdef MISSIONPACK
 		// don't play gib sound when using the kamikaze because it interferes
 		// with the kamikaze sound, downside is that the gib sound will also
 		// not be played when someone is gibbed while just carrying the kamikaze
 		if ( !(es->eFlags & EF_KAMIKAZE) ) {
 			trap_S_StartSound( NULL, es->number, CHAN_BODY, cgs.media.gibSound );
 		}
+#endif
 		CG_GibPlayer( cent->lerpOrigin );
 		break;
 

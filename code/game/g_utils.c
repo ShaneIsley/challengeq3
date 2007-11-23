@@ -417,20 +417,18 @@ void G_FreeEntity( gentity_t *ed ) {
 	ed->inuse = qfalse;
 }
 
-/*
-=================
-G_TempEntity
 
+/*
 Spawns an event entity that will be auto-removed
 The origin will be snapped to save net bandwidth, so care
 must be taken if the origin is right on a surface (snap towards start vector first)
-=================
 */
-gentity_t *G_TempEntity( vec3_t origin, int event ) {
-	gentity_t		*e;
-	vec3_t		snapped;
 
-	e = G_Spawn();
+gentity_t* G_TempEntity( const vec3_t origin, int event )
+{
+	vec3_t snapped;
+
+	gentity_t* e = G_Spawn();
 	e->s.eType = ET_EVENTS + event;
 
 	e->classname = "tempEntity";
@@ -555,22 +553,18 @@ void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
 //==============================================================================
 
 
-/*
-================
-G_SetOrigin
+// sets the pos trajectory for a fixed position
 
-Sets the pos trajectory for a fixed position
-================
-*/
-void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
+void G_SetOrigin( gentity_t* ent, const vec3_t origin )
+{
 	VectorCopy( origin, ent->s.pos.trBase );
 	ent->s.pos.trType = TR_STATIONARY;
 	ent->s.pos.trTime = 0;
 	ent->s.pos.trDuration = 0;
 	VectorClear( ent->s.pos.trDelta );
-
 	VectorCopy( origin, ent->r.currentOrigin );
 }
+
 
 /*
 ================

@@ -954,8 +954,10 @@ void ClientSpawn(gentity_t *ent)
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
+#ifdef MISSIONPACK
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
+#endif
 
 	// toggle the teleport bit so the client knows to not lerp
 	// and never clear the voted flag
