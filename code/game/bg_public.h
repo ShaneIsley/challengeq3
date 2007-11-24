@@ -46,11 +46,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	VOTE_TIME			30000	// 30 seconds before vote times out
 
-#define	DEFAULT_VIEWHEIGHT	26
+#define DEFAULT_VIEWHEIGHT	26
 #define CROUCH_VIEWHEIGHT	12
-#define	DEAD_VIEWHEIGHT		-16
+#define DEAD_VIEWHEIGHT		-16
 
-const enum {
+enum {
 	WATERLEVEL_NONE = 0,
 	WATERLEVEL_SHALLOW,	// playerMins.z < water < player.origin, i.e. from feet to mid-thigh
 	WATERLEVEL_DEEP,	// player.origin < water < player.viewheight, i.e. from mid-thigh to eyes
