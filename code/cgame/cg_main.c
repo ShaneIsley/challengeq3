@@ -179,8 +179,6 @@ vmCvar_t	cg_cameraOrbitDelay;
 vmCvar_t	cg_timescaleFadeEnd;
 vmCvar_t	cg_timescaleFadeSpeed;
 vmCvar_t	cg_timescale;
-vmCvar_t	cg_smallFont;
-vmCvar_t	cg_bigFont;
 vmCvar_t	cg_noTaunt;
 vmCvar_t	cg_noProjectileTrail;
 vmCvar_t	cg_trueLightning;
@@ -194,6 +192,8 @@ vmCvar_t cg_railTrailTime;
 vmCvar_t cg_viewAdjustments;
 
 #ifdef MISSIONPACK
+vmCvar_t	cg_smallFont;
+vmCvar_t	cg_bigFont;
 vmCvar_t 	cg_redTeamName;
 vmCvar_t 	cg_blueTeamName;
 vmCvar_t	cg_currentSelectedPlayer;
@@ -286,6 +286,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
 	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
 #ifdef MISSIONPACK
+	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
+	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_currentSelectedPlayer, "cg_currentSelectedPlayer", "0", CVAR_ARCHIVE},
@@ -312,8 +314,6 @@ static cvarTable_t cvarTable[] = {
 	{ &pmove_msec, "pmove_msec", "8", 0},
 	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
-	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
-	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
 
 	{ &cg_muzzleFlash, "cg_muzzleFlash", "1", CVAR_ARCHIVE },

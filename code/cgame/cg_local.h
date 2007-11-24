@@ -1170,12 +1170,12 @@ extern	vmCvar_t		cg_timescaleFadeEnd;
 extern	vmCvar_t		cg_timescaleFadeSpeed;
 extern	vmCvar_t		cg_timescale;
 extern	vmCvar_t		cg_cameraMode;
-extern  vmCvar_t		cg_smallFont;
-extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
 extern	vmCvar_t		cg_noProjectileTrail;
 extern	vmCvar_t		cg_trueLightning;
 #ifdef MISSIONPACK
+extern  vmCvar_t		cg_smallFont;
+extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
 extern	vmCvar_t		cg_currentSelectedPlayer;
