@@ -728,6 +728,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define MAX_BOTS_TEXT		8192
 
 
+#ifdef MISSIONPACK
 // Kamikaze
 
 // 1st shockwave times
@@ -749,6 +750,8 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define KAMI_SHOCKWAVE_MAXRADIUS		1320
 #define KAMI_BOOMSPHERE_MAXRADIUS		720
 #define KAMI_SHOCKWAVE2_MAXRADIUS		704
+
+#endif
 
 
 #define VOICECHAT_GETFLAG			"getflag"				// command someone to get the flag
