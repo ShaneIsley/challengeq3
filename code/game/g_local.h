@@ -643,11 +643,10 @@ void Svcmd_GameMem_f( void );
 //
 // g_session.c
 //
-void G_ReadSessionData( gclient_t *client );
-void G_InitSessionData( gclient_t *client, char *userinfo );
-
-void G_InitWorldSession( void );
-void G_WriteSessionData( void );
+void G_ReadSessionData( gclient_t* client );
+void G_InitSessionData( gclient_t* client, const char* userinfo );
+void G_InitWorldSession();
+void G_WriteSessionData();
 
 //
 // g_arenas.c

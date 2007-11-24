@@ -33,18 +33,15 @@ and tournament restarts.
 =======================================================================
 */
 
-/*
-================
-G_WriteClientSessionData
 
-Called on game shutdown
-================
-*/
-void G_WriteClientSessionData( gclient_t *client ) {
-	const char	*s;
-	const char	*var;
+// called on game shutdown
 
-	s = va("%i %i %i %i %i %i %i", 
+static void G_WriteClientSessionData( gclient_t* client )
+{
+	const char* s;
+	const char* var;
+
+	s = va("%i %i %i %i %i %i %i",
 		client->sess.sessionTeam,
 		client->sess.spectatorTime,
 		client->sess.spectatorState,
@@ -59,16 +56,13 @@ void G_WriteClientSessionData( gclient_t *client ) {
 	trap_Cvar_Set( var, s );
 }
 
-/*
-================
-G_ReadSessionData
 
-Called on a reconnect
-================
-*/
-void G_ReadSessionData( gclient_t *client ) {
-	char	s[MAX_STRING_CHARS];
-	const char	*var;
+// called on a reconnect
+
+void G_ReadSessionData( gclient_t* client )
+{
+	char s[MAX_STRING_CHARS];
+	const char* var;
 
 	// bk001205 - format
 	int teamLeader;
@@ -95,18 +89,12 @@ void G_ReadSessionData( gclient_t *client ) {
 }
 
 
-/*
-================
-G_InitSessionData
+// called on a first-time connect
 
-Called on a first-time connect
-================
-*/
-void G_InitSessionData( gclient_t *client, char *userinfo ) {
-	clientSession_t	*sess;
-	const char		*value;
-
-	sess = &client->sess;
+void G_InitSessionData( gclient_t* client, const char* userinfo )
+{
+	clientSession_t* sess = &client->sess;
+	const char* value;
 
 	// initial team determination
 	if ( g_gametype.integer >= GT_TEAM ) {
@@ -115,7 +103,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 			BroadcastTeamChange( client, -1 );
 		} else {
 			// always spawn as spectator in team games
-			sess->sessionTeam = TEAM_SPECTATOR;	
+			sess->sessionTeam = TEAM_SPECTATOR;
 		}
 	} else {
 		value = Info_ValueForKey( userinfo, "team" );
@@ -153,34 +141,24 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 }
 
 
-/*
-==================
-G_InitWorldSession
-
-==================
-*/
-void G_InitWorldSession( void ) {
+void G_InitWorldSession()
+{
 	char	s[MAX_STRING_CHARS];
 	int			gt;
 
 	trap_Cvar_VariableStringBuffer( "session", s, sizeof(s) );
 	gt = atoi( s );
-	
-	// if the gametype changed since the last session, don't use any
-	// client sessions
+
+	// if the gametype changed since the last session, don't restore any client sessions
 	if ( g_gametype.integer != gt ) {
 		level.newSession = qtrue;
 		G_Printf( "Gametype changed, clearing session data.\n" );
 	}
 }
 
-/*
-==================
-G_WriteSessionData
 
-==================
-*/
-void G_WriteSessionData( void ) {
+void G_WriteSessionData()
+{
 	int		i;
 
 	trap_Cvar_Set( "session", va("%i", g_gametype.integer) );
