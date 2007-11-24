@@ -966,13 +966,13 @@ ifeq ($(ARCH),i386)
   Q3OBJ += \
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
-    $(B)/client/ftola.o \
+    $(B)/client/ftola.o
 endif
 ifeq ($(ARCH),x86)
   Q3OBJ += \
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
-    $(B)/client/ftola.o \
+    $(B)/client/ftola.o
 endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
