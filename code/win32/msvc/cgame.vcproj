@@ -170,7 +170,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../../../../baseq3/cgamex86.dll"
-				LinkIncremental="0"
+				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\cgame.def"
 				GenerateDebugInformation="true"
