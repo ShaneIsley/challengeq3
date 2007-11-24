@@ -526,8 +526,8 @@ gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
 //
 // g_mover.c
 //
-void G_RunMover( gentity_t *ent );
-void Touch_DoorTrigger( gentity_t *ent, gentity_t *other );
+void G_RunMover( gentity_t* ent );
+void Touch_DoorTrigger( gentity_t* ent, gentity_t* other );
 
 
 //
