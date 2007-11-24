@@ -23,11 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-qboolean	G_SpawnString( const char *key, const char *defaultString, char **out ) {
-	int		i;
+
+qboolean G_SpawnString( const char* key, const char* defaultString, const char** out )
+{
+	int i;
 
 	if ( !level.spawning ) {
-		*out = (char *)defaultString;
+		*out = defaultString;
 //		G_Error( "G_SpawnString() called while not spawning" );
 	}
 
@@ -38,37 +40,36 @@ qboolean	G_SpawnString( const char *key, const char *defaultString, char **out )
 		}
 	}
 
-	*out = (char *)defaultString;
+	*out = defaultString;
 	return qfalse;
 }
 
-qboolean	G_SpawnFloat( const char *key, const char *defaultString, float *out ) {
-	char		*s;
-	qboolean	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+qboolean G_SpawnFloat( const char* key, const char* defaultString, float* out )
+{
+	const char* s;
+	qboolean present = G_SpawnString( key, defaultString, &s );
 	*out = atof( s );
 	return present;
 }
 
-qboolean	G_SpawnInt( const char *key, const char *defaultString, int *out ) {
-	char		*s;
-	qboolean	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+qboolean G_SpawnInt( const char* key, const char* defaultString, int* out )
+{
+	const char* s;
+	qboolean present = G_SpawnString( key, defaultString, &s );
 	*out = atoi( s );
 	return present;
 }
 
-qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out ) {
-	char		*s;
-	qboolean	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+qboolean G_SpawnVector( const char* key, const char* defaultString, vec3_t out )
+{
+	const char* s;
+	qboolean present = G_SpawnString( key, defaultString, &s );
 	sscanf( s, "%f %f %f", &out[0], &out[1], &out[2] );
 	return present;
 }
-
 
 
 //
@@ -89,13 +90,13 @@ typedef enum {
 
 typedef struct
 {
-	char	*name;
+	const char* name;
 	int		ofs;
 	fieldtype_t	type;
 	int		flags;
 } field_t;
 
-field_t fields[] = {
+static const field_t fields[] = {
 	{"classname", FOFS(classname), F_LSTRING},
 	{"origin", FOFS(s.origin), F_VECTOR},
 	{"model", FOFS(model), F_LSTRING},
@@ -120,7 +121,7 @@ field_t fields[] = {
 
 
 typedef struct {
-	char	*name;
+	const char* name;
 	void	(*spawn)(gentity_t *ent);
 } spawn_t;
 
@@ -184,14 +185,15 @@ void SP_team_CTF_blueplayer( gentity_t *ent );
 void SP_team_CTF_redspawn( gentity_t *ent );
 void SP_team_CTF_bluespawn( gentity_t *ent );
 
+void SP_item_botroam( gentity_t *ent ) { }
+
 #ifdef MISSIONPACK
 void SP_team_blueobelisk( gentity_t *ent );
 void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
-void SP_item_botroam( gentity_t *ent ) { }
 
-spawn_t	spawns[] = {
+const spawn_t spawns[] = {
 	// info entities don't do anything at all, but provide positional
 	// information for things controlled by other processes
 	{"info_player_start", SP_info_player_start},
@@ -257,27 +259,24 @@ spawn_t	spawns[] = {
 	{"team_CTF_redspawn", SP_team_CTF_redspawn},
 	{"team_CTF_bluespawn", SP_team_CTF_bluespawn},
 
+	{"item_botroam", SP_item_botroam},
+
 #ifdef MISSIONPACK
 	{"team_redobelisk", SP_team_redobelisk},
 	{"team_blueobelisk", SP_team_blueobelisk},
 	{"team_neutralobelisk", SP_team_neutralobelisk},
 #endif
-	{"item_botroam", SP_item_botroam},
 
 	{NULL, 0}
 };
 
-/*
-===============
-G_CallSpawn
 
-Finds the spawn function for the entity and calls it,
-returning qfalse if not found
-===============
-*/
-qboolean G_CallSpawn( gentity_t *ent ) {
-	spawn_t	*s;
-	gitem_t	*item;
+// finds the spawn function for the entity and calls it, returning qfalse if not found
+
+static qboolean G_CallSpawn( gentity_t* ent )
+{
+	const spawn_t* s;
+	gitem_t* item;
 
 	if ( !ent->classname ) {
 		G_Printf ("G_CallSpawn: NULL classname\n");
@@ -300,22 +299,20 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-	G_Printf ("%s doesn't have a spawn function\n", ent->classname);
+
+	G_Printf( "%s doesn't have a spawn function\n", ent->classname );
 	return qfalse;
 }
 
-/*
-=============
-G_NewString
 
-Builds a copy of the string, translating \n to real linefeeds
-so message texts can be multi-line
-=============
-*/
-char *G_NewString( const char *string ) {
+// builds a copy of the string, translating \n to real linefeeds
+// so message texts can be multi-line
+
+static const char* G_NewString( const char* string )
+{
 	char	*newb, *new_p;
 	int		i,l;
-	
+
 	l = strlen(string) + 1;
 
 	newb = G_Alloc( l );
@@ -325,42 +322,27 @@ char *G_NewString( const char *string ) {
 	// turn \n into a real linefeed
 	for ( i=0 ; i< l ; i++ ) {
 		if (string[i] == '\\' && i < l-1) {
-			//Fixed issue with entity spawn keys containing a backslash (\) skipping the next letter after it.
-	         if (string[i+1] == 'n') { 
-	            *new_p++ = '\n'; 
-	            i++; 
-	         } else { 
-	            *new_p++ = '\\'; 
-	         }
-         	/*
-			i++;
-			if (string[i] == 'n') {
+			// fixed issue with entity spawn keys containing a backslash (\) skipping the next letter after it.
+			if (string[i+1] == 'n') {
 				*new_p++ = '\n';
+				i++; 
 			} else {
 				*new_p++ = '\\';
 			}
-			*/
 		} else {
 			*new_p++ = string[i];
 		}
 	}
-	
+
 	return newb;
 }
 
 
+// takes a key/value pair and sets the binary values in a gentity
 
-
-/*
-===============
-G_ParseField
-
-Takes a key/value pair and sets the binary values
-in a gentity
-===============
-*/
-void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
-	field_t	*f;
+static void G_ParseField( const char* key, const char* value, gentity_t* ent )
+{
+	const field_t* f;
 	byte	*b;
 	float	v;
 	vec3_t	vec;
@@ -372,7 +354,7 @@ void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
 
 			switch( f->type ) {
 			case F_LSTRING:
-				*(char **)(b+f->ofs) = G_NewString (value);
+				*(const char **)(b+f->ofs) = G_NewString(value);
 				break;
 			case F_VECTOR:
 				sscanf (value, "%f %f %f", &vec[0], &vec[1], &vec[2]);
@@ -402,21 +384,15 @@ void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
 }
 
 
+// spawn an entity and fill in all of the level fields from level.spawnVars[]
+// then call the class-specfic spawn function
 
-
-/*
-===================
-G_SpawnGEntityFromSpawnVars
-
-Spawn an entity and fill in all of the level fields from
-level.spawnVars[], then call the class specfic spawn function
-===================
-*/
-void G_SpawnGEntityFromSpawnVars( void ) {
+static void G_SpawnGEntityFromSpawnVars()
+{
+	static const char* gametypeNames[] = { "ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament" };
 	int			i;
 	gentity_t	*ent;
-	char		*s, *value, *gametypeName;
-	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
+	char		*s, *value;
 
 	// get the next free entity
 	ent = G_Spawn();
@@ -464,9 +440,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 	if( G_SpawnString( "gametype", NULL, &value ) ) {
 		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
-			gametypeName = gametypeNames[g_gametype.integer];
-
-			s = strstr( value, gametypeName );
+			s = strstr( value, gametypeNames[g_gametype.integer] );
 			if( !s ) {
 				G_FreeEntity( ent );
 				return;
@@ -485,15 +459,10 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 }
 
 
-
-/*
-====================
-G_AddSpawnVarToken
-====================
-*/
-char *G_AddSpawnVarToken( const char *string ) {
-	int		l;
-	char	*dest;
+static const char* G_AddSpawnVarToken( const char* string )
+{
+	int l;
+	char* dest;
 
 	l = strlen( string );
 	if ( level.numSpawnVarChars + l + 1 > MAX_SPAWN_VARS_CHARS ) {
@@ -508,19 +477,15 @@ char *G_AddSpawnVarToken( const char *string ) {
 	return dest;
 }
 
-/*
-====================
-G_ParseSpawnVars
 
-Parses a brace bounded set of key / value pairs out of the
-level's entity strings into level.spawnVars[]
+// parses a brace bounded set of key / value pairs out of the
+// level's entity strings into level.spawnVars[]
+// does not actually spawn an entity
 
-This does not actually spawn an entity.
-====================
-*/
-qboolean G_ParseSpawnVars( void ) {
-	char		keyname[MAX_TOKEN_CHARS];
-	char		com_token[MAX_TOKEN_CHARS];
+static qboolean G_ParseSpawnVars()
+{
+	char keyname[MAX_TOKEN_CHARS];
+	char com_token[MAX_TOKEN_CHARS];
 
 	level.numSpawnVars = 0;
 	level.numSpawnVarChars = 0;
@@ -565,7 +530,6 @@ qboolean G_ParseSpawnVars( void ) {
 }
 
 
-
 /*QUAKED worldspawn (0 0 0) ?
 
 Every map should have exactly one worldspawn.
@@ -573,8 +537,9 @@ Every map should have exactly one worldspawn.
 "gravity"	800 is default gravity
 "message"	Text to print during connection process
 */
-void SP_worldspawn( void ) {
-	char	*s;
+static void SP_worldspawn()
+{
+	const char* s;
 
 	G_SpawnString( "classname", "", &s );
 	if ( Q_stricmp( s, "worldspawn" ) ) {
@@ -597,11 +562,13 @@ void SP_worldspawn( void ) {
 	G_SpawnString( "gravity", "800", &s );
 	trap_Cvar_Set( "g_gravity", s );
 
+#ifdef MISSIONPACK
 	G_SpawnString( "enableDust", "0", &s );
 	trap_Cvar_Set( "g_enableDust", s );
 
 	G_SpawnString( "enableBreath", "0", &s );
 	trap_Cvar_Set( "g_enableBreath", s );
+#endif
 
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
 	g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
@@ -620,14 +587,10 @@ void SP_worldspawn( void ) {
 }
 
 
-/*
-==============
-G_SpawnEntitiesFromString
+// parses textual entity definitions out of an entstring and spawns gentities
 
-Parses textual entity definitions out of an entstring and spawns gentities.
-==============
-*/
-void G_SpawnEntitiesFromString( void ) {
+void G_SpawnEntitiesFromString()
+{
 	// allow calls to G_Spawn*()
 	level.spawning = qtrue;
 	level.numSpawnVars = 0;

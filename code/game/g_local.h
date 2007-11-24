@@ -387,7 +387,7 @@ typedef struct {
 	// spawn variables
 	qboolean	spawning;				// the G_Spawn*() functions are valid
 	int			numSpawnVars;
-	char		*spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
+	const char* spawnVars[MAX_SPAWN_VARS][2];	// key / value pairs
 	int			numSpawnVarChars;
 	char		spawnVarChars[MAX_SPAWN_VARS_CHARS];
 
@@ -417,13 +417,12 @@ typedef struct {
 //
 // g_spawn.c
 //
-qboolean	G_SpawnString( const char *key, const char *defaultString, char **out );
 // spawn string returns a temporary reference, you must CopyString() if you want to keep it
-qboolean	G_SpawnFloat( const char *key, const char *defaultString, float *out );
-qboolean	G_SpawnInt( const char *key, const char *defaultString, int *out );
-qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out );
-void		G_SpawnEntitiesFromString( void );
-char *G_NewString( const char *string );
+qboolean	G_SpawnString( const char* key, const char* defaultString, const char** out );
+qboolean	G_SpawnFloat( const char* key, const char* defaultString, float* out );
+qboolean	G_SpawnInt( const char* key, const char* defaultString, int* out );
+qboolean	G_SpawnVector( const char* key, const char* defaultString, vec3_t out );
+void		G_SpawnEntitiesFromString();
 
 //
 // g_cmds.c
