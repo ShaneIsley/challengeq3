@@ -307,139 +307,82 @@ void Svcmd_RemoveIP_f (void)
 	G_Printf ( "Didn't find %s.\n", str );
 }
 
-/*
-===================
-Svcmd_EntityList_f
-===================
-*/
-void	Svcmd_EntityList_f (void) {
-	int			e;
-	gentity_t		*check;
 
-	check = g_entities+1;
-	for (e = 1; e < level.num_entities ; e++, check++) {
-		if ( !check->inuse ) {
-			continue;
-		}
-		G_Printf("%3i:", e);
-		switch ( check->s.eType ) {
-		case ET_GENERAL:
-			G_Printf("ET_GENERAL          ");
-			break;
-		case ET_PLAYER:
-			G_Printf("ET_PLAYER           ");
-			break;
-		case ET_ITEM:
-			G_Printf("ET_ITEM             ");
-			break;
-		case ET_MISSILE:
-			G_Printf("ET_MISSILE          ");
-			break;
-		case ET_MOVER:
-			G_Printf("ET_MOVER            ");
-			break;
-		case ET_BEAM:
-			G_Printf("ET_BEAM             ");
-			break;
-		case ET_PORTAL:
-			G_Printf("ET_PORTAL           ");
-			break;
-		case ET_SPEAKER:
-			G_Printf("ET_SPEAKER          ");
-			break;
-		case ET_PUSH_TRIGGER:
-			G_Printf("ET_PUSH_TRIGGER     ");
-			break;
-		case ET_TELEPORT_TRIGGER:
-			G_Printf("ET_TELEPORT_TRIGGER ");
-			break;
-		case ET_INVISIBLE:
-			G_Printf("ET_INVISIBLE        ");
-			break;
-		case ET_GRAPPLE:
-			G_Printf("ET_GRAPPLE          ");
-			break;
-		default:
-			G_Printf("%3i                 ", check->s.eType);
-			break;
-		}
+// forceteam <player> <team>
 
-		if ( check->classname ) {
-			G_Printf("%s", check->classname);
-		}
-		G_Printf("\n");
-	}
-}
-
-gclient_t	*ClientForString( const char *s ) {
-	gclient_t	*cl;
-	int			i;
-	int			idnum;
-
-	// numeric values are just slot numbers
-	if ( s[0] >= '0' && s[0] <= '9' ) {
-		idnum = atoi( s );
-		if ( idnum < 0 || idnum >= level.maxclients ) {
-			Com_Printf( "Bad client slot: %i\n", idnum );
-			return NULL;
-		}
-
-		cl = &level.clients[idnum];
-		if ( cl->pers.connected == CON_DISCONNECTED ) {
-			G_Printf( "Client %i is not connected\n", idnum );
-			return NULL;
-		}
-		return cl;
-	}
-
-	// check for a name match
-	for ( i=0 ; i < level.maxclients ; i++ ) {
-		cl = &level.clients[i];
-		if ( cl->pers.connected == CON_DISCONNECTED ) {
-			continue;
-		}
-		if ( !Q_stricmp( cl->pers.netname, s ) ) {
-			return cl;
-		}
-	}
-
-	G_Printf( "User %s is not on the server\n", s );
-
-	return NULL;
-}
-
-/*
-===================
-Svcmd_ForceTeam_f
-
-forceteam <player> <team>
-===================
-*/
-void	Svcmd_ForceTeam_f( void ) {
-	gclient_t	*cl;
-	char		str[MAX_TOKEN_CHARS];
+static void Svcmd_ForceTeam_f()
+{
+	int clientnum;
+	char s[MAX_TOKEN_CHARS];
 
 	// find the player
-	trap_Argv( 1, str, sizeof( str ) );
-	cl = ClientForString( str );
-	if ( !cl ) {
-		return;
-	}
+	trap_Argv( 1, s, sizeof( s ) );
+	clientnum = ClientNumberFromString( NULL, s );
 
 	// set the team
-	trap_Argv( 2, str, sizeof( str ) );
-	SetTeam( &g_entities[cl - level.clients], str );
+	trap_Argv( 2, s, sizeof( s ) );
+	SetTeam( &g_entities[clientnum], s );
 }
 
 
-/*
-=================
-ConsoleCommand
+static const char* azEntityTypes[ET_NUM_ETYPES] = {
+	"ET_GENERAL          ",
+	"ET_PLAYER           ",
+	"ET_ITEM             ",
+	"ET_MISSILE          ",
+	"ET_MOVER            ",
+	"ET_BEAM             ",
+	"ET_PORTAL           ",
+	"ET_SPEAKER          ",
+	"ET_PUSH_TRIGGER     ",
+	"ET_TELEPORT_TRIGGER ",
+	"ET_INVISIBLE        ",
+	"ET_GRAPPLE          ",
+	"ET_TEAM             ",
+	"ET_EVENT            ",
+};
 
-=================
-*/
-qboolean	ConsoleCommand( void ) {
-	char	cmd[MAX_TOKEN_CHARS];
+static void Svcmd_EntityList_f()
+{
+	int e, count[ET_NUM_ETYPES], linked[ET_NUM_ETYPES], toclient[ET_NUM_ETYPES];
+	const gentity_t* check = g_entities;
+
+	for (e = 0; e < ET_NUM_ETYPES; e++) {
+		count[e] = 0;
+		linked[e] = 0;
+		toclient[e] = 0;
+	}
+
+	for (e = 0; e < level.num_entities; e++, check++) {
+		if (!check->inuse)
+			continue;
+
+		if ((check->s.eType >= 0) && (check->s.eType < ET_NUM_ETYPES)) {
+			G_Printf("%3i:%c%c:%s", e, check->r.linked ? 'L' : ' ', !(check->r.svFlags & SVF_NOCLIENT) ? 'C' : ' ', azEntityTypes[check->s.eType]);
+			if (check->r.linked)
+				linked[check->s.eType]++;
+			if (!(check->r.svFlags & SVF_NOCLIENT))
+				toclient[check->s.eType]++;
+			count[check->s.eType]++;
+		} else {
+			G_Printf("^1%3i:ET_UNKNOWN %i", e, check->s.eType);
+		}
+
+		if (check->classname)
+			G_Printf("%s", check->classname);
+
+		G_Printf("\n");
+	}
+
+	G_Printf("\nTotals:\n");
+	for (e = 0; e < ET_NUM_ETYPES; e++)
+		G_Printf("%s: %3i   (%3i linked, %3i client)\n", azEntityTypes[e], count[e], linked[e], toclient[e]);
+}
+
+
+qboolean ConsoleCommand()
+{
+	char cmd[MAX_TOKEN_CHARS];
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 

@@ -427,6 +427,7 @@ void		G_SpawnEntitiesFromString();
 //
 // g_cmds.c
 //
+int ClientNumberFromString( const gentity_t* ent, const char* s );
 void Cmd_Score_f( const gentity_t* ent );
 void StopFollowing( gentity_t* ent );
 void BroadcastTeamChange( const gclient_t* client, int oldTeam );
@@ -454,8 +455,8 @@ void SaveRegisteredItems();
 //
 // g_utils.c
 //
-int G_ModelIndex( char *name );
-int		G_SoundIndex( char *name );
+int G_ModelIndex( const char* name );
+int G_SoundIndex( const char* name );
 void	G_TeamCommand( team_t team, const char* cmd );
 void	G_KillBox (gentity_t *ent);
 gentity_t* G_Find( const gentity_t* from, int fieldofs, const char* match );

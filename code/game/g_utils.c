@@ -33,13 +33,9 @@ model / sound configstring indexes
 =========================================================================
 */
 
-/*
-================
-G_FindConfigstringIndex
 
-================
-*/
-int G_FindConfigstringIndex( char *name, int start, int max, qboolean create ) {
+static int G_FindConfigstringIndex( const char* name, int start, int max, qboolean create )
+{
 	int		i;
 	char	s[MAX_STRING_CHARS];
 
@@ -71,15 +67,18 @@ int G_FindConfigstringIndex( char *name, int start, int max, qboolean create ) {
 }
 
 
-int G_ModelIndex( char *name ) {
-	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, qtrue);
+int G_ModelIndex( const char* name )
+{
+	return G_FindConfigstringIndex( name, CS_MODELS, MAX_MODELS, qtrue );
 }
 
-int G_SoundIndex( char *name ) {
-	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
+int G_SoundIndex( const char* name )
+{
+	return G_FindConfigstringIndex( name, CS_SOUNDS, MAX_SOUNDS, qtrue );
 }
 
-//=====================================================================
+
+///////////////////////////////////////////////////////////////
 
 
 // broadcasts a command to only a specific team
@@ -91,7 +90,7 @@ void G_TeamCommand( team_t team, const char* cmd )
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 			if ( level.clients[i].sess.sessionTeam == team ) {
-				trap_SendServerCommand( i, va("%s", cmd ));
+				trap_SendServerCommand( i, cmd );
 			}
 		}
 	}

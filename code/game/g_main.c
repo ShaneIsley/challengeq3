@@ -1376,28 +1376,16 @@ static void CheckVote()
 // yet more crap that belongs in g_team
 
 
-static void PrintTeam( int team, const char* message )
-{
-	int i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam != team)
-			continue;
-		trap_SendServerCommand( i, message );
-	}
-}
-
-
 void SetLeader(int team, int client)
 {
 	int i;
 
 	if ( level.clients[client].pers.connected == CON_DISCONNECTED ) {
-		PrintTeam(team, va("print \"%s is not connected\n\"", level.clients[client].pers.netname) );
+		G_TeamCommand( team, va("print \"%s is not connected\n\"", level.clients[client].pers.netname) );
 		return;
 	}
 	if (level.clients[client].sess.sessionTeam != team) {
-		PrintTeam(team, va("print \"%s is not on the team anymore\n\"", level.clients[client].pers.netname) );
+		G_TeamCommand( team, va("print \"%s is not on the team anymore\n\"", level.clients[client].pers.netname) );
 		return;
 	}
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
@@ -1408,9 +1396,10 @@ void SetLeader(int team, int client)
 			ClientUserinfoChanged(i);
 		}
 	}
+
 	level.clients[client].sess.teamLeader = qtrue;
 	ClientUserinfoChanged( client );
-	PrintTeam(team, va("print \"%s is the new team leader\n\"", level.clients[client].pers.netname) );
+	G_TeamCommand( team, va("print \"%s is the new team leader\n\"", level.clients[client].pers.netname) );
 }
 
 

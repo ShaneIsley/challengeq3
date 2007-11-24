@@ -152,12 +152,17 @@ static void SanitizeString( const char* in, char* out )
 }
 
 
+#define PrCli(x)   \
+	if (ent) trap_SendServerCommand((ent - g_entities), x);   \
+	else G_Printf(x)
+
+
 // returns a player number for either a number or name string
 // returns -1 if invalid
 
-static int ClientNumberFromString( const gentity_t* to, const char* s )
+int ClientNumberFromString( const gentity_t* ent, const char* s )
 {
-	gclient_t	*cl;
+	const gclient_t* cl;
 	int			idnum;
 	char		s2[MAX_STRING_CHARS];
 	char		n2[MAX_STRING_CHARS];
@@ -166,13 +171,13 @@ static int ClientNumberFromString( const gentity_t* to, const char* s )
 	if (s[0] >= '0' && s[0] <= '9') {
 		idnum = atoi( s );
 		if ( idnum < 0 || idnum >= level.maxclients ) {
-			trap_SendServerCommand( to-g_entities, va("print \"Bad client slot: %i\n\"", idnum));
+			PrCli( va("print \"Bad client slot: %i\n\"", idnum) );
 			return -1;
 		}
 
 		cl = &level.clients[idnum];
 		if ( cl->pers.connected == CON_DISCONNECTED ) {
-			trap_SendServerCommand( to-g_entities, va("print \"Client %i is not active\n\"", idnum));
+			PrCli( va("print \"Client %i is not active\n\"", idnum) );
 			return -1;
 		}
 		return idnum;
@@ -190,7 +195,7 @@ static int ClientNumberFromString( const gentity_t* to, const char* s )
 		}
 	}
 
-	trap_SendServerCommand( to-g_entities, va("print \"User %s is not on the server\n\"", s));
+	PrCli( va("print \"User %s is not on the server\n\"", s) );
 	return -1;
 }
 

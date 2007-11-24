@@ -390,9 +390,9 @@ static void G_ParseField( const char* key, const char* value, gentity_t* ent )
 static void G_SpawnGEntityFromSpawnVars()
 {
 	static const char* gametypeNames[] = { "ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament" };
-	int			i;
-	gentity_t	*ent;
-	char		*s, *value;
+	int i;
+	gentity_t* ent;
+	const char *s, *value;
 
 	// get the next free entity
 	ent = G_Spawn();

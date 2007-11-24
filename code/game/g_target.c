@@ -22,27 +22,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 #include "g_local.h"
 
-//==========================================================
 
 /*QUAKED target_give (1 0 0) (-8 -8 -8) (8 8 8)
 Gives the activator all the items pointed to.
 */
-void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
-	gentity_t	*t;
+static void Use_Target_Give( gentity_t* ent, gentity_t* other, gentity_t* activator )
+{
+	gentity_t* t = NULL;
 
-	if ( !activator->client ) {
+	if (!activator->client || !ent->target)
 		return;
-	}
 
-	if ( !ent->target ) {
-		return;
-	}
-
-	t = NULL;
-	while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
-		if ( !t->item ) {
+	while ((t = G_Find(t, FOFS(targetname), ent->target)) != NULL) {
+		if ( !t->item )
 			continue;
-		}
 		Touch_Item( t, activator );
 
 		// make sure it isn't going to respawn or show any events
@@ -51,12 +44,15 @@ void Use_Target_Give( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	}
 }
 
-void SP_target_give( gentity_t *ent ) {
+
+void SP_target_give( gentity_t *ent )
+{
 	ent->use = Use_Target_Give;
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 /*QUAKED target_remove_powerups (1 0 0) (-8 -8 -8) (8 8 8)
 takes away all the activators powerups.
@@ -83,7 +79,8 @@ void SP_target_remove_powerups( gentity_t *ent ) {
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 /*QUAKED target_delay (1 0 0) (-8 -8 -8) (8 8 8)
 "wait" seconds to pause before firing targets.
@@ -112,7 +109,8 @@ void SP_target_delay( gentity_t *ent ) {
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 /*QUAKED target_score (1 0 0) (-8 -8 -8) (8 8 8)
 "count" number of points to add, default 1
@@ -131,7 +129,8 @@ void SP_target_score( gentity_t *ent ) {
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 /*QUAKED target_print (1 0 0) (-8 -8 -8) (8 8 8) redteam blueteam private
 "message"	text to print
@@ -161,7 +160,7 @@ void SP_target_print( gentity_t *ent ) {
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
 
 
 /*QUAKED target_speaker (1 0 0) (-8 -8 -8) (8 8 8) looped-on looped-off global activator
@@ -193,9 +192,10 @@ void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator)
 	}
 }
 
-void SP_target_speaker( gentity_t *ent ) {
+void SP_target_speaker( gentity_t *ent )
+{
 	char	buffer[MAX_QPATH];
-	char	*s;
+	const char* s;
 
 	G_SpawnFloat( "wait", "0", &ent->wait );
 	G_SpawnFloat( "random", "0", &ent->random );
@@ -204,7 +204,7 @@ void SP_target_speaker( gentity_t *ent ) {
 		G_Error( "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
 	}
 
-	// force all client reletive sounds to be "activator" speakers that
+	// force all client relative sounds to be "activator" speakers that
 	// play on the entity that activates it
 	if ( s[0] == '*' ) {
 		ent->spawnflags |= 8;
@@ -243,8 +243,8 @@ void SP_target_speaker( gentity_t *ent ) {
 }
 
 
+///////////////////////////////////////////////////////////////
 
-//==========================================================
 
 /*QUAKED target_laser (0 .5 .8) (-8 -8 -8) (8 8 8) START_ON
 When triggered, fires a laser.  You can either set a target or a direction.
@@ -338,7 +338,8 @@ void SP_target_laser (gentity_t *self)
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	gentity_t	*dest;
@@ -364,7 +365,8 @@ void SP_target_teleporter( gentity_t *self ) {
 	self->use = target_teleporter_use;
 }
 
-//==========================================================
+
+///////////////////////////////////////////////////////////////
 
 
 /*QUAKED target_relay (.5 .5 .5) (-8 -8 -8) (8 8 8) RED_ONLY BLUE_ONLY RANDOM
@@ -398,7 +400,8 @@ void SP_target_relay (gentity_t *self) {
 }
 
 
-//==========================================================
+///////////////////////////////////////////////////////////////
+
 
 /*QUAKED target_kill (.5 .5 .5) (-8 -8 -8) (8 8 8)
 Kills the activator.
