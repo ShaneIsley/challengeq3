@@ -464,12 +464,11 @@ gentity_t *G_PickTarget (char *targetname);
 void	G_UseTargets( gentity_t* ent, gentity_t* activator );
 void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
 
-void	G_InitGentity( gentity_t *e );
+void	G_InitGentity( gentity_t* e );
 gentity_t* G_Spawn();
 gentity_t* G_TempEntity( const vec3_t origin, int event );
 void	G_Sound( gentity_t *ent, int channel, int soundIndex );
-void	G_FreeEntity( gentity_t *e );
-qboolean	G_EntitiesFree( void );
+void	G_FreeEntity( gentity_t* e );
 
 void	G_TouchSolids (gentity_t *ent);
 
@@ -630,7 +629,7 @@ void G_RunClient( gentity_t *ent );
 // g_team.c
 //
 qboolean OnSameTeam( const gentity_t* ent1, const gentity_t* ent2 );
-void Team_CheckDroppedItem( gentity_t *dropped );
+void Team_CheckDroppedItem( const gentity_t* dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 
 //

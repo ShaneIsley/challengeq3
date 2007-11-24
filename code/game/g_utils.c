@@ -306,7 +306,8 @@ float vectoyaw( const vec3_t vec ) {
 }
 
 
-void G_InitGentity( gentity_t *e ) {
+void G_InitGentity( gentity_t* e )
+{
 	e->inuse = qtrue;
 	e->classname = "noclass";
 	e->s.number = e - g_entities;
@@ -328,11 +329,11 @@ instead of being removed and recreated, which can cause interpolated
 angles and bad trails.
 =================
 */
-gentity_t *G_Spawn( void ) {
+gentity_t* G_Spawn()
+{
 	int			i, force;
-	gentity_t	*e;
+	gentity_t* e = NULL;
 
-	e = NULL;	// shut up warning
 	i = 0;		// shut up warning
 	for ( force = 0 ; force < 2 ; force++ ) {
 		// if we go through all entities and can't find one to free,
@@ -375,26 +376,6 @@ gentity_t *G_Spawn( void ) {
 	return e;
 }
 
-/*
-=================
-G_EntitiesFree
-=================
-*/
-qboolean G_EntitiesFree( void ) {
-	int			i;
-	gentity_t	*e;
-
-	e = &g_entities[MAX_CLIENTS];
-	for ( i = MAX_CLIENTS; i < level.num_entities; i++, e++) {
-		if ( e->inuse ) {
-			continue;
-		}
-		// slot available
-		return qtrue;
-	}
-	return qfalse;
-}
-
 
 /*
 =================
@@ -403,17 +384,18 @@ G_FreeEntity
 Marks the entity as free
 =================
 */
-void G_FreeEntity( gentity_t *ed ) {
-	trap_UnlinkEntity (ed);		// unlink from world
+void G_FreeEntity( gentity_t* e )
+{
+	trap_UnlinkEntity(e);
 
-	if ( ed->neverFree ) {
+	if ( e->neverFree ) {
 		return;
 	}
 
-	memset (ed, 0, sizeof(*ed));
-	ed->classname = "freed";
-	ed->freetime = level.time;
-	ed->inuse = qfalse;
+	memset( e, 0, sizeof(*e) );
+	e->classname = "freed";
+	e->freetime = level.time;
+	e->inuse = qfalse;
 }
 
 
