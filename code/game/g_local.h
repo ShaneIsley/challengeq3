@@ -560,13 +560,13 @@ void SetClientViewAngle( gentity_t* ent, const vec3_t angle );
 gentity_t* SelectSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles );
 void CopyToBodyQue( gentity_t* ent );
 void RespawnPlayer( gentity_t* ent );
-void BeginIntermission (void);
+void BeginIntermission();
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
 void InitBodyQue();
 void ClientSpawn( gentity_t *ent );
 void AddScore( gentity_t* ent, const vec3_t origin, int score );
-void CalculateRanks( void );
+void CalculateRanks();
 qboolean SpotWouldTelefrag( const gentity_t* spot );
 
 //
@@ -587,8 +587,8 @@ void G_StartKamikaze( gentity_t *ent );
 //
 // p_hud.c
 //
-void MoveClientToIntermission( gentity_t* client );
-void DeathmatchScoreboardMessage( const gentity_t* client );
+void MoveClientToIntermission( gentity_t* ent );
+void DeathmatchScoreboardMessage( const gentity_t* ent );
 
 //
 // g_cmds.c
@@ -603,12 +603,10 @@ const char* ConcatArgs( int start );
 //
 // g_main.c
 //
-void FindIntermissionPoint();
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
-void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
 
@@ -740,7 +738,6 @@ extern	vmCvar_t	g_obeliskRespawnDelay;
 extern	vmCvar_t	g_cubeTimeout;
 extern	vmCvar_t	g_redteam;
 extern	vmCvar_t	g_blueteam;
-extern	vmCvar_t	g_rankings;
 extern	vmCvar_t	g_enableDust;
 extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;

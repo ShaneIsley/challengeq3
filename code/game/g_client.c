@@ -283,11 +283,8 @@ static gentity_t* SelectInitialSpawnPoint( vec3_t origin, vec3_t angles )
 
 static gentity_t* SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles )
 {
-	FindIntermissionPoint();
-
 	VectorCopy( level.intermission_origin, origin );
 	VectorCopy( level.intermission_angle, angles );
-
 	return NULL;
 }
 
