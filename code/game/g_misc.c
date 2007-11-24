@@ -76,12 +76,16 @@ TELEPORTERS
 =================================================================================
 */
 
-void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
-	gentity_t	*tent;
+#define TELE_EXIT_SPEED 400
 
+
+void TeleportPlayer( gentity_t* player, const vec3_t origin, const vec3_t angles )
+{
 	// use temp events at source and destination to prevent the effect
 	// from getting dropped by a second player event
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		gentity_t* tent;
+
 		tent = G_TempEntity( player->client->ps.origin, EV_PLAYER_TELEPORT_OUT );
 		tent->s.clientNum = player->s.clientNum;
 
@@ -90,14 +94,14 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	}
 
 	// unlink to make sure it can't possibly interfere with G_KillBox
-	trap_UnlinkEntity (player);
+	trap_UnlinkEntity(player);
 
-	VectorCopy ( origin, player->client->ps.origin );
+	VectorCopy( origin, player->client->ps.origin );
 	player->client->ps.origin[2] += 1;
 
 	// spit the player out
 	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
-	VectorScale( player->client->ps.velocity, 400, player->client->ps.velocity );
+	VectorScale( player->client->ps.velocity, TELE_EXIT_SPEED, player->client->ps.velocity );
 	player->client->ps.pm_time = 160;		// hold time
 	player->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 
@@ -119,7 +123,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	VectorCopy( player->client->ps.origin, player->r.currentOrigin );
 
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		trap_LinkEntity (player);
+		trap_LinkEntity(player);
 	}
 }
 
@@ -162,7 +166,7 @@ void locateCamera( gentity_t *ent ) {
 
 	owner = G_PickTarget( ent->target );
 	if ( !owner ) {
-		G_Printf( "Couldn't find target for misc_partal_surface\n" );
+		G_Printf( "Couldn't find target for misc_portal_surface\n" );
 		G_FreeEntity( ent );
 		return;
 	}

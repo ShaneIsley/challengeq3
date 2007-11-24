@@ -511,12 +511,12 @@ void TossClientCubes( gentity_t *self );
 //
 void G_RunMissile( gentity_t *ent );
 
-gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
-gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
-gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t aimdir);
-gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir);
-gentity_t *fire_bfg (gentity_t *self, vec3_t start, vec3_t dir);
-gentity_t *fire_grapple (gentity_t *self, vec3_t start, vec3_t dir);
+gentity_t* fire_grenade( gentity_t* ent, const vec3_t start, vec3_t dir );
+gentity_t* fire_rocket( gentity_t* ent, const vec3_t start, vec3_t dir );
+gentity_t* fire_plasma( gentity_t* ent, const vec3_t start, vec3_t dir );
+gentity_t* fire_bfg( gentity_t* ent, const vec3_t start, vec3_t dir );
+gentity_t* fire_grapple( gentity_t* ent, const vec3_t start, vec3_t dir );
+
 #ifdef MISSIONPACK
 gentity_t *fire_nail( gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up );
 gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
@@ -533,7 +533,7 @@ void Touch_DoorTrigger( gentity_t *ent, gentity_t *other );
 //
 // g_misc.c
 //
-void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
+void TeleportPlayer( gentity_t* player, const vec3_t origin, const vec3_t angles );
 #ifdef MISSIONPACK
 void DropPortalSource( gentity_t *ent );
 void DropPortalDestination( gentity_t *ent );
