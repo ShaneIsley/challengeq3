@@ -967,14 +967,12 @@ ifeq ($(ARCH),i386)
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
     $(B)/client/ftola.o \
-    $(B)/client/snapvectora.o
 endif
 ifeq ($(ARCH),x86)
   Q3OBJ += \
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
     $(B)/client/ftola.o \
-    $(B)/client/snapvectora.o
 endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
@@ -1215,7 +1213,6 @@ $(B)/client/sdl_snd.o : $(UDIR)/sdl_snd.cpp; $(DO_CC)
 $(B)/client/snd_mixa.o : $(UDIR)/snd_mixa.s; $(DO_AS)
 $(B)/client/matha.o : $(UDIR)/matha.s; $(DO_AS)
 $(B)/client/ftola.o : $(UDIR)/ftola.s; $(DO_AS)
-$(B)/client/snapvectora.o : $(UDIR)/snapvectora.s; $(DO_AS)
 
 $(B)/client/win_gamma.o : $(W32DIR)/win_gamma.cpp; $(DO_CC)
 $(B)/client/win_glimp.o : $(W32DIR)/win_glimp.cpp; $(DO_CC)
@@ -1316,7 +1313,6 @@ Q3DOBJ = \
 ifeq ($(ARCH),i386)
   Q3DOBJ += \
       $(B)/ded/ftola.o \
-      $(B)/ded/snapvectora.o \
       $(B)/ded/matha.o
 endif
 
@@ -1405,7 +1401,6 @@ $(B)/ded/vm.o : $(CMDIR)/vm.cpp; $(DO_DED_CC)
 $(B)/ded/vm_interpreted.o : $(CMDIR)/vm_interpreted.cpp; $(DO_DED_CC)
 
 $(B)/ded/ftola.o : $(UDIR)/ftola.s; $(DO_AS)
-$(B)/ded/snapvectora.o : $(UDIR)/snapvectora.s; $(DO_AS)
 $(B)/ded/matha.o : $(UDIR)/matha.s; $(DO_AS)
 
 $(B)/ded/vm_x86.o : $(CMDIR)/vm_x86.cpp; $(DO_DED_CC)
