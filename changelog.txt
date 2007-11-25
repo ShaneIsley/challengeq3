@@ -12,6 +12,8 @@ demo filename is YYYY_MM_DD-HH_MM_SS
 
 fixed demos to be MAX_OSPATH instead of MAX_QPATH, ie 256 chars now
 
+renamed cl_mouseAccel to m_accel
+
 removed support for BMP and PCX
 
 removed fs_cdpath, fs_copyfiles, touchfile, fs_restrict

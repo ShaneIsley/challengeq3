@@ -48,9 +48,9 @@ cvar_t	*cl_forceavidemo;
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;
 
-cvar_t	*cl_mouseAccel;
 cvar_t	*cl_showMouseRate;
 
+cvar_t	*m_accel;
 cvar_t	*m_pitch;
 cvar_t	*m_yaw;
 cvar_t	*m_forward;
@@ -3066,11 +3066,6 @@ void CL_Init()
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
-	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
-	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
-	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
-
-	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 #if defined(USE_CURL)
@@ -3090,6 +3085,8 @@ void CL_Init()
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
+	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
+	m_accel = Cvar_Get ("m_accel", "0", CVAR_ARCHIVE);
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
 	m_yaw = Cvar_Get ("m_yaw", "0.022", CVAR_ARCHIVE);
 	m_forward = Cvar_Get ("m_forward", "0.25", CVAR_ARCHIVE);
@@ -3100,6 +3097,8 @@ void CL_Init()
 #else
 	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
 #endif
+	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
+	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
 

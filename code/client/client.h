@@ -353,9 +353,9 @@ extern	cvar_t	*cl_anglespeedkey;
 extern	cvar_t	*cl_sensitivity;
 extern	cvar_t	*cl_freelook;
 
-extern	cvar_t	*cl_mouseAccel;
 extern	cvar_t	*cl_showMouseRate;
 
+extern	cvar_t	*m_accel;
 extern	cvar_t	*m_pitch;
 extern	cvar_t	*m_yaw;
 extern	cvar_t	*m_forward;
