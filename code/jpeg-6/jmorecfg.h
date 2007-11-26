@@ -149,7 +149,7 @@ typedef unsigned short UINT16;
 typedef unsigned int UINT16;
 #endif /* HAVE_UNSIGNED_SHORT */
 
-#if !defined(__cplusplus)
+#ifdef __GNUC__
 #ifndef XMD_H			/* X11/xmd.h correctly defines INT16 */
 typedef short INT16;
 typedef long INT32;

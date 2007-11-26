@@ -97,7 +97,7 @@ USE_SDL=1
 endif
 
 ifndef USE_OPENAL
-USE_OPENAL=1
+USE_OPENAL=0
 endif
 
 ifndef USE_OPENAL_DLOPEN
@@ -120,8 +120,8 @@ ifndef USE_CODEC_VORBIS
 USE_CODEC_VORBIS=0
 endif
 
-ifndef USE_LOCAL_HEADERS
-USE_LOCAL_HEADERS=1
+ifndef USE_OPENAL_LOCALH
+USE_OPENAL_LOCALH=1
 endif
 
 #############################################################################
@@ -730,8 +730,8 @@ ifdef DEFAULT_BASEDIR
   BASE_CFLAGS += -DDEFAULT_BASEDIR=\\\"$(DEFAULT_BASEDIR)\\\"
 endif
 
-ifeq ($(USE_LOCAL_HEADERS),1)
-  BASE_CFLAGS += -DUSE_LOCAL_HEADERS=1
+ifeq ($(USE_OPENAL_LOCALH),1)
+  BASE_CFLAGS += -DUSE_OPENAL_LOCALH=1
 endif
 
 ifeq ($(GENERATE_DEPENDENCIES),1)
@@ -1129,41 +1129,41 @@ $(B)/client/l_precomp.o : $(BLIBDIR)/l_precomp.cpp; $(DO_BOT_CC)
 $(B)/client/l_script.o : $(BLIBDIR)/l_script.cpp; $(DO_BOT_CC)
 $(B)/client/l_struct.o : $(BLIBDIR)/l_struct.cpp; $(DO_BOT_CC)
 
-$(B)/client/jcapimin.o : $(JPDIR)/jcapimin.cpp; $(DO_CC)
-$(B)/client/jchuff.o : $(JPDIR)/jchuff.cpp; $(DO_CC)
-$(B)/client/jcinit.o : $(JPDIR)/jcinit.cpp; $(DO_CC)
-$(B)/client/jccoefct.o : $(JPDIR)/jccoefct.cpp; $(DO_CC)
-$(B)/client/jccolor.o : $(JPDIR)/jccolor.cpp; $(DO_CC)
-$(B)/client/jfdctflt.o : $(JPDIR)/jfdctflt.cpp; $(DO_CC)
-$(B)/client/jcdctmgr.o : $(JPDIR)/jcdctmgr.cpp; $(DO_CC)
-$(B)/client/jcmainct.o : $(JPDIR)/jcmainct.cpp; $(DO_CC)
-$(B)/client/jcmarker.o : $(JPDIR)/jcmarker.cpp; $(DO_CC)
-$(B)/client/jcmaster.o : $(JPDIR)/jcmaster.cpp; $(DO_CC)
-$(B)/client/jcomapi.o : $(JPDIR)/jcomapi.cpp; $(DO_CC)
-$(B)/client/jcparam.o : $(JPDIR)/jcparam.cpp;  $(DO_CC)
-$(B)/client/jcprepct.o : $(JPDIR)/jcprepct.cpp; $(DO_CC)
-$(B)/client/jcsample.o : $(JPDIR)/jcsample.cpp; $(DO_CC)
+$(B)/client/jcapimin.o : $(JPDIR)/jcapimin.c; $(DO_CC)
+$(B)/client/jchuff.o : $(JPDIR)/jchuff.c; $(DO_CC)
+$(B)/client/jcinit.o : $(JPDIR)/jcinit.c; $(DO_CC)
+$(B)/client/jccoefct.o : $(JPDIR)/jccoefct.c; $(DO_CC)
+$(B)/client/jccolor.o : $(JPDIR)/jccolor.c; $(DO_CC)
+$(B)/client/jfdctflt.o : $(JPDIR)/jfdctflt.c; $(DO_CC)
+$(B)/client/jcdctmgr.o : $(JPDIR)/jcdctmgr.c; $(DO_CC)
+$(B)/client/jcmainct.o : $(JPDIR)/jcmainct.c; $(DO_CC)
+$(B)/client/jcmarker.o : $(JPDIR)/jcmarker.c; $(DO_CC)
+$(B)/client/jcmaster.o : $(JPDIR)/jcmaster.c; $(DO_CC)
+$(B)/client/jcomapi.o : $(JPDIR)/jcomapi.c; $(DO_CC)
+$(B)/client/jcparam.o : $(JPDIR)/jcparam.c;  $(DO_CC)
+$(B)/client/jcprepct.o : $(JPDIR)/jcprepct.c; $(DO_CC)
+$(B)/client/jcsample.o : $(JPDIR)/jcsample.c; $(DO_CC)
 
-$(B)/client/jdapimin.o : $(JPDIR)/jdapimin.cpp; $(DO_CC)
-$(B)/client/jdapistd.o : $(JPDIR)/jdapistd.cpp; $(DO_CC)
-$(B)/client/jdatasrc.o : $(JPDIR)/jdatasrc.cpp; $(DO_CC)
-$(B)/client/jdcoefct.o : $(JPDIR)/jdcoefct.cpp; $(DO_CC)
-$(B)/client/jdcolor.o : $(JPDIR)/jdcolor.cpp; $(DO_CC)
-$(B)/client/jcphuff.o : $(JPDIR)/jcphuff.cpp; $(DO_CC)
-$(B)/client/jddctmgr.o : $(JPDIR)/jddctmgr.cpp; $(DO_CC)
-$(B)/client/jdhuff.o : $(JPDIR)/jdhuff.cpp; $(DO_CC)
-$(B)/client/jdinput.o : $(JPDIR)/jdinput.cpp; $(DO_CC)
-$(B)/client/jdmainct.o : $(JPDIR)/jdmainct.cpp; $(DO_CC)
-$(B)/client/jdmarker.o : $(JPDIR)/jdmarker.cpp; $(DO_CC)
-$(B)/client/jdmaster.o : $(JPDIR)/jdmaster.cpp; $(DO_CC)
-$(B)/client/jdpostct.o : $(JPDIR)/jdpostct.cpp; $(DO_CC)
-$(B)/client/jdsample.o : $(JPDIR)/jdsample.cpp; $(DO_CC)
-$(B)/client/jdtrans.o : $(JPDIR)/jdtrans.cpp; $(DO_CC)
-$(B)/client/jerror.o : $(JPDIR)/jerror.cpp; $(DO_CC) $(GL_CFLAGS) $(MINGW_CFLAGS)
-$(B)/client/jidctflt.o : $(JPDIR)/jidctflt.cpp; $(DO_CC)
-$(B)/client/jmemmgr.o : $(JPDIR)/jmemmgr.cpp; $(DO_CC)
-$(B)/client/jmemnobs.o : $(JPDIR)/jmemnobs.cpp; $(DO_CC)  $(GL_CFLAGS) $(MINGW_CFLAGS)
-$(B)/client/jutils.o : $(JPDIR)/jutils.cpp; $(DO_CC)
+$(B)/client/jdapimin.o : $(JPDIR)/jdapimin.c; $(DO_CC)
+$(B)/client/jdapistd.o : $(JPDIR)/jdapistd.c; $(DO_CC)
+$(B)/client/jdatasrc.o : $(JPDIR)/jdatasrc.c; $(DO_CC)
+$(B)/client/jdcoefct.o : $(JPDIR)/jdcoefct.c; $(DO_CC)
+$(B)/client/jdcolor.o : $(JPDIR)/jdcolor.c; $(DO_CC)
+$(B)/client/jcphuff.o : $(JPDIR)/jcphuff.c; $(DO_CC)
+$(B)/client/jddctmgr.o : $(JPDIR)/jddctmgr.c; $(DO_CC)
+$(B)/client/jdhuff.o : $(JPDIR)/jdhuff.c; $(DO_CC)
+$(B)/client/jdinput.o : $(JPDIR)/jdinput.c; $(DO_CC)
+$(B)/client/jdmainct.o : $(JPDIR)/jdmainct.c; $(DO_CC)
+$(B)/client/jdmarker.o : $(JPDIR)/jdmarker.c; $(DO_CC)
+$(B)/client/jdmaster.o : $(JPDIR)/jdmaster.c; $(DO_CC)
+$(B)/client/jdpostct.o : $(JPDIR)/jdpostct.c; $(DO_CC)
+$(B)/client/jdsample.o : $(JPDIR)/jdsample.c; $(DO_CC)
+$(B)/client/jdtrans.o : $(JPDIR)/jdtrans.c; $(DO_CC)
+$(B)/client/jerror.o : $(JPDIR)/jerror.c; $(DO_CC) $(GL_CFLAGS) $(MINGW_CFLAGS)
+$(B)/client/jidctflt.o : $(JPDIR)/jidctflt.c; $(DO_CC)
+$(B)/client/jmemmgr.o : $(JPDIR)/jmemmgr.c; $(DO_CC)
+$(B)/client/jmemnobs.o : $(JPDIR)/jmemnobs.c; $(DO_CC)  $(GL_CFLAGS) $(MINGW_CFLAGS)
+$(B)/client/jutils.o : $(JPDIR)/jutils.c; $(DO_CC)
 
 $(B)/client/tr_bsp.o : $(RDIR)/tr_bsp.cpp; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/tr_animation.o : $(RDIR)/tr_animation.cpp; $(DO_CC)  $(GL_CFLAGS)
