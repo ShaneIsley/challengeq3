@@ -49,7 +49,7 @@ extern	int			chat_playerNum;
 
 void Key_WriteBindings( fileHandle_t f );
 void Key_SetBinding( int keynum, const char *binding );
-char *Key_GetBinding( int keynum );
+const char* Key_GetBinding( int keynum );
 qbool Key_IsDown( int keynum );
 qbool Key_GetOverstrikeMode( void );
 void Key_SetOverstrikeMode( qbool state );

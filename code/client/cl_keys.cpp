@@ -47,13 +47,13 @@ qkey_t		keys[MAX_KEYS];
 
 
 typedef struct {
-	char	*name;
-	int		keynum;
+	const char* name;
+	int keynum;
 } keyname_t;
 
 
 // names not in this list can either be lowercase ascii, or '0xnn' hex sequences
-keyname_t keynames[] =
+static const keyname_t keynames[] =
 {
 	{"TAB", K_TAB},
 	{"ENTER", K_ENTER},
@@ -73,7 +73,6 @@ keyname_t keynames[] =
 
 	{"CAPSLOCK", K_CAPSLOCK},
 
-	
 	{"F1", K_F1},
 	{"F2", K_F2},
 	{"F3", K_F3},
@@ -788,7 +787,7 @@ void Key_SetBinding( int keynum, const char *binding ) {
 	if ( keys[ keynum ].binding ) {
 		Z_Free( keys[ keynum ].binding );
 	}
-		
+
 	// allocate memory for new binding
 	keys[keynum].binding = CopyString( binding );
 
@@ -798,12 +797,7 @@ void Key_SetBinding( int keynum, const char *binding ) {
 }
 
 
-/*
-===================
-Key_GetBinding
-===================
-*/
-char *Key_GetBinding( int keynum ) {
+const char* Key_GetBinding( int keynum ) {
 	if ( keynum == -1 ) {
 		return "";
 	}

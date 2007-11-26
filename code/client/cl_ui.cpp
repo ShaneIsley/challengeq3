@@ -648,15 +648,11 @@ static void Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
 	Q_strncpyz( buf, Key_KeynumToString( keynum ), buflen );
 }
 
-/*
-====================
-Key_GetBindingBuf
-====================
-*/
-static void Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
-	char	*value;
 
-	value = Key_GetBinding( keynum );
+static void Key_GetBindingBuf( int keynum, char *buf, int buflen )
+{
+	const char* value = Key_GetBinding( keynum );
+
 	if ( value ) {
 		Q_strncpyz( buf, value, buflen );
 	}
