@@ -189,7 +189,7 @@ ifeq ($(PLATFORM),linux)
   endif
   endif
 
-  BASE_CFLAGS = -Wall -Weffc++ -fno-strict-aliasing -Wimplicit -pipe
+  BASE_CFLAGS = -Wall -Weffc++ -fno-operator-names -fno-strict-aliasing -Wimplicit -pipe
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL=1
