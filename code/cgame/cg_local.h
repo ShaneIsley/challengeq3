@@ -1133,9 +1133,6 @@ extern	vmCvar_t		cg_gun_y;
 extern	vmCvar_t		cg_gun_z;
 extern	vmCvar_t		cg_drawGun;
 extern	vmCvar_t		cg_viewsize;
-extern	vmCvar_t		cg_tracerChance;
-extern	vmCvar_t		cg_tracerWidth;
-extern	vmCvar_t		cg_tracerLength;
 extern	vmCvar_t		cg_autoswitch;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
@@ -1376,7 +1373,7 @@ void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean fles
 void CG_RailTrail( const clientInfo_t* ci, const vec3_t start, const vec3_t end );
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 void CG_AddViewWeapon( const playerState_t* ps );
-void CG_AddPlayerWeapon( refEntity_t *parent, const playerState_t* ps, centity_t *cent, int team );
+void CG_AddPlayerWeapon( const refEntity_t* parent, const playerState_t* ps, centity_t* cent );
 void CG_DrawWeaponSelect( void );
 
 void CG_OutOfAmmoChange( void );	// should this be in pmove?

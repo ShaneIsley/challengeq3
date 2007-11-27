@@ -2492,7 +2492,7 @@ void CG_Player( centity_t *cent ) {
 	//
 	// add the gun / barrel / flash
 	//
-	CG_AddPlayerWeapon( &torso, NULL, cent, ci->team );
+	CG_AddPlayerWeapon( &torso, NULL, cent );
 
 	// add powerups floating behind the player
 	CG_PlayerPowerups( cent, &torso );
