@@ -124,24 +124,17 @@ gentity_t *SelectNearestDeathmatchSpawnPoint( vec3_t from ) {
 }
 
 
-/*
-================
-SelectRandomDeathmatchSpawnPoint
+// go to a random point that doesn't telefrag
 
-go to a random point that doesn't telefrag
-================
-*/
-#define	MAX_SPAWN_POINTS	128
-gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
-	gentity_t	*spot;
-	int			count;
-	int			selection;
-	gentity_t	*spots[MAX_SPAWN_POINTS];
+#define MAX_SPAWN_POINTS 128
 
-	count = 0;
-	spot = NULL;
+static gentity_t* SelectRandomDeathmatchSpawnPoint()
+{
+	gentity_t* spots[MAX_SPAWN_POINTS];
+	gentity_t* spot = NULL;
+	int count = 0;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+	while (spot = G_Find(spot, FOFS(classname), "info_player_deathmatch")) {
 		if ( SpotWouldTelefrag( spot ) ) {
 			continue;
 		}
@@ -149,75 +142,62 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 		count++;
 	}
 
-	if ( !count ) {	// no spots that won't telefrag
-		return G_Find( NULL, FOFS(classname), "info_player_deathmatch");
+	if ( !count ) { // no spots that won't telefrag, so just use the first one
+		return G_Find( NULL, FOFS(classname), "info_player_deathmatch" );
 	}
 
-	selection = rand() % count;
-	return spots[ selection ];
+	return spots[ rand() % count ];
+}
+
+
+typedef struct {
+	gentity_t* spot;
+	int distance;
+} SpawnPoint;
+
+static int QDECL SortSpawnPoints( const void* a, const void* b )
+{
+	const SpawnPoint* lhs = (const SpawnPoint*)a;
+	const SpawnPoint* rhs = (const SpawnPoint*)b;
+	return (rhs->distance - lhs->distance);		// note that we want them sorted FURTHEST first
 }
 
 
 // chooses a player start, deathmatch start, etc
 
-static gentity_t* SelectRandomFurthestSpawnPoint ( const vec3_t avoidPoint, vec3_t origin, vec3_t angles )
+static gentity_t* SelectRandomFurthestSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles )
 {
-	gentity_t	*spot;
-	vec3_t		delta;
-	float		dist;
-	float		list_dist[64];
-	gentity_t	*list_spot[64];
-	int			numSpots, rnd, i, j;
+	SpawnPoint aSpawnPoints[MAX_SPAWN_POINTS];
+	gentity_t* spot = NULL;
+	int count = 0;
 
-	numSpots = 0;
-	spot = NULL;
-
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
+	while ((spot = G_Find(spot, FOFS(classname), "info_player_deathmatch")) && (count < MAX_SPAWN_POINTS)) {
+		if (SpotWouldTelefrag( spot ))
 			continue;
-		}
-		VectorSubtract( spot->s.origin, avoidPoint, delta );
-		dist = VectorLength( delta );
-		for (i = 0; i < numSpots; i++) {
-			if ( dist > list_dist[i] ) {
-				if ( numSpots >= 64 )
-					numSpots = 64-1;
-				for (j = numSpots; j > i; j--) {
-					list_dist[j] = list_dist[j-1];
-					list_spot[j] = list_spot[j-1];
-				}
-				list_dist[i] = dist;
-				list_spot[i] = spot;
-				numSpots++;
-				if (numSpots > 64)
-					numSpots = 64;
-				break;
-			}
-		}
-		if (i >= numSpots && numSpots < 64) {
-			list_dist[numSpots] = dist;
-			list_spot[numSpots] = spot;
-			numSpots++;
-		}
+		aSpawnPoints[count].spot = spot;
+		aSpawnPoints[count].distance = Distance( avoidPoint, spot->s.origin );
+		++count;
 	}
-	if (!numSpots) {
-		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch");
+
+	if ( !count ) { // no spots that won't telefrag, so just use the first one
+		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch" );
 		if (!spot)
 			G_Error( "Couldn't find a spawn point" );
-		VectorCopy (spot->s.origin, origin);
+		VectorCopy( spot->s.origin, origin );
 		origin[2] += 9;
-		VectorCopy (spot->s.angles, angles);
+		VectorCopy( spot->s.angles, angles );
 		return spot;
 	}
 
 	// select a random spot from the spawn points furthest away
-	rnd = random() * (numSpots / 2);
+	qsort( aSpawnPoints, count, sizeof(SpawnPoint), SortSpawnPoints );
+	spot = aSpawnPoints[ (int)(random() * (count / 2)) ].spot;
 
-	VectorCopy (list_spot[rnd]->s.origin, origin);
+	VectorCopy( spot->s.origin, origin );
 	origin[2] += 9;
-	VectorCopy (list_spot[rnd]->s.angles, angles);
+	VectorCopy( spot->s.angles, angles );
 
-	return list_spot[rnd];
+	return spot;
 }
 
 
@@ -226,34 +206,6 @@ static gentity_t* SelectRandomFurthestSpawnPoint ( const vec3_t avoidPoint, vec3
 gentity_t* SelectSpawnPoint( const vec3_t avoidPoint, vec3_t origin, vec3_t angles )
 {
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles );
-
-	/*
-	gentity_t	*spot;
-	gentity_t	*nearestSpot;
-
-	nearestSpot = SelectNearestDeathmatchSpawnPoint( avoidPoint );
-
-	spot = SelectRandomDeathmatchSpawnPoint ( );
-	if ( spot == nearestSpot ) {
-		// roll again if it would be real close to point of death
-		spot = SelectRandomDeathmatchSpawnPoint ( );
-		if ( spot == nearestSpot ) {
-			// last try
-			spot = SelectRandomDeathmatchSpawnPoint ( );
-		}		
-	}
-
-	// find a single player start spot
-	if (!spot) {
-		G_Error( "Couldn't find a spawn point" );
-	}
-
-	VectorCopy (spot->s.origin, origin);
-	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
-
-	return spot;
-	*/
 }
 
 
@@ -273,9 +225,9 @@ static gentity_t* SelectInitialSpawnPoint( vec3_t origin, vec3_t angles )
 		return SelectSpawnPoint( vec3_origin, origin, angles );
 	}
 
-	VectorCopy (spot->s.origin, origin);
+	VectorCopy( spot->s.origin, origin );
 	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
+	VectorCopy( spot->s.angles, angles );
 
 	return spot;
 }
@@ -893,7 +845,7 @@ after the first ClientBegin, and after each respawn
 Initializes all non-persistant parts of playerState
 */
 
-void ClientSpawn(gentity_t *ent)
+void ClientSpawn( gentity_t* ent )
 {
 	int		index;
 	vec3_t	spawn_origin, spawn_angles;

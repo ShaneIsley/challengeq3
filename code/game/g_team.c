@@ -915,17 +915,15 @@ qboolean Team_GetLocationMsg( const gentity_t* ent, char* loc, int loclen )
 }
 
 
-/*---------------------------------------------------------------------------*/
+///////////////////////////////////////////////////////////////
 
-/*
-================
-SelectRandomDeathmatchSpawnPoint
 
-go to a random point that doesn't telefrag
-================
-*/
-#define	MAX_TEAM_SPAWN_POINTS	32
-gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
+// go to a random team-specific point that doesn't telefrag
+
+#define MAX_TEAM_SPAWN_POINTS 32
+
+static gentity_t* SelectRandomTeamSpawnPoint( int teamstate, team_t team )
+{
 	gentity_t	*spot;
 	int			count;
 	int			selection;
@@ -960,7 +958,7 @@ gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
 			break;
 	}
 
-	if ( !count ) {	// no spots that won't telefrag
+	if ( !count ) { // no spots that won't telefrag
 		return G_Find( NULL, FOFS(classname), classname);
 	}
 
@@ -969,27 +967,20 @@ gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
 }
 
 
-/*
-===========
-SelectCTFSpawnPoint
-
-============
-*/
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles ) {
-	gentity_t	*spot;
-
-	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
+gentity_t* SelectCTFSpawnPoint( team_t team, int teamstate, vec3_t origin, vec3_t angles )
+{
+	gentity_t* spot = SelectRandomTeamSpawnPoint( teamstate, team );
 
 	if (!spot) {
 		return SelectSpawnPoint( vec3_origin, origin, angles );
 	}
 
-	VectorCopy (spot->s.origin, origin);
+	VectorCopy( spot->s.origin, origin );
 	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
-
+	VectorCopy( spot->s.angles, angles );
 	return spot;
 }
+
 
 /*---------------------------------------------------------------------------*/
 

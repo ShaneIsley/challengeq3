@@ -180,24 +180,20 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
-	gentity_t		*t;
-	
-	if ( !ent ) {
+void G_UseTargets( gentity_t* ent, gentity_t* activator )
+{
+	gentity_t* t = NULL;
+
+	if ( !ent || !ent->target ) {
 		return;
 	}
 
-	if ( !ent->target ) {
-		return;
-	}
-
-	t = NULL;
-	while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
+	while (t = G_Find (t, FOFS(targetname), ent->target)) {
 		if ( t == ent ) {
 			G_Printf ("WARNING: Entity used itself.\n");
 		} else {
 			if ( t->use ) {
-				t->use (t, ent, activator);
+				t->use( t, ent, activator );
 			}
 		}
 		if ( !ent->inuse ) {
@@ -208,51 +204,19 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 }
 
 
-/*
-=============
-TempVector
+// this is just a convenience function for printing vectors
 
-This is just a convenience function
-for making temporary vectors for function calls
-=============
-*/
-float	*tv( float x, float y, float z ) {
-	static	int		index;
-	static	vec3_t	vecs[8];
-	float	*v;
-
-	// use an array so that multiple tempvectors won't collide
-	// for a while
-	v = vecs[index];
-	index = (index + 1)&7;
-
-	v[0] = x;
-	v[1] = y;
-	v[2] = z;
-
-	return v;
-}
-
-
-/*
-=============
-VectorToString
-
-This is just a convenience function
-for printing vectors
-=============
-*/
-char	*vtos( const vec3_t v ) {
+const char* vtos( const vec3_t v )
+{
 	static	int		index;
 	static	char	str[8][32];
-	char	*s;
+	char* s;
 
 	// use an array so that multiple vtos won't collide
 	s = str[index];
 	index = (index + 1)&7;
 
-	Com_sprintf (s, 32, "(%i %i %i)", (int)v[0], (int)v[1], (int)v[2]);
-
+	Com_sprintf( s, 32, "(%i %i %i)", (int)v[0], (int)v[1], (int)v[2] );
 	return s;
 }
 
