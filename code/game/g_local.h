@@ -60,7 +60,6 @@ typedef enum {
 	MOVER_2TO1
 } moverState_t;
 
-#define SP_PODIUM_MODEL		"models/mapobjects/podium/podium4.md3"
 
 //============================================================================
 
@@ -650,7 +649,7 @@ void G_WriteSessionData();
 // g_arenas.c
 //
 void UpdateTournamentInfo( void );
-void SpawnModelsOnVictoryPads( void );
+void SpawnModelsOnVictoryPads();
 void Svcmd_AbortPodium_f( void );
 
 //

@@ -136,7 +136,8 @@ void UpdateTournamentInfo( void ) {
 }
 
 
-static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity_t *ent, int place ) {
+static gentity_t* SpawnModelOnVictoryPad( const gentity_t* pad, const vec3_t offset, gentity_t *ent, int place )
+{
 	gentity_t	*body;
 	vec3_t		vec;
 	vec3_t		f, r, u;
@@ -192,47 +193,35 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 
 	G_SetOrigin( body, vec );
 
-	trap_LinkEntity (body);
-
-	body->count = place;
+	trap_LinkEntity(body);
 
 	return body;
 }
 
 
-static void CelebrateStop( gentity_t *player ) {
-	int		anim;
-
-	if( player->s.weapon == WP_GAUNTLET) {
-		anim = TORSO_STAND2;
-	}
-	else {
-		anim = TORSO_STAND;
-	}
+static void CelebrateStop( gentity_t* player )
+{
+	int anim = (player->s.weapon == WP_GAUNTLET) ? TORSO_STAND2 : TORSO_STAND;
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 }
 
 
-#define	TIMER_GESTURE	(34*66+50)
-static void CelebrateStart( gentity_t *player ) {
+static void CelebrateStart( gentity_t* player )
+{
+	const int TIMER_GESTURE = 34*66+50;
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | TORSO_GESTURE;
 	player->nextthink = level.time + TIMER_GESTURE;
 	player->think = CelebrateStop;
-
-	/*
-	player->client->ps.events[player->client->ps.eventSequence & (MAX_PS_EVENTS-1)] = EV_TAUNT;
-	player->client->ps.eventParms[player->client->ps.eventSequence & (MAX_PS_EVENTS-1)] = 0;
-	player->client->ps.eventSequence++;
-	*/
 	G_AddEvent(player, EV_TAUNT, 0);
 }
 
 
-static vec3_t	offsetFirst  = {0, 0, 74};
-static vec3_t	offsetSecond = {-10, 60, 54};
-static vec3_t	offsetThird  = {-19, -60, 45};
+static const vec3_t offsetFirst  = {0, 0, 74};
+static const vec3_t offsetSecond = {-10, 60, 54};
+static const vec3_t offsetThird  = {-19, -60, 45};
 
-static void PodiumPlacementThink( gentity_t *podium ) {
+static void PodiumPlacementThink( gentity_t* podium )
+{
 	vec3_t		vec;
 	vec3_t		origin;
 	vec3_t		f, r, u;
@@ -288,7 +277,10 @@ static void PodiumPlacementThink( gentity_t *podium ) {
 }
 
 
-static gentity_t *SpawnPodium( void ) {
+#define SP_PODIUM_MODEL "models/mapobjects/podium/podium4.md3"
+
+static const gentity_t* SpawnPodium()
+{
 	gentity_t	*podium;
 	vec3_t		vec;
 	vec3_t		origin;
@@ -300,19 +292,15 @@ static gentity_t *SpawnPodium( void ) {
 
 	podium->classname = "podium";
 	podium->s.eType = ET_GENERAL;
-	podium->s.number = podium - g_entities;
 	podium->clipmask = CONTENTS_SOLID;
 	podium->r.contents = CONTENTS_SOLID;
 	podium->s.modelindex = G_ModelIndex( SP_PODIUM_MODEL );
 
-	AngleVectors( level.intermission_angle, vec, NULL, NULL );
-	VectorMA( level.intermission_origin, trap_Cvar_VariableIntegerValue( "g_podiumDist" ), vec, origin );
-	origin[2] -= trap_Cvar_VariableIntegerValue( "g_podiumDrop" );
-	G_SetOrigin( podium, origin );
+	PodiumPlacementThink( podium );
 
 	VectorSubtract( level.intermission_origin, podium->r.currentOrigin, vec );
 	podium->s.apos.trBase[YAW] = vectoyaw( vec );
-	trap_LinkEntity (podium);
+	trap_LinkEntity( podium );
 
 	podium->think = PodiumPlacementThink;
 	podium->nextthink = level.time + 100;
@@ -320,14 +308,10 @@ static gentity_t *SpawnPodium( void ) {
 }
 
 
-/*
-==================
-SpawnModelsOnVictoryPads
-==================
-*/
-void SpawnModelsOnVictoryPads( void ) {
-	gentity_t	*player;
-	gentity_t	*podium;
+void SpawnModelsOnVictoryPads()
+{
+	const gentity_t* podium;
+	gentity_t* player;
 
 	podium1 = NULL;
 	podium2 = NULL;

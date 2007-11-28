@@ -1792,21 +1792,15 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 }
 
 
-/*
-===============
-CG_PlayerFloatSprite
+// float a sprite over the player's head
 
-Float a sprite over the player's head
-===============
-*/
-static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader ) {
-	int				rf;
-	refEntity_t		ent;
+static void CG_PlayerFloatSprite( const centity_t* cent, qhandle_t shader )
+{
+	int rf = 0;
+	refEntity_t ent;
 
 	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson ) {
 		rf = RF_THIRD_PERSON;		// only show in mirrors
-	} else {
-		rf = 0;
 	}
 
 	memset( &ent, 0, sizeof( ent ) );
@@ -1824,16 +1818,11 @@ static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader ) {
 }
 
 
+// float sprites over the player's head
 
-/*
-===============
-CG_PlayerSprites
-
-Float sprites over the player's head
-===============
-*/
-static void CG_PlayerSprites( centity_t *cent ) {
-	int		team;
+static void CG_PlayerSprites( const centity_t* cent )
+{
+	int team;
 
 	if ( cent->currentState.eFlags & EF_CONNECTION ) {
 		CG_PlayerFloatSprite( cent, cgs.media.connectionShader );
@@ -2081,10 +2070,6 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 }
 
 /*
-=================
-CG_LightVerts
-=================
-*/
 int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 {
 	int				i, j;
@@ -2126,14 +2111,12 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 	}
 	return qtrue;
 }
-
-/*
-===============
-CG_Player
-===============
 */
-void CG_Player( centity_t *cent ) {
-	clientInfo_t	*ci;
+
+
+void CG_Player( centity_t* cent )
+{
+	const clientInfo_t* ci;
 	refEntity_t		legs;
 	refEntity_t		torso;
 	refEntity_t		head;
@@ -2155,7 +2138,7 @@ void CG_Player( centity_t *cent ) {
 	// multiple corpses on the level using the same clientinfo
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-		CG_Error( "Bad clientNum on player entity");
+		CG_Error( "Bad clientNum on player entity" );
 	}
 	ci = &cgs.clientinfo[ clientNum ];
 
@@ -2187,7 +2170,7 @@ void CG_Player( centity_t *cent ) {
 	
 	// get the animation state (after rotation, to allow feet shuffle)
 	CG_PlayerAnimation( cent, &legs.oldframe, &legs.frame, &legs.backlerp,
-		 &torso.oldframe, &torso.frame, &torso.backlerp );
+			&torso.oldframe, &torso.frame, &torso.backlerp );
 
 	// add the talk baloon or disconnect icon
 	CG_PlayerSprites( cent );
@@ -2207,7 +2190,7 @@ void CG_Player( centity_t *cent ) {
 		CG_PlayerTokens( cent, renderfx );
 	}
 #endif
-	//
+
 	// add the legs
 	//
 	legs.hModel = ci->legsModel;
@@ -2218,11 +2201,17 @@ void CG_Player( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, legs.lightingOrigin );
 	legs.shadowPlane = shadowPlane;
 	legs.renderfx = renderfx;
-	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
+	VectorCopy( legs.origin, legs.oldorigin );	// don't positionally lerp at all
 
-	legs.shaderRGBA[0] = 0;
-	legs.shaderRGBA[1] = 255;
-	legs.shaderRGBA[2] = 0;
+	if ( cent->currentState.eFlags & EF_DEAD ) {
+		legs.shaderRGBA[0] = 64;
+		legs.shaderRGBA[1] = 64;
+		legs.shaderRGBA[2] = 64;
+	} else {
+		legs.shaderRGBA[0] = 0;
+		legs.shaderRGBA[1] = 255;
+		legs.shaderRGBA[2] = 0;
+	}
 	legs.shaderRGBA[3] = 255;
 
 	CG_AddRefEntityWithPowerups( &legs, &cent->currentState, ci->team );
@@ -2232,7 +2221,6 @@ void CG_Player( centity_t *cent ) {
 		return;
 	}
 
-	//
 	// add the torso
 	//
 	torso.hModel = ci->torsoModel;
@@ -2244,15 +2232,15 @@ void CG_Player( centity_t *cent ) {
 
 	VectorCopy( cent->lerpOrigin, torso.lightingOrigin );
 
-	CG_PositionRotatedEntityOnTag( &torso, &legs, ci->legsModel, "tag_torso");
+	CG_PositionRotatedEntityOnTag( &torso, &legs, ci->legsModel, "tag_torso" );
 
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
 
-	torso.shaderRGBA[0] = 0;
-	torso.shaderRGBA[1] = 255;
-	torso.shaderRGBA[2] = 0;
-	torso.shaderRGBA[3] = 255;
+	torso.shaderRGBA[0] = legs.shaderRGBA[0];
+	torso.shaderRGBA[1] = legs.shaderRGBA[1];
+	torso.shaderRGBA[2] = legs.shaderRGBA[2];
+	torso.shaderRGBA[3] = legs.shaderRGBA[3];
 
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 
@@ -2460,7 +2448,6 @@ void CG_Player( centity_t *cent ) {
 	}
 #endif // MISSIONPACK
 
-	//
 	// add the head
 	//
 	head.hModel = ci->headModel;
@@ -2471,25 +2458,23 @@ void CG_Player( centity_t *cent ) {
 
 	VectorCopy( cent->lerpOrigin, head.lightingOrigin );
 
-	CG_PositionRotatedEntityOnTag( &head, &torso, ci->torsoModel, "tag_head");
+	CG_PositionRotatedEntityOnTag( &head, &torso, ci->torsoModel, "tag_head" );
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
 
-	head.shaderRGBA[0] = 0;
-	head.shaderRGBA[1] = 255;
-	head.shaderRGBA[2] = 0;
-	head.shaderRGBA[3] = 255;
+	head.shaderRGBA[0] = legs.shaderRGBA[0];
+	head.shaderRGBA[1] = legs.shaderRGBA[1];
+	head.shaderRGBA[2] = legs.shaderRGBA[2];
+	head.shaderRGBA[3] = legs.shaderRGBA[3];
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
 
 #ifdef MISSIONPACK
 	CG_BreathPuffs(cent, &head);
-
 	CG_DustTrail(cent);
 #endif
 
-	//
 	// add the gun / barrel / flash
 	//
 	CG_AddPlayerWeapon( &torso, NULL, cent );
