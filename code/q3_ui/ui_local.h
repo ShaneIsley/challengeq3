@@ -293,9 +293,8 @@ extern const vec4_t colorLtGrey;
 extern const vec4_t colorMdGrey;
 extern const vec4_t colorDkGrey;
 
-extern char	*ui_medalNames[];
-extern char	*ui_medalPicNames[];
-extern char	*ui_medalSounds[];
+extern const char* ui_medalPicNames[];
+extern const char* ui_medalSounds[];
 
 //
 // ui_mfield.c
