@@ -222,6 +222,9 @@ static const vec3_t offsetThird  = {-19, -60, 45};
 
 static void PodiumPlacementThink( gentity_t* podium )
 {
+	const float podiumDist = 80;
+	const float podiumDrop = 70;
+
 	vec3_t		vec;
 	vec3_t		origin;
 	vec3_t		f, r, u;
@@ -229,8 +232,8 @@ static void PodiumPlacementThink( gentity_t* podium )
 	podium->nextthink = level.time + 100;
 
 	AngleVectors( level.intermission_angle, vec, NULL, NULL );
-	VectorMA( level.intermission_origin, trap_Cvar_VariableIntegerValue( "g_podiumDist" ), vec, origin );
-	origin[2] -= trap_Cvar_VariableIntegerValue( "g_podiumDrop" );
+	VectorMA( level.intermission_origin, podiumDist, vec, origin );
+	origin[2] -= podiumDrop;
 	G_SetOrigin( podium, origin );
 
 	if( podium1 ) {
@@ -283,7 +286,6 @@ static const gentity_t* SpawnPodium()
 {
 	gentity_t	*podium;
 	vec3_t		vec;
-	vec3_t		origin;
 
 	podium = G_Spawn();
 	if ( !podium ) {
