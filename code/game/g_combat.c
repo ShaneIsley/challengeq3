@@ -552,8 +552,7 @@ void player_die( gentity_t* self, gentity_t* inflictor, gentity_t* attacker, int
 	VectorCopy( self->s.angles, self->client->ps.viewangles );
 
 	// don't allow respawn until the death anim is done
-	// g_forcerespawn may force spawning at some later time
-	self->client->respawnTime = level.time + 1500;
+	self->client->respawnTime = level.time + RESPAWN_DELAY_MIN;
 
 	// remove powerups
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );

@@ -42,6 +42,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	INTERMISSION_DELAY_TIME	1000
 #define	SP_INTERMISSION_DELAY_TIME	5000
 
+#define RESPAWN_DELAY_MIN 1500
+#define RESPAWN_DELAY_MAX 2500 // note that this is *in addition to* RESPAWN_DELAY_MIN
+
 // gentity->flags
 #define	FL_GODMODE				0x00000010
 #define	FL_NOTARGET				0x00000020
@@ -267,7 +270,7 @@ typedef struct gclient_s {
 
 	int			lastCmdTime;		// level.time of last usercmd_t, for EF_CONNECTION
 									// we can't just use pers.lastCommand.time, because
-									// of the g_sycronousclients case
+									// of the g_synchronousclients case
 	int			buttons;
 	int			oldbuttons;
 	int			latched_buttons;
@@ -293,9 +296,9 @@ typedef struct gclient_s {
 	int			lasthurt_mod;		// type of damage the client did
 
 	// timers
-	int			respawnTime;		// can respawn when time > this, force after g_forcerespwan
+	int			respawnTime;		// can respawn when time > this
 	int			inactivityTime;		// kick players when time > this
-	qboolean	inactivityWarning;	// qtrue if the five seoond warning has been given
+	qboolean	inactivityWarning;	// true if the five second warning has been given
 	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
 
 	int			airOutTime;
@@ -705,7 +708,6 @@ extern	vmCvar_t	g_password;
 extern	vmCvar_t	g_needpass;
 extern	vmCvar_t	g_gravity;
 extern	vmCvar_t	g_quadfactor;
-extern	vmCvar_t	g_forcerespawn;
 extern	vmCvar_t	g_inactivity;
 extern	vmCvar_t	g_debugMove;
 extern	vmCvar_t	g_debugAlloc;

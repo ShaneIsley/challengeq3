@@ -922,12 +922,11 @@ static void ClientThink_real( gentity_t* ent )
 		// wait for the attack button to be pressed
 		if ( level.time > client->respawnTime ) {
 			// forcerespawn is to prevent users from waiting out powerups
-			if ( g_forcerespawn.integer > 0 && 
-				( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
+			if ( ( level.time - client->respawnTime ) > RESPAWN_DELAY_MAX ) {
 				RespawnPlayer( ent );
 				return;
 			}
-		
+
 			// pressing attack or use is the normal respawn method
 			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
 				RespawnPlayer( ent );
