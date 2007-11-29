@@ -407,70 +407,32 @@ const char* UI_GetBotInfoByName( const char* name )
 // single player game info
 //
 
-/*
-===============
-UI_GetBestScore
 
-Returns the player's best finish on a given level, 0 if the have not played the level
-===============
-*/
-void UI_GetBestScore( int level, int *score, int *skill ) {
-	int		n;
-	int		skillScore;
-	int		bestScore;
-	int		bestScoreSkill;
-	char	arenaKey[16];
-	char	scores[MAX_INFO_VALUE];
+// returns the highest difficulty the player has won a given level on (0 = unwon)
 
-	if( !score || !skill ) {
-		return;
-	}
+int UI_GetBestScore( int level )
+{
+	char arenaKey[16];
+	char scores[MAX_INFO_VALUE];
 
 	if( level < 0 || level > ui_numArenas ) {
-		return;
+		return 0;
 	}
 
-	bestScore = 0;
-	bestScoreSkill = 0;
+	trap_Cvar_VariableStringBuffer( "g_spScores", scores, MAX_INFO_VALUE );
 
-	for( n = 1; n <= 5; n++ ) {
-		trap_Cvar_VariableStringBuffer( va( "g_spScores%i", n ), scores, MAX_INFO_VALUE );
-
-		Com_sprintf( arenaKey, sizeof( arenaKey ), "l%i", level );
-		skillScore = atoi( Info_ValueForKey( scores, arenaKey ) );
-
-		if( skillScore < 1 || skillScore > 8 ) {
-			continue;
-		}
-
-		if( !bestScore || skillScore <= bestScore ) {
-			bestScore = skillScore;
-			bestScoreSkill = n;
-		}
-	}
-
-	*score = bestScore;
-	*skill = bestScoreSkill;
+	Com_sprintf( arenaKey, sizeof( arenaKey ), "l%i", level );
+	return atoi( Info_ValueForKey( scores, arenaKey ) );
 }
 
 
-/*
-===============
-UI_SetBestScore
+// set the player's best finish for a level
 
-Set the player's best finish for a level
-===============
-*/
-void UI_SetBestScore( int level, int score ) {
-	int		skill;
-	int		oldScore;
-	char	arenaKey[16];
-	char	scores[MAX_INFO_VALUE];
-
-	// validate score
-	if( score < 1 || score > 8 ) {
-		return;
-	}
+void UI_SetBestScore( int level )
+{
+	int skill, oldskill;
+	char arenaKey[16];
+	char scores[MAX_INFO_VALUE];
 
 	// validate skill
 	skill = (int)trap_Cvar_VariableValue( "g_spSkill" );
@@ -479,18 +441,18 @@ void UI_SetBestScore( int level, int score ) {
 	}
 
 	// get scores
-	trap_Cvar_VariableStringBuffer( va( "g_spScores%i", skill ), scores, MAX_INFO_VALUE );
+	trap_Cvar_VariableStringBuffer( "g_spScores", scores, MAX_INFO_VALUE );
 
 	// see if this is better
 	Com_sprintf( arenaKey, sizeof( arenaKey ), "l%i", level );
-	oldScore = atoi( Info_ValueForKey( scores, arenaKey ) );
-	if( oldScore && oldScore <= score ) {
+	oldskill = atoi( Info_ValueForKey( scores, arenaKey ) );
+	if( oldskill && oldskill >= skill ) {
 		return;
 	}
 
 	// update scores
-	Info_SetValueForKey( scores, arenaKey, va( "%i", score ) );
-	trap_Cvar_Set( va( "g_spScores%i", skill ), scores );
+	Info_SetValueForKey( scores, arenaKey, va( "%i", skill ) );
+	trap_Cvar_Set( "g_spScores", scores );
 }
 
 
@@ -548,8 +510,6 @@ int UI_TierCompleted( int levelWon ) {
 	int			level;
 	int			n;
 	int			tier;
-	int			score;
-	int			skill;
 	const char	*info;
 
 	tier = levelWon / ARENAS_PER_TIER;
@@ -568,8 +528,7 @@ int UI_TierCompleted( int levelWon ) {
 	}
 
 	for( n = 0; n < ARENAS_PER_TIER; n++, level++ ) {
-		UI_GetBestScore( level, &score, &skill );
-		if ( score != 1 ) {
+		if ( !UI_GetBestScore( level ) ) {
 			return -1;
 		}
 	}
@@ -632,31 +591,23 @@ qboolean UI_CanShowTierVideo( int tier ) {
 }
 
 
-/*
-===============
-UI_GetCurrentGame
+// returns the next level the player has not won
 
-Returns the next level the player has not won
-===============
-*/
-int UI_GetCurrentGame( void ) {
-	int		level;
-	int		rank;
-	int		skill;
-	const char *info;
+int UI_GetCurrentGame()
+{
+	int level;
+	const char* info;
 
 	info = UI_GetSpecialArenaInfo( "training" );
 	if( info ) {
 		level = atoi( Info_ValueForKey( info, "num" ) );
-		UI_GetBestScore( level, &rank, &skill );
-		if ( !rank || rank > 1 ) {
+		if (!UI_GetBestScore( level )) {
 			return level;
 		}
 	}
 
 	for( level = 0; level < ui_numSinglePlayerArenas; level++ ) {
-		UI_GetBestScore( level, &rank, &skill );
-		if ( !rank || rank > 1 ) {
+		if (!UI_GetBestScore( level )) {
 			return level;
 		}
 	}
@@ -677,11 +628,7 @@ Clears the scores and sets the difficutly level
 ===============
 */
 void UI_NewGame( void ) {
-	trap_Cvar_Set( "g_spScores1", "" );
-	trap_Cvar_Set( "g_spScores2", "" );
-	trap_Cvar_Set( "g_spScores3", "" );
-	trap_Cvar_Set( "g_spScores4", "" );
-	trap_Cvar_Set( "g_spScores5", "" );
+	trap_Cvar_Set( "g_spScores", "" );
 	trap_Cvar_Set( "g_spAwards", "" );
 	trap_Cvar_Set( "g_spVideos", "" );
 }
@@ -723,30 +670,24 @@ int UI_GetNumBots()
 }
 
 
-/*
-===============
-UI_SPUnlock_f
-===============
-*/
-void UI_SPUnlock_f( void ) {
+void UI_SPUnlock_f( void )
+{
 	char	arenaKey[16];
 	char	scores[MAX_INFO_VALUE];
-	int		level;
-	int		tier;
+	int		i;
 
-	// get scores for skill 1
-	trap_Cvar_VariableStringBuffer( "g_spScores1", scores, MAX_INFO_VALUE );
+	trap_Cvar_VariableStringBuffer( "g_spScores", scores, MAX_INFO_VALUE );
 
 	// update scores
-	for( level = 0; level < ui_numSinglePlayerArenas + ui_numSpecialSinglePlayerArenas; level++ ) {
-		Com_sprintf( arenaKey, sizeof( arenaKey ), "l%i", level );
+	for( i = 0; i < ui_numSinglePlayerArenas + ui_numSpecialSinglePlayerArenas; i++ ) {
+		Com_sprintf( arenaKey, sizeof( arenaKey ), "l%i", i );
 		Info_SetValueForKey( scores, arenaKey, "1" );
 	}
-	trap_Cvar_Set( "g_spScores1", scores );
+	trap_Cvar_Set( "g_spScores", scores );
 
 	// unlock cinematics
-	for( tier = 1; tier <= 8; tier++ ) {
-		UI_ShowTierVideo( tier );
+	for( i = 1; i <= 8; i++ ) {
+		UI_ShowTierVideo( i );
 	}
 
 	trap_Print( "All levels unlocked at skill level 1\n" );

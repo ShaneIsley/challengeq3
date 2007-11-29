@@ -92,7 +92,6 @@ typedef struct {
 	int				numMaps;
 	char			levelPicNames[4][MAX_QPATH];
 	char			levelNames[4][16];
-	int				levelScores[4];
 	int				levelScoresSkill[4];
 	qhandle_t		levelSelectedPic;
 	qhandle_t		levelFocusPic;
@@ -218,10 +217,7 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
 	Q_strupr( levelMenuInfo.levelNames[n] );
 
-	UI_GetBestScore( level, &levelMenuInfo.levelScores[n], &levelMenuInfo.levelScoresSkill[n] );
-	if( levelMenuInfo.levelScores[n] > 8 ) {
-		levelMenuInfo.levelScores[n] = 8;
-	}
+	levelMenuInfo.levelScoresSkill[n] = UI_GetBestScore( level );
 
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s.tga", map ) );
 	if( !trap_R_RegisterShaderNoMip( levelMenuInfo.levelPicNames[n] ) ) {
@@ -607,7 +603,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		UI_DrawString( x + 64, y + 96, levelMenuInfo.levelNames[n], UI_CENTER|UI_SMALLFONT, color_orange );
 
-		if( levelMenuInfo.levelScores[n] == 1 ) {
+		if( levelMenuInfo.levelScoresSkill[n] ) {
 			UI_DrawHandlePic( x, y, 128, 96, levelMenuInfo.levelCompletePic[levelMenuInfo.levelScoresSkill[n] - 1] ); 
 		}
 

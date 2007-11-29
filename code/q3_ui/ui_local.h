@@ -750,12 +750,12 @@ const char* UI_GetBotInfoByNumber( int num );
 const char* UI_GetBotInfoByName( const char* name );
 int UI_GetNumBots();
 
-void UI_GetBestScore( int level, int *score, int *skill );
-void UI_SetBestScore( int level, int score );
+int UI_GetBestScore( int level );
+void UI_SetBestScore( int level );
 int UI_TierCompleted( int levelWon );
 qboolean UI_ShowTierVideo( int tier );
 qboolean UI_CanShowTierVideo( int tier );
-int  UI_GetCurrentGame( void );
+int UI_GetCurrentGame();
 void UI_NewGame( void );
 void UI_LogAwardData( int award, int data );
 int UI_GetAwardLevel( int award );

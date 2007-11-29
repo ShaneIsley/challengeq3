@@ -546,7 +546,8 @@ void UI_SPPostgameMenu_f( void ) {
 		}
 	}
 
-	UI_SetBestScore( postgameMenuInfo.level, playerGameRank );
+	if (playerGameRank == 1)
+		UI_SetBestScore( postgameMenuInfo.level );
 
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
