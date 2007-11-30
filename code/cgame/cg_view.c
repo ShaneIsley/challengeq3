@@ -397,17 +397,14 @@ void CG_ZoomUp_f( void ) {
 }
 
 
-/*
-====================
-CG_CalcFov
+// fixed fov at intermissions, otherwise account for fov variable and zoom
 
-Fixed fov at intermissions, otherwise account for fov variable and zooms.
-====================
-*/
-#define	WAVE_AMPLITUDE	1
-#define	WAVE_FREQUENCY	0.4
+#define MAX_FOV 140
+#define WAVE_AMPLITUDE 1
+#define WAVE_FREQUENCY 0.4
 
-static int CG_CalcFov( void ) {
+static int CG_CalcFov()
+{
 	float	x;
 	float	phase;
 	float	v;
@@ -421,30 +418,19 @@ static int CG_CalcFov( void ) {
 		// if in intermission, use a fixed value
 		fov_x = 90;
 	} else {
-		fov_x = cg_fov.value;
-		if ( fov_x < 1 ) {
-			fov_x = 1;
-		} else if ( fov_x > 160 ) {
-			fov_x = 160;
-		}
+		fov_x = Com_Clamp(1, MAX_FOV, cg_fov.value);
 
 		// account for zooms
-		zoomFov = cg_zoomFov.value;
-		if ( zoomFov < 1 ) {
-			zoomFov = 1;
-		} else if ( zoomFov > 160 ) {
-			zoomFov = 160;
-		}
+		zoomFov = Com_Clamp(1, MAX_FOV, cg_zoomFov.value);
 
+		f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
 		if ( cg.zoomed ) {
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
 			if ( f > 1.0 ) {
 				fov_x = zoomFov;
 			} else {
 				fov_x = fov_x + f * ( zoomFov - fov_x );
 			}
 		} else {
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
 			if ( f > 1.0 ) {
 				fov_x = fov_x;
 			} else {
@@ -485,32 +471,13 @@ static int CG_CalcFov( void ) {
 }
 
 
+static void CG_DamageBlendBlob()
+{
+	refEntity_t ent;
+	int t = cg.time - cg.damageTime;
 
-/*
-===============
-CG_DamageBlendBlob
-
-===============
-*/
-static void CG_DamageBlendBlob( void ) {
-	int			t;
-	int			maxTime;
-	refEntity_t		ent;
-
-	if ( !cg.damageValue ) {
+	if (!cg.damageValue || (t <= 0) || (t >= DAMAGE_TIME))
 		return;
-	}
-
-	//if (cg.cameraMode) {
-	//	return;
-	//}
-
-	maxTime = DAMAGE_TIME;
-	t = cg.time - cg.damageTime;
-	if ( t <= 0 || t >= maxTime ) {
-		return;
-	}
-
 
 	memset( &ent, 0, sizeof( ent ) );
 	ent.reType = RT_SPRITE;
@@ -520,25 +487,21 @@ static void CG_DamageBlendBlob( void ) {
 	VectorMA( ent.origin, cg.damageX * -8, cg.refdef.viewaxis[1], ent.origin );
 	VectorMA( ent.origin, cg.damageY * 8, cg.refdef.viewaxis[2], ent.origin );
 
-	ent.radius = cg.damageValue * 3;
+	ent.radius = cg.damageValue;
 	ent.customShader = cgs.media.viewBloodShader;
 	ent.shaderRGBA[0] = 255;
 	ent.shaderRGBA[1] = 255;
 	ent.shaderRGBA[2] = 255;
-	ent.shaderRGBA[3] = 200 * ( 1.0 - ((float)t / maxTime) );
+	ent.shaderRGBA[3] = 128 * (1.0 - ((float)t / DAMAGE_TIME));
 	trap_R_AddRefEntityToScene( &ent );
 }
 
 
-/*
-===============
-CG_CalcViewValues
+// set up cg.refdef view values
 
-Sets cg.refdef view values
-===============
-*/
-static int CG_CalcViewValues( void ) {
-	playerState_t	*ps;
+static int CG_CalcViewValues()
+{
+	playerState_t* ps = &cg.predictedPlayerState;
 
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 
@@ -549,7 +512,6 @@ static int CG_CalcViewValues( void ) {
 	// calculate size of 3D view
 	CG_CalcVrect();
 
-	ps = &cg.predictedPlayerState;
 /*
 	if (cg.cameraMode) {
 		vec3_t origin, angles;
@@ -574,9 +536,7 @@ static int CG_CalcViewValues( void ) {
 
 	cg.bobcycle = ( ps->bobCycle & 128 ) >> 7;
 	cg.bobfracsin = fabs( sin( ( ps->bobCycle & 127 ) / 127.0 * M_PI ) );
-	cg.xyspeed = sqrt( ps->velocity[0] * ps->velocity[0] +
-		ps->velocity[1] * ps->velocity[1] );
-
+	cg.xyspeed = sqrt( ps->velocity[0] * ps->velocity[0] + ps->velocity[1] * ps->velocity[1] );
 
 	VectorCopy( ps->origin, cg.refdef.vieworg );
 	VectorCopy( ps->viewangles, cg.refdefViewAngles );
@@ -589,11 +549,7 @@ static int CG_CalcViewValues( void ) {
 	}
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {
-		int		t;
-		float	f;
-
-		t = cg.time - cg.predictedErrorTime;
-		f = ( cg_errorDecay.value - t ) / cg_errorDecay.value;
+		float f = (errdecay - (cg.time - cg.predictedErrorTime)) / errdecay;
 		if ( f > 0 && f < 1 ) {
 			VectorMA( cg.refdef.vieworg, f, cg.predictedError, cg.refdef.vieworg );
 		} else {
@@ -609,7 +565,7 @@ static int CG_CalcViewValues( void ) {
 		CG_OffsetFirstPersonView();
 	}
 
-	// position eye reletive to origin
+	// position eye relative to origin
 	AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
 
 	if ( cg.hyperspace ) {
@@ -621,12 +577,8 @@ static int CG_CalcViewValues( void ) {
 }
 
 
-/*
-=====================
-CG_PowerupTimerSounds
-=====================
-*/
-static void CG_PowerupTimerSounds( void ) {
+static void CG_PowerupTimerSounds()
+{
 	int		i;
 	int		t;
 
@@ -645,12 +597,9 @@ static void CG_PowerupTimerSounds( void ) {
 	}
 }
 
-/*
-=====================
-CG_AddBufferedSound
-=====================
-*/
-void CG_AddBufferedSound( sfxHandle_t sfx ) {
+
+void CG_AddBufferedSound( sfxHandle_t sfx )
+{
 	if ( !sfx )
 		return;
 	cg.soundBuffer[cg.soundBufferIn] = sfx;
@@ -660,12 +609,9 @@ void CG_AddBufferedSound( sfxHandle_t sfx ) {
 	}
 }
 
-/*
-=====================
-CG_PlayBufferedSounds
-=====================
-*/
-static void CG_PlayBufferedSounds( void ) {
+
+static void CG_PlayBufferedSounds()
+{
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
 			trap_S_StartLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
@@ -676,33 +622,28 @@ static void CG_PlayBufferedSounds( void ) {
 	}
 }
 
-//=========================================================================
 
-/*
-=================
-CG_DrawActiveFrame
+///////////////////////////////////////////////////////////////
 
-Generates and draws a game scene and status information at the given time.
-=================
-*/
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
+
+// generate and draw a game scene and status information for the given time
+
+void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback )
+{
 	int		inwater;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
 
-	// update cvars
 	CG_UpdateCvars();
 
-	// if we are only updating the screen as a loading
-	// pacifier, don't even try to read snapshots
+	// if we are only updating the screen as a loading pacifier, don't even try to read snapshots
 	if ( cg.infoScreenText[0] != 0 ) {
 		CG_DrawInformation();
 		return;
 	}
 
-	// any looped sounds will be respecified as entities
-	// are added to the render list
+	// any looped sounds will be respecified when entities are added to the render list
 	trap_S_ClearLoopingSounds(qfalse);
 
 	// clear all the render lists
@@ -711,8 +652,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// set up cg.snap and possibly cg.nextSnap
 	CG_ProcessSnapshots();
 
-	// if we haven't received any snapshots yet, all
-	// we can draw is the information screen
+	// if we haven't received any snapshots yet, all we can draw is the information screen
 	if ( !cg.snap || ( cg.snap->snapFlags & SNAPFLAG_NOT_ACTIVE ) ) {
 		CG_DrawInformation();
 		return;
