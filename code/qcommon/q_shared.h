@@ -167,8 +167,9 @@ typedef int		clipHandle_t;
 
 #if defined(_MSC_VER)
 	#define ALIGN(x) __declspec( align(x) )
-#elif defined(__GNUC__)
-	#define ALIGN(x) __align(x)
+// fuck it, im sick of gcc's arbitrary stupidities
+//#elif defined(__GNUC__)
+//	#define ALIGN(x) __align(x)
 #else
 	#define ALIGN(x)
 #endif
