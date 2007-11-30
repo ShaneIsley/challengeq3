@@ -1339,7 +1339,7 @@ void CG_RegisterWeapon( int weaponNum );
 void CG_RegisterItemVisuals( int itemNum );
 
 void CG_FireWeapon( centity_t *cent );
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
+void CG_MissileHitWall( int weapon, int clientNum, const vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 void CG_ShotgunFire( const entityState_t* es );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
@@ -1348,9 +1348,9 @@ void CG_RailTrail( const clientInfo_t* ci, const vec3_t start, const vec3_t end 
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 void CG_AddViewWeapon( const playerState_t* ps );
 void CG_AddPlayerWeapon( const refEntity_t* parent, const playerState_t* ps, centity_t* cent );
-void CG_DrawWeaponSelect( void );
+void CG_DrawWeaponSelect();
 
-void CG_OutOfAmmoChange( void );	// should this be in pmove?
+void CG_OutOfAmmoChange();	// should this be in pmove?
 
 //
 // cg_marks.c
@@ -1398,7 +1398,7 @@ void CG_BigExplode( vec3_t playerOrigin );
 
 void CG_Bleed( vec3_t origin, int entityNum );
 
-localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
+localEntity_t* CG_MakeExplosion( const vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int msec,
 								qboolean isSprite );
 

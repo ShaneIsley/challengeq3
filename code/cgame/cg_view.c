@@ -549,7 +549,7 @@ static int CG_CalcViewValues()
 	}
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {
-		float f = (errdecay - (cg.time - cg.predictedErrorTime)) / errdecay;
+		float f = (cg_errorDecay.value - (cg.time - cg.predictedErrorTime)) / cg_errorDecay.value;
 		if ( f > 0 && f < 1 ) {
 			VectorMA( cg.refdef.vieworg, f, cg.predictedError, cg.refdef.vieworg );
 		} else {
