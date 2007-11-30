@@ -1442,7 +1442,7 @@ void CG_PlayBufferedVoiceChats( void );
 //
 // cg_playerstate.c
 //
-void CG_Respawn( void );
+void CG_Respawn();
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 
 
