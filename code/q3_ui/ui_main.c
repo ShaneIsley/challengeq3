@@ -115,11 +115,7 @@ vmCvar_t	ui_ctf_friendly;
 
 vmCvar_t	ui_arenasFile;
 vmCvar_t	ui_botsFile;
-vmCvar_t	ui_spScores1;
-vmCvar_t	ui_spScores2;
-vmCvar_t	ui_spScores3;
-vmCvar_t	ui_spScores4;
-vmCvar_t	ui_spScores5;
+vmCvar_t	ui_spScores;
 vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
@@ -174,7 +170,7 @@ static cvarTable_t		cvarTable[] = {
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_spScores1, "g_spScores", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores, "g_spScores", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },

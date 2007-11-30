@@ -33,8 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/keycodes.h"
 #include "../game/bg_public.h"
 
-typedef void (*voidfunc_f)(void);
-
 extern vmCvar_t	ui_ffa_fraglimit;
 extern vmCvar_t	ui_ffa_timelimit;
 
@@ -51,11 +49,7 @@ extern vmCvar_t	ui_ctf_friendly;
 
 extern vmCvar_t	ui_arenasFile;
 extern vmCvar_t	ui_botsFile;
-extern vmCvar_t	ui_spScores1;
-extern vmCvar_t	ui_spScores2;
-extern vmCvar_t	ui_spScores3;
-extern vmCvar_t	ui_spScores4;
-extern vmCvar_t	ui_spScores5;
+extern vmCvar_t	ui_spScores;
 extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
@@ -674,7 +668,7 @@ int				trap_MemoryRemaining( void );
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
 
-qboolean               trap_VerifyCDKey( const char *key, const char *chksum); // bk001208 - RC4
+qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
 
 void			trap_SetPbClStatus( int status );
 
@@ -764,34 +758,5 @@ void UI_SPUnlock_f( void );
 void UI_SPUnlockMedals_f( void );
 
 void UI_InitGameinfo( void );
-
-//GRank
-
-//
-// ui_rankings.c
-//
-void Rankings_DrawText( void* self );
-void Rankings_DrawName( void* self );
-void Rankings_DrawPassword( void* self );
-void Rankings_Cache( void );
-void UI_RankingsMenu( void );
-
-//
-// ui_login.c
-//
-void Login_Cache( void );
-void UI_LoginMenu( void );
-
-//
-// ui_signup.c
-//
-void Signup_Cache( void );
-void UI_SignupMenu( void );
-
-//
-// ui_rankstatus.c
-//
-void RankStatus_Cache( void );
-void UI_RankStatusMenu( void );
 
 #endif
