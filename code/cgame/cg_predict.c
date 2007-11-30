@@ -581,9 +581,6 @@ void CG_PredictPlayerState()
 
 		// add push trigger movement effects
 		CG_TouchTriggerPrediction();
-
-		// check for predictable events that changed from previous predictions
-		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
 	if ( cg_showmiss.integer > 1 ) {

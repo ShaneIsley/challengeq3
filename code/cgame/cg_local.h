@@ -1444,7 +1444,6 @@ void CG_PlayBufferedVoiceChats( void );
 //
 void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
-void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
 
 //===============================================
