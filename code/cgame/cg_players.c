@@ -2021,17 +2021,10 @@ static void CG_PlayerSplash( centity_t *cent ) {
 }
 
 
+// adds a piece of a player with modifications or duplications for powerups
 
-/*
-===============
-CG_AddRefEntityWithPowerups
-
-Adds a piece with modifications or duplications for powerups
-Also called by CG_Missile for quad rockets, but nobody can tell...
-===============
-*/
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
-
+static void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team )
+{
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {
 		ent->customShader = cgs.media.invisShader;
 		trap_R_AddRefEntityToScene( ent );
@@ -2050,10 +2043,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 
 		if ( state->powerups & ( 1 << PW_QUAD ) )
 		{
-			if (team == TEAM_RED)
-				ent->customShader = cgs.media.redQuadShader;
-			else
-				ent->customShader = cgs.media.quadShader;
+			ent->customShader = cgs.media.quadShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
 		if ( state->powerups & ( 1 << PW_REGEN ) ) {
@@ -2486,36 +2476,27 @@ void CG_Player( centity_t* cent )
 
 //=====================================================================
 
-/*
-===============
-CG_ResetPlayerEntity
 
-A player just came into view or teleported, so reset all animation info
-===============
-*/
-void CG_ResetPlayerEntity( centity_t *cent ) {
-	cent->errorTime = -99999;		// guarantee no error decay added
-	cent->extrapolated = qfalse;	
+// a player just came into view or teleported, so reset all animation info
 
+void CG_ResetPlayerEntity( centity_t* cent )
+{
 	CG_ClearLerpFrame( &cgs.clientinfo[ cent->currentState.clientNum ], &cent->pe.legs, cent->currentState.legsAnim );
 	CG_ClearLerpFrame( &cgs.clientinfo[ cent->currentState.clientNum ], &cent->pe.torso, cent->currentState.torsoAnim );
 
 	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
 	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );
 
-	VectorCopy( cent->lerpOrigin, cent->rawOrigin );
-	VectorCopy( cent->lerpAngles, cent->rawAngles );
-
 	memset( &cent->pe.legs, 0, sizeof( cent->pe.legs ) );
-	cent->pe.legs.yawAngle = cent->rawAngles[YAW];
+	cent->pe.legs.yawAngle = cent->lerpAngles[YAW];
 	cent->pe.legs.yawing = qfalse;
 	cent->pe.legs.pitchAngle = 0;
 	cent->pe.legs.pitching = qfalse;
 
 	memset( &cent->pe.torso, 0, sizeof( cent->pe.legs ) );
-	cent->pe.torso.yawAngle = cent->rawAngles[YAW];
+	cent->pe.torso.yawAngle = cent->lerpAngles[YAW];
 	cent->pe.torso.yawing = qfalse;
-	cent->pe.torso.pitchAngle = cent->rawAngles[PITCH];
+	cent->pe.torso.pitchAngle = cent->lerpAngles[PITCH];
 	cent->pe.torso.pitching = qfalse;
 
 	if ( cg_debugPosition.integer ) {

@@ -1573,32 +1573,24 @@ typedef struct {
 
 lagometer_t		lagometer;
 
-/*
-==============
-CG_AddLagometerFrameInfo
 
-Adds the current interpolate / extrapolate bar for this frame
-==============
-*/
-void CG_AddLagometerFrameInfo( void ) {
-	int			offset;
+// adds the current interpolate / extrapolate bar for this frame
 
-	offset = cg.time - cg.latestSnapshotTime;
+void CG_AddLagometerFrameInfo()
+{
+	int offset = cg.time - cg.latestSnapshotTime;
 	lagometer.frameSamples[ lagometer.frameCount & ( LAG_SAMPLES - 1) ] = offset;
 	lagometer.frameCount++;
 }
 
-/*
-==============
-CG_AddLagometerSnapshotInfo
 
+/*
 Each time a snapshot is received, log its ping time and
 the number of snapshots that were dropped before it.
-
 Pass NULL for a dropped packet.
-==============
 */
-void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
+void CG_AddLagometerSnapshotInfo( const snapshot_t* snap )
+{
 	// dropped packet
 	if ( !snap ) {
 		lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = -1;
@@ -2073,6 +2065,8 @@ static void CG_DrawVote()
 }
 
 
+#ifdef MISSIONPACK
+
 static void CG_DrawTeamVote()
 {
 	int		sec, cs_offset;
@@ -2103,6 +2097,8 @@ static void CG_DrawTeamVote()
 							cgs.teamVoteYes[cs_offset], cgs.teamVoteNo[cs_offset] );
 	CG_DrawSmallString( 0, 90, s, 1.0F );
 }
+
+#endif
 
 
 static qboolean CG_DrawScoreboard( void ) {
@@ -2502,12 +2498,12 @@ static void CG_Draw2D( void ) {
 #else
 			CG_DrawStatusBar();
 #endif
-      
+
 			CG_DrawAmmoWarning();
 
 #ifdef MISSIONPACK
 			CG_DrawProxWarning();
-#endif      
+#endif
 			CG_DrawCrosshair();
 			CG_DrawCrosshairNames();
 			CG_DrawWeaponSelect();
@@ -2519,7 +2515,7 @@ static void CG_Draw2D( void ) {
 #endif
 			CG_DrawReward();
 		}
-    
+
 		if ( cgs.gametype >= GT_TEAM ) {
 #ifndef MISSIONPACK
 			CG_DrawTeamInfo();
@@ -2528,7 +2524,9 @@ static void CG_Draw2D( void ) {
 	}
 
 	CG_DrawVote();
+#ifdef MISSIONPACK
 	CG_DrawTeamVote();
+#endif
 
 	CG_DrawLagometer();
 

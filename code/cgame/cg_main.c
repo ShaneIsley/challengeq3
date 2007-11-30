@@ -361,14 +361,11 @@ static void CG_ForceModelChange( void ) {
 	}
 }
 
-/*
-=================
-CG_UpdateCvars
-=================
-*/
-void CG_UpdateCvars( void ) {
-	int			i;
-	cvarTable_t	*cv;
+
+void CG_UpdateCvars()
+{
+	int i;
+	cvarTable_t* cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
@@ -376,18 +373,11 @@ void CG_UpdateCvars( void ) {
 
 	// check for modications here
 
-	// If team overlay is on, ask for updates from the server.  If its off,
-	// let the server know so we don't receive it
+	// if team overlay is on, ask for updates from the server
+	// if its off, let the server know so we don't receive it
 	if ( drawTeamOverlayModificationCount != cg_drawTeamOverlay.modificationCount ) {
 		drawTeamOverlayModificationCount = cg_drawTeamOverlay.modificationCount;
-
-		if ( cg_drawTeamOverlay.integer > 0 ) {
-			trap_Cvar_Set( "teamoverlay", "1" );
-		} else {
-			trap_Cvar_Set( "teamoverlay", "0" );
-		}
-		// FIXME E3 HACK
-		trap_Cvar_Set( "teamoverlay", "1" );
+		trap_Cvar_Set( "teamoverlay", cg_drawTeamOverlay.integer ? "1" : "0" );
 	}
 
 	// if force model changed
@@ -396,6 +386,7 @@ void CG_UpdateCvars( void ) {
 		CG_ForceModelChange();
 	}
 }
+
 
 int CG_CrosshairPlayer( void ) {
 	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
@@ -873,14 +864,12 @@ static void CG_RegisterGraphics()
 
 #ifdef MISSIONPACK
 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
-#else
-	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
-#endif
 		cgs.media.redCubeModel = trap_R_RegisterModel( "models/powerups/orb/r_orb.md3" );
 		cgs.media.blueCubeModel = trap_R_RegisterModel( "models/powerups/orb/b_orb.md3" );
 		cgs.media.redCubeIcon = trap_R_RegisterShader( "icons/skull_red" );
 		cgs.media.blueCubeIcon = trap_R_RegisterShader( "icons/skull_blue" );
 	}
+#endif
 
 #ifdef MISSIONPACK
 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
@@ -938,7 +927,6 @@ static void CG_RegisterGraphics()
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
-		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
 		cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.tga" );
 #ifdef MISSIONPACK
 		cgs.media.blueKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikblu" );
@@ -990,10 +978,9 @@ static void CG_RegisterGraphics()
 	cgs.media.invulnerabilityJuicedModel = trap_R_RegisterModel( "models/powerups/shield/juicer.md3" );
 	cgs.media.medkitUsageModel = trap_R_RegisterModel( "models/powerups/regen.md3" );
 	cgs.media.heartShader = trap_R_RegisterShaderNoMip( "ui/assets/statusbar/selectedhealth.tga" );
-
+	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/shield.md3" );
 #endif
 
-	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/shield.md3" );
 	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );
 	cgs.media.medalExcellent = trap_R_RegisterShaderNoMip( "medal_excellent" );
 	cgs.media.medalGauntlet = trap_R_RegisterShaderNoMip( "medal_gauntlet" );
@@ -1082,13 +1069,10 @@ static void CG_RegisterGraphics()
 }
 
 
-/*
-=======================
-CG_BuildSpectatorString
+#ifdef MISSIONPACK
 
-=======================
-*/
-void CG_BuildSpectatorString(void) {
+void CG_BuildSpectatorString()
+{
 	int i;
 	cg.spectatorList[0] = 0;
 	for (i = 0; i < MAX_CLIENTS; i++) {
@@ -1103,20 +1087,18 @@ void CG_BuildSpectatorString(void) {
 	}
 }
 
+#endif
 
-/*
-===================
-CG_RegisterClients
-===================
-*/
-static void CG_RegisterClients( void ) {
+
+static void CG_RegisterClients()
+{
 	int		i;
 
 	CG_LoadingClient(cg.clientNum);
 	CG_NewClientInfo(cg.clientNum);
 
-	for (i=0 ; i<MAX_CLIENTS ; i++) {
-		const char		*clientInfo;
+	for (i = 0; i < MAX_CLIENTS; i++) {
+		const char* clientInfo;
 
 		if (cg.clientNum == i) {
 			continue;
@@ -1129,7 +1111,10 @@ static void CG_RegisterClients( void ) {
 		CG_LoadingClient( i );
 		CG_NewClientInfo( i );
 	}
+
+#ifdef MISSIONPACK
 	CG_BuildSpectatorString();
+#endif
 }
 
 //===========================================================================

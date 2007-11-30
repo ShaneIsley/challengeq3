@@ -147,7 +147,7 @@ typedef struct {
 	lerpFrame_t		legs, torso, flag;
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
-	int				lightningFiring;
+	qboolean		lightningFiring;
 
 	// railgun trail spawning
 	vec3_t			railImpact;
@@ -173,25 +173,16 @@ typedef struct centity_s {
 
 	int				muzzleFlashTime;	// move to playerEntity?
 	int				previousEvent;
-	int				teleportFlag;
 
 	int				trailTime;		// so missile trails can handle dropped initial packets
-	int				dustTrailTime;
 	int				miscTime;
+#ifdef MISSIONPACK
+	int				dustTrailTime;
+#endif
 
 	int				snapShotTime;	// last time this entity was found in a snapshot
 
 	playerEntity_t	pe;
-
-	int				errorTime;		// decay the error from this time
-	vec3_t			errorOrigin;
-	vec3_t			errorAngles;
-	
-	qboolean		extrapolated;	// false if origin / angles is an interpolation
-	vec3_t			rawOrigin;
-	vec3_t			rawAngles;
-
-	vec3_t			beamEnd;
 
 	// exact interpolated position of entity on this frame
 	vec3_t			lerpOrigin;
@@ -279,7 +270,7 @@ typedef struct localEntity_s {
 	leMarkType_t		leMarkType;		// mark to leave on fragment impact
 	leBounceSoundType_t	leBounceSoundType;
 
-	refEntity_t		refEntity;		
+	refEntity_t		refEntity;
 } localEntity_t;
 
 //======================================================================
@@ -300,7 +291,6 @@ typedef struct {
 	int				assistCount;
 	int				captures;
 	qboolean	perfect;
-	int				team;
 } score_t;
 
 // each client has an associated clientInfo_t
@@ -342,8 +332,7 @@ typedef struct {
 	int				breathPuffTime;
 
 	// when clientinfo is changed, the loading of models/skins/sounds
-	// can be deferred until you are dead, to prevent hitches in
-	// gameplay
+	// can be deferred until you are dead, to prevent hitches in gameplay
 	char			modelName[MAX_QPATH];
 	char			skinName[MAX_QPATH];
 	qboolean		deferred;
@@ -387,7 +376,6 @@ typedef struct weaponInfo_s {
 
 	vec3_t			weaponMidpoint;		// so it will rotate centered instead of by tag
 
-	float			flashDlight;
 	vec3_t			flashDlightColor;
 	sfxHandle_t		flashSound[4];		// fast firing weapons randomly choose
 
@@ -415,7 +403,7 @@ typedef struct weaponInfo_s {
 
 
 // each IT_* item has an associated itemInfo_t
-// that constains media references necessary to present the
+// that contains media references necessary to present the
 // item and its effects
 typedef struct {
 	qboolean		registered;
@@ -423,35 +411,27 @@ typedef struct {
 	qhandle_t		icon;
 } itemInfo_t;
 
+#define MAX_REWARDSTACK		10
+#define MAX_SOUNDBUFFER		20
 
-typedef struct {
-	int				itemNum;
-} powerupInfo_t;
-
-
+#ifdef MISSIONPACK
 #define MAX_SKULLTRAIL		10
-
 typedef struct {
 	vec3_t positions[MAX_SKULLTRAIL];
 	int numpositions;
 } skulltrail_t;
-
-
-#define MAX_REWARDSTACK		10
-#define MAX_SOUNDBUFFER		20
+#endif
 
 //======================================================================
 
-// all cg.stepTime, cg.duckTime, cg.landTime, etc are set to cg.time when the action
-// occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
 
 #define MAX_PREDICTED_EVENTS	16
- 
+
 typedef struct {
 	int			clientFrame;		// incremented each frame
 
 	int			clientNum;
-	
+
 	qboolean	demoPlayback;
 	qboolean	levelShot;			// taking a level menu screenshot
 	int			deferredPlayerLoading;
@@ -473,8 +453,7 @@ typedef struct {
 
 	int			frametime;		// cg.time - cg.oldTime
 
-	int			time;			// this is the time value that the client
-								// is rendering at.
+	int			time;			// this is the time value that the client is rendering at
 	int			oldTime;		// time at last frame, used for missile trails and prediction checking
 
 	int			physicsTime;	// either cg.snap->time or cg.nextSnap->time
@@ -496,6 +475,9 @@ typedef struct {
 
 	int			eventSequence;
 	int			predictableEvents[MAX_PREDICTED_EVENTS];
+
+	// all cg.stepTime, cg.duckTime, cg.landTime, etc are set to cg.time when the action
+	// occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
 
 	float		stepChange;				// for stair up smoothing
 	int			stepTime;
@@ -537,6 +519,8 @@ typedef struct {
 	qboolean	scoreBoardShowing;
 	int			scoreFadeTime;
 	char		killerName[MAX_NAME_LENGTH];
+
+#ifdef MISSIONPACK
 	char			spectatorList[MAX_STRING_CHARS];		// list of names
 	int				spectatorLen;												// length of list
 	float			spectatorWidth;											// width in device units
@@ -548,6 +532,7 @@ typedef struct {
 
 	// skull trails
 	skulltrail_t	skulltrails[MAX_CLIENTS];
+#endif
 
 	// centerprinting
 	int			centerPrintTime;
@@ -587,10 +572,12 @@ typedef struct {
 	int			soundTime;
 	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
 
+#ifdef MISSIONPACK
 	// for voice chat buffer
 	int			voiceChatTime;
 	int			voiceChatBufferIn;
 	int			voiceChatBufferOut;
+#endif
 
 	// warmup countdown
 	int			warmup;
@@ -624,17 +611,14 @@ typedef struct {
 	float		v_dmg_pitch;
 	float		v_dmg_roll;
 
-	vec3_t		kick_angles;	// weapon kicks
-	vec3_t		kick_origin;
-
-	// temp working variables for player view
+	// view-adjustment vars for run/bob shit, held here so that weapon models can be synced
 	float		bobfracsin;
 	int			bobcycle;
 	float		xyspeed;
-	int     nextOrbitTime;
+
+	int			nextOrbitTime;
 
 	//qboolean cameraMode;		// if rendering from a loaded camera
-
 
 	// development tool
 	refEntity_t		testModelEntity;
@@ -647,7 +631,7 @@ typedef struct {
 // all of the model, shader, and sound references that are
 // loaded at gamestate time are stored in cgMedia_t
 // Other media that can be tied to clients, weapons, or items are
-// stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
+// stored in the clientInfo_t, itemInfo_t, weaponInfo_t
 typedef struct {
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
@@ -655,10 +639,6 @@ typedef struct {
 	qhandle_t	charsetPropB;
 	qhandle_t	whiteShader;
 
-	qhandle_t	redCubeModel;
-	qhandle_t	blueCubeModel;
-	qhandle_t	redCubeIcon;
-	qhandle_t	blueCubeIcon;
 	qhandle_t	redFlagModel;
 	qhandle_t	blueFlagModel;
 	qhandle_t	neutralFlagModel;
@@ -678,6 +658,11 @@ typedef struct {
 	qhandle_t	neutralFlagBaseModel;
 
 #ifdef MISSIONPACK
+	qhandle_t	redCubeModel;
+	qhandle_t	blueCubeModel;
+	qhandle_t	redCubeIcon;
+	qhandle_t	blueCubeIcon;
+
 	qhandle_t	overloadBaseModel;
 	qhandle_t	overloadTargetModel;
 	qhandle_t	overloadLightsModel;
@@ -713,7 +698,6 @@ typedef struct {
 	qhandle_t	machinegunBrassModel;
 	qhandle_t	shotgunBrassModel;
 
-	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
 
 	qhandle_t	lightningShader;
@@ -757,15 +741,12 @@ typedef struct {
 
 	// powerup shaders
 	qhandle_t	quadShader;
-	qhandle_t	redQuadShader;
 	qhandle_t	quadWeaponShader;
 	qhandle_t	invisShader;
 	qhandle_t	regenShader;
 	qhandle_t	battleSuitShader;
 	qhandle_t	battleWeaponShader;
 	qhandle_t	hastePuffShader;
-	qhandle_t	redKamikazeShader;
-	qhandle_t	blueKamikazeShader;
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -785,7 +766,10 @@ typedef struct {
 	// special effects models
 	qhandle_t	teleportEffectModel;
 	qhandle_t	teleportEffectShader;
+
 #ifdef MISSIONPACK
+	qhandle_t	redKamikazeShader;
+	qhandle_t	blueKamikazeShader;
 	qhandle_t	kamikazeEffectModel;
 	qhandle_t	kamikazeShockWave;
 	qhandle_t	kamikazeHeadModel;
@@ -799,8 +783,8 @@ typedef struct {
 	qhandle_t	medkitUsageModel;
 	qhandle_t	dustPuffShader;
 	qhandle_t	heartShader;
-#endif
 	qhandle_t	invulnerabilityPowerupModel;
+#endif
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -980,7 +964,7 @@ typedef struct {
 
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
-// be cleared when a tournement restart is done, allowing
+// be cleared when a tournament restart is done, allowing
 // all clients to begin playing instantly
 typedef struct {
 	gameState_t		gameState;			// gamestate from server
@@ -1003,8 +987,6 @@ typedef struct {
 	int				timelimit;
 	int				maxclients;
 	char			mapname[MAX_QPATH];
-	char			redTeam[MAX_QPATH];
-	char			blueTeam[MAX_QPATH];
 
 	int				voteTime;
 	int				voteYes;
@@ -1012,19 +994,22 @@ typedef struct {
 	qboolean		voteModified;			// beep whenever changed
 	char			voteString[MAX_STRING_TOKENS];
 
+#ifdef MISSIONPACK
+	char			redTeam[MAX_QPATH];
+	char			blueTeam[MAX_QPATH];
+
 	int				teamVoteTime[2];
 	int				teamVoteYes[2];
 	int				teamVoteNo[2];
 	qboolean		teamVoteModified[2];	// beep whenever changed
 	char			teamVoteString[2][MAX_STRING_TOKENS];
+#endif
 
 	int				levelStartTime;
 
 	int				scores1, scores2;		// from configstrings
 	int				redflag, blueflag;		// flag status from configstrings
 	int				flagStatus;
-
-	qboolean  newHud;
 
 	//
 	// locally derived information from gamestate
@@ -1044,6 +1029,7 @@ typedef struct {
 	int				teamChatPos;
 	int				teamLastChatPos;
 
+#ifdef MISSIONPACK
 	int cursorX;
 	int cursorY;
 	qboolean eventHandling;
@@ -1061,8 +1047,8 @@ typedef struct {
 	int acceptTask;
 	int acceptLeader;
 	char acceptVoice[MAX_NAME_LENGTH];
+#endif
 
-	// media
 	cgMedia_t		media;
 
 } cgs_t;
@@ -1205,7 +1191,7 @@ void QDECL CG_Error( const char *msg, ... );
 
 void CG_StartMusic();
 
-void CG_UpdateCvars( void );
+void CG_UpdateCvars();
 
 int CG_CrosshairPlayer( void );
 int CG_LastAttacker( void );
@@ -1216,7 +1202,7 @@ void CG_EventHandling(int type);
 void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore( void );
-void CG_BuildSpectatorString( void );
+void CG_BuildSpectatorString();
 
 int Cvar_VariableIntegerValue(const char* s);	// the trap_ version is missing from cgame, sigh
 
@@ -1271,20 +1257,24 @@ void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 //
 // cg_draw.c, cg_newDraw.c
 //
-extern	int sortedTeamPlayers[TEAM_MAXOVERLAY];
-extern	int	numSortedTeamPlayers;
-extern	int drawTeamOverlayModificationCount;
-extern  char systemChat[256];
-extern  char teamChat1[256];
-extern  char teamChat2[256];
+extern int sortedTeamPlayers[TEAM_MAXOVERLAY];
+extern int numSortedTeamPlayers;
+extern int drawTeamOverlayModificationCount;
 
-void CG_AddLagometerFrameInfo( void );
-void CG_AddLagometerSnapshotInfo( snapshot_t *snap );
+void CG_AddLagometerFrameInfo();
+void CG_AddLagometerSnapshotInfo( const snapshot_t* snap );
+
 void CG_CenterPrint( const char *str, int y, int charWidth );
 void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t headAngles );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
+
+#ifdef MISSIONPACK
+extern  char systemChat[256];
+extern  char teamChat1[256];
+extern  char teamChat2[256];
+
 void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
 void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width(const char *text, float scale, int limit);
@@ -1307,17 +1297,16 @@ const char *CG_GameTypeString( void );
 qboolean CG_YourTeamHasFlag( void );
 qboolean CG_OtherTeamHasFlag( void );
 qhandle_t CG_StatusHandle(int task);
-
+#endif
 
 
 //
 // cg_player.c
 //
 void CG_Player( centity_t *cent );
-void CG_ResetPlayerEntity( centity_t *cent );
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
+void CG_ResetPlayerEntity( centity_t* cent );
 void CG_NewClientInfo( int clientNum );
-sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
+sfxHandle_t CG_CustomSound( int clientNum, const char *soundName );
 
 //
 // cg_predict.c
@@ -1334,7 +1323,7 @@ void CG_LoadDeferredPlayers( void );
 // cg_events.c
 //
 void CG_CheckEvents( centity_t *cent );
-const char	*CG_PlaceString( int rank );
+const char* CG_PlaceString( int rank );
 void CG_EntityEvent( centity_t *cent, vec3_t position );
 void CG_PainEvent( centity_t *cent, int health );
 
@@ -1549,7 +1538,7 @@ int			trap_CM_MarkFragments( int numPoints, const vec3_t *points,
 
 // normal sounds will have their volume dynamically changed as their entity
 // moves and the listener moves
-void		trap_S_StartSound( vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfx );
+void		trap_S_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfx );
 void		trap_S_StopLoopingSound(int entnum);
 
 // a local sound is always played full volume
@@ -1583,8 +1572,8 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 
 // polys are intended for simple wall marks, not really for doing
 // significant construction
-void		trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
-void		trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int numPolys );
+void		trap_R_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts );
+void		trap_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 void		trap_R_RenderScene( const refdef_t *fd );
@@ -1609,7 +1598,7 @@ void		trap_GetGameState( gameState_t *gamestate );
 // snapshot latency can be calculated.
 void		trap_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime );
 
-// a snapshot get can fail if the snapshot (or the entties it holds) is so
+// a snapshot get can fail if the snapshot (or the entities it holds) is so
 // old that it has fallen out of the client system queue
 qboolean	trap_GetSnapshot( int snapshotNumber, snapshot_t *snapshot );
 
@@ -1623,7 +1612,7 @@ qboolean	trap_GetServerCommand( int serverCommandNumber );
 // this will always be at least one higher than the number in the current
 // snapshot, and it may be quite a few higher if it is a fast computer on
 // a lagged connection
-int			trap_GetCurrentCmdNumber( void );	
+int			trap_GetCurrentCmdNumber( void );
 
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
@@ -1640,13 +1629,6 @@ qboolean	trap_Key_IsDown( int keynum );
 int			trap_Key_GetCatcher( void );
 void		trap_Key_SetCatcher( int catcher );
 int			trap_Key_GetKey( const char *binding );
-
-
-typedef enum {
-  SYSTEM_PRINT,
-  CHAT_PRINT,
-  TEAMCHAT_PRINT
-} q3print_t; // bk001201 - warning: useless keyword or type name in empty declaration
 
 
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);

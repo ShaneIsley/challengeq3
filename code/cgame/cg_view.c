@@ -376,10 +376,6 @@ static void CG_OffsetFirstPersonView()
 	if (timeDelta < STEP_TIME) {
 		cg.refdef.vieworg[2] -= cg.stepChange * (STEP_TIME - timeDelta) / STEP_TIME;
 	}
-
-	// add kick offset
-	VectorAdd(origin, cg.kick_origin, origin);
-	VectorAdd(angles, cg.kick_angles, angles);
 }
 
 //======================================================================
