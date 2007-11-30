@@ -29,16 +29,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // the server does not know how to interpret most of the values
 // in entityStates (level eType), so the game must explicitly flag
 // special server behaviors
-#define	SVF_NOCLIENT			0x00000001	// don't send entity to clients, even if it has effects
-
-// TTimo
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=551
-#define SVF_CLIENTMASK 0x00000002
-
+#define SVF_NOCLIENT			0x00000001	// don't send entity to clients, even if it has effects
+#define SVF_CLIENTMASK			0x00000002	// send to a specific subset of clients
 #define SVF_BOT					0x00000008	// set if the entity is a bot
-#define	SVF_BROADCAST			0x00000020	// send to all connected clients
-#define	SVF_PORTAL				0x00000040	// merge a second pvs at origin2 into snapshots
-#define	SVF_USE_CURRENT_ORIGIN	0x00000080	// entity->r.currentOrigin instead of entity->s.origin
+#define SVF_BROADCAST			0x00000020	// send to all connected clients
+#define SVF_PORTAL				0x00000040	// merge a second pvs at origin2 into snapshots
+#define SVF_USE_CURRENT_ORIGIN	0x00000080	// entity->r.currentOrigin instead of entity->s.origin
 											// for link position (missiles and movers)
 #define SVF_SINGLECLIENT		0x00000100	// only send to a single client (entityShared_t->singleClient)
 #define SVF_NOSERVERINFO		0x00000200	// don't send CS_SERVERINFO updates to this client
@@ -61,9 +57,10 @@ typedef struct {
 
 	int			svFlags;			// SVF_NOCLIENT, SVF_BROADCAST, etc
 
-	// only send to this client when SVF_SINGLECLIENT is set	
-	// if SVF_CLIENTMASK is set, use bitmask for clients to send to (maxclients must be <= 32, up to the mod to enforce this)
-	int			singleClient;		
+	// only send to this client when SVF_SINGLECLIENT is set
+	// if SVF_CLIENTMASK is set, use as bitmask of clients to send to
+	// (maxclients must be <= 32, up to the mod to enforce this)
+	int			singleClient;
 
 	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
 									// only set by trap_SetBrushModel
@@ -225,7 +222,7 @@ typedef enum {
 
 	G_TRACECAPSULE,	// ( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
 	G_ENTITY_CONTACTCAPSULE,	// ( const vec3_t mins, const vec3_t maxs, const gentity_t *ent );
-	
+
 	// 1.32
 	G_FS_SEEK,
 
