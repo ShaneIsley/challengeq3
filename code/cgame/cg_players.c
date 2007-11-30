@@ -954,19 +954,12 @@ void CG_NewClientInfo( int clientNum ) {
 }
 
 
+// called each frame when a player is dead and the scoreboard is up
 
-/*
-======================
-CG_LoadDeferredPlayers
-
-Called each frame when a player is dead
-and the scoreboard is up
-so deferred players can be loaded
-======================
-*/
-void CG_LoadDeferredPlayers( void ) {
-	int		i;
-	clientInfo_t	*ci;
+void CG_LoadDeferredPlayers()
+{
+	int i;
+	clientInfo_t* ci;
 
 	// scan for a deferred player to load
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ ) {
@@ -978,10 +971,10 @@ void CG_LoadDeferredPlayers( void ) {
 				continue;
 			}
 			CG_LoadClientInfo( i, ci );
-//			break;
 		}
 	}
 }
+
 
 /*
 =============================================================================

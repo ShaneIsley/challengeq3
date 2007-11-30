@@ -411,10 +411,10 @@ We detect prediction errors and allow them to be decayed off over several frames
 to ease the jerk.
 =================
 */
-void CG_PredictPlayerState( void ) {
+void CG_PredictPlayerState()
+{
 	int			cmdNum, current;
 	playerState_t	oldPlayerState;
-	qboolean	moved;
 	usercmd_t	oldestCmd;
 	usercmd_t	latestCmd;
 
@@ -429,7 +429,7 @@ void CG_PredictPlayerState( void ) {
 	}
 
 
-	// demo playback just copies the moves
+	// demo playback and following just copy the moves
 	if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) ) {
 		CG_InterpolatePlayerState( qfalse );
 		return;
@@ -500,7 +500,6 @@ void CG_PredictPlayerState( void ) {
 	cg_pmove.pmove_msec = pmove_msec.integer;
 
 	// run cmds
-	moved = qfalse;
 	for ( cmdNum = current - CMD_BACKUP + 1 ; cmdNum <= current ; cmdNum++ ) {
 		// get the command
 		trap_GetUserCmd( cmdNum, &cg_pmove.cmd );
@@ -549,19 +548,16 @@ void CG_PredictPlayerState( void ) {
 				len = VectorLength( delta );
 				if ( len > 0.1 ) {
 					if ( cg_showmiss.integer ) {
-						CG_Printf("Prediction miss: %f\n", len);
+						CG_Printf("Prediction miss: %.3f\n", len);
 					}
 					if ( cg_errorDecay.integer ) {
-						int		t;
-						float	f;
-
-						t = cg.time - cg.predictedErrorTime;
-						f = ( cg_errorDecay.value - t ) / cg_errorDecay.value;
+						int t = cg.time - cg.predictedErrorTime;
+						float f = ( cg_errorDecay.value - t ) / cg_errorDecay.value;
 						if ( f < 0 ) {
 							f = 0;
 						}
 						if ( f > 0 && cg_showmiss.integer ) {
-							CG_Printf("Double prediction decay: %f\n", f);
+							CG_Printf("Double prediction decay: %.3f\n", f);
 						}
 						VectorScale( cg.predictedError, f, cg.predictedError );
 					} else {
@@ -583,8 +579,6 @@ void CG_PredictPlayerState( void ) {
 
 		Pmove (&cg_pmove);
 
-		moved = qtrue;
-
 		// add push trigger movement effects
 		CG_TouchTriggerPrediction();
 
@@ -596,17 +590,10 @@ void CG_PredictPlayerState( void ) {
 		CG_Printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );
 	}
 
-	if ( !moved ) {
-		if ( cg_showmiss.integer ) {
-			CG_Printf( "not moved\n" );
-		}
-		return;
-	}
-
 	// adjust for the movement of the groundentity
-	CG_AdjustPositionForMover( cg.predictedPlayerState.origin, 
-		cg.predictedPlayerState.groundEntityNum, 
-		cg.physicsTime, cg.time, cg.predictedPlayerState.origin );
+	CG_AdjustPositionForMover( cg.predictedPlayerState.origin,
+			cg.predictedPlayerState.groundEntityNum,
+			cg.physicsTime, cg.time, cg.predictedPlayerState.origin );
 
 	if ( cg_showmiss.integer ) {
 		if (cg.predictedPlayerState.eventSequence > oldPlayerState.eventSequence + MAX_PS_EVENTS) {
