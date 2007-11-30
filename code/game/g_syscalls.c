@@ -366,11 +366,11 @@ int trap_AAS_PredictClientMovement(void /* struct aas_clientmove_s */ *move, int
 	return syscall( BOTLIB_AAS_PREDICT_CLIENT_MOVEMENT, move, entnum, origin, presencetype, onground, velocity, cmdmove, cmdframes, maxframes, PASSFLOAT(frametime), stopevent, stopareanum, visualize );
 }
 
-void EA_Say( int client, const char* s ) {
+void trap_EA_Say( int client, const char* s ) {
 	syscall( BOTLIB_EA_SAY, client, s );
 }
 
-void EA_SayTeam( int client, const char* s ) {
+void trap_EA_SayTeam( int client, const char* s ) {
 	syscall( BOTLIB_EA_SAY_TEAM, client, s );
 }
 
