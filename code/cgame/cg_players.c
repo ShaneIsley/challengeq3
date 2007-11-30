@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
 
-char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
+static const char* cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*death1.wav",
 	"*death2.wav",
 	"*death3.wav",
@@ -40,15 +40,10 @@ char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 };
 
 
-/*
-================
-CG_CustomSound
-
-================
-*/
-sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
-	clientInfo_t *ci;
-	int			i;
+sfxHandle_t CG_CustomSound( int clientNum, const char *soundName )
+{
+	int i;
+	const clientInfo_t* ci;
 
 	if ( soundName[0] != '*' ) {
 		return trap_S_RegisterSound( soundName, qfalse );
@@ -997,15 +992,11 @@ PLAYER ANIMATION
 */
 
 
-/*
-===============
-CG_SetLerpFrameAnimation
+// may include ANIM_TOGGLEBIT
 
-may include ANIM_TOGGLEBIT
-===============
-*/
-static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation ) {
-	animation_t	*anim;
+static void CG_SetLerpFrameAnimation( const clientInfo_t* ci, lerpFrame_t* lf, int newAnimation )
+{
+	const animation_t* anim;
 
 	lf->animationNumber = newAnimation;
 	newAnimation &= ~ANIM_TOGGLEBIT;
@@ -1024,17 +1015,14 @@ static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int new
 	}
 }
 
-/*
-===============
-CG_RunLerpFrame
 
-Sets cg.snap, cg.oldFrame, and cg.backlerp
-cg.time should be between oldFrameTime and frameTime after exit
-===============
-*/
-static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation, float speedScale ) {
+// sets cg.snap, cg.oldFrame, and cg.backlerp
+// cg.time should be between oldFrameTime and frameTime after exit
+
+static void CG_RunLerpFrame( const clientInfo_t* ci, lerpFrame_t* lf, int newAnimation, float speedScale )
+{
 	int			f, numFrames;
-	animation_t	*anim;
+	const animation_t* anim;
 
 	// debugging tool to get no animations
 	if ( cg_animSpeed.integer == 0 ) {
@@ -1926,21 +1914,17 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 
 	// add the mark as a temporary, so it goes directly to the renderer
 	// without taking a spot in the cg_marks array
-	CG_ImpactMark( cgs.media.shadowMarkShader, trace.endpos, trace.plane.normal, 
-		cent->pe.legs.yawAngle, alpha,alpha,alpha,1, qfalse, 24, qtrue );
+	CG_ImpactMark( cgs.media.shadowMarkShader, trace.endpos, trace.plane.normal,
+			cent->pe.legs.yawAngle, alpha,alpha,alpha,1, qfalse, 24, qtrue );
 
 	return qtrue;
 }
 
 
-/*
-===============
-CG_PlayerSplash
+// draw a mark at the water surface
 
-Draw a mark at the water surface
-===============
-*/
-static void CG_PlayerSplash( centity_t *cent ) {
+static void CG_PlayerSplash( const centity_t* cent )
+{
 	vec3_t		start, end;
 	trace_t		trace;
 	int			contents;
@@ -2059,50 +2043,6 @@ static void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state,
 	}
 }
 
-/*
-int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
-{
-	int				i, j;
-	float			incoming;
-	vec3_t			ambientLight;
-	vec3_t			lightDir;
-	vec3_t			directedLight;
-
-	trap_R_LightForPoint( verts[0].xyz, ambientLight, directedLight, lightDir );
-
-	for (i = 0; i < numVerts; i++) {
-		incoming = DotProduct (normal, lightDir);
-		if ( incoming <= 0 ) {
-			verts[i].modulate[0] = ambientLight[0];
-			verts[i].modulate[1] = ambientLight[1];
-			verts[i].modulate[2] = ambientLight[2];
-			verts[i].modulate[3] = 255;
-			continue;
-		} 
-		j = ( ambientLight[0] + incoming * directedLight[0] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[0] = j;
-
-		j = ( ambientLight[1] + incoming * directedLight[1] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[1] = j;
-
-		j = ( ambientLight[2] + incoming * directedLight[2] );
-		if ( j > 255 ) {
-			j = 255;
-		}
-		verts[i].modulate[2] = j;
-
-		verts[i].modulate[3] = 255;
-	}
-	return qtrue;
-}
-*/
-
 
 void CG_Player( centity_t* cent )
 {
@@ -2157,7 +2097,7 @@ void CG_Player( centity_t* cent )
 
 	// get the rotation information
 	CG_PlayerAngles( cent, legs.axis, torso.axis, head.axis );
-	
+
 	// get the animation state (after rotation, to allow feet shuffle)
 	CG_PlayerAnimation( cent, &legs.oldframe, &legs.frame, &legs.backlerp,
 			&torso.oldframe, &torso.frame, &torso.backlerp );
@@ -2474,7 +2414,7 @@ void CG_Player( centity_t* cent )
 }
 
 
-//=====================================================================
+///////////////////////////////////////////////////////////////
 
 
 // a player just came into view or teleported, so reset all animation info

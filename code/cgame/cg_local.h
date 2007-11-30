@@ -138,8 +138,8 @@ typedef struct {
 	qboolean	pitching;
 
 	int			animationNumber;	// may include ANIM_TOGGLEBIT
-	animation_t	*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
+	const animation_t* animation;
 } lerpFrame_t;
 
 
