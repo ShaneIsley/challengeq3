@@ -71,7 +71,6 @@ cvar_t	*cl_dlURL;
 #endif
 
 cvar_t	*cl_serverStatusResendTime;
-cvar_t	*cl_trn;
 
 clientActive_t		cl;
 clientConnection_t	clc;
@@ -1262,7 +1261,7 @@ void CL_NextDownload(void) {
 	char *dlURL;
 #endif
 
-	qbool  useCURL = qfalse;
+	qbool useCURL = qfalse;
 	// We are looking to start a download here
 	if (*clc.downloadList) {
 		s = clc.downloadList;
