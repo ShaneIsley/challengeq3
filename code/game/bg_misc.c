@@ -1008,26 +1008,23 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 	return NULL;
 }
 
-/*
-============
-BG_PlayerTouchesItem
 
-Items can be picked up without actually touching their physical bounds to make
-grabbing them easier
-============
-*/
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
-	vec3_t		origin;
+// items can be picked up without actually touching their physical bounds
+// to make grabbing them easier
+
+qboolean BG_PlayerTouchesItem( const playerState_t* ps, const entityState_t* item, int atTime )
+{
+	vec3_t origin;
 
 	BG_EvaluateTrajectory( &item->pos, atTime, origin );
 
 	// we are ignoring ducked differences here
-	if ( ps->origin[0] - origin[0] > 44
-		|| ps->origin[0] - origin[0] < -50
+	if ( ps->origin[0] - origin[0] > 36
+		|| ps->origin[0] - origin[0] < -36
 		|| ps->origin[1] - origin[1] > 36
 		|| ps->origin[1] - origin[1] < -36
-		|| ps->origin[2] - origin[2] > 36
-		|| ps->origin[2] - origin[2] < -36 ) {
+		|| ps->origin[2] - origin[2] > 50
+		|| ps->origin[2] - origin[2] < -44 ) {
 		return qfalse;
 	}
 
@@ -1035,16 +1032,11 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 }
 
 
+// returns false if the item should not be picked up
+// this needs to be the same for client side prediction and server use
 
-/*
-================
-BG_CanItemBeGrabbed
-
-Returns false if the item should not be picked up.
-This needs to be the same for client side prediction and server use.
-================
-*/
-qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
+qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps )
+{
 	gitem_t	*item;
 #ifdef MISSIONPACK
 	int		upperBound;
@@ -1061,10 +1053,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		return qtrue;	// weapons are always picked up
 
 	case IT_AMMO:
-		if ( ps->ammo[ item->giTag ] >= 200 ) {
-			return qfalse;		// can't hold any more
-		}
-		return qtrue;
+		return ( ps->ammo[ item->giTag ] < 200 );
 
 	case IT_ARMOR:
 #ifdef MISSIONPACK
@@ -1091,25 +1080,16 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		return qtrue;
 
 	case IT_HEALTH:
-		// small and mega healths will go over the max, otherwise
-		// don't pick up if already at max
+		// +5 and mega healths will go over the max, otherwise don't pick up if already at max
 #ifdef MISSIONPACK
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
 			upperBound = ps->stats[STAT_MAX_HEALTH];
 		}
 		else
 #endif
-		if ( item->quantity == 5 || item->quantity == 100 ) {
-			if ( ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] * 2 ) {
-				return qfalse;
-			}
-			return qtrue;
-		}
-
-		if ( ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] ) {
-			return qfalse;
-		}
-		return qtrue;
+		if ( item->quantity == 5 || item->quantity == 100 )
+			return ( ps->stats[STAT_HEALTH] < ps->stats[STAT_MAX_HEALTH] * 2 );
+		return ( ps->stats[STAT_HEALTH] < ps->stats[STAT_MAX_HEALTH] );
 
 	case IT_POWERUP:
 		return qtrue;	// powerups are always picked up
@@ -1134,6 +1114,10 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	case IT_TEAM: // team items, such as flags
 #ifdef MISSIONPACK		
+		if( gametype == GT_HARVESTER ) {
+			return qtrue;
+		}
+
 		if( gametype == GT_1FCTF ) {
 			// neutral flag can always be picked up
 			if( item->giTag == PW_NEUTRALFLAG ) {
@@ -1167,43 +1151,26 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			}
 		}
 
-#ifdef MISSIONPACK
-		if( gametype == GT_HARVESTER ) {
-			return qtrue;
-		}
-#endif
 		return qfalse;
 
 	case IT_HOLDABLE:
 		// can only hold one item at a time
-		if ( ps->stats[STAT_HOLDABLE_ITEM] ) {
-			return qfalse;
-		}
-		return qtrue;
+		return !ps->stats[STAT_HOLDABLE_ITEM];
 
-        case IT_BAD:
-            Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
-        default:
-#ifndef Q3_VM
-#ifndef NDEBUG // bk0001204
-          Com_Printf("BG_CanItemBeGrabbed: unknown enum %d\n", item->giType );
-#endif
-#endif
-         break;
+	default:
+		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: invalid item type %d\n", item->giType );
+		break;
 	}
 
 	return qfalse;
 }
 
-//======================================================================
 
-/*
-================
-BG_EvaluateTrajectory
+///////////////////////////////////////////////////////////////
 
-================
-*/
-void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) {
+
+void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result )
+{
 	float		deltaTime;
 	float		phase;
 
@@ -1242,14 +1209,11 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 	}
 }
 
-/*
-================
-BG_EvaluateTrajectoryDelta
 
-For determining velocity at a given time
-================
-*/
-void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result ) {
+// for determining velocity at a given time
+
+void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result )
+{
 	float	deltaTime;
 	float	phase;
 
@@ -1287,7 +1251,7 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 
 
 #ifdef _DEBUG
-const char* eventnames[] = {
+static const char* eventnames[] = {
 	"EV_NONE",
 
 	"EV_FOOTSTEP",
@@ -1389,23 +1353,21 @@ const char* eventnames[] = {
 #endif
 
 
-// handles the sequence numbers
-
 extern void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+
+// handles the sequence numbers
 
 void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps )
 {
 #ifdef _DEBUG
-	{
-		char buf[256];
-		trap_Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
-		if ( atof(buf) != 0 ) {
+	char buf[256];
+	trap_Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
+	if ( atof(buf) != 0 ) {
 #ifdef QAGAME
-			Com_Printf(" game event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
+		Com_Printf(" game event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
 #else
-			Com_Printf("Cgame event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
+		Com_Printf("Cgame event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
 #endif
-		}
 	}
 #endif
 
@@ -1451,14 +1413,9 @@ void BG_TouchJumpPad( playerState_t* ps, const entityState_t* jumppad )
 	VectorCopy( jumppad->origin2, ps->velocity );
 }
 
-/*
-========================
-BG_PlayerStateToEntityState
 
-This is done after each set of usercmd_t on the server,
-and after local prediction on the client
-========================
-*/
+// this is done after each set of usercmd_t on the server, and after local prediction on the client
+
 void BG_PlayerStateToEntityState( playerState_t* ps, entityState_t* es, qboolean snap )
 {
 	int i;
@@ -1526,14 +1483,9 @@ void BG_PlayerStateToEntityState( playerState_t* ps, entityState_t* es, qboolean
 	es->generic1 = ps->generic1;
 }
 
-/*
-========================
-BG_PlayerStateToEntityStateExtraPolate
 
-This is done after each set of usercmd_t on the server,
-and after local prediction on the client
-========================
-*/
+// this is done after each set of usercmd_t on the server, and never on the client
+
 void BG_PlayerStateToEntityStateExtraPolate( playerState_t* ps, entityState_t* es, int time, qboolean snap )
 {
 	BG_PlayerStateToEntityState( ps, es, snap );

@@ -377,53 +377,6 @@ static qboolean PM_CheckJump()
 	return qtrue;
 }
 
-/*
-=============
-PM_CheckWaterJump
-=============
-*/
-static qboolean	PM_CheckWaterJump( void ) {
-	vec3_t	spot;
-	int		cont;
-	vec3_t	flatforward;
-
-	if (pm->ps->pm_time) {
-		return qfalse;
-	}
-
-	// check for water jump
-	if ( pm->waterlevel != 2 ) {
-		return qfalse;
-	}
-
-	flatforward[0] = pml.forward[0];
-	flatforward[1] = pml.forward[1];
-	flatforward[2] = 0;
-	VectorNormalize (flatforward);
-
-	VectorMA (pm->ps->origin, 30, flatforward, spot);
-	spot[2] += 4;
-	cont = pm->pointcontents (spot, pm->ps->clientNum );
-	if ( !(cont & CONTENTS_SOLID) ) {
-		return qfalse;
-	}
-
-	spot[2] += 16;
-	cont = pm->pointcontents (spot, pm->ps->clientNum );
-	if ( cont ) {
-		return qfalse;
-	}
-
-	// jump out of water
-	VectorScale (pml.forward, 200, pm->ps->velocity);
-	pm->ps->velocity[2] = 350;
-
-	pm->ps->pm_flags |= PMF_TIME_WATERJUMP;
-	pm->ps->pm_time = 2000;
-
-	return qtrue;
-}
-
 
 ///////////////////////////////////////////////////////////////
 
@@ -690,6 +643,42 @@ static void PM_StepSlideMove( qboolean gravity )
 
 
 ///////////////////////////////////////////////////////////////
+
+
+// send the player flying onto dry land automatically at water's edge (DM12 etc)
+
+static qboolean PM_CheckWaterJump()
+{
+	vec3_t v;
+
+	if (pm->ps->pm_time)
+		return qfalse;
+
+	// only for vaulting out of waist-deep water, not puddles
+	if (pm->waterlevel != WATERLEVEL_DEEP)
+		return qfalse;
+
+	VectorSet( v, pml.forward[0], pml.forward[1], 0 );
+	VectorNormalize( v );
+
+	VectorMA( pm->ps->origin, 30, v, v );
+	v[2] += 4;
+	if (!(pm->pointcontents( v, pm->ps->clientNum ) & CONTENTS_SOLID))
+		return qfalse;
+
+	v[2] += 16;
+	if (pm->pointcontents( v, pm->ps->clientNum ))
+		return qfalse;
+
+	// jump out of water
+	VectorScale( pml.forward, 200, pm->ps->velocity );
+	pm->ps->velocity[2] = 350;
+
+	pm->ps->pm_flags |= PMF_TIME_WATERJUMP;
+	pm->ps->pm_time = 2000;
+
+	return qtrue;
+}
 
 
 static void PM_WaterJumpMove()
@@ -1867,10 +1856,8 @@ static void PmoveSingle( pmove_t* pmove )
 	PM_GroundTrace();
 	PM_SetWaterLevel();
 
-	// weapons
 	PM_Weapon();
 
-	// torso animation
 	PM_TorsoAnimation();
 
 	// footstep events / legs animations
