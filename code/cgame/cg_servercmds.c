@@ -141,8 +141,6 @@ void CG_ParseServerinfo()
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
 	trap_Cvar_Set("g_gametype", va("%i", cgs.gametype));
-	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
-	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
 	cgs.fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
 	cgs.capturelimit = atoi( Info_ValueForKey( info, "capturelimit" ) );
 	cgs.timelimit = atoi( Info_ValueForKey( info, "timelimit" ) );
@@ -157,18 +155,12 @@ void CG_ParseServerinfo()
 #endif
 }
 
-/*
-==================
-CG_ParseWarmup
-==================
-*/
-static void CG_ParseWarmup( void ) {
-	const char	*info;
-	int			warmup;
 
-	info = CG_ConfigString( CS_WARMUP );
+static void CG_ParseWarmup( void )
+{
+	const char* info = CG_ConfigString( CS_WARMUP );
+	int warmup = atoi( info );
 
-	warmup = atoi( info );
 	cg.warmupCount = -1;
 
 	if ( warmup == 0 && cg.warmup ) {
@@ -215,17 +207,10 @@ void CG_SetConfigValues( void ) {
 }
 
 
-/*
-================
-CG_ConfigStringModified
-
-================
-*/
-static void CG_ConfigStringModified( void ) {
-	const char	*str;
-	int		num;
-
-	num = atoi( CG_Argv( 1 ) );
+static void CG_ConfigStringModified()
+{
+	const char* str;
+	int num = atoi( CG_Argv( 1 ) );
 
 	// get the gamestate from the client system, which will have the
 	// new configstring already integrated
@@ -301,13 +286,8 @@ static void CG_ConfigStringModified( void ) {
 }
 
 
-/*
-=======================
-CG_AddToTeamChat
-
-=======================
-*/
-static void CG_AddToTeamChat( const char *str ) {
+static void CG_AddToTeamChat( const char* str )
+{
 	int len;
 	char *p, *ls;
 	int lastcolor;
@@ -374,16 +354,13 @@ static void CG_AddToTeamChat( const char *str ) {
 		cgs.teamLastChatPos = cgs.teamChatPos - chatHeight;
 }
 
-/*
-===============
-CG_MapRestart
 
+/*
 The server has issued a map_restart, so the next snapshot
 is completely new and should not be interpolated to.
 
-A tournement restart will clear everything, but doesn't
+A tournament restart will clear everything, but doesn't
 require a reload of all the media
-===============
 */
 static void CG_MapRestart()
 {
@@ -427,6 +404,12 @@ static void CG_MapRestart()
 #endif
 	trap_Cvar_Set("cg_thirdPerson", "0");
 }
+
+
+///////////////////////////////////////////////////////////////
+
+
+#ifdef MISSIONPACK
 
 #define MAX_VOICEFILESIZE	16384
 #define MAX_VOICEFILES		8
@@ -643,7 +626,6 @@ CG_VoiceChatListForClient
 */
 voiceChatList_t *CG_VoiceChatListForClient( int clientNum )
 {
-/* jeez, what a trainwreck...
 	clientInfo_t *ci;
 	int voiceChatNum, i, j, k, gender;
 	char filename[MAX_QPATH], headModelName[MAX_QPATH];
@@ -725,7 +707,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum )
 			break;
 		}
 	}
-*/
+
 	// just return the first voice chat list
 	return &voiceChatLists[0];
 }
@@ -749,7 +731,6 @@ CG_PlayVoiceChat
 =================
 */
 void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
-#ifdef MISSIONPACK
 	// if we are going into the intermission, don't start any voices
 	if ( cg.intermissionStarted ) {
 		return;
@@ -774,7 +755,6 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 		CG_Printf( "%s\n", vchat->message );
 	}
 	voiceChatBuffer[cg.voiceChatBufferOut].snd = 0;
-#endif
 }
 
 /*
@@ -783,7 +763,6 @@ CG_PlayBufferedVoieChats
 =====================
 */
 void CG_PlayBufferedVoiceChats( void ) {
-#ifdef MISSIONPACK
 	if ( cg.voiceChatTime < cg.time ) {
 		if (cg.voiceChatBufferOut != cg.voiceChatBufferIn && voiceChatBuffer[cg.voiceChatBufferOut].snd) {
 			//
@@ -793,7 +772,6 @@ void CG_PlayBufferedVoiceChats( void ) {
 			cg.voiceChatTime = cg.time + 1000;
 		}
 	}
-#endif
 }
 
 /*
@@ -802,7 +780,6 @@ CG_AddBufferedVoiceChat
 =====================
 */
 void CG_AddBufferedVoiceChat( bufferedVoiceChat_t *vchat ) {
-#ifdef MISSIONPACK
 	// if we are going into the intermission, don't start any voices
 	if ( cg.intermissionStarted ) {
 		return;
@@ -814,7 +791,6 @@ void CG_AddBufferedVoiceChat( bufferedVoiceChat_t *vchat ) {
 		CG_PlayVoiceChat( &voiceChatBuffer[cg.voiceChatBufferOut] );
 		cg.voiceChatBufferOut++;
 	}
-#endif
 }
 
 /*
@@ -823,7 +799,6 @@ CG_VoiceChatLocal
 =================
 */
 void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd ) {
-#ifdef MISSIONPACK
 	char *chat;
 	voiceChatList_t *voiceChatList;
 	clientInfo_t *ci;
@@ -863,7 +838,6 @@ void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, 
 			CG_AddBufferedVoiceChat(&vchat);
 		}
 	}
-#endif
 }
 
 /*
@@ -872,7 +846,6 @@ CG_VoiceChat
 =================
 */
 void CG_VoiceChat( int mode ) {
-#ifdef MISSIONPACK
 	const char *cmd;
 	int clientNum, color;
 	qboolean voiceOnly;
@@ -891,8 +864,13 @@ void CG_VoiceChat( int mode ) {
 	}
 
 	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd );
-#endif
 }
+
+#endif
+
+
+///////////////////////////////////////////////////////////////
+
 
 /*
 =================
@@ -911,19 +889,13 @@ static void CG_RemoveChatEscapeChar( char *text ) {
 	text[l] = '\0';
 }
 
-/*
-=================
-CG_ServerCommand
 
-The string has been tokenized and can be retrieved with
-Cmd_Argc() / Cmd_Argv()
-=================
-*/
-static void CG_ServerCommand( void ) {
-	const char	*cmd;
-	char		text[MAX_SAY_TEXT];
+// the string has been tokenized and can be retrieved with Cmd_Argc() / Cmd_Argv()
 
-	cmd = CG_Argv(0);
+static void CG_ServerCommand()
+{
+	char text[MAX_SAY_TEXT];
+	const char* cmd = CG_Argv(0);
 
 	if ( !cmd[0] ) {
 		// server claimed the command
@@ -972,6 +944,8 @@ static void CG_ServerCommand( void ) {
 		CG_Printf( "%s\n", text );
 		return;
 	}
+
+#ifdef MISSIONPACK
 	if ( !strcmp( cmd, "vchat" ) ) {
 		CG_VoiceChat( SAY_ALL );
 		return;
@@ -986,6 +960,7 @@ static void CG_ServerCommand( void ) {
 		CG_VoiceChat( SAY_TELL );
 		return;
 	}
+#endif
 
 	if ( !strcmp( cmd, "scores" ) ) {
 		CG_ParseScores();
@@ -1019,15 +994,10 @@ static void CG_ServerCommand( void ) {
 }
 
 
-/*
-====================
-CG_ExecuteNewServerCommands
+// execute all of the server commands that were received along with this this snapshot
 
-Execute all of the server commands that were received along
-with this this snapshot.
-====================
-*/
-void CG_ExecuteNewServerCommands( int latestSequence ) {
+void CG_ExecuteNewServerCommands( int latestSequence )
+{
 	while ( cgs.serverCommandSequence < latestSequence ) {
 		if ( trap_GetServerCommand( ++cgs.serverCommandSequence ) ) {
 			CG_ServerCommand();

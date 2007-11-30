@@ -967,8 +967,6 @@ typedef struct {
 
 	// parsed from serverinfo
 	gametype_t		gametype;
-	int				dmflags;
-	int				teamflags;
 	int				fraglimit;
 	int				capturelimit;
 	int				timelimit;
@@ -1435,9 +1433,11 @@ void CG_InitConsoleCommands( void );
 void CG_ExecuteNewServerCommands( int latestSequence );
 void CG_ParseServerinfo();
 void CG_SetConfigValues( void );
+#ifdef MISSIONPACK
 void CG_LoadVoiceChats();
 void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd );
 void CG_PlayBufferedVoiceChats( void );
+#endif
 
 //
 // cg_playerstate.c
