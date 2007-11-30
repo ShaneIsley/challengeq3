@@ -225,49 +225,6 @@ void ByteToDir( int b, vec3_t dir ) {
 }
 
 
-unsigned ColorBytes3 (float r, float g, float b) {
-	unsigned	i;
-
-	( (byte *)&i )[0] = r * 255;
-	( (byte *)&i )[1] = g * 255;
-	( (byte *)&i )[2] = b * 255;
-
-	return i;
-}
-
-unsigned ColorBytes4 (float r, float g, float b, float a) {
-	unsigned	i;
-
-	( (byte *)&i )[0] = r * 255;
-	( (byte *)&i )[1] = g * 255;
-	( (byte *)&i )[2] = b * 255;
-	( (byte *)&i )[3] = a * 255;
-
-	return i;
-}
-
-float NormalizeColor( const vec3_t in, vec3_t out ) {
-	float	max;
-	
-	max = in[0];
-	if ( in[1] > max ) {
-		max = in[1];
-	}
-	if ( in[2] > max ) {
-		max = in[2];
-	}
-
-	if ( !max ) {
-		VectorClear( out );
-	} else {
-		out[0] = in[0] / max;
-		out[1] = in[1] / max;
-		out[2] = in[2] / max;
-	}
-	return max;
-}
-
-
 /*
 =====================
 PlaneFromPoints
@@ -1146,26 +1103,6 @@ int Q_log2( int val ) {
 	}
 	return answer;
 }
-
-
-
-/*
-=================
-PlaneTypeForNormal
-=================
-*/
-/*
-int	PlaneTypeForNormal (vec3_t normal) {
-	if ( normal[0] == 1.0 )
-		return PLANE_X;
-	if ( normal[1] == 1.0 )
-		return PLANE_Y;
-	if ( normal[2] == 1.0 )
-		return PLANE_Z;
-	
-	return PLANE_NON_AXIAL;
-}
-*/
 
 
 /*

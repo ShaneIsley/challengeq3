@@ -1346,6 +1346,19 @@ static void R_LoadPlanes( const lump_t* l )
 }
 
 
+static unsigned ColorBytes4( float r, float g, float b, float a )
+{
+	unsigned i;
+
+	( (byte *)&i )[0] = r * 255;
+	( (byte *)&i )[1] = g * 255;
+	( (byte *)&i )[2] = b * 255;
+	( (byte *)&i )[3] = a * 255;
+
+	return i;
+}
+
+
 static void R_LoadFogs( const lump_t* l, const lump_t* brushesLump, const lump_t* sidesLump )
 {
 	const dfog_t* fogs = ReadLump<dfog_t>( l, &s_worldData.numfogs );

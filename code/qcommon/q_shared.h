@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
-// note that there's a bunch of CG/UI/etc-specific crap that has no business being in here
 
 #define Q3_VERSION				"CNQ3 1.40"
 #define CLIENT_WINDOW_TITLE		"Quake3"
@@ -156,7 +155,7 @@ typedef qbool qboolean;
 # endif
 #endif
 
-typedef unsigned char 		byte;
+typedef unsigned char		byte;
 
 typedef int		qhandle_t;
 typedef int		sfxHandle_t;
@@ -210,8 +209,6 @@ typedef int		clipHandle_t;
 
 #define	MAX_NAME_LENGTH		32		// max length of a client name
 
-#define	MAX_SAY_TEXT	150
-
 // paramters for command buffer stuffing
 typedef enum {
 	EXEC_NOW,			// don't return until completed, a VM should NEVER use this,
@@ -257,28 +254,6 @@ typedef enum {
 #define	CMD_MASK		(CMD_BACKUP - 1)
 
 
-// font rendering values used by ui and cgame
-
-#define PROP_GAP_WIDTH			3
-#define PROP_SPACE_WIDTH		8
-#define PROP_HEIGHT				27
-#define PROP_SMALL_SIZE_SCALE	0.75
-
-#define BLINK_DIVISOR			200
-#define PULSE_DIVISOR			75
-
-#define UI_LEFT			0x00000000	// default
-#define UI_CENTER		0x00000001
-#define UI_RIGHT		0x00000002
-#define UI_FORMATMASK	0x00000007
-#define UI_SMALLFONT	0x00000010
-#define UI_BIGFONT		0x00000020	// default
-#define UI_GIANTFONT	0x00000040
-#define UI_DROPSHADOW	0x00000800
-#define UI_BLINK		0x00001000
-#define UI_INVERSE		0x00002000
-#define UI_PULSE		0x00004000
-
 #if defined(_DEBUG) && !defined(BSPC)
 	#define HUNK_DEBUG
 #endif
@@ -309,7 +284,7 @@ void Snd_Memset (void* dest, const int val, const size_t count);
 
 #define CIN_system	1
 #define CIN_loop	2
-#define	CIN_hold	4
+#define CIN_hold	4
 #define CIN_silent	8
 #define CIN_shader	16
 
@@ -456,41 +431,38 @@ typedef struct {
 #define VectorSet(v, x, y, z)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z))
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
-unsigned ColorBytes3 (float r, float g, float b);
-unsigned ColorBytes4 (float r, float g, float b, float a);
-
-float NormalizeColor( const vec3_t in, vec3_t out );
-
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs );
 void ClearBounds( vec3_t mins, vec3_t maxs );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 
-#if !defined( Q3_VM ) || ( defined( Q3_VM ) && defined( __Q3_VM_MATH ) )
-static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
-	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
-		return 0;
-	}			
-	return 1;
+
+#if !defined( Q3_VM ) || defined( __Q3_VM_MATH )
+
+static ID_INLINE qboolean VectorCompare( const vec3_t v1, const vec3_t v2 )
+{
+	return (v1[0] == v2[0] && v1[1] == v2[1] && v1[2] == v2[2]);
 }
 
-static ID_INLINE vec_t VectorLength( const vec3_t v ) {
+static ID_INLINE vec_t VectorLength( const vec3_t v )
+{
 	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
+static ID_INLINE vec_t VectorLengthSquared( const vec3_t v )
+{
 	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
+static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 )
+{
 	vec3_t	v;
-
 	VectorSubtract (p2, p1, v);
 	return VectorLength( v );
 }
 
-static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
+static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 )
+{
 	vec3_t	v;
-
 	VectorSubtract (p2, p1, v);
 	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
 }
@@ -499,47 +471,40 @@ static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
 // that length != 0, nor does it return length, uses rsqrt approximation
 static ID_INLINE void VectorNormalizeFast( vec3_t v )
 {
-	float ilength;
-
-	ilength = Q_rsqrt( DotProduct( v, v ) );
-
+	float ilength = Q_rsqrt( DotProduct( v, v ) );
 	v[0] *= ilength;
 	v[1] *= ilength;
 	v[2] *= ilength;
 }
 
-static ID_INLINE void VectorInverse( vec3_t v ){
+static ID_INLINE void VectorInverse( vec3_t v )
+{
 	v[0] = -v[0];
 	v[1] = -v[1];
 	v[2] = -v[2];
 }
 
-static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
+static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross )
+{
 	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
 	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
 }
 
 #else
-int VectorCompare( const vec3_t v1, const vec3_t v2 );
 
+qboolean VectorCompare( const vec3_t v1, const vec3_t v2 );
 vec_t VectorLength( const vec3_t v );
-
 vec_t VectorLengthSquared( const vec3_t v );
-
 vec_t Distance( const vec3_t p1, const vec3_t p2 );
-
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 );
-
 void VectorNormalizeFast( vec3_t v ); // uses rsqrt approximation and does NOT validate length
-
 void VectorInverse( vec3_t v );
-
 void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross );
 
 #endif
 
-vec_t VectorNormalize (vec3_t v);		// returns vector length
+vec_t VectorNormalize( vec3_t v );		// returns vector length
 vec_t VectorNormalize2( const vec3_t v, vec3_t out );
 void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
@@ -554,7 +519,7 @@ float	Q_crandom( int *seed );
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
 
-void vectoangles( const vec3_t value1, vec3_t angles);
+void vectoangles( const vec3_t value1, vec3_t angles );
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
 
 void AxisClear( vec3_t axis[3] );
@@ -588,8 +553,6 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 void RotateAroundDirection( vec3_t axis[3], float yaw );
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 // perpendicular vector could be replaced by this
-
-//int	PlaneTypeForNormal (vec3_t normal);
 
 void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
@@ -796,13 +759,6 @@ COLLISION DETECTION
 #define	PLANE_Z			2
 #define	PLANE_NON_AXIAL	3
 
-
-/*
-=================
-PlaneTypeForNormal
-=================
-*/
-
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 
 // plane_t structure
@@ -839,7 +795,6 @@ typedef struct {
 } markFragment_t;
 
 
-
 typedef struct {
 	vec3_t		origin;
 	vec3_t		axis[3];
@@ -850,10 +805,10 @@ typedef struct {
 
 // in order from highest priority to lowest
 // if none of the catchers are active, bound key strings will be executed
-#define KEYCATCH_CONSOLE		0x0001
-#define	KEYCATCH_UI					0x0002
-#define	KEYCATCH_MESSAGE		0x0004
-#define	KEYCATCH_CGAME			0x0008
+#define KEYCATCH_CONSOLE	0x0001
+#define KEYCATCH_UI			0x0002
+#define KEYCATCH_MESSAGE	0x0004
+#define KEYCATCH_CGAME		0x0008
 
 
 // sound channels
@@ -879,18 +834,17 @@ typedef enum {
 ========================================================================
 */
 
-#define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
-#define	SHORT2ANGLE(x)	((x)*(360.0/65536))
+#define ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
+#define SHORT2ANGLE(x)	((x)*(360.0/65536))
 
-#define	SNAPFLAG_RATE_DELAYED	1
-#define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
+#define SNAPFLAG_RATE_DELAYED	1
+#define SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
 #define SNAPFLAG_SERVERCOUNT	4	// toggled every map_restart so transitions can be detected
 
 //
 // per-level limits
 //
 #define	MAX_CLIENTS			64		// absolute limit
-#define MAX_LOCATIONS		64
 
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
@@ -929,7 +883,7 @@ typedef struct {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
-#define	MAX_WEAPONS				16		
+#define	MAX_WEAPONS				16
 
 #define	MAX_PS_EVENTS			2
 
@@ -1046,10 +1000,10 @@ typedef struct playerState_s {
 
 // usercmd_t is sent to the server each client frame
 typedef struct usercmd_s {
-	int				serverTime;
-	int				angles[3];
-	int 			buttons;
-	byte			weapon;           // weapon 
+	int			serverTime;
+	int			angles[3];
+	int			buttons;
+	byte		weapon;
 	signed char	forwardmove, rightmove, upmove;
 } usercmd_t;
 
@@ -1189,7 +1143,7 @@ typedef struct {
 //=============================================
 
 
-typedef struct qtime_s {
+typedef struct {
 	int tm_sec;     /* seconds after the minute - [0,59] */
 	int tm_min;     /* minutes after the hour - [0,59] */
 	int tm_hour;    /* hours since midnight - [0,23] */
@@ -1200,14 +1154,6 @@ typedef struct qtime_s {
 	int tm_yday;    /* days since January 1 - [0,365] */
 	int tm_isdst;   /* daylight savings time flag */
 } qtime_t;
-
-
-// server browser sources
-// TTimo: AS_MPLAYER is no longer used
-#define AS_LOCAL		0
-#define AS_MPLAYER		1
-#define AS_GLOBAL		2
-#define AS_FAVORITES	3
 
 
 // cinematic states
@@ -1222,17 +1168,53 @@ typedef enum {
 } e_status;
 
 
+// server browser sources
+// TTimo: AS_MPLAYER is no longer used
+#define AS_LOCAL		0
+#define AS_MPLAYER		1
+#define AS_GLOBAL		2
+#define AS_FAVORITES	3
+
 #define	MAX_GLOBAL_SERVERS			4096
 #define	MAX_OTHER_SERVERS			128
 #define MAX_PINGREQUESTS			32
 #define MAX_SERVERSTATUSREQUESTS	16
 
+#define CDKEY_LEN 16
+#define CDCHKSUM_LEN 2
+
+
+// game/cgame/ui-specific crap that has no business being in here
+
+#define MAX_LOCATIONS	64
+
+#define MAX_SAY_TEXT	150
+
 #define SAY_ALL		0
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
-#define CDKEY_LEN 16
-#define CDCHKSUM_LEN 2
+// font rendering values used by ui and cgame
+
+#define PROP_GAP_WIDTH			3
+#define PROP_SPACE_WIDTH		8
+#define PROP_HEIGHT				27
+#define PROP_SMALL_SIZE_SCALE	0.75
+
+#define BLINK_DIVISOR			200
+#define PULSE_DIVISOR			75
+
+#define UI_LEFT			0x00000000	// default
+#define UI_CENTER		0x00000001
+#define UI_RIGHT		0x00000002
+#define UI_FORMATMASK	0x00000007
+#define UI_SMALLFONT	0x00000010
+#define UI_BIGFONT		0x00000020	// default
+#define UI_GIANTFONT	0x00000040
+#define UI_DROPSHADOW	0x00000800
+#define UI_BLINK		0x00001000
+#define UI_INVERSE		0x00002000
+#define UI_PULSE		0x00004000
 
 
 #if defined(__cplusplus)
