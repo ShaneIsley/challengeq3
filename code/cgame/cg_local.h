@@ -1382,9 +1382,9 @@ void	CG_ImpactMark( qhandle_t markShader,
 //
 // cg_localents.c
 //
-void	CG_InitLocalEntities( void );
-localEntity_t	*CG_AllocLocalEntity( void );
-void	CG_AddLocalEntities( void );
+void CG_InitLocalEntities();
+localEntity_t* CG_AllocLocalEntity();
+void CG_AddLocalEntities();
 void CG_DrawBeam( const refEntity_t* re );
 
 //

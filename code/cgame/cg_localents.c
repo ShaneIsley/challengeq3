@@ -26,37 +26,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#define	MAX_LOCAL_ENTITIES	512
-localEntity_t	cg_localEntities[MAX_LOCAL_ENTITIES];
-localEntity_t	cg_activeLocalEntities;		// double linked list
-localEntity_t	*cg_freeLocalEntities;		// single linked list
+#define MAX_LOCAL_ENTITIES	512
+static localEntity_t cg_localEntities[MAX_LOCAL_ENTITIES];
+static localEntity_t cg_activeLocalEntities;	// double linked list
+static localEntity_t* cg_freeLocalEntities;		// single linked list
 
-/*
-===================
-CG_InitLocalEntities
 
-This is called at startup and for tournement restarts
-===================
-*/
-void	CG_InitLocalEntities( void ) {
-	int		i;
+// this is called at startup and for tournament restarts
+
+void CG_InitLocalEntities()
+{
+	int i;
 
 	memset( cg_localEntities, 0, sizeof( cg_localEntities ) );
 	cg_activeLocalEntities.next = &cg_activeLocalEntities;
 	cg_activeLocalEntities.prev = &cg_activeLocalEntities;
 	cg_freeLocalEntities = cg_localEntities;
+
 	for ( i = 0 ; i < MAX_LOCAL_ENTITIES - 1 ; i++ ) {
 		cg_localEntities[i].next = &cg_localEntities[i+1];
 	}
 }
 
 
-/*
-==================
-CG_FreeLocalEntity
-==================
-*/
-void CG_FreeLocalEntity( localEntity_t *le ) {
+static void CG_FreeLocalEntity( localEntity_t* le )
+{
 	if ( !le->prev ) {
 		CG_Error( "CG_FreeLocalEntity: not active" );
 	}
@@ -70,15 +64,12 @@ void CG_FreeLocalEntity( localEntity_t *le ) {
 	cg_freeLocalEntities = le;
 }
 
-/*
-===================
-CG_AllocLocalEntity
 
-Will allways succeed, even if it requires freeing an old active entity
-===================
-*/
-localEntity_t	*CG_AllocLocalEntity( void ) {
-	localEntity_t	*le;
+// will allways succeed, even if it requires freeing an old active entity
+
+localEntity_t* CG_AllocLocalEntity()
+{
+	localEntity_t* le;
 
 	if ( !cg_freeLocalEntities ) {
 		// no free entities, so free the one at the end of the chain
@@ -232,8 +223,6 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 		( trace->plane.normal[2] > 0 && 
 		( le->pos.trDelta[2] < 40 || le->pos.trDelta[2] < -cg.frametime * le->pos.trDelta[2] ) ) ) {
 		le->pos.trType = TR_STATIONARY;
-	} else {
-
 	}
 }
 
@@ -465,32 +454,16 @@ static void CG_AddFallScaleFade( localEntity_t *le ) {
 }
 
 
+static void CG_AddExplosion( const localEntity_t* le )
+{
+	const refEntity_t* ent = &le->refEntity;
 
-/*
-================
-CG_AddExplosion
-================
-*/
-static void CG_AddExplosion( localEntity_t *ex ) {
-	refEntity_t	*ent;
-
-	ent = &ex->refEntity;
-
-	// add the entity
 	trap_R_AddRefEntityToScene(ent);
 
-	// add the dlight
-	if ( ex->light ) {
-		float		light;
-
-		light = (float)( cg.time - ex->startTime ) / ( ex->endTime - ex->startTime );
-		if ( light < 0.5 ) {
-			light = 1.0;
-		} else {
-			light = 1.0 - ( light - 0.5 ) * 2;
-		}
-		light = ex->light * light;
-		trap_R_AddLightToScene(ent->origin, light, ex->lightColor[0], ex->lightColor[1], ex->lightColor[2] );
+	if ( le->light ) {
+		float light = (float)(cg.time - le->startTime) / (le->endTime - le->startTime);
+		light = (light < 0.5) ? 1.0 : (1.0 - (light - 0.5) * 2);
+		trap_R_AddLightToScene( ent->origin, le->light * light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
 	}
 }
 
@@ -863,23 +836,18 @@ static void CG_AddBeamFadeAlpha( localEntity_t* le )
 }
 
 
-//==============================================================================
+///////////////////////////////////////////////////////////////
 
-/*
-===================
-CG_AddLocalEntities
 
-===================
-*/
-void CG_AddLocalEntities( void ) {
+void CG_AddLocalEntities()
+{
 	localEntity_t	*le, *next;
 
 	// walk the list backwards, so any new local entities generated
 	// (trails, marks, etc) will be present this frame
 	le = cg_activeLocalEntities.prev;
 	for ( ; le != &cg_activeLocalEntities ; le = next ) {
-		// grab next now, so if the local entity is freed we
-		// still have it
+		// grab next now, so we still have it if the local entity is freed
 		next = le->prev;
 
 		if ( cg.time >= le->endTime ) {
