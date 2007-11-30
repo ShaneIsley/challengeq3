@@ -50,32 +50,33 @@ jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
 FILE *debuglogfile;
-static fileHandle_t logfile;
-fileHandle_t	com_journalFile;			// events are written here
-fileHandle_t	com_journalDataFile;		// config files are written here
+//FIXME: "-1" ??????
+static fileHandle_t logfile = 0;
+fileHandle_t	com_journalFile = 0;			// events are written here
+fileHandle_t	com_journalDataFile = 0;		// config files are written here
 
-cvar_t	*com_viewlog;
-cvar_t	*com_speeds;
-cvar_t	*com_developer;
-cvar_t	*com_dedicated;
-cvar_t	*com_timescale;
-cvar_t	*com_fixedtime;
-cvar_t	*com_dropsim;		// 0.0 to 1.0, simulated packet drops
-cvar_t	*com_journal;
-cvar_t	*com_maxfps;
-cvar_t	*com_altivec;
-cvar_t	*com_timedemo;
-cvar_t	*com_sv_running;
-cvar_t	*com_cl_running;
-cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
-cvar_t	*com_showtrace;
-cvar_t	*com_version;
-cvar_t	*com_buildScript;	// for automated data building scripts
-cvar_t	*com_introPlayed;
-cvar_t	*cl_paused;
-cvar_t	*sv_paused;
-cvar_t	*cl_packetdelay;
-cvar_t	*sv_packetdelay;
+cvar_t	*com_viewlog = 0;
+cvar_t	*com_speeds = 0;
+cvar_t	*com_developer = 0;
+cvar_t	*com_dedicated = 0;
+cvar_t	*com_timescale = 0;
+cvar_t	*com_fixedtime = 0;
+cvar_t	*com_dropsim = 0;		// 0.0 to 1.0, simulated packet drops
+cvar_t	*com_journal = 0;
+cvar_t	*com_maxfps = 0;
+cvar_t	*com_altivec = 0;
+cvar_t	*com_timedemo = 0;
+cvar_t	*com_sv_running = 0;
+cvar_t	*com_cl_running = 0;
+cvar_t	*com_logfile = 0;		// 1 = buffer log, 2 = flush after each print
+cvar_t	*com_showtrace = 0;
+cvar_t	*com_version = 0;
+cvar_t	*com_buildScript = 0;	// for automated data building scripts
+cvar_t	*com_introPlayed = 0;
+cvar_t	*cl_paused = 0;
+cvar_t	*sv_paused = 0;
+cvar_t	*cl_packetdelay = 0;
+cvar_t	*sv_packetdelay = 0;
 #if defined(_WIN32) && defined(_DEBUG)
 cvar_t	*com_noErrorInterrupt;
 #endif
@@ -208,18 +209,17 @@ A Com_Printf that only shows up if the "developer" cvar is set
 */
 void QDECL Com_DPrintf( const char *fmt, ...)
 {
-	va_list		argptr;
-	char		msg[MAXPRINTMSG];
+	// don't confuse non-developers with techie stuff...
+	if ( com_developer && com_developer->integer ) {
+		va_list		argptr;
+		char		msg[MAXPRINTMSG];
 
-	if ( !com_developer || !com_developer->integer ) {
-		return;			// don't confuse non-developers with techie stuff...
+		va_start (argptr,fmt);
+		Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
+		va_end (argptr);
+
+		Com_Printf ("%s", msg);
 	}
-
-	va_start (argptr,fmt);
-	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
-	va_end (argptr);
-
-	Com_Printf ("%s", msg);
 }
 
 /*
@@ -711,10 +711,10 @@ typedef struct {
 } memzone_t;
 
 // main zone for all "dynamic" memory allocation
-static memzone_t* mainzone;
+static memzone_t* mainzone = NULL;
 // we also have a small zone for small allocations that would only
 // fragment the main zone (think of cvar and cmd strings)
-static memzone_t* smallzone;
+static memzone_t* smallzone = NULL;
 
 void Z_CheckHeap( void );
 

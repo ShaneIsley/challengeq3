@@ -230,12 +230,12 @@ typedef struct searchpath_s {
 } searchpath_t;
 
 static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
-static	cvar_t		*fs_debug;
-static	cvar_t		*fs_homepath;
-static	cvar_t		*fs_basepath;
-static	cvar_t		*fs_basegame;
-static	cvar_t		*fs_gamedirvar;
-static	searchpath_t	*fs_searchpaths;
+static	cvar_t		*fs_debug = NULL;
+static	cvar_t		*fs_homepath = NULL;
+static	cvar_t		*fs_basepath = NULL;
+static	cvar_t		*fs_basegame = NULL;
+static	cvar_t		*fs_gamedirvar = NULL;
+static	searchpath_t	*fs_searchpaths = NULL;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
 static	int			fs_loadStack;			// total files in memory
@@ -3036,6 +3036,8 @@ is resetting due to a game change
 ================
 */
 void FS_InitFilesystem( void ) {
+	Com_Memset( fsh, 0, sizeof(fsh) );
+
 	// allow command line parms to override our defaults
 	// we have to specially handle this, because normal command
 	// line variable sets don't happen until after the filesystem
