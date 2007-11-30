@@ -245,13 +245,13 @@ typedef struct {
 
 typedef struct {
 	netadr_t	adr;
-	char	  	hostName[MAX_NAME_LENGTH];
-	char	  	mapName[MAX_NAME_LENGTH];
-	char	  	game[MAX_NAME_LENGTH];
+	char		hostName[MAX_NAME_LENGTH];
+	char		mapName[MAX_NAME_LENGTH];
+	char		game[MAX_NAME_LENGTH];
 	int			netType;
 	int			gameType;
-	int		  	clients;
-	int		  	maxClients;
+	int			clients;
+	int			maxClients;
 	int			minPing;
 	int			maxPing;
 	int			ping;
@@ -366,7 +366,6 @@ extern	cvar_t	*cl_aviMotionJpeg;
 extern	cvar_t	*cl_activeAction;
 
 extern	cvar_t	*cl_allowDownload;
-extern  cvar_t  *cl_dlURL;
 extern	cvar_t	*cl_conXOffset;
 extern	cvar_t	*cl_inGameVideo;
 

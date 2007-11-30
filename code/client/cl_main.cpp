@@ -63,9 +63,12 @@ cvar_t	*cl_motd;
 cvar_t	*cl_motdString;
 
 cvar_t	*cl_allowDownload;
-cvar_t	*cl_dlURL;
 cvar_t	*cl_conXOffset;
 cvar_t	*cl_inGameVideo;
+
+#if defined(USE_CURL)
+cvar_t	*cl_dlURL;
+#endif
 
 cvar_t	*cl_serverStatusResendTime;
 cvar_t	*cl_trn;
