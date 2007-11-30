@@ -929,7 +929,7 @@ void CG_NewClientInfo( int clientNum ) {
 	}
 
 	// force PM skins in FFA, because e.g. daemia is actually "major/daemia"
-	if (cgs.gametype < GT_TEAM) {
+	if ((clientNum != cg.clientNum) && (cgs.gametype < GT_TEAM)) {
 		Q_strncpyz( newInfo.skinName, "pm", sizeof( newInfo.skinName ) );
 	}
 
