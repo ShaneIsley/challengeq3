@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
+// note that there's a bunch of CG/UI/etc-specific crap that has no business being in here
 
 #define Q3_VERSION				"CNQ3 1.40"
 #define CLIENT_WINDOW_TITLE		"Quake3"
@@ -1202,9 +1203,9 @@ typedef struct qtime_s {
 
 // server browser sources
 // TTimo: AS_MPLAYER is no longer used
-#define AS_LOCAL			0
+#define AS_LOCAL		0
 #define AS_MPLAYER		1
-#define AS_GLOBAL			2
+#define AS_GLOBAL		2
 #define AS_FAVORITES	3
 
 
@@ -1219,19 +1220,10 @@ typedef enum {
 	FMV_ID_WAIT
 } e_status;
 
-typedef enum _flag_status {
-	FLAG_ATBASE = 0,
-	FLAG_TAKEN,			// CTF
-	FLAG_TAKEN_RED,		// One Flag CTF
-	FLAG_TAKEN_BLUE,	// One Flag CTF
-	FLAG_DROPPED
-} flagStatus_t;
 
-
-
-#define	MAX_GLOBAL_SERVERS				4096
-#define	MAX_OTHER_SERVERS					128
-#define MAX_PINGREQUESTS					32
+#define	MAX_GLOBAL_SERVERS			4096
+#define	MAX_OTHER_SERVERS			128
+#define MAX_PINGREQUESTS			32
 #define MAX_SERVERSTATUSREQUESTS	16
 
 #define SAY_ALL		0
