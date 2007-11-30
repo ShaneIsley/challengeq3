@@ -25,21 +25,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "cg_local.h"
 
 
+#define MAX_VERTS_ON_POLY 10
 #define MAX_MARK_POLYS 256
+
+typedef struct markPoly_s {
+	struct markPoly_s	*prevMark, *nextMark;
+	int			time;
+	qhandle_t	markShader;
+	qboolean	alphaFade;		// fade alpha instead of rgb
+	float		color[4];
+	poly_t		poly;
+	polyVert_t	verts[MAX_VERTS_ON_POLY];
+} markPoly_t;
+
 static markPoly_t  cg_markPolys[MAX_MARK_POLYS];
 static markPoly_t  cg_activeMarkPolys;	// double linked list
 static markPoly_t* cg_freeMarkPolys;	// single linked list
 
 
-/*
-===================
-CG_InitMarkPolys
+// called at startup and game (re)starts
 
-This is called at startup and for tournement restarts
-===================
-*/
-void	CG_InitMarkPolys( void ) {
-	int		i;
+void CG_InitMarkPolys()
+{
+	int i;
 
 	memset( cg_markPolys, 0, sizeof(cg_markPolys) );
 
@@ -52,12 +60,8 @@ void	CG_InitMarkPolys( void ) {
 }
 
 
-/*
-==================
-CG_FreeMarkPoly
-==================
-*/
-void CG_FreeMarkPoly( markPoly_t *le ) {
+static void CG_FreeMarkPoly( markPoly_t* le )
+{
 	if ( !le->prevMark ) {
 		CG_Error( "CG_FreeMarkPoly: not active" );
 	}
@@ -71,21 +75,17 @@ void CG_FreeMarkPoly( markPoly_t *le ) {
 	cg_freeMarkPolys = le;
 }
 
-/*
-===================
-CG_AllocMark
 
-Will allways succeed, even if it requires freeing an old active mark
-===================
-*/
-markPoly_t	*CG_AllocMark( void ) {
-	markPoly_t	*le;
-	int time;
+// will always succeed, even if it requires freeing an old active mark
+
+static markPoly_t* CG_AllocMark()
+{
+	markPoly_t* le;
 
 	if ( !cg_freeMarkPolys ) {
 		// no free entities, so free the one at the end of the chain
 		// remove the oldest active entity
-		time = cg_activeMarkPolys.prevMark->time;
+		int time = cg_activeMarkPolys.prevMark->time;
 		while (cg_activeMarkPolys.prevMark && time == cg_activeMarkPolys.prevMark->time) {
 			CG_FreeMarkPoly( cg_activeMarkPolys.prevMark );
 		}
@@ -105,24 +105,20 @@ markPoly_t	*CG_AllocMark( void ) {
 }
 
 
-
 /*
-=================
-CG_ImpactMark
+origin should be a point within a unit of the plane, dir should be the plane normal
 
-origin should be a point within a unit of the plane
-dir should be the plane normal
-
-temporary marks will not be stored or randomly oriented, but immediately
-passed to the renderer.
-=================
+temporary marks will not be stored or randomly oriented,
+but immediately passed to the renderer.
 */
-#define	MAX_MARK_FRAGMENTS	128
-#define	MAX_MARK_POINTS		384
 
-void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
-				   float orientation, float red, float green, float blue, float alpha,
-				   qboolean alphaFade, float radius, qboolean temporary ) {
+#define MAX_MARK_FRAGMENTS	128
+#define MAX_MARK_POINTS		384
+
+void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
+					float orientation, float red, float green, float blue, float alpha,
+					qboolean alphaFade, float radius, qboolean temporary )
+{
 	vec3_t			axis[3];
 	float			texCoordScale;
 	vec3_t			originalPoints[4];
@@ -133,17 +129,12 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
 
-	if ( !cg_addMarks.integer ) {
+	if (!cg_addMarks.integer && !temporary)
 		return;
-	}
 
 	if ( radius <= 0 ) {
 		CG_Error( "CG_ImpactMark called with <= 0 radius" );
 	}
-
-	//if ( markTotal >= MAX_MARK_POLYS ) {
-	//	return;
-	//}
 
 	// create the texture axis
 	VectorNormalize2( dir, axis[0] );
@@ -214,15 +205,11 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 }
 
 
-/*
-===============
-CG_AddMarks
-===============
-*/
-#define	MARK_TOTAL_TIME		10000
-#define	MARK_FADE_TIME		1000
+#define MARK_TOTAL_TIME		10000
+#define MARK_FADE_TIME		1000
 
-void CG_AddMarks( void ) {
+void CG_AddMarks()
+{
 	int			j;
 	markPoly_t	*mp, *next;
 	int			t;
@@ -232,10 +219,8 @@ void CG_AddMarks( void ) {
 		return;
 	}
 
-	mp = cg_activeMarkPolys.nextMark;
-	for ( ; mp != &cg_activeMarkPolys ; mp = next ) {
-		// grab next now, so if the local entity is freed we
-		// still have it
+	for (mp = cg_activeMarkPolys.nextMark ; mp != &cg_activeMarkPolys ; mp = next ) {
+		// grab next now, so we still have it if the local entity is freed
 		next = mp->nextMark;
 
 		// see if it is time to completely remove it

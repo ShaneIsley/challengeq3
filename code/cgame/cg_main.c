@@ -342,18 +342,13 @@ static void CG_RegisterCvars()
 	trap_Cvar_Register( NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 }
 
-/*
-===================
-CG_ForceModelChange
-===================
-*/
-static void CG_ForceModelChange( void ) {
-	int		i;
 
-	for (i=0 ; i<MAX_CLIENTS ; i++) {
-		const char		*clientInfo;
+static void CG_ForceModelChange()
+{
+	int i;
 
-		clientInfo = CG_ConfigString( CS_PLAYERS+i );
+	for (i = 0; i < MAX_CLIENTS; ++i) {
+		const char* clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0] ) {
 			continue;
 		}
@@ -446,16 +441,11 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	CG_Printf ("%s", text);
 }
 
-/*
-================
-CG_Argv
-================
-*/
-const char *CG_Argv( int arg ) {
-	static char	buffer[MAX_STRING_CHARS];
 
+const char* CG_Argv( int arg )
+{
+	static char buffer[MAX_STRING_CHARS];
 	trap_Argv( arg, buffer, sizeof( buffer ) );
-
 	return buffer;
 }
 

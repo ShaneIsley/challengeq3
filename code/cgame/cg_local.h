@@ -61,8 +61,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	MAX_STEP_CHANGE		32
 
-#define	MAX_VERTS_ON_POLY	10
-
 #define STAT_MINUS			10	// num frame for '-' stats digit
 
 #define	ICON_SIZE			48
@@ -194,17 +192,6 @@ typedef struct centity_s {
 
 // local entities are created as a result of events or predicted actions,
 // and live independantly from all server transmitted entities
-
-typedef struct markPoly_s {
-	struct markPoly_s	*prevMark, *nextMark;
-	int			time;
-	qhandle_t	markShader;
-	qboolean	alphaFade;		// fade alpha instead of rgb
-	float		color[4];
-	poly_t		poly;
-	polyVert_t	verts[MAX_VERTS_ON_POLY];
-} markPoly_t;
-
 
 typedef enum {
 	LE_MARK,
@@ -1370,14 +1357,11 @@ void CG_OutOfAmmoChange( void );	// should this be in pmove?
 //
 // cg_marks.c
 //
-void	CG_InitMarkPolys( void );
-void	CG_AddMarks( void );
-void	CG_ImpactMark( qhandle_t markShader, 
-				    const vec3_t origin, const vec3_t dir, 
-					float orientation, 
-				    float r, float g, float b, float a, 
-					qboolean alphaFade, 
-					float radius, qboolean temporary );
+void CG_InitMarkPolys();
+void CG_AddMarks();
+void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
+					float orientation, float r, float g, float b, float a,
+					qboolean alphaFade, float radius, qboolean temporary );
 
 //
 // cg_localents.c

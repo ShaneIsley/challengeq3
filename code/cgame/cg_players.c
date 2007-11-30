@@ -1915,7 +1915,7 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	// add the mark as a temporary, so it goes directly to the renderer
 	// without taking a spot in the cg_marks array
 	CG_ImpactMark( cgs.media.shadowMarkShader, trace.endpos, trace.plane.normal,
-			cent->pe.legs.yawAngle, alpha,alpha,alpha,1, qfalse, 24, qtrue );
+			cent->pe.torso.yawAngle, alpha,alpha,alpha,1, qfalse, 24, qtrue );
 
 	return qtrue;
 }
