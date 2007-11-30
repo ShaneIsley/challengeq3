@@ -338,7 +338,7 @@ int trap_AAS_AreaReachability(int areanum) {
 	return syscall( BOTLIB_AAS_AREA_REACHABILITY, areanum );
 }
 
-int trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags) {
+int trap_AAS_AreaTravelTimeToGoalArea(int areanum, const vec3_t origin, int goalareanum, int travelflags) {
 	return syscall( BOTLIB_AAS_AREA_TRAVEL_TIME_TO_GOAL_AREA, areanum, origin, goalareanum, travelflags );
 }
 
@@ -366,15 +366,15 @@ int trap_AAS_PredictClientMovement(void /* struct aas_clientmove_s */ *move, int
 	return syscall( BOTLIB_AAS_PREDICT_CLIENT_MOVEMENT, move, entnum, origin, presencetype, onground, velocity, cmdmove, cmdframes, maxframes, PASSFLOAT(frametime), stopevent, stopareanum, visualize );
 }
 
-void trap_EA_Say(int client, char *str) {
-	syscall( BOTLIB_EA_SAY, client, str );
+void EA_Say( int client, const char* s ) {
+	syscall( BOTLIB_EA_SAY, client, s );
 }
 
-void trap_EA_SayTeam(int client, char *str) {
-	syscall( BOTLIB_EA_SAY_TEAM, client, str );
+void EA_SayTeam( int client, const char* s ) {
+	syscall( BOTLIB_EA_SAY_TEAM, client, s );
 }
 
-void trap_EA_Command(int client, char *command) {
+void trap_EA_Command( int client, const char* command ) {
 	syscall( BOTLIB_EA_COMMAND, client, command );
 }
 

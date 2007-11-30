@@ -240,7 +240,7 @@ typedef struct aas_export_s
 	//--------------------------------------------
 	// be_aas_route.c
 	//--------------------------------------------
-	int			(*AAS_AreaTravelTimeToGoalArea)(int areanum, vec3_t origin, int goalareanum, int travelflags);
+	int			(*AAS_AreaTravelTimeToGoalArea)(int areanum, const vec3_t origin, int goalareanum, int travelflags);
 	int			(*AAS_EnableRoutingArea)(int areanum, int enable);
 	int			(*AAS_PredictRoute)(struct aas_predictroute_s *route, int areanum, vec3_t origin,
 							int goalareanum, int travelflags, int maxareas, int maxtime,
@@ -267,9 +267,9 @@ typedef struct aas_export_s
 typedef struct ea_export_s
 {
 	//ClientCommand elementary actions
-	void	(*EA_Command)(int client, const char* command );
-	void	(*EA_Say)(int client, char *str);
-	void	(*EA_SayTeam)(int client, char *str);
+	void	(*EA_Command)( int client, const char* command );
+	void	(*EA_Say)( int client, const char* s );
+	void	(*EA_SayTeam)( int client, const char* s );
 	//
 	void	(*EA_Action)(int client, int action);
 	void	(*EA_Gesture)(int client);

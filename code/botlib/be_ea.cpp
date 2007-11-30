@@ -49,9 +49,9 @@ bot_input_t *botinputs;
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void EA_Say(int client, char *str)
+void EA_Say( int client, const char* s )
 {
-	botimport.BotClientCommand(client, va("say %s", str) );
+	botimport.BotClientCommand(client, va("say %s", s) );
 } //end of the function EA_Say
 //===========================================================================
 //
@@ -59,19 +59,9 @@ void EA_Say(int client, char *str)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void EA_SayTeam(int client, char *str)
+void EA_SayTeam( int client, const char* s )
 {
-	botimport.BotClientCommand(client, va("say_team %s", str));
-} //end of the function EA_SayTeam
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-void EA_Tell(int client, int clientto, char *str)
-{
-	botimport.BotClientCommand(client, va("tell %d, %s", clientto, str));
+	botimport.BotClientCommand(client, va("say_team %s", s));
 } //end of the function EA_SayTeam
 //===========================================================================
 //

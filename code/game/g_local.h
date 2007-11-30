@@ -400,7 +400,6 @@ typedef struct {
 										// frag can be watched.  Disable future
 										// kills during this delay
 	int			intermissiontime;		// time the intermission was started
-	char		*changemap;
 	qboolean	readyToExit;			// at least one client wants to exit
 	int			exitTime;
 	vec3_t		intermission_origin;	// also used for spectator spawns
@@ -544,7 +543,7 @@ void DropPortalDestination( gentity_t *ent );
 // g_weapon.c
 //
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
-void SnapVectorTowards( vec3_t v, vec3_t to );
+void SnapVectorTowards( vec3_t v, const vec3_t to );
 qboolean CheckGauntletAttack( gentity_t *ent );
 void Weapon_HookFree (gentity_t *ent);
 void Weapon_HookThink (gentity_t *ent);
@@ -562,7 +561,6 @@ void CopyToBodyQue( gentity_t* ent );
 void RespawnPlayer( gentity_t* ent );
 void BeginIntermission();
 void InitClientPersistant (gclient_t *client);
-void InitClientResp (gclient_t *client);
 void InitBodyQue();
 void ClientSpawn( gentity_t* ent );
 void AddScore( gentity_t* ent, const vec3_t origin, int score );
@@ -572,7 +570,7 @@ qboolean SpotWouldTelefrag( const gentity_t* spot );
 //
 // g_svcmds.c
 //
-qboolean	ConsoleCommand( void );
+qboolean ConsoleCommand();
 void G_ProcessIPBans(void);
 qboolean G_FilterPacket( const char* from );
 
@@ -823,7 +821,7 @@ int		trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value);
 
 int		trap_AAS_AreaReachability(int areanum);
 
-int		trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags);
+int		trap_AAS_AreaTravelTimeToGoalArea( int areanum, const vec3_t origin, int goalareanum, int travelflags );
 int		trap_AAS_EnableRoutingArea( int areanum, int enable );
 int		trap_AAS_PredictRoute(void /*struct aas_predictroute_s*/ *route, int areanum, vec3_t origin,
 							int goalareanum, int travelflags, int maxareas, int maxtime,
@@ -836,9 +834,9 @@ int		trap_AAS_Swimming(vec3_t origin);
 int		trap_AAS_PredictClientMovement(void /* aas_clientmove_s */ *move, int entnum, vec3_t origin, int presencetype, int onground, vec3_t velocity, vec3_t cmdmove, int cmdframes, int maxframes, float frametime, int stopevent, int stopareanum, int visualize);
 
 
-void	trap_EA_Say(int client, char *str);
-void	trap_EA_SayTeam(int client, char *str);
-void	trap_EA_Command(int client, char *command);
+void	trap_EA_Say( int client, const char* s );
+void	trap_EA_SayTeam( int client, const char* s );
+void	trap_EA_Command( int client, const char* command );
 
 void	trap_EA_Action(int client, int action);
 void	trap_EA_Gesture(int client);

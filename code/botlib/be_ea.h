@@ -31,8 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 //ClientCommand elementary actions
-void EA_Say(int client, char *str);
-void EA_SayTeam(int client, char *str);
+void EA_Say( int client, const char* s );
+void EA_SayTeam( int client, const char* s );
 void EA_Command( int client, const char* command );
 
 void EA_Action(int client, int action);

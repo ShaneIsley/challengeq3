@@ -877,7 +877,6 @@ static void ExitLevel()
 			RemoveTournamentLoser();
 			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
-			level.changemap = NULL;
 			level.intermissiontime = 0;
 		}
 		return;
@@ -893,7 +892,6 @@ static void ExitLevel()
 		trap_SendConsoleCommand( EXEC_APPEND, "vstr nextmap\n" );
 	}
 
-	level.changemap = NULL;
 	level.intermissiontime = 0;
 
 	// reset all the scores so we don't enter the intermission again
