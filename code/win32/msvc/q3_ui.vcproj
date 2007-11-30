@@ -2426,24 +2426,8 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\q3_ui\ui_public.h"
+				RelativePath="..\..\ui\ui_public.h"
 				>
-				<FileConfiguration
-					Name="Debug TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release TA|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
