@@ -467,7 +467,7 @@ void	G_SetMovedir( vec3_t angles, vec3_t movedir);
 void	G_InitGentity( gentity_t* e );
 gentity_t* G_Spawn();
 gentity_t* G_TempEntity( const vec3_t origin, int event );
-void	G_Sound( gentity_t *ent, int channel, int soundIndex );
+void	G_Sound( const gentity_t* ent, int channel, int soundIndex );
 void	G_FreeEntity( gentity_t* e );
 
 void	G_TouchSolids (gentity_t *ent);

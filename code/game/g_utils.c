@@ -158,15 +158,10 @@ gentity_t* G_PickTarget( const char* targetname )
 
 
 /*
-==============================
-G_UseTargets
-
 "activator" should be set to the entity that initiated the firing.
 
 Search for (string)targetname in all entities that
 match (string)self.target and call their .use function
-
-==============================
 */
 void G_UseTargets( gentity_t* ent, gentity_t* activator )
 {
@@ -176,7 +171,7 @@ void G_UseTargets( gentity_t* ent, gentity_t* activator )
 		return;
 	}
 
-	while (t = G_Find (t, FOFS(targetname), ent->target)) {
+	while (t = G_Find(t, FOFS(targetname), ent->target)) {
 		if ( t == ent ) {
 			G_Printf ("WARNING: Entity used itself.\n");
 		} else {
@@ -210,16 +205,13 @@ const char* vtos( const vec3_t v )
 
 
 /*
-===============
-G_SetMovedir
-
 The editor only specifies a single value for angles (yaw),
 but we have special constants to generate an up or down direction.
 Angles will be cleared, because it is being used to represent a direction
 instead of an orientation.
-===============
 */
-void G_SetMovedir( vec3_t angles, vec3_t movedir ) {
+void G_SetMovedir( vec3_t angles, vec3_t movedir )
+{
 	static vec3_t VEC_UP		= {0, -1, 0};
 	static vec3_t MOVEDIR_UP	= {0, 0, 1};
 	static vec3_t VEC_DOWN		= {0, -2, 0};
@@ -232,13 +224,15 @@ void G_SetMovedir( vec3_t angles, vec3_t movedir ) {
 	} else {
 		AngleVectors (angles, movedir, NULL, NULL);
 	}
+
 	VectorClear( angles );
 }
 
 
-float vectoyaw( const vec3_t vec ) {
-	float	yaw;
-	
+float vectoyaw( const vec3_t vec )
+{
+	float yaw;
+
 	if (vec[YAW] == 0 && vec[PITCH] == 0) {
 		yaw = 0;
 	} else {
@@ -266,27 +260,23 @@ void G_InitGentity( gentity_t* e )
 	e->r.ownerNum = ENTITYNUM_NONE;
 }
 
-/*
-=================
-G_Spawn
 
+/*
 Either finds a free entity, or allocates a new one.
 
-  The slots from 0 to MAX_CLIENTS-1 are always reserved for clients, and will
-never be used by anything else.
+The slots from 0 to MAX_CLIENTS-1 are always reserved for clients
+and will never be used by anything else.
 
 Try to avoid reusing an entity that was recently freed, because it
 can cause the client to think the entity morphed into something else
 instead of being removed and recreated, which can cause interpolated
 angles and bad trails.
-=================
 */
 gentity_t* G_Spawn()
 {
-	int			i, force;
+	int i = 0, force;
 	gentity_t* e = NULL;
 
-	i = 0;		// shut up warning
 	for ( force = 0 ; force < 2 ; force++ ) {
 		// if we go through all entities and can't find one to free,
 		// override the normal minimum times before use
@@ -316,7 +306,7 @@ gentity_t* G_Spawn()
 		}
 		G_Error( "G_Spawn: no free entities" );
 	}
-	
+
 	// open up a new slot
 	level.num_entities++;
 
@@ -329,20 +319,14 @@ gentity_t* G_Spawn()
 }
 
 
-/*
-=================
-G_FreeEntity
+// marks the entity as free
 
-Marks the entity as free
-=================
-*/
 void G_FreeEntity( gentity_t* e )
 {
 	trap_UnlinkEntity(e);
 
-	if ( e->neverFree ) {
+	if ( e->neverFree )
 		return;
-	}
 
 	memset( e, 0, sizeof(*e) );
 	e->classname = "freed";
@@ -379,58 +363,38 @@ gentity_t* G_TempEntity( const vec3_t origin, int event )
 }
 
 
+// kills all entities that would touch the proposed new positioning of ent
+// ent should be unlinked before calling this!
 
-/*
-==============================================================================
-
-Kill box
-
-==============================================================================
-*/
-
-/*
-=================
-G_KillBox
-
-Kills all entities that would touch the proposed new positioning
-of ent.  Ent should be unlinked before calling this!
-=================
-*/
-void G_KillBox (gentity_t *ent) {
+void G_KillBox( gentity_t* ent)
+{
 	int			i, num;
 	int			touch[MAX_GENTITIES];
-	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
 	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
 	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
-	for (i=0 ; i<num ; i++) {
-		hit = &g_entities[touch[i]];
-		if ( !hit->client ) {
-			continue;
+	for (i = 0; i < num; ++i) {
+		gentity_t* hit = &g_entities[touch[i]];
+		if ( hit->client ) {
+			G_Damage( hit, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
 		}
-
-		// nail it
-		G_Damage ( hit, ent, ent, NULL, NULL,
-			100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
 	}
-
 }
 
-//==============================================================================
+
+///////////////////////////////////////////////////////////////
+
 
 /*
-===============
-G_AddPredictableEvent
-
 Use for non-pmove events that would also be predicted on the
 client side: jumppads and item pickups
 Adds an event+parm and twiddles the event counter
-===============
 */
-void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm ) {
+void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm )
+{
 	if ( !ent->client ) {
 		return;
 	}
@@ -438,14 +402,10 @@ void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm ) {
 }
 
 
-/*
-===============
-G_AddEvent
+// adds an event+parm and twiddles the event counter
 
-Adds an event+parm and twiddles the event counter
-===============
-*/
-void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
+void G_AddEvent( gentity_t *ent, int event, int eventParm )
+{
 	int		bits;
 
 	if ( !event ) {
@@ -470,20 +430,14 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
 }
 
 
-/*
-=============
-G_Sound
-=============
-*/
-void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
-	gentity_t	*te;
-
-	te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );
+void G_Sound( const gentity_t* ent, int channel, int soundIndex )
+{
+	gentity_t* te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );
 	te->s.eventParm = soundIndex;
 }
 
 
-//==============================================================================
+///////////////////////////////////////////////////////////////
 
 
 // sets the pos trajectory for a fixed position
