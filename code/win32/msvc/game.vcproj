@@ -170,7 +170,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib"
-				OutputFile="../../../../baseq3/cgamex86.dll"
+				OutputFile="../../../../baseq3/qagamex86.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\game.def"
@@ -1623,6 +1623,10 @@
 						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK;$(NoInherit)"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\game\g_logic.c"
+				>
 			</File>
 			<File
 				RelativePath="..\..\game\g_main.c"
