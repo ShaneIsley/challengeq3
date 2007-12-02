@@ -339,7 +339,6 @@ static void CG_RegisterCvars()
 	trap_Cvar_Register( NULL, "color1", "n", CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "color2", "y", CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register( NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register( NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 }
 
 
