@@ -336,10 +336,8 @@ static void Cmd_LevelShot_f( gentity_t* ent )
 		return;
 	}
 
-	// doesn't work in single player
-	if ( g_gametype.integer != 0 ) {
-		trap_SendServerCommand( ent-g_entities, 
-			"print \"Must be in g_gametype 0 for levelshot\n\"" );
+	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+		trap_SendServerCommand( ent-g_entities, "print \"Can't use levelshot in SP\n\"" );
 		return;
 	}
 
