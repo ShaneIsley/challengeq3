@@ -582,20 +582,10 @@ void G_StartKamikaze( gentity_t *ent );
 #endif
 
 //
-// p_hud.c
-//
-void MoveClientToIntermission( gentity_t* ent );
-void DeathmatchScoreboardMessage( const gentity_t* ent );
-
-//
 // g_cmds.c
 //
 const char* ConcatArgs( int start );
-
-//
-// g_pweapon.c
-//
-
+void DeathmatchScoreboardMessage( const gentity_t* ent );
 
 //
 // g_main.c
@@ -606,6 +596,7 @@ void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
+void MoveClientToIntermission( gentity_t* ent );
 
 //
 // g_client.c
@@ -622,13 +613,6 @@ void ClientCommand( int clientNum );
 void ClientThink( int clientNum );
 void ClientEndFrame( gentity_t *ent );
 void G_RunClient( gentity_t *ent );
-
-//
-// g_team.c
-//
-qboolean OnSameTeam( const gentity_t* ent1, const gentity_t* ent2 );
-void Team_CheckDroppedItem( const gentity_t* dropped );
-qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 
 //
 // g_mem.c
@@ -663,15 +647,11 @@ void Svcmd_AddBot_f( void );
 void Svcmd_BotList_f( void );
 void BotInterbreedEndMatch( void );
 
-// ai_main.c
-#define MAX_FILEPATH			144
-
-//bot settings
 typedef struct bot_settings_s
 {
-	char characterfile[MAX_FILEPATH];
+	char characterfile[MAX_QPATH];
 	float skill;
-	char team[MAX_FILEPATH];
+	char team[MAX_QPATH];
 } bot_settings_t;
 
 int BotAISetup( int restart );

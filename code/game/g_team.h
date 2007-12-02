@@ -36,6 +36,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CTF_RETURN_FLAG_ASSIST_BONUS		10	// awarded for returning a flag that causes a capture to happen almost immediately
 #define CTF_FRAG_CARRIER_ASSIST_BONUS		10	// award for fragging a flag carrier if a capture happens almost immediately
 
+#define OVERLOAD_ATTACK_BASE_SOUND_TIME		20000
+
+qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
+
 #else
 
 #define CTF_CAPTURE_BONUS		5		// what you get for capture
@@ -51,8 +55,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CTF_RETURN_FLAG_ASSIST_BONUS		1	// awarded for returning a flag that causes a capture to happen almost immediately
 #define CTF_FRAG_CARRIER_ASSIST_BONUS		2	// award for fragging a flag carrier if a capture happens almost immediately
 
-#define OVERLOAD_ATTACK_BASE_SOUND_TIME		20000
-
 #endif
 
 #define CTF_TARGET_PROTECT_RADIUS			1000	// the radius around an object being defended where a target will be worth extra frags
@@ -66,6 +68,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CTF_GRAPPLE_PULL_SPEED				750	// speed player is pulled at
 
 
+qboolean OnSameTeam( const gentity_t* ent1, const gentity_t* ent2 );
+void Team_CheckDroppedItem( const gentity_t* dropped );
 void Team_DroppedFlagThink(gentity_t *ent);
 void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker);
 void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker);
