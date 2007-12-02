@@ -128,20 +128,15 @@ gentity_t* G_Find( const gentity_t* from, int fieldofs, const char* match )
 }
 
 
-/*
-=============
-G_PickTarget
+// selects a random entity from among the targets
 
-Selects a random entity from among the targets
-=============
-*/
-#define MAXCHOICES	32
+#define MAX_TARGET_CHOICES 32
 
-gentity_t *G_PickTarget (char *targetname)
+gentity_t* G_PickTarget( const char* targetname )
 {
-	gentity_t	*ent = NULL;
-	int		num_choices = 0;
-	gentity_t	*choice[MAXCHOICES];
+	gentity_t* ent = NULL;
+	int choices = 0;
+	gentity_t* choice[MAX_TARGET_CHOICES];
 
 	if (!targetname)
 	{
@@ -149,23 +144,16 @@ gentity_t *G_PickTarget (char *targetname)
 		return NULL;
 	}
 
-	while(1)
-	{
-		ent = G_Find (ent, FOFS(targetname), targetname);
-		if (!ent)
-			break;
-		choice[num_choices++] = ent;
-		if (num_choices == MAXCHOICES)
-			break;
-	}
+	while ((choices < MAX_TARGET_CHOICES) && (ent = G_Find(ent, FOFS(targetname), targetname)))
+		choice[choices++] = ent;
 
-	if (!num_choices)
+	if (!choices)
 	{
 		G_Printf("G_PickTarget: target %s not found\n", targetname);
 		return NULL;
 	}
 
-	return choice[rand() % num_choices];
+	return choice[rand() % choices];
 }
 
 

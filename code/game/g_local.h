@@ -79,7 +79,7 @@ struct gentity_s {
 
 	qboolean	inuse;
 
-	char		*classname;			// set in QuakeEd
+	const char*	classname;			// set in QuakeEd
 	int			spawnflags;			// set in QuakeEd
 
 	qboolean	neverFree;			// if true, FreeEntity will only unlink
@@ -87,10 +87,10 @@ struct gentity_s {
 
 	int			flags;				// FL_* variables
 
-	char		*model;
-	char		*model2;
+	const char*	model;
+	const char*	model2;
 	int			freetime;			// level.time when the object was freed
-	
+
 	int			eventTime;			// events will be cleared EVENT_VALID_MSEC after set
 	qboolean	freeAfterEvent;
 	qboolean	unlinkAfterEvent;
@@ -114,14 +114,14 @@ struct gentity_s {
 	gentity_t	*prevTrain;
 	vec3_t		pos1, pos2;
 
-	char		*message;
+	const char*	message;
 
 	int			timestamp;		// body queue sinking, etc
 
 	float		angle;			// set in editor, -1 = up, -2 = down
-	char		*target;
-	char		*targetname;
-	char		*team;
+	const char*	target;
+	const char*	targetname;
+	const char*	team;
 	gentity_t	*target_ent;
 
 	float		speed;
@@ -172,7 +172,7 @@ struct gentity_s {
 	float		wait;
 	float		random;
 
-	gitem_t		*item;			// for bonus items
+	const gitem_t*	item;			// for bonus items
 };
 
 
@@ -460,7 +460,7 @@ int G_SoundIndex( const char* name );
 void	G_TeamCommand( team_t team, const char* cmd );
 void	G_KillBox (gentity_t *ent);
 gentity_t* G_Find( const gentity_t* from, int fieldofs, const char* match );
-gentity_t *G_PickTarget (char *targetname);
+gentity_t* G_PickTarget( const char* targetname );
 void	G_UseTargets( gentity_t* ent, gentity_t* activator );
 void	G_SetMovedir( vec3_t angles, vec3_t movedir);
 
