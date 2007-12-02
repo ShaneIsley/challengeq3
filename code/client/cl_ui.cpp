@@ -756,14 +756,11 @@ static int FloatAsInt( float f ) {
 	return temp;
 }
 
-/*
-====================
-CL_UISystemCalls
 
-The ui module is making a system call
-====================
-*/
-intptr_t CL_UISystemCalls( intptr_t *args ) {
+// the ui module is making a system call
+
+static intptr_t CL_UISystemCalls( intptr_t* args )
+{
 	switch( args[0] ) {
 	case UI_ERROR:
 		Com_Error( ERR_DROP, "%s", (const char*)VMA(1) );

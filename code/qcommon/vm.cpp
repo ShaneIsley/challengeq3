@@ -301,7 +301,7 @@ Dlls will call this directly
    This is likely due to C's inability to pass "..." parameters to
    a function in one clean chunk. On PowerPC Linux, these parameters
    are not necessarily passed on the stack, so while (&arg[0] == arg)
-   is qtrue, (&arg[1] == 2nd function parameter) is not necessarily
+   is true, (&arg[1] == 2nd function parameter) is not necessarily
    accurate, as arg's value might have been stored to the stack or
    other piece of scratch memory to give it a valid address, but the
    next parameter might still be sitting in a register.
@@ -327,21 +327,22 @@ Dlls will call this directly
  
 ============
 */
-intptr_t QDECL VM_DllSyscall( intptr_t arg, ... ) {
+static intptr_t QDECL VM_DllSyscall( intptr_t arg, ... )
+{
 #if !id386
-  // rcg010206 - see commentary above
-  intptr_t args[16];
-  int i;
-  va_list ap;
-  
-  args[0] = arg;
-  
-  va_start(ap, arg);
-  for (i = 1; i < sizeof (args) / sizeof (args[i]); i++)
-    args[i] = va_arg(ap, intptr_t);
-  va_end(ap);
-  
-  return currentVM->systemCall( args );
+	// rcg010206 - see commentary above
+	intptr_t args[16];
+	int i;
+	va_list ap;
+
+	args[0] = arg;
+
+	va_start(ap, arg);
+	for (i = 1; i < sizeof (args) / sizeof (args[i]); i++)
+		args[i] = va_arg(ap, intptr_t);
+	va_end(ap);
+
+	return currentVM->systemCall( args );
 #else // original id code
 	return currentVM->systemCall( &arg );
 #endif
@@ -706,7 +707,7 @@ intptr_t	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
 	lastVM = vm;
 
 	if ( vm_debugLevel ) {
-	  Com_Printf( "VM_Call( %ld )\n", callnum );
+		Com_Printf( "VM_Call( %ld )\n", callnum );
 	}
 
 	// if we have a dll loaded, call it directly

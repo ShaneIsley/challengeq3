@@ -390,14 +390,11 @@ static int	FloatAsInt( float f ) {
 	return temp;
 }
 
-/*
-====================
-CL_CgameSystemCalls
 
-The cgame module is making a system call
-====================
-*/
-intptr_t CL_CgameSystemCalls( intptr_t *args ) {
+// the cgame module is making a system call
+
+static intptr_t CL_CgameSystemCalls( intptr_t *args )
+{
 	switch( args[0] ) {
 	case CG_PRINT:
 		Com_Printf( "%s", (const char*)VMA(1) );
