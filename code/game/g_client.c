@@ -868,14 +868,13 @@ void ClientSpawn( gentity_t* ent )
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
 	if ( client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		spawnPoint = SelectSpectatorSpawnPoint ( 
-						spawn_origin, spawn_angles);
-	} else if (g_gametype.integer >= GT_CTF ) {
+		spawnPoint = SelectSpectatorSpawnPoint( spawn_origin, spawn_angles );
+	} else if (g_gametype.integer >= GT_CTF) {
 		// all base oriented team games use the CTF spawn points
-		spawnPoint = SelectCTFSpawnPoint ( 
-						client->sess.sessionTeam, 
-						client->pers.teamState.state, 
-						spawn_origin, spawn_angles);
+		spawnPoint = SelectCTFSpawnPoint(
+						client->sess.sessionTeam,
+						client->pers.teamState.state,
+						spawn_origin, spawn_angles );
 	} else {
 		do {
 			// the first spawn should be at a good looking spot
@@ -887,18 +886,16 @@ void ClientSpawn( gentity_t* ent )
 				spawnPoint = SelectSpawnPoint( client->ps.origin, spawn_origin, spawn_angles );
 			}
 
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
+			// Tim needs to prevent bots from spawning at the initial point on q3dm0...
 			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
 				continue;	// try again
 			}
-			// just to be symetric, we have a nohumans option...
+			// just to be symmetric, we have a nohumans option...
 			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
 				continue;	// try again
 			}
 
 			break;
-
 		} while ( 1 );
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
