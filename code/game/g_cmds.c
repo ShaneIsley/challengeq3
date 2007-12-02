@@ -824,6 +824,8 @@ static void Cmd_Tell_f( gentity_t* ent )
 ///////////////////////////////////////////////////////////////
 
 
+#ifdef MISSIONPACK
+
 static void G_VoiceTo( gentity_t* ent, const gentity_t* other, int mode, const char* id, qboolean voiceonly )
 {
 	int color;
@@ -1003,6 +1005,8 @@ static void Cmd_VoiceTaunt_f( gentity_t* ent )
 	// just say something
 	G_Voice( ent, NULL, SAY_ALL, VOICECHAT_TAUNT, qfalse );
 }
+
+#endif
 
 
 ///////////////////////////////////////////////////////////////
@@ -1425,6 +1429,8 @@ void ClientCommand( int clientNum )
 		Cmd_Tell_f ( ent );
 		return;
 	}
+
+#ifdef MISSIONPACK
 	if (Q_stricmp (cmd, "vsay") == 0) {
 		Cmd_Voice_f (ent, SAY_ALL, qfalse, qfalse);
 		return;
@@ -1453,6 +1459,8 @@ void ClientCommand( int clientNum )
 		Cmd_VoiceTaunt_f ( ent );
 		return;
 	}
+#endif
+
 	if (Q_stricmp (cmd, "score") == 0) {
 		Cmd_Score_f (ent);
 		return;
