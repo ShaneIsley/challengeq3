@@ -48,6 +48,11 @@ void AddScore( gentity_t* ent, const vec3_t origin, int score )
 		return;
 	}
 
+	// TA-era shitcode mindlessly does one of these for flag pickups
+	// because in TA that's 10 points. in Q3 though it's 0, but they still plum it...
+	if (!score)
+		return;
+
 	ScorePlum(ent, origin, score);
 
 	ent->client->ps.persistant[PERS_SCORE] += score;
