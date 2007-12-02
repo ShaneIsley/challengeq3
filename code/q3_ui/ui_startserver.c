@@ -1032,26 +1032,16 @@ static void ServerOptions_InitBotNames()
 	char		bots[MAX_INFO_STRING];
 
 	if( s_serveroptions.gametype >= GT_TEAM ) {
-		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "grunt", 16 );
+		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "slash", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "major", 16 );
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "visor", 16 );
-		}
-		else {
-			s_serveroptions.playerType[3].curvalue = 2;
-		}
+		Q_strncpyz( s_serveroptions.playerNameBuffers[3], "hunter", 16 );
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "sarge", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "grunt", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "major", 16 );
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "visor", 16 );
-		}
-		else {
-			s_serveroptions.playerType[9].curvalue = 2;
-		}
+		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "xaero", 16 );
+		Q_strncpyz( s_serveroptions.playerNameBuffers[9], "visor", 16 );
 		s_serveroptions.playerType[10].curvalue = 2;
 		s_serveroptions.playerType[11].curvalue = 2;
 
