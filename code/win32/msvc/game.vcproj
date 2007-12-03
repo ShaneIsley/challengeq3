@@ -1625,10 +1625,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\game\g_logic.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\game\g_main.c"
 				>
 				<FileConfiguration
