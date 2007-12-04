@@ -24,9 +24,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 typedef enum {
-	OP_UNDEF, 
+	OP_UNDEF,
 
-	OP_IGNORE, 
+	OP_IGNORE,
 
 	OP_BREAK,
 

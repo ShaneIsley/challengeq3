@@ -61,41 +61,45 @@ static	int		pc = 0;
 
 static	int		*instructionPointers = NULL;
 
-/* KHB !!!  ftol() was obsoleted a long time ago
-if we ever want it back, this hackfn is pretty decent
-#define FTOL_PTR
-long ftol( float x )
-  static const double magic = 6755399441055744.0; // 2^51 + 2^52
 
-  double tmp = x;
-  tmp += (x > 0) ? -0.499999999999 : +0.499999999999;
-  tmp += magic;
-  return *(long*)&tmp;
-*/
+#define FTOL_PTR
+
+#if defined( FTOL_PTR )
+
+// BEWARE: static int Q_ftol( float f ) { return (int)f; }
+// does NOT work - the function needs to be naked
 
 #ifdef _MSC_VER
 
-#if defined( FTOL_PTR )
-int _ftol( float );
-static	int		ftolPtr = (int)_ftol;
-#endif
+// there are "clever" ways to do with this with bit-hacking, but they aren't worthwhile
+
+static const __int16 FPU_CW = 0x0E7F; // double precision, round towards 0
+
+// the float value is already sitting on the top of the FP stack
+
+__declspec(naked) void Q_ftol()
+{
+	static __int16 cw;
+	int n;
+	__asm {
+		fnstcw cw
+		fldcw FPU_CW
+		fistp n
+		fldcw cw
+		mov eax, n
+		ret
+	}
+}
+
+static int ftolPtr = (int)Q_ftol;
 
 #else // _MSC_VER
 
-#if defined( FTOL_PTR )
-// bk001213 - BEWARE: does not work! UI menu etc. broken - stack!
-// bk001119 - added: int gftol( float x ) { return (int)x; }
-
-int qftol( void );     // bk001213 - label, see unix/ftol.nasm
-int qftol027F( void ); // bk001215 - fixed FPU control variants
-int qftol037F( void );
-int qftol0E7F( void ); // bk010102 - fixed bogus bits (duh)
-int qftol0F7F( void );
-
-static	int		ftolPtr = (int)qftol0F7F;
-#endif // FTOL_PTR
+static int ftolPtr = (int)qftol0F7F;
 
 #endif
+
+#endif // FTOL_PTR
 
 
 static	int		callMask = 0; // bk001213 - init
@@ -1123,7 +1127,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			break;
 		case OP_CVFI:
 #ifndef FTOL_PTR // WHENHELLISFROZENOVER  // bk001213 - was used in 1.17
-			// not IEEE complient, but simple and fast
+			// not IEEE compliant, but simple and fast
 			EmitString( "D9 07" );		// fld dword ptr [edi]
 			EmitString( "DB 1F" );		// fistp dword ptr [edi]
 #else // FTOL_PTR
