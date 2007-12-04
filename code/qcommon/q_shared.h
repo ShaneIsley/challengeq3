@@ -563,7 +563,7 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 float Com_Clamp( float min, float max, float value );
 
-char	*COM_SkipPath( char *pathname );
+const char* COM_SkipPath( const char* pathname );
 void	COM_StripExtension(const char *in, char *out, int destsize);
 void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 

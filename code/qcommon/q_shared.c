@@ -42,21 +42,14 @@ float Com_Clamp( float min, float max, float value )
 }
 
 
-/*
-============
-COM_SkipPath
-============
-*/
-char *COM_SkipPath (char *pathname)
+const char* COM_SkipPath( const char* pathname )
 {
-	char	*last;
-	
-	last = pathname;
+	const char* last = pathname;
 	while (*pathname)
 	{
-		if (*pathname=='/')
+		if (*pathname == '/')
 			last = pathname+1;
-		pathname++;
+		++pathname;
 	}
 	return last;
 }
