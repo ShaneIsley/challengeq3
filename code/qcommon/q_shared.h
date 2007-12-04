@@ -533,9 +533,9 @@ void AxisCopy( const vec3_t in[3], vec3_t out[3] );
 
 void SetPlaneSignbits( struct cplane_s *out );
 #if !defined(__GNUC__)
-int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
+int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const struct cplane_s* p );
 #else
-extern "C" int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *plane);
+extern "C" int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, struct cplane_s* p );
 #endif
 
 float	AngleMod(float a);

@@ -62,16 +62,12 @@ static	int		pc = 0;
 static	int		*instructionPointers = NULL;
 
 
-#define FTOL_PTR
-
-#if defined( FTOL_PTR )
 
 // BEWARE: static int Q_ftol( float f ) { return (int)f; }
 // does NOT work - the function needs to be naked
+// there are "clever" ways to do ftol with bit-hacking, but they aren't worthwhile
 
-#ifdef _MSC_VER
-
-// there are "clever" ways to do with this with bit-hacking, but they aren't worthwhile
+#if defined(_MSC_VER)
 
 static const __int16 FPU_CW = 0x0E7F; // double precision, round towards 0
 
@@ -91,15 +87,19 @@ __declspec(naked) void Q_ftol()
 	}
 }
 
+#define FTOL_PTR
 static int ftolPtr = (int)Q_ftol;
 
-#else // _MSC_VER
+#else if defined(__GNUC__)
 
+#define FTOL_PTR
 static int ftolPtr = (int)qftol0F7F;
 
-#endif
+#else
 
-#endif // FTOL_PTR
+#error no ANSI-compatible ftol for this platform/compiler
+
+#endif
 
 
 static	int		callMask = 0; // bk001213 - init
