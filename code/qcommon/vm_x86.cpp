@@ -90,9 +90,10 @@ __declspec(naked) void Q_ftol()
 #define FTOL_PTR
 static int ftolPtr = (int)Q_ftol;
 
-#else if defined(__GNUC__)
+#elif defined(__GNUC__)
 
 #define FTOL_PTR
+extern "C" int qftol0F7F( void );
 static int ftolPtr = (int)qftol0F7F;
 
 #else
