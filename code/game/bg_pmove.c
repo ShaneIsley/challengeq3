@@ -411,7 +411,7 @@ static qboolean PM_SlideMove( qboolean gravity )
 		primal_velocity[2] = endVelocity[2];
 		if ( pml.groundPlane ) {
 			// slide along the ground plane
-			PM_ClipVelocity (pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP );
+			PM_ClipVelocity( pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP );
 		}
 	} else {
 		VectorClear(endVelocity);
@@ -497,10 +497,10 @@ static qboolean PM_SlideMove( qboolean gravity )
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PM_ClipVelocity( pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PM_ClipVelocity( endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the new move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -615,9 +615,9 @@ static void PM_StepSlideMove( qboolean gravity )
 	// push down the final amount
 	VectorCopy (pm->ps->origin, down);
 	down[2] -= delta;
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask);
+	pm->trace( &trace, pm->ps->origin, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask );
 	if ( !trace.allsolid ) {
-		VectorCopy (trace.endpos, pm->ps->origin);
+		VectorCopy( trace.endpos, pm->ps->origin );
 	}
 	if ( trace.fraction < 1.0 ) {
 		PM_ClipVelocity( pm->ps->velocity, trace.plane.normal, pm->ps->velocity, OVERCLIP );
@@ -785,7 +785,7 @@ static void PM_AirMove()
 	// we may have a ground plane that is very steep, even though we don't have a groundentity
 	// slide along the steep plane
 	if (pml.groundPlane)
-		PM_ClipVelocity(pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP);
+		PM_ClipVelocity( pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP );
 
 	PM_StepSlideMove(qtrue);
 }
@@ -888,6 +888,8 @@ static void PM_WalkMove()
 		// don't reset the z velocity for slopes
 		//pm->ps->velocity[2] = 0;
 	}
+
+	PM_ClipVelocity( pm->ps->velocity, pml.groundTrace.plane.normal, pm->ps->velocity, OVERCLIP );
 
 	// don't do anything if standing still
 	if (!pm->ps->velocity[0] && !pm->ps->velocity[1])
