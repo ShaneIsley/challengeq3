@@ -49,8 +49,8 @@ cvar_t* cm_playerCurveClip;
 // can just be stored out and get a proper clipping hull structure.
 
 static cmodel_t box_model;
-static cplane_t* box_planes;
-static cbrush_t* box_brush;
+static cplane_t* box_planes = NULL;
+static cbrush_t* box_brush = NULL;
 
 static void CM_InitBoxHull()
 {

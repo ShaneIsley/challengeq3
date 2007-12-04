@@ -84,8 +84,8 @@ int	c_totalPatchBlocks;
 int	c_totalPatchSurfaces;
 int	c_totalPatchEdges;
 
-static const patchCollide_t	*debugPatchCollide;
-static const facet_t		*debugFacet;
+static const patchCollide_t	*debugPatchCollide = NULL;
+static const facet_t		*debugFacet = NULL;
 static qbool		debugBlock;
 static vec3_t		debugBlockPoints[4];
 

@@ -43,13 +43,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
-int		com_argc;
+int		com_argc = 0;
 char	*com_argv[MAX_NUM_ARGVS+1];
 
 jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
-FILE *debuglogfile;
+FILE *debuglogfile = NULL;
 //FIXME: "-1" ??????
 static fileHandle_t logfile = 0;
 fileHandle_t	com_journalFile = 0;			// events are written here
@@ -1150,10 +1150,10 @@ typedef struct hunkblock_s {
 	int line;
 } hunkblock_t;
 
-static	hunkblock_t *hunkblocks;
+static	hunkblock_t *hunkblocks = NULL;
 
 static	hunkUsed_t	hunk_low, hunk_high;
-static	hunkUsed_t	*hunk_permanent, *hunk_temp;
+static	hunkUsed_t	*hunk_permanent = NULL, *hunk_temp = NULL;
 
 static	byte	*s_hunkData = NULL;
 static	int		s_hunkTotal;
@@ -2685,11 +2685,11 @@ void Field_Clear( field_t* edit )
 	edit->scroll = 0;
 }
 
-static const char* completionString;
+static const char* completionString = NULL;
 static char shortestMatch[MAX_TOKEN_CHARS];
-static int	matchCount;
+static int	matchCount = 0;
 // field we are working on, passed to Field_AutoComplete(&g_consoleCommand for instance)
-static field_t* completionField;
+static field_t* completionField = NULL;
 
 static void FindMatches( const char *s )
 {
