@@ -73,7 +73,7 @@ static const __int16 FPU_CW = 0x0E7F; // double precision, round towards 0
 
 // the float value is already sitting on the top of the FP stack
 
-__declspec(naked) void Q_ftol()
+static __declspec(naked) void QVM_ftol()
 {
 	static __int16 cw;
 	int n;
@@ -88,7 +88,7 @@ __declspec(naked) void Q_ftol()
 }
 
 #define FTOL_PTR
-static int ftolPtr = (int)Q_ftol;
+static int ftolPtr = (int)QVM_ftol;
 
 #elif defined(__GNUC__)
 
