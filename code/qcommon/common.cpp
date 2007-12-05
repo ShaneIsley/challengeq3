@@ -1150,16 +1150,16 @@ typedef struct hunkblock_s {
 	int line;
 } hunkblock_t;
 
-static	hunkblock_t *hunkblocks;
+static	hunkblock_t *hunkblocks = NULL;
 
-static	hunkUsed_t	hunk_low, hunk_high;
-static	hunkUsed_t	*hunk_permanent, *hunk_temp;
+static	hunkUsed_t	hunk_low = {0}, hunk_high = {0};
+static	hunkUsed_t	*hunk_permanent = &hunk_low, *hunk_temp = &hunk_high;
 
 static	byte	*s_hunkData = NULL;
-static	int		s_hunkTotal;
+static	int		s_hunkTotal = 0;
 
-static	int		s_zoneTotal;
-static	int		s_smallZoneTotal;
+static	int		s_zoneTotal = 0;
+static	int		s_smallZoneTotal = 0;
 
 
 /*
