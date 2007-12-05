@@ -126,7 +126,7 @@ typedef struct bot_weaponstate_s
 } bot_weaponstate_t;
 
 static bot_weaponstate_t *botweaponstates[MAX_CLIENTS+1];
-static weaponconfig_t *weaponconfig = NULL;
+static weaponconfig_t *weaponconfig;
 
 //========================================================================
 //
