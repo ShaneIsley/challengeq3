@@ -29,7 +29,7 @@ static float s_quadFactor;
 static vec3_t forward, right, up, muzzle;
 
 
-static void CalcMuzzlePoint( gentity_t* ent )
+static void CalcMuzzlePoint( const gentity_t* ent )
 {
 	AngleVectors( ent->client->ps.viewangles, forward, right, up );
 
@@ -125,7 +125,6 @@ MACHINEGUN
 Round a vector to integers for more efficient network transmission
 but towards a given point rather than blindly truncating.
 This prevents it from truncating into a wall.
-======================
 */
 void SnapVectorTowards( vec3_t v, const vec3_t to )
 {
@@ -154,20 +153,19 @@ static void Bullet_Fire( gentity_t *ent, float spread, int damage )
 #ifdef MISSIONPACK
 	vec3_t		impactpoint, bouncedir;
 #endif
-	float		r;
-	float		u;
+	float		a, r, u;
 	gentity_t	*tent;
 	gentity_t	*traceEnt;
 	int			i, passent;
 
 	damage *= s_quadFactor;
 
-	r = random() * M_PI * 2.0f;
+	a = random() * M_PI * 2.0f;
 	u = sin(r) * crandom() * spread * 16;
 	r = cos(r) * crandom() * spread * 16;
-	VectorMA (muzzle, 8192*16, forward, end);
-	VectorMA (end, r, right, end);
-	VectorMA (end, u, up, end);
+	VectorMA( muzzle, 8192*16, forward, end );
+	VectorMA( end, r, right, end );
+	VectorMA( end, u, up, end );
 
 	passent = ent->s.number;
 	for (i = 0; i < 10; i++) {
@@ -231,14 +229,11 @@ BFG
 ======================================================================
 */
 
-void BFG_Fire ( gentity_t *ent ) {
-	gentity_t	*m;
-
-	m = fire_bfg (ent, muzzle, forward);
+static void BFG_Fire( gentity_t* ent )
+{
+	gentity_t* m = fire_bfg (ent, muzzle, forward);
 	m->damage *= s_quadFactor;
 	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
 
 
@@ -250,11 +245,12 @@ SHOTGUN
 ======================================================================
 */
 
-// DEFAULT_SHOTGUN_SPREAD and DEFAULT_SHOTGUN_COUNT	are in bg_public.h, because
+// DEFAULT_SHOTGUN_SPREAD and DEFAULT_SHOTGUN_COUNT are in bg_public.h, because
 // client predicts same spreads
 #define	DEFAULT_SHOTGUN_DAMAGE	10
 
-qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
+static qboolean ShotgunPellet( const vec3_t start, const vec3_t end, gentity_t* ent )
+{
 	trace_t		tr;
 	int			damage, i, passent;
 	gentity_t	*traceEnt;
@@ -311,12 +307,12 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 }
 
 // this should match CG_ShotgunPattern
-void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
+static void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t* ent )
+{
 	int			i;
 	float		r, u;
 	vec3_t		end;
 	vec3_t		forward, right, up;
-	int			oldScore;
 	qboolean	hitClient = qfalse;
 
 	// derive the right and up vectors from the forward vector, because
@@ -325,15 +321,13 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	PerpendicularVector( right, forward );
 	CrossProduct( forward, right, up );
 
-	oldScore = ent->client->ps.persistant[PERS_SCORE];
-
 	// generate the "random" spread pattern
 	for ( i = 0 ; i < DEFAULT_SHOTGUN_COUNT ; i++ ) {
 		r = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD * 16;
 		u = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD * 16;
-		VectorMA( origin, 8192 * 16, forward, end);
-		VectorMA (end, r, right, end);
-		VectorMA (end, u, up, end);
+		VectorMA( origin, 8192 * 16, forward, end );
+		VectorMA( end, r, right, end );
+		VectorMA( end, u, up, end );
 		if( ShotgunPellet( origin, end, ent ) && !hitClient ) {
 			hitClient = qtrue;
 			ent->client->accuracy_hits++;
@@ -342,8 +336,9 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 }
 
 
-void weapon_supershotgun_fire (gentity_t *ent) {
-	gentity_t		*tent;
+static void weapon_supershotgun_fire( gentity_t* ent )
+{
+	gentity_t* tent;
 
 	// send shotgun blast
 	tent = G_TempEntity( muzzle, EV_SHOTGUN );
@@ -364,19 +359,19 @@ GRENADE LAUNCHER
 ======================================================================
 */
 
-void weapon_grenadelauncher_fire (gentity_t *ent) {
-	gentity_t	*m;
+static void weapon_grenadelauncher_fire( gentity_t* ent)
+{
+	gentity_t* m;
 
 	// extra vertical velocity
 	forward[2] += 0.2f;
 	VectorNormalize( forward );
 
-	m = fire_grenade (ent, muzzle, forward);
+	m = fire_grenade( ent, muzzle, forward );
 	m->damage *= s_quadFactor;
 	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
+
 
 /*
 ======================================================================
@@ -386,14 +381,11 @@ ROCKET
 ======================================================================
 */
 
-void Weapon_RocketLauncher_Fire (gentity_t *ent) {
-	gentity_t	*m;
-
-	m = fire_rocket (ent, muzzle, forward);
+static void Weapon_RocketLauncher_Fire( gentity_t* ent )
+{
+	gentity_t* m = fire_rocket( ent, muzzle, forward );
 	m->damage *= s_quadFactor;
 	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
 
 
@@ -405,15 +397,13 @@ PLASMA GUN
 ======================================================================
 */
 
-void Weapon_Plasmagun_Fire (gentity_t *ent) {
-	gentity_t	*m;
-
-	m = fire_plasma (ent, muzzle, forward);
+static void Weapon_Plasmagun_Fire( gentity_t* ent )
+{
+	gentity_t* m = fire_plasma (ent, muzzle, forward);
 	m->damage *= s_quadFactor;
 	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
+
 
 /*
 ======================================================================
@@ -424,13 +414,9 @@ RAILGUN
 */
 
 
-/*
-=================
-weapon_railgun_fire
-=================
-*/
 #define	MAX_RAIL_HITS	4
-void weapon_railgun_fire (gentity_t *ent) {
+static void weapon_railgun_fire( gentity_t* ent )
+{
 	vec3_t		end;
 #ifdef MISSIONPACK
 	vec3_t impactpoint, bouncedir;
@@ -439,7 +425,6 @@ void weapon_railgun_fire (gentity_t *ent) {
 	gentity_t	*tent;
 	gentity_t	*traceEnt;
 	int			damage;
-	int			i;
 	int			hits;
 	int			unlinked;
 	int			passent;
@@ -447,7 +432,7 @@ void weapon_railgun_fire (gentity_t *ent) {
 
 	damage = 100 * s_quadFactor;
 
-	VectorMA (muzzle, 8192, forward, end);
+	VectorMA( muzzle, 8192, forward, end );
 
 	// trace only against the solids, so the railgun will go through people
 	unlinked = 0;
@@ -504,9 +489,8 @@ void weapon_railgun_fire (gentity_t *ent) {
 	} while ( unlinked < MAX_RAIL_HITS );
 
 	// link back in any entities we unlinked
-	for ( i = 0 ; i < unlinked ; i++ ) {
-		trap_LinkEntity( unlinkedEntities[i] );
-	}
+	while ( unlinked )
+		trap_LinkEntity( unlinkedEntities[ --unlinked ] );
 
 	// the final trace endpos will be the terminal point of the rail trail
 
@@ -540,7 +524,7 @@ void weapon_railgun_fire (gentity_t *ent) {
 			ent->client->accurateCount -= 2;
 			ent->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
 			// add the sprite over the player's head
-			ent->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
+			ent->client->ps.eFlags &= ~EF_AWARD_ALL;
 			ent->client->ps.eFlags |= EF_AWARD_IMPRESSIVE;
 			ent->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 		}
@@ -590,6 +574,7 @@ void Weapon_HookThink (gentity_t *ent)
 	VectorCopy( ent->r.currentOrigin, ent->parent->client->ps.grapplePoint);
 }
 
+
 /*
 ======================================================================
 
@@ -598,7 +583,8 @@ LIGHTNING GUN
 ======================================================================
 */
 
-void Weapon_LightningFire( gentity_t *ent ) {
+static void Weapon_LightningFire( gentity_t* ent )
+{
 	trace_t		tr;
 	vec3_t		end;
 #ifdef MISSIONPACK
@@ -676,6 +662,7 @@ void Weapon_LightningFire( gentity_t *ent ) {
 		break;
 	}
 }
+
 
 #ifdef MISSIONPACK
 /*
