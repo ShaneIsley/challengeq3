@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/vm_local.h"
 #include "../qcommon/vm_shim.h"
 
+/*
 #include "../botlib/botlib.h"
 
 extern	botlib_export_t	*botlib_export;
@@ -32,22 +33,17 @@ extern	botlib_export_t	*botlib_export;
 extern qbool loadCamera(const char *name);
 extern void startCamera(int time);
 extern qbool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
-
-/*
-====================
-CL_GetGameState
-====================
 */
-void CL_GetGameState( gameState_t *gs ) {
+
+
+static void CL_GetGameState( gameState_t* gs )
+{
 	*gs = cl.gameState;
 }
 
-/*
-====================
-CL_GetGlconfig
-====================
-*/
-void CL_GetGlconfig( glconfig_t *glconfig ) {
+
+static void CL_GetGlconfig( glconfig_t* glconfig )
+{
 	*glconfig = cls.glconfig;
 }
 
@@ -871,7 +867,7 @@ void CL_FirstSnapshot( void ) {
 		Cbuf_AddText( cl_activeAction->string );
 		Cvar_Set( "activeAction", "" );
 	}
-	
+
 	Sys_BeginProfiling();
 }
 
@@ -902,7 +898,7 @@ void CL_SetCGameTime( void ) {
 		if ( cls.state != CA_ACTIVE ) {
 			return;
 		}
-	}	
+	}
 
 	// if we have gotten to this point, cl.snap is guaranteed to be valid
 	if ( !cl.snap.valid ) {
@@ -931,7 +927,7 @@ void CL_SetCGameTime( void ) {
 		// or less latency to be added in the interest of better 
 		// smoothness or better responsiveness.
 		int tn;
-		
+
 		tn = cl_timeNudge->integer;
 		if (tn<-30) {
 			tn = -30;
@@ -992,6 +988,4 @@ void CL_SetCGameTime( void ) {
 	}
 
 }
-
-
 

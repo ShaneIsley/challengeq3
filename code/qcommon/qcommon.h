@@ -984,8 +984,6 @@ void	Sys_EndProfiling( void );
 qbool Sys_LowPhysicalMemory( void );
 unsigned int Sys_ProcessorCount( void );
 
-int Sys_MonkeyShouldBeSpanked( void );
-
 qbool Sys_DetectAltivec( void );
 
 /* This is based on the Adaptive Huffman algorithm described in Sayood's Data
