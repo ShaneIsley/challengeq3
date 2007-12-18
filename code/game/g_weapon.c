@@ -161,8 +161,8 @@ static void Bullet_Fire( gentity_t *ent, float spread, int damage )
 	damage *= s_quadFactor;
 
 	a = random() * M_PI * 2.0f;
-	u = sin(r) * crandom() * spread * 16;
-	r = cos(r) * crandom() * spread * 16;
+	u = sin(a) * crandom() * spread * 16;
+	r = cos(a) * crandom() * spread * 16;
 	VectorMA( muzzle, 8192*16, forward, end );
 	VectorMA( end, r, right, end );
 	VectorMA( end, u, up, end );
