@@ -34,9 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
-// Used to determine local installation path
-static char installPath[MAX_OSPATH];
-
 // Used to determine where to store user-specific files
 static char homePath[MAX_OSPATH];
 
@@ -326,19 +323,6 @@ const char* Sys_Cwd()
 	cwd[MAX_OSPATH-1] = 0;
 
 	return cwd;
-}
-
-void Sys_SetDefaultInstallPath(const char *path)
-{
-	Q_strncpyz(installPath, path, sizeof(installPath));
-}
-
-const char* Sys_DefaultInstallPath()
-{
-	if (*installPath)
-		return installPath;
-	else
-		return Sys_Cwd();
 }
 
 void Sys_SetDefaultHomePath(const char *path)
