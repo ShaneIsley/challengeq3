@@ -275,34 +275,16 @@ typedef enum {
 	VMI_COMPILED
 } vmInterpret_t;
 
-typedef enum {
-	TRAP_MEMSET = 100,
-	TRAP_MEMCPY,
-	TRAP_STRNCPY,
-	TRAP_SIN,
-	TRAP_COS,
-	TRAP_ATAN2,
-	TRAP_SQRT,
-	TRAP_MATRIXMULTIPLY,
-	TRAP_ANGLEVECTORS,
-	TRAP_PERPENDICULARVECTOR,
-	TRAP_FLOOR,
-	TRAP_CEIL,
-
-	TRAP_TESTPRINTINT,
-	TRAP_TESTPRINTFLOAT
-} sharedTraps_t;
 
 void	VM_Init( void );
-vm_t	*VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *), 
-				   vmInterpret_t interpret );
+vm_t	*VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *), vmInterpret_t interpret );
 // module should be bare: "cgame", not "cgame.dll" or "vm/cgame.qvm"
 
 void	VM_Free( vm_t *vm );
 void	VM_Clear(void);
 vm_t	*VM_Restart( vm_t *vm );
 
-intptr_t		QDECL VM_Call( vm_t *vm, int callNum, ... );
+intptr_t	QDECL VM_Call( vm_t *vm, int callNum, ... );
 
 void	VM_Debug( int level );
 
@@ -456,7 +438,7 @@ qbool Cvar_Command();
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known command
 // returns true if the command was a variable reference that was handled. (print or change)
 
-void 	Cvar_WriteVariables( fileHandle_t f );
+void	Cvar_WriteVariables( fileHandle_t f );
 // writes lines containing "set variable value" for all variables
 // with the archive flag set to qtrue.
 
@@ -674,10 +656,10 @@ void		Info_Print( const char *s );
 
 void		Com_BeginRedirect (char *buffer, int buffersize, void (*flush)(char *));
 void		Com_EndRedirect( void );
-void 		QDECL Com_Printf( const char *fmt, ... );
-void 		QDECL Com_DPrintf( const char *fmt, ... );
-void 		QDECL Com_Error( int code, const char *fmt, ... );
-void 		Com_Quit_f( void );
+void		QDECL Com_Printf( const char *fmt, ... );
+void		QDECL Com_DPrintf( const char *fmt, ... );
+void		QDECL Com_Error( int code, const char *fmt, ... );
+void		Com_Quit_f( void );
 int			Com_EventLoop( void );
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
@@ -719,7 +701,6 @@ extern	int		time_frontend;
 extern	int		time_backend;		// renderer backend time
 
 extern	int		com_frameTime;
-extern	int		com_frameMsec;
 
 extern	qbool	com_errorEntered;
 
@@ -971,7 +952,6 @@ void	Sys_ShowIP();
 
 void	Sys_Mkdir( const char *path );
 const char* Sys_Cwd();
-void	Sys_SetDefaultInstallPath(const char *path);
 const char* Sys_GetCurrentUser();
 const char* Sys_DefaultHomePath();
 

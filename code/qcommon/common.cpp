@@ -32,25 +32,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 
-#define MAX_NUM_ARGVS	50
-
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
 #define DEF_COMHUNKMEGS		64
 #define DEF_COMZONEMEGS		24
-#define XSTRING(x)				STRING(x)
-#define STRING(x)					#x
+#define XSTRING(x)			STRING(x)
+#define STRING(x)			#x
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
-int		com_argc;
-char	*com_argv[MAX_NUM_ARGVS+1];
 
 jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
-FILE *debuglogfile;
-//FIXME: "-1" ??????
 static fileHandle_t logfile = 0;
 fileHandle_t	com_journalFile = 0;			// events are written here
 fileHandle_t	com_journalDataFile = 0;		// config files are written here
@@ -86,17 +80,16 @@ int		time_game;
 int		time_frontend;		// renderer frontend time
 int		time_backend;		// renderer backend time
 
-int			com_frameTime;
-int			com_frameMsec;
-int			com_frameNumber;
+int		com_frameTime;
+int		com_frameNumber;
 
 qbool	com_errorEntered;
 qbool	com_fullyInitialized;
 
 char	com_errorMessage[MAXPRINTMSG];
 
-void Com_WriteConfig_f( void );
-void CIN_CloseAllVideos( void );
+static void Com_WriteConfig_f();
+extern void CIN_CloseAllVideos( void );
 
 //============================================================================
 
@@ -2428,7 +2421,7 @@ static void Com_WriteConfiguration()
 
 // write the config file to a specific name
 
-void Com_WriteConfig_f( void )
+static void Com_WriteConfig_f()
 {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf( "Usage: writeconfig <filename>\n" );
@@ -2541,7 +2534,6 @@ void Com_Frame( void )
 	}
 
 	// mess with msec if needed
-	com_frameMsec = msec;
 	msec = Com_ModifyMsec( msec );
 
 	//
