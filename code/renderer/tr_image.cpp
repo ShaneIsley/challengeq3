@@ -1040,14 +1040,14 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* form
 	//if ((targa_header.image_type != 2) && (targa_header.image_type != 10) && (targa_header.image_type != 3))
 	//	ri.Error(ERR_DROP, "LoadTGA: Only type 2 (RGB), 3 (gray), and 10 (RGB) TGA images supported\n");
 	if ((targa_header.image_type != 2) && (targa_header.image_type != 10))
-		ri.Error(ERR_DROP, "LoadTGA: Only type 2 and 10 (RGB/A) TGA images supported\n");
+		ri.Error( ERR_DROP, "LoadTGA %s: Only type 2 and 10 (RGB/A) TGA images supported\n", name );
 
 	if ( targa_header.colormap_type )
-		ri.Error( ERR_DROP, "LoadTGA: colormaps not supported\n" );
+		ri.Error( ERR_DROP, "LoadTGA %s: Colormaps not supported\n", name );
 
 	//if ( ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 ) && targa_header.image_type != 3 )
 	if ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 )
-		ri.Error(ERR_DROP, "LoadTGA: Only 32 or 24 bit images supported (no colormaps)\n");
+		ri.Error( ERR_DROP, "LoadTGA %s: Only 32 or 24 bit images supported\n", name );
 
 	*format = (targa_header.pixel_size == 32) ? GL_RGBA : GL_RGB;
 
