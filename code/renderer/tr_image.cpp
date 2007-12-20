@@ -1037,17 +1037,14 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* form
 
 	p += sizeof(TargaHeader);
 
-	//if ((targa_header.image_type != 2) && (targa_header.image_type != 10) && (targa_header.image_type != 3))
-	//	ri.Error(ERR_DROP, "LoadTGA: Only type 2 (RGB), 3 (gray), and 10 (RGB) TGA images supported\n");
-	if ((targa_header.image_type != 2) && (targa_header.image_type != 10))
-		ri.Error( ERR_DROP, "LoadTGA %s: Only type 2 and 10 (RGB/A) TGA images supported\n", name );
+	if ((targa_header.image_type != 2) && (targa_header.image_type != 10) && (targa_header.image_type != 3))
+		ri.Error( ERR_DROP, "LoadTGA %s: Only type 2 and 10 (RGB/A) and 3 (gray) images supported\n", name );
 
 	if ( targa_header.colormap_type )
 		ri.Error( ERR_DROP, "LoadTGA %s: Colormaps not supported\n", name );
 
-	//if ( ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 ) && targa_header.image_type != 3 )
-	if ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 )
-		ri.Error( ERR_DROP, "LoadTGA %s: Only 32 or 24 bit images supported\n", name );
+	if ( ( targa_header.pixel_size != 32 && targa_header.pixel_size != 24 ) && targa_header.image_type != 3 )
+		ri.Error( ERR_DROP, "LoadTGA %s: Only 32 or 24 bit color images supported\n", name );
 
 	*format = (targa_header.pixel_size == 32) ? GL_RGBA : GL_RGB;
 
@@ -1071,6 +1068,16 @@ static qbool LoadTGA( const char* name, byte** pic, int* w, int* h, GLenum* form
 
 	byte pixel[4] = { 0, 0, 0, 255 };
 	int bpp = (targa_header.pixel_size >> 3);
+
+	// uncompressed greyscale - expand it into fake-RGB
+	if (targa_header.image_type == 3) {
+		for (int y = rows-1; y >= 0; --y) {
+			dst = *pic + y*columns*4;
+			for (int x = 0; x < columns; ++x) {
+				pixel[0] = pixel[1] = pixel[2] = *p++;
+			}
+		}
+	}
 
 	// one of these days we'll actually just use GL_BGRA_EXT, but until then...
 	#define UNMUNGE_TGA_PIXEL { *dst++ = pixel[2]; *dst++ = pixel[1]; *dst++ = pixel[0]; *dst++ = pixel[3]; }
