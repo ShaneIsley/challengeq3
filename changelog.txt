@@ -46,6 +46,7 @@ merged platform-specific *_net.* into qcommon/net_ip.cpp, <3 timbo  :)
 
 fixed USERINFO vars not being sent properly during connect
 
+remove some network stuff (buffer sizes and TOS) http://support.microsoft.com/kb/248611
 
 12 Sep 07 - released as 1.34, since it was about time we did  :P
 
