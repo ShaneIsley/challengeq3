@@ -1426,7 +1426,7 @@ static void R_LoadFogs( const lump_t* l, const lump_t* brushesLump, const lump_t
 			shader->fogParms.color[2] * tr.identityLight,
 			1.0 );
 
-		out->tcScale = 1.0f / (8 * max( 1, shader->fogParms.depthForOpaque ));
+		out->tcScale = 1.0f / (8 * max( 1.0f, shader->fogParms.depthForOpaque ));
 
 		// set the gradient vector
 		sideNum = LittleLong( fogs->visibleSide );
