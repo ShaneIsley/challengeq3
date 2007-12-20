@@ -571,9 +571,9 @@ extern BOOL ( WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
 
 extern BOOL ( WINAPI * qwglSwapIntervalEXT)( int interval );
 
-};
-
 #endif	// _WIN32
+
+};
 
 #if ( (defined __linux__ )  || (defined __FreeBSD__ ) || (defined __sun) ) // rb010123
 
