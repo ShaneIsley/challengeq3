@@ -803,8 +803,8 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   }
 
 #if USE_SDL_VIDEO
-  dllEntry = SDL_LoadFunction( libHandle, "dllEntry" );
-  *entryPoint = SDL_LoadFunction( libHandle, "vmMain" );
+  dllEntry = (void (*)(intptr_t (*)(intptr_t, ...)))SDL_LoadFunction( libHandle, "dllEntry" );
+  *entryPoint = (intptr_t (*)(int, ...))SDL_LoadFunction( libHandle, "vmMain" );
 #else
   dllEntry = (void (*)(intptr_t (*)(intptr_t, ...)))dlsym( libHandle, "dllEntry" );
   *entryPoint = (intptr_t (*)(int, ...))dlsym( libHandle, "vmMain" );
