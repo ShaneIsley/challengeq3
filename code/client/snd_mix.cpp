@@ -63,10 +63,10 @@ void S_WriteLinearBlastStereo16 (void)
 }
 #elif defined(__GNUC__)
 // uses snd_mixa.s
-void S_WriteLinearBlastStereo16 (void);
+extern "C" void S_WriteLinearBlastStereo16(void);
 #else
 
-__declspec( naked ) void S_WriteLinearBlastStereo16 (void)
+static __declspec( naked ) void S_WriteLinearBlastStereo16()
 {
 	__asm {
 
