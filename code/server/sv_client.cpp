@@ -114,9 +114,8 @@ void SV_GetChallenge( netadr_t from ) {
 	challenge_t	*challenge;
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) {
+	if (Cvar_VariableValue("sv_singlePlayer"))
 		return;
-	}
 
 	oldest = 0;
 	oldestTime = 0x7fffffff;

@@ -324,9 +324,8 @@ void SVC_Status( netadr_t from ) {
 	char	infostring[MAX_INFO_STRING];
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ) {
+	if (Cvar_VariableValue("sv_singlePlayer"))
 		return;
-	}
 
 	strcpy( infostring, Cvar_InfoString( CVAR_SERVERINFO ) );
 
@@ -365,14 +364,11 @@ static void SVC_Info( const netadr_t& from )
 	char	infostring[MAX_INFO_STRING];
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) {
+	if (Cvar_VariableValue("sv_singlePlayer"))
 		return;
-	}
 
-	/*
-	 * Check whether Cmd_Argv(1) has a sane length. This was not done in the original Quake3 version which led
-	 * to the Infostring bug discovered by Luigi Auriemma. See http://aluigi.altervista.org/ for the advisory.
-	 */
+	// Check whether Cmd_Argv(1) has a sane length. This was not done in the original Quake3 version which led
+	// to the Infostring bug discovered by Luigi Auriemma. See http://aluigi.altervista.org/ for the advisory.
 
 	// A maximum challenge length of 128 should be more than plenty.
 	if(strlen(Cmd_Argv(1)) > 128)

@@ -176,9 +176,6 @@ static void SV_Map_f( void )
 			cheat = qfalse;
 			killBots = qfalse;
 		}
-		if( sv_gametype->integer == GT_SINGLE_PLAYER ) {
-			Cvar_SetValue( "g_gametype", GT_FFA );
-		}
 	}
 
 	// save the map name here cause on a map restart we reload the q3config.cfg

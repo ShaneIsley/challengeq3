@@ -921,7 +921,6 @@ static void CL_ForwardToServer_f()
 void CL_Disconnect_f( void )
 {
 	SCR_StopCinematic();
-	Cvar_Set("ui_singlePlayerActive", "0");
 	if ( cls.state != CA_DISCONNECTED && cls.state != CA_CINEMATIC ) {
 		Com_Error (ERR_DISCONNECT, "Disconnected from server");
 	}
@@ -934,7 +933,6 @@ static void CL_Reconnect_f()
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
-	Cvar_Set("ui_singlePlayerActive", "0");
 	Cbuf_AddText( va("connect %s\n", cls.servername ) );
 }
 
@@ -945,8 +943,6 @@ static void CL_Connect_f()
 		Com_Printf( "usage: connect <server>\n");
 		return;
 	}
-
-	Cvar_Set("ui_singlePlayerActive", "0");
 
 	// fire a message off to the motd server
 	CL_RequestMotd();
