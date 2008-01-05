@@ -87,6 +87,8 @@ typedef void *QGLContext;
 #define GLimp_SetCurrentContext(ctx)
 #endif
 
+#define OPENGL_DRIVER_NAME	"libGL.so.1"
+
 static QGLContext opengl_context;
 
 //#define KBD_DBG
@@ -532,7 +534,7 @@ static qboolean GLW_StartDriverAndSetMode( const char *drivername,
     fullscreen = qfalse;		
 	}
 
-  err = GLW_SetMode( drivername, mode, fullscreen );
+  err = (rserr_t)GLW_SetMode( drivername, mode, fullscreen );
 
   switch ( err )
   {
@@ -657,7 +659,7 @@ static int GLW_SetMode( const char *drivername, int mode, qboolean fullscreen )
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, tstencilbits );
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-    //SDL_WM_SetCaption(CLIENT_WINDOW_TITLE, CLIENT_WINDOW_ICON);
+    SDL_WM_SetCaption(CLIENT_WINDOW_TITLE, NULL);
     SDL_ShowCursor(0);
     SDL_EnableUNICODE(1);
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -927,7 +929,7 @@ void GLimp_Init( void )
 
   IN_Init();   // rcg08312005 moved into glimp.
 
-  // Hack here so that if the UI 
+/*  // Hack here so that if the UI 
   if ( *r_previousglDriver->string )
   {
     // The UI changed it on us, hack it back
@@ -979,7 +981,11 @@ void GLimp_Init( void )
   }
 
   // Save it in case the UI stomps it
-  ri.Cvar_Set( "r_previousglDriver", r_glDriver->string );
+  ri.Cvar_Set( "r_previousglDriver", r_glDriver->string ); */
+
+  // load appropriate DLL and initialize subsystem
+  if (!GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
+	ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL/SDL subsystem\n" );
 
   // This values force the UI to disable driver selection
   glConfig.driverType = GLDRV_ICD;
@@ -1349,9 +1355,11 @@ void IN_Frame (void) {
 
   if ( cls.keyCatchers & KEYCATCH_CONSOLE )
   {
-    // temporarily deactivate if not in the game and
-    // running on the desktop
-    // voodoo always counts as full screen
+	// Let go of the mouse if we're NOT fullscreen'd AND the console is down (active)
+	if (!Cvar_VariableValue("r_fullscreen")) {
+		IN_DeactivateMouse ();
+		return;
+	}
   }
 
   IN_ActivateMouse();
