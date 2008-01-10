@@ -1,4 +1,11 @@
 
+Jan 08 - 1.41
+
+removed all bs references to GT_SINGLE_PLAYER and ui_singlePlayerActive
+(except from the bot code, which has bigger problems)
+added sv_singleplayer
+
+
 19 Dec 07 - 1.40
 
 the code now requires a C++ compiler
