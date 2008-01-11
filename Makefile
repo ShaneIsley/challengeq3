@@ -177,7 +177,7 @@ ifeq ($(PLATFORM),linux)
     ARCH=axp
   else
   ifeq ($(ARCH),x86_64)
-    LIB=lib64
+    ARCH=i386
   else
   ifeq ($(ARCH),ppc64)
     LIB=lib64
