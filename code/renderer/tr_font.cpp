@@ -96,7 +96,7 @@ static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* 
 	ftb.width = GLYPH_TRUNC( face->glyph->metrics.width );
 	ftb.pitch = ftb.width;
 	// several fonts have pitch<width on some chars, which obviously doesn't work very well...
-	font->pitches[i - GLYPH_START] = max<int>( ftb.pitch, GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
+	font->pitches[i - GLYPH_START] = max<int>( ftb.pitch, (int)GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
 	if (font->pitches[i - GLYPH_START] > font->maxpitch)
 		font->maxpitch = font->pitches[i - GLYPH_START];
 

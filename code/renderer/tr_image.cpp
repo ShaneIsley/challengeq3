@@ -1984,7 +1984,7 @@ void R_SetColorMappings()
 	for (int i = 0; i < 256; ++i) {
 		int n = 255 * pow( i / 255.0f, 1.0f / r_gamma->value ) + 0.5f;
 		s_gammatable[i] = Com_Clamp( 0, 255, n << tr.overbrightBits );
-		s_intensitytable[i] = min( i * r_intensity->value, 255 );
+		s_intensitytable[i] = min<byte>( (byte)(i * r_intensity->value), 255 );
 	}
 
 	if (glConfig.deviceSupportsGamma)
