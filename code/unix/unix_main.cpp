@@ -767,7 +767,7 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
                    intptr_t (*systemcalls)(intptr_t, ...) ) 
 {
   void *libHandle;
-  void  (*dllEntry)( intptr_t (*syscallptr)(intptr_t, ...) );
+  void	(QDECL *dllEntry)( int (QDECL *syscallptr)(int, ...) );
   char  curpath[MAX_OSPATH];
   char  fname[MAX_OSPATH];
   const char*  err = NULL;
@@ -803,11 +803,11 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
   }
 
 #if USE_SDL_VIDEO
-  dllEntry = (void (*)(intptr_t (*)(intptr_t, ...)))SDL_LoadFunction( libHandle, "dllEntry" );
-  *entryPoint = (intptr_t (*)(int, ...))SDL_LoadFunction( libHandle, "vmMain" );
+  dllEntry = ( void (QDECL *)( int (QDECL *)( int, ... ) ) )SDL_LoadFunction( libHandle, "dllEntry" );
+  *entryPoint = (int (QDECL *)(int,...))SDL_LoadFunction( libHandle, "vmMain" );
 #else
-  dllEntry = (void (*)(intptr_t (*)(intptr_t, ...)))dlsym( libHandle, "dllEntry" );
-  *entryPoint = (intptr_t (*)(int, ...))dlsym( libHandle, "vmMain" );
+  dllEntry = ( void (QDECL *)( int (QDECL *)( int, ... ) ) )dlsym( libHandle, "dllEntry" );
+  *entryPoint = (int (QDECL *)(int,...))dlsym( libHandle, "vmMain" );
 #endif
 
   if ( !*entryPoint || !dllEntry )
