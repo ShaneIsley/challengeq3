@@ -1665,7 +1665,7 @@ template <class T> T* RI_New() { return (T*)ri.Hunk_Alloc(sizeof(T), h_low); }
 template <class T> T* RI_New( size_t c ) { return static_cast<T*>(ri.Hunk_Alloc(sizeof(T) * c, h_low)); }
 
 struct RI_AutoPtr {
-	RI_AutoPtr() mp(0) {}
+	RI_AutoPtr() : mp(0) {}
 	RI_AutoPtr( size_t c ) { mp = (byte*)ri.Hunk_AllocateTempMemory(c); }
 	~RI_AutoPtr() { if (mp) ri.Hunk_FreeTempMemory(mp); }
 	void* Alloc( size_t c ) { assert(!mp); mp = (byte*)ri.Hunk_AllocateTempMemory(c); return mp; }
