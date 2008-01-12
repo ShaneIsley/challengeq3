@@ -216,9 +216,9 @@ static void CG_Obituary( const entityState_t* es )
 			s = va("You fragged %s", targetName );
 		}
 #ifdef MISSIONPACK
-		if (!(cg_singlePlayerActive.integer && cg_cameraOrbit.integer)) {
+		if (!(cg_singlePlayer.integer && cg_cameraOrbit.integer)) {
 			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-		} 
+		}
 #else
 		CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #endif
