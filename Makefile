@@ -694,9 +694,6 @@ endif
 
 ifneq ($(BUILD_CLIENT),0)
   TARGETS += $(B)/ChallengeQuake3.$(ARCH)$(BINEXT)
-  ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/ChallengeQuake3-smp.$(ARCH)$(BINEXT)
-  endif
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
@@ -839,6 +836,7 @@ Q3OBJ = \
   $(B)/client/md5.o \
   $(B)/client/msg.o \
   $(B)/client/net_chan.o \
+  $(B)/client/net_ip.o \
   $(B)/client/huffman.o \
   \
   $(B)/client/snd_adpcm.o \
@@ -982,9 +980,6 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),x86)
     Q3OBJ += $(B)/client/vm_x86.o
   endif
-  ifeq ($(ARCH),x86_64)
-    Q3OBJ += $(B)/client/vm_x86_64.o
-  endif
   ifeq ($(ARCH),ppc)
     Q3OBJ += $(B)/client/$(VM_PPC).o
   endif
@@ -1017,27 +1012,17 @@ else
     Q3OBJ += $(B)/client/linux_joystick.o
   endif
 
-  ifeq ($(USE_SDL),1)
-    ifneq ($(PLATFORM),darwin)
-      BUILD_CLIENT_SMP = 0
-    endif
-  endif
+  BUILD_CLIENT_SMP = 0
 
   Q3POBJ = \
     $(B)/client/linux_glimp.o \
     $(B)/client/sdl_glimp.o
 
-  Q3POBJ_SMP = \
-    $(B)/client/linux_glimp_smp.o \
-    $(B)/client/sdl_glimp_smp.o
 endif
 
 $(B)/ChallengeQuake3.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(CC)  -o $@ $(Q3OBJ) $(Q3POBJ) $(CLIENT_LDFLAGS) $(LDFLAGS) $(LIBSDLMAIN)
 
-$(B)/ChallengeQuake3-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
-	$(CC)  -o $@ $(Q3OBJ) $(Q3POBJ_SMP) $(CLIENT_LDFLAGS) \
-		$(THREAD_LDFLAGS) $(LDFLAGS) $(LIBSDLMAIN)
 
 ifneq ($(strip $(LIBSDLMAIN)),)
 ifneq ($(strip $(LIBSDLMAINSRC)),)
@@ -1096,6 +1081,7 @@ $(B)/client/md4.o : $(CMDIR)/md4.cpp; $(DO_CC)
 $(B)/client/md5.o : $(CMDIR)/md5.cpp; $(DO_CC)
 $(B)/client/msg.o : $(CMDIR)/msg.cpp; $(DO_CC)
 $(B)/client/net_chan.o : $(CMDIR)/net_chan.cpp; $(DO_CC)
+$(B)/client/net_ip.o : $(CMDIR)/net_ip.cpp; $(DO_CC)
 $(B)/client/huffman.o : $(CMDIR)/huffman.cpp; $(DO_CC)
 $(B)/client/q_shared.o : $(CMDIR)/q_shared.c; $(DO_CC)
 $(B)/client/q_math.o : $(CMDIR)/q_math.c; $(DO_CC)
@@ -1224,7 +1210,6 @@ $(B)/client/win_wndproc.o : $(W32DIR)/win_wndproc.cpp; $(DO_CC)
 $(B)/client/win_resource.o : $(W32DIR)/winquake.rc; $(DO_WINDRES)
 
 $(B)/client/vm_x86.o : $(CMDIR)/vm_x86.cpp; $(DO_CC)
-$(B)/client/vm_x86_64.o : $(CMDIR)/vm_x86_64.cpp; $(DO_CC)
 ifneq ($(VM_PPC),)
 $(B)/client/$(VM_PPC).o : $(CMDIR)/$(VM_PPC).cpp; $(DO_CC)
 endif
@@ -1320,9 +1305,6 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),x86)
     Q3DOBJ += $(B)/ded/vm_x86.o
   endif
-  ifeq ($(ARCH),x86_64)
-    Q3DOBJ += $(B)/ded/vm_x86_64.o
-  endif
   ifeq ($(ARCH),ppc)
     Q3DOBJ += $(B)/ded/$(VM_PPC).o
   endif
@@ -1401,7 +1383,6 @@ $(B)/ded/ftola.o : $(UDIR)/ftola.s; $(DO_AS)
 $(B)/ded/matha.o : $(UDIR)/matha.s; $(DO_AS)
 
 $(B)/ded/vm_x86.o : $(CMDIR)/vm_x86.cpp; $(DO_DED_CC)
-$(B)/ded/vm_x86_64.o : $(CMDIR)/vm_x86_64.cpp; $(DO_DED_CC)
 ifneq ($(VM_PPC),)
 $(B)/ded/$(VM_PPC).o : $(CMDIR)/$(VM_PPC).cpp; $(DO_DED_CC)
 endif
@@ -1742,11 +1723,6 @@ ifneq ($(BUILD_CLIENT),0)
 	$(INSTALL) -s -m 0755 $(BR)/ChallengeQuake3.$(ARCH)$(BINEXT) $(COPYDIR)/ChallengeQuake3.$(ARCH)$(BINEXT)
 endif
 
-# Don't copy the SMP until it's working together with SDL.
-#ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) -s -m 0755 $(BR)/ChallengeQuake3-smp.$(ARCH)$(BINEXT) $(COPYDIR)/ChallengeQuake3-smp.$(ARCH)$(BINEXT)
-#endif
-
 ifneq ($(BUILD_SERVER),0)
 	@if [ -f $(BR)/cq3d.$(ARCH)$(BINEXT) ]; then \
 		$(INSTALL) -s -m 0755 $(BR)/cq3d.$(ARCH)$(BINEXT) $(COPYDIR)/cq3d.$(ARCH)$(BINEXT); \
@@ -1785,7 +1761,7 @@ clean: clean-debug clean-release
 
 clean2:
 	if [ -d $(B) ];then (find $(B) -name '*.d' -exec rm {} \;)fi
-	rm -f $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3DOBJ) \
+	rm -f $(Q3OBJ) $(Q3POBJ) $(Q3DOBJ) \
 		$(MPGOBJ) $(Q3GOBJ) $(Q3CGOBJ) $(MPCGOBJ) $(Q3UIOBJ) $(MPUIOBJ) \
 		$(MPGVMOBJ) $(Q3GVMOBJ) $(Q3CGVMOBJ) $(MPCGVMOBJ) $(Q3UIVMOBJ) $(MPUIVMOBJ)
 	rm -f $(TARGETS)
