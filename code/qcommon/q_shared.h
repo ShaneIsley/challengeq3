@@ -84,7 +84,7 @@ extern "C" {
 // technically-correct form, handy for catching sloppy code that mismixes bool and int, *cough* JPVW  :P
 //typedef enum { qfalse, qtrue } qbool;
 #if defined(Q3_VM)
-#define assert(x) { if (!x) Com_Error(ERR_FATAL, "ASSERT "__FILE__"(%d): %s", __LINE__, #x); }
+#define assert(x) { if (!(x)) Com_Error(ERR_FATAL, "ASSERT "__FILE__"(%d): %s", __LINE__, #x); }
 typedef enum { qfalse, qtrue } qbool;
 #else
 // this is a shitty shitty hack - the offending code should be cleaned up so we CAN use the typedef
