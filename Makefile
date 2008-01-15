@@ -256,7 +256,7 @@ ifeq ($(PLATFORM),linux)
   SHLIBLDFLAGS=-shared $(LDFLAGS)
 
   THREAD_LDFLAGS=-lpthread
-  LDFLAGS=-ldl -lm
+  LDFLAGS=-ldl -lm -lfreetype
 
   ifeq ($(USE_SDL),1)
     CLIENT_LDFLAGS=$(shell sdl-config --libs)
@@ -1001,7 +1001,6 @@ ifeq ($(PLATFORM),mingw32)
 else
   Q3OBJ += \
     $(B)/client/unix_main.o \
-    $(B)/client/unix_net.o \
     $(B)/client/unix_shared.o \
     $(B)/client/linux_signals.o \
     $(B)/client/linux_qgl.o \
@@ -1046,6 +1045,7 @@ $(B)/client/cl_avi.o : $(CDIR)/cl_avi.cpp; $(DO_CC)
 $(B)/client/snd_adpcm.o : $(CDIR)/snd_adpcm.cpp; $(DO_CC)
 $(B)/client/snd_dma.o : $(CDIR)/snd_dma.cpp; $(DO_CC)
 $(B)/client/snd_mem.o : $(CDIR)/snd_mem.cpp; $(DO_CC)
+$(B)/client/snd_mixa.o : $(UDIR)/snd_mixa.s; $(DO_AS)
 $(B)/client/snd_mix.o : $(CDIR)/snd_mix.cpp; $(DO_CC)
 $(B)/client/snd_wavelet.o : $(CDIR)/snd_wavelet.cpp; $(DO_CC)
 
@@ -1189,11 +1189,10 @@ $(B)/client/linux_signals.o : $(UDIR)/linux_signals.cpp; $(DO_CC) $(GL_CFLAGS)
 $(B)/client/linux_glimp.o : $(UDIR)/linux_glimp.c; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/sdl_glimp.o : $(UDIR)/sdl_glimp.c; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/linux_joystick.o : $(UDIR)/linux_joystick.c; $(DO_CC)
-$(B)/client/linux_qgl.o : $(UDIR)/linux_qgl.cpp; $(DO_CC)  $(GL_CFLAGS)
+$(B)/client/linux_qgl.o : $(UDIR)/linux_qgl.c; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/linux_input.o : $(UDIR)/linux_input.cpp; $(DO_CC)
 $(B)/client/linux_snd.o : $(UDIR)/linux_snd.c; $(DO_CC)
 $(B)/client/sdl_snd.o : $(UDIR)/sdl_snd.c; $(DO_CC)
-$(B)/client/snd_mixa.o : $(UDIR)/snd_mixa.s; $(DO_AS)
 $(B)/client/matha.o : $(UDIR)/matha.s; $(DO_AS)
 $(B)/client/ftola.o : $(UDIR)/ftola.s; $(DO_AS)
 

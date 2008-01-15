@@ -147,8 +147,8 @@ reset_error_mgr (j_common_ptr cinfo)
   cinfo->err->msg_code = 0;	/* may be useful as a flag for "no error" */
 }
 
-extern void error_exit( j_common_ptr cinfo );
-extern void output_message( j_common_ptr cinfo );
+//extern void error_exit( j_common_ptr cinfo );
+//extern void output_message( j_common_ptr cinfo );
 
 
 /*
@@ -164,9 +164,9 @@ extern void output_message( j_common_ptr cinfo );
 GLOBAL struct jpeg_error_mgr *
 jpeg_std_error (struct jpeg_error_mgr * err)
 {
-  err->error_exit = error_exit;
+  err->error_exit = error_exit_ptr;//error_exit;
   err->emit_message = emit_message;
-  err->output_message = output_message;
+  err->output_message = output_message_ptr;//output_message;
   err->format_message = format_message;
   err->reset_error_mgr = reset_error_mgr;
 

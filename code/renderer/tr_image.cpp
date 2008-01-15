@@ -38,7 +38,7 @@ extern "C"
 	void* jpeg_get_small( j_common_ptr cinfo, size_t sizeofobject ) { return (void*)ri.Malloc(sizeofobject); }
 	void jpeg_free_small( j_common_ptr cinfo, void* object, size_t sizeofobject ) { ri.Free(object); }
 	void* jpeg_get_large( j_common_ptr cinfo, size_t sizeofobject ) { return jpeg_get_small( cinfo, sizeofobject ); }
-	void jpeg_free_large( j_common_ptr cinfo, void* object, size_t sizeofobject ) { return jpeg_free_small( cinfo, object, sizeofobject ); }
+	void jpeg_free_large( j_common_ptr cinfo, void* object, size_t sizeofobject ) { jpeg_free_small( cinfo, object, sizeofobject ); }
 
 	void error_exit( j_common_ptr cinfo )
 	{
@@ -54,6 +54,18 @@ extern "C"
 		(*cinfo->err->format_message)(cinfo, buffer);
 		ri.Printf(PRINT_ALL, "%s\n", buffer);
 	}
+	typedef void (*jcallback)(j_common_ptr cinfo);
+
+	jcallback error_exit_ptr = &error_exit;
+	jcallback output_message_ptr = &output_message;
+
+	typedef void* (*jmem_get)( j_common_ptr cinfo, size_t sizeofobject );
+	typedef void (*jmem_free)( j_common_ptr cinfo, void* object, size_t sizeofobject );
+
+	jmem_get jpeg_get_small_ptr = &jpeg_get_small;
+	jmem_free jpeg_free_small_ptr = &jpeg_free_small;
+	jmem_get jpeg_get_large_ptr = &jpeg_get_large;
+	jmem_free jpeg_free_large_ptr = &jpeg_free_large;
 };
 
 

@@ -626,6 +626,8 @@ struct jpeg_decompress_struct {
 
 
 /* Error handler object */
+extern void (*error_exit_ptr)(j_common_ptr cinfo);
+extern void (*output_message_ptr)(j_common_ptr cinfo);
 
 struct jpeg_error_mgr {
   /* Error exit handler: does not return to caller */
@@ -1047,5 +1049,10 @@ struct jpeg_color_quantizer { long dummy; };
 #include "../jpeg-6/jpegint.h"		/* fetch private declarations */
 #include "../jpeg-6/jerror.h"		/* fetch error codes too */
 #endif
+
+extern void* (*jpeg_get_small_ptr)( j_common_ptr cinfo, size_t sizeofobject );
+extern void (*jpeg_free_small_ptr)( j_common_ptr cinfo, void* object, size_t sizeofobject );
+extern void* (*jpeg_get_large_ptr)( j_common_ptr cinfo, size_t sizeofobject );
+extern void (*jpeg_free_large_ptr)( j_common_ptr cinfo, void* object, size_t sizeofobject );
 
 #endif /* JPEGLIB_H */
