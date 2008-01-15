@@ -28,7 +28,7 @@ endif
 
 BUILD_SERVER     =
 # the client is boned ATM
-BUILD_CLIENT     = 0
+BUILD_CLIENT     = 
 # this should probably be deleted/merged anyway
 BUILD_CLIENT_SMP = 0
 # the baseq3 vm is worthless
