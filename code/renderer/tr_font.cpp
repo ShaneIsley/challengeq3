@@ -148,17 +148,15 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 {
 	int w = 0, i;
 
-	for (i = GLYPH_START; i <= GLYPH_END; ++i) {
-		FT_Load_Char( face, i, FT_LOAD_DEFAULT );
-		FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
+	for (i = 0; i < GLYPHS_PER_FONT; ++i) {
+		FT_Load_Char( face, i + GLYPH_START, FT_LOAD_DEFAULT );
+		//FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
 		FT_Outline_Translate( &face->glyph->outline, -face->glyph->metrics.horiBearingX, -face->size->metrics.descender );
-
-		int pitch = GLYPH_TRUNC( face->glyph->metrics.width );
-		// several fonts have pitch<width on some chars, which obviously doesn't work very well...
-		font->pitches[i - GLYPH_START] = max( pitch, (int)GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
-		if (font->pitches[i - GLYPH_START] > font->maxpitch)
-			font->maxpitch = font->pitches[i - GLYPH_START];
-		w += pitch;
+		// face->glyph->metrics.width is garbage on pretty much every font i've seen, so...
+		font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.horiAdvance - face->glyph->metrics.horiBearingX );
+		if (font->pitches[i] > font->maxpitch)
+			font->maxpitch = font->pitches[i];
+		w += font->pitches[i];
 	}
 
 	// there are all sorts of "clever" things we could do here to square the texture etc
@@ -173,15 +171,15 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 	ftb.buffer = (byte*)Z_Malloc( w * ftb.rows );
 
 	float s = 0;
-	for (i = GLYPH_START; i <= GLYPH_END; ++i) {
-		FT_Load_Char( face, i, FT_LOAD_DEFAULT );
-		FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
+	for (i = 0; i < GLYPHS_PER_FONT; ++i) {
+		FT_Load_Char( face, i + GLYPH_START, FT_LOAD_DEFAULT );
+		//FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
 		FT_Outline_Translate( &face->glyph->outline,
 				-face->glyph->metrics.horiBearingX + FLOAT_TO_FTPOS(s * w),
 				-face->size->metrics.descender );
 		FT_Outline_Get_Bitmap( ft, &face->glyph->outline, &ftb );
-		font->s[i - GLYPH_START] = s;
-		s += (float)font->pitches[i - GLYPH_START] / w;
+		font->s[i] = s;
+		s += (float)font->pitches[i] / w;
 	}
 	font->s[GLYPHS_PER_FONT] = 1.0;
 
@@ -228,7 +226,9 @@ qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 	}
 
 	// no, this isn't a typo: we want to precompensate for the screen's aspect ratio
-	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidHeight / 640, pointSize * glConfig.vidHeight / 480 );
+	//FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidHeight / 640, pointSize * glConfig.vidHeight / 480 );
+	// except that every damn TTF out there is already stupidly thin  :(
+	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidWidth / 640, pointSize * glConfig.vidHeight / 480 );
 
 	font->vpitch = GLYPH_TRUNC( face->size->metrics.height );
 	font->height = CeilPO2( font->vpitch );
