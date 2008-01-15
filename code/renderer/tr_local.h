@@ -1656,9 +1656,9 @@ void RE_TakeVideoFrame( int width, int height,
 		byte *captureBuffer, byte *encodeBuffer, qbool motionJpeg );
 
 // font stuff
-void R_InitFreeType( void );
-void R_DoneFreeType( void );
-void RE_RegisterFont( const char *fontName, int pointSize, fontInfo_t* font );
+void R_InitFreeType();
+void R_DoneFreeType();
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font );
 
 // renderer allocs are always on the low heap
 template <class T> T* RI_New() { return (T*)ri.Hunk_Alloc(sizeof(T), h_low); }

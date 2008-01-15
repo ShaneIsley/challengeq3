@@ -211,7 +211,7 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 #endif
 
 
-void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 {
 	Com_Memset( font, 0, sizeof(fontInfo_t) );
 
@@ -224,7 +224,7 @@ void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 
 	if (err != FT_Err_Ok) {
 		ri.Printf( PRINT_ALL, "RE_RegisterFont: %s(%dpt) Failed (%d)\n", fontName, pointSize, err );
-		return;
+		return qfalse;
 	}
 
 	// no, this isn't a typo: we want to precompensate for the screen's aspect ratio
@@ -246,5 +246,6 @@ void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 	FT_Done_Face( face );
 
 	ri.Printf( PRINT_ALL, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
+	return qtrue;
 }
 
