@@ -218,17 +218,17 @@ ifeq ($(PLATFORM),linux)
     GL_CFLAGS = -I/usr/X11R6/include
   endif
 
-  OPTIMIZE = -O3 -ffast-math -funroll-loops -fomit-frame-pointer
+  OPTIMIZE = -O2 -ffast-math -funroll-loops -fomit-frame-pointer
 
   ifeq ($(ARCH),x86_64)
-    OPTIMIZE = -O3 -fomit-frame-pointer -ffast-math -funroll-loops \
+    OPTIMIZE = -O2 -fomit-frame-pointer -ffast-math -funroll-loops \
       -falign-loops=2 -falign-jumps=2 -falign-functions=2 \
       -fstrength-reduce
     # experimental x86_64 jit compiler! you need GNU as
     HAVE_VM_COMPILED = true
   else
   ifeq ($(ARCH),i386)
-    OPTIMIZE = -O3 -march=i586 -fomit-frame-pointer -ffast-math \
+    OPTIMIZE = -O2 -march=i586 -fomit-frame-pointer -ffast-math \
       -funroll-loops -falign-loops=2 -falign-jumps=2 \
       -falign-functions=2 -fstrength-reduce
     HAVE_VM_COMPILED=true
@@ -243,7 +243,7 @@ ifeq ($(PLATFORM),linux)
   endif
 
   # -fomit-frame-pointer on g++ causes crashes, ty Timbo
-  OPTIMIZE = -O3 -march=i586 -ffast-math -funroll-loops
+  OPTIMIZE = -O2 -march=i586 -ffast-math -funroll-loops
 
   ifneq ($(HAVE_VM_COMPILED),true)
     BASE_CFLAGS += -DNO_VM_COMPILED
@@ -331,7 +331,7 @@ ifeq ($(PLATFORM),darwin)
     GL_CFLAGS =
   endif
 
-  OPTIMIZE = -O3 -ffast-math -falign-loops=16
+  OPTIMIZE = -O2 -ffast-math -falign-loops=16
 
   ifeq ($(ARCH),ppc)
   BASE_CFLAGS += -faltivec
@@ -420,7 +420,7 @@ ifeq ($(PLATFORM),mingw32)
   GL_CFLAGS =
   MINGW_CFLAGS = -DDONT_TYPEDEF_INT32
 
-  OPTIMIZE = -O3 -march=i586 -fomit-frame-pointer -ffast-math -falign-loops=2 \
+  OPTIMIZE = -O2 -march=i586 -fomit-frame-pointer -ffast-math -falign-loops=2 \
     -funroll-loops -falign-jumps=2 -falign-functions=2 -fstrength-reduce
 
   HAVE_VM_COMPILED = true
@@ -496,12 +496,12 @@ ifeq ($(PLATFORM),freebsd)
   ifeq ($(ARCH),axp)
     CC=gcc
     BASE_CFLAGS += -DNO_VM_COMPILED
-    RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O3 -ffast-math -funroll-loops \
+    RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O2 -ffast-math -funroll-loops \
       -fomit-frame-pointer -fexpensive-optimizations
   else
   ifeq ($(ARCH),i386)
     CC=gcc
-    RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O3 -mtune=pentiumpro \
+    RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O2 -mtune=pentiumpro \
       -march=pentium -fomit-frame-pointer -pipe -ffast-math \
       -falign-loops=2 -falign-jumps=2 -falign-functions=2 \
       -funroll-loops -fstrength-reduce
@@ -580,7 +580,7 @@ ifeq ($(PLATFORM),irix)
   CC=cc
   BASE_CFLAGS=-Dstricmp=strcasecmp -Xcpluscomm -woff 1185 -mips3 \
     -nostdinc -I. -I$(ROOT)/usr/include -DNO_VM_COMPILED
-  RELEASE_CFLAGS=$(BASE_CFLAGS) -O3
+  RELEASE_CFLAGS=$(BASE_CFLAGS) -O2
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 
   SHLIBEXT=so
@@ -625,17 +625,17 @@ ifeq ($(PLATFORM),sunos)
     GL_CFLAGS = -I/usr/openwin/include
   endif
 
-  OPTIMIZE = -O3 -ffast-math -funroll-loops
+  OPTIMIZE = -O2 -ffast-math -funroll-loops
 
   ifeq ($(ARCH),sparc)
-    OPTIMIZE = -O3 -ffast-math -falign-loops=2 \
+    OPTIMIZE = -O2 -ffast-math -falign-loops=2 \
       -falign-jumps=2 -falign-functions=2 -fstrength-reduce \
       -mtune=ultrasparc -mv8plus -mno-faster-structs \
       -funroll-loops
     BASE_CFLAGS += -DNO_VM_COMPILED
   else
   ifeq ($(ARCH),i386)
-    OPTIMIZE = -O3 -march=i586  -ffast-math \
+    OPTIMIZE = -O2 -march=i586  -ffast-math \
       -falign-loops=2 -falign-jumps=2 -falign-functions=2 \
       -funroll-loops -fstrength-reduce
   endif
@@ -674,7 +674,7 @@ else # ifeq sunos
   CC=cc
   BASE_CFLAGS=-DNO_VM_COMPILED
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
-  RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O3
+  RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O2
 
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
