@@ -177,7 +177,11 @@ typedef unsigned int JDIMENSION;
 #define METHODDEF static	/* a function called through method pointers */
 #define LOCAL	  static	/* a function used only in its module */
 #define GLOBAL			/* a function referenced thru EXTERNs */
+#ifdef __cplusplus
+#define EXTERN	  extern "C"	/* a reference to a GLOBAL function */
+#else/* __cplusplus */
 #define EXTERN	  extern	/* a reference to a GLOBAL function */
+#endif/* __cplusplus */
 
 
 /* Here is the pseudo-keyword for declaring pointers that must be "far"

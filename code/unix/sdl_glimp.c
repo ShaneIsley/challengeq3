@@ -123,6 +123,7 @@ cvar_t   *joy_threshold    = NULL;
 
 cvar_t  *r_allowSoftwareGL;   // don't abort out if the pixelformat claims software
 cvar_t  *r_previousglDriver;
+cvar_t	*r_fullscreen;
 
 qboolean GLimp_sdl_init_video(void)
 {

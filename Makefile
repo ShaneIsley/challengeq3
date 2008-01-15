@@ -190,6 +190,8 @@ ifeq ($(PLATFORM),linux)
   endif
 
   BASE_CFLAGS = -Wall -Weffc++ -fno-operator-names -fno-strict-aliasing -Wimplicit -pipe
+	BASE_CFLAGS += $(shell freetype-config --cflags)
+	CLIENT_LDFLAGS += $(shell freetype-config --libs)
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL=1
@@ -259,9 +261,9 @@ ifeq ($(PLATFORM),linux)
   LDFLAGS=-ldl -lm -lfreetype
 
   ifeq ($(USE_SDL),1)
-    CLIENT_LDFLAGS=$(shell sdl-config --libs)
+    CLIENT_LDFLAGS += $(shell sdl-config --libs)
   else
-    CLIENT_LDFLAGS=-L/usr/X11R6/$(LIB) -lX11 -lXext -lXxf86dga -lXxf86vm
+    CLIENT_LDFLAGS += -L/usr/X11R6/$(LIB) -lX11 -lXext -lXxf86dga -lXxf86vm
   endif
 
   ifeq ($(USE_OPENAL),1)
