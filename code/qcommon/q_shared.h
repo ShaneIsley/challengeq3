@@ -1128,14 +1128,21 @@ typedef struct {
 #define GLYPH_START 32
 #define GLYPH_END 126
 #define GLYPHS_PER_FONT (GLYPH_END - GLYPH_START + 1)
+// #define GLYPH_PER_TEXURE 1 // see comments in tr_font for the tradeoffs
 
 typedef struct {
 	int height;
 	int vpitch;
 	int maxpitch;
+#if defined( GLYPH_PER_TEXURE )
 	qhandle_t shaders[GLYPHS_PER_FONT];
 	int widths[GLYPHS_PER_FONT];  // the size of the TEXTURE containing the glyph
 	int pitches[GLYPHS_PER_FONT]; // the size of the glyph WITHIN that texture
+#else
+	qhandle_t shader;
+	int pitches[GLYPHS_PER_FONT];
+	float s[GLYPHS_PER_FONT + 1]; // LHS TC of glyph, ergo s[ch+1] = RHS TC
+#endif
 } fontInfo_t;
 
 

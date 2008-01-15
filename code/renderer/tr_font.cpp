@@ -76,6 +76,19 @@ static __inline unsigned int CeilPO2( unsigned int x )
 
 #define GLYPH_TRUNC(x)  ((x) >> 6)
 
+#define FLOAT_TO_FTPOS(x)  ((x) * 64) // why the FUCK is this not in the FT headers, sigh
+
+
+// there are basically two ways you can rasterise a font
+// stuffing all the chars into a single texture is MUCH more performant
+//  but can ONLY be used at the point size it was loaded for or higher, or will mip+alias to SHIT
+// loading each char into its own texture is MUCH slower to render (and more resource heavy)
+//  but is the ONLY way to get acceptable results if you want to draw resized characters
+
+
+///////////////////////////////////////////////////////////////
+
+#if defined( GLYPH_PER_TEXURE )
 
 static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* s )
 {
@@ -129,6 +142,74 @@ static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* 
 	return qtrue;
 }
 
+#else
+
+static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage )
+{
+	int w = 0, i;
+
+	for (i = GLYPH_START; i <= GLYPH_END; ++i) {
+		FT_Load_Char( face, i, FT_LOAD_DEFAULT );
+		FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
+		FT_Outline_Translate( &face->glyph->outline, -face->glyph->metrics.horiBearingX, -face->size->metrics.descender );
+
+		int pitch = GLYPH_TRUNC( face->glyph->metrics.width );
+		// several fonts have pitch<width on some chars, which obviously doesn't work very well...
+		font->pitches[i - GLYPH_START] = max( pitch, (int)GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
+		if (font->pitches[i - GLYPH_START] > font->maxpitch)
+			font->maxpitch = font->pitches[i - GLYPH_START];
+		w += pitch;
+	}
+
+	// there are all sorts of "clever" things we could do here to square the texture etc
+	// but they're not worth it. if someone wants to load a 200pt font on a TNT then gfl to them  :)
+	w = CeilPO2( w );
+
+	FT_Bitmap ftb;
+	ftb.pixel_mode = ft_pixel_mode_grays;
+	ftb.num_grays = 256;
+	ftb.rows = font->vpitch;
+	ftb.pitch = ftb.width = w;
+	ftb.buffer = (byte*)Z_Malloc( w * ftb.rows );
+
+	float s = 0;
+	for (i = GLYPH_START; i <= GLYPH_END; ++i) {
+		FT_Load_Char( face, i, FT_LOAD_DEFAULT );
+		FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
+		FT_Outline_Translate( &face->glyph->outline,
+				-face->glyph->metrics.horiBearingX + FLOAT_TO_FTPOS(s * w),
+				-face->size->metrics.descender );
+		FT_Outline_Get_Bitmap( ft, &face->glyph->outline, &ftb );
+		font->s[i - GLYPH_START] = s;
+		s += (float)font->pitches[i - GLYPH_START] / w;
+	}
+	font->s[GLYPHS_PER_FONT] = 1.0;
+
+	byte* img = (byte*)Z_Malloc( 4 * w * font->height );
+
+	const byte* src = ftb.buffer;
+	for (int y = 0; y < ftb.rows; ++y) {
+		byte* dst = img + (4 * y * w);
+		for (int x = 0; x < w; ++x) {
+			*dst++ = 255;
+			*dst++ = 255;
+			*dst++ = 255;
+			*dst++ = *src++;
+		}
+	}
+
+	image_t* image = R_CreateImage( sImage, img, w, font->height, GL_RGBA, qfalse, qfalse, GL_CLAMP_TO_EDGE );
+	font->shader = RE_RegisterShaderFromImage( sImage, LIGHTMAP_2D, image, qfalse );
+
+	Z_Free( img );
+
+	Z_Free( ftb.buffer );
+
+	return qtrue;
+}
+
+#endif
+
 
 void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 {
@@ -152,11 +233,15 @@ void RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 	font->vpitch = GLYPH_TRUNC( face->size->metrics.height );
 	font->height = CeilPO2( font->vpitch );
 
+#if defined( GLYPH_PER_TEXURE )
 	for (int i = GLYPH_START; i <= GLYPH_END; ++i) {
 		// we don't really WANT this stuff named, but the system can't cope with anon images+shaders. yet.  :P
 		const char* s = va( "Font-%s-%02d-%02X", fontName, pointSize, i );
 		R_UploadGlyph( face, font, i, s );
 	}
+#else
+	R_UploadGlyphs( face, font, va( "Font-%s-%02d", fontName, pointSize ) );
+#endif
 
 	FT_Done_Face( face );
 
