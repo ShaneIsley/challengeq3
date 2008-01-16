@@ -159,7 +159,7 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 			font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.horiAdvance );
 		if (font->pitches[i] > font->maxpitch)
 			font->maxpitch = font->pitches[i];
-		w += font->pitches[i];
+		w += font->pitches[i] + 1; // pad cells to avoid blerp filter bleeds
 	}
 
 	// there are all sorts of "clever" things we could do here to square the texture etc
@@ -181,7 +181,7 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 				-face->size->metrics.descender );
 		FT_Outline_Get_Bitmap( ft, &face->glyph->outline, &ftb );
 		font->s[i] = s;
-		s += (float)font->pitches[i] / w;
+		s += (float)(font->pitches[i] + 1) / w;
 	}
 	font->s[GLYPHS_PER_FONT] = 1.0;
 
