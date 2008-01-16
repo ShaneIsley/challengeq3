@@ -150,10 +150,13 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 
 	for (i = 0; i < GLYPHS_PER_FONT; ++i) {
 		FT_Load_Char( face, i + GLYPH_START, FT_LOAD_DEFAULT );
-		//FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
 		FT_Outline_Translate( &face->glyph->outline, -face->glyph->metrics.horiBearingX, -face->size->metrics.descender );
-		// face->glyph->metrics.width is garbage on pretty much every font i've seen, so...
-		font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.horiAdvance - face->glyph->metrics.horiBearingX );
+		// TTF hinting is invariably absolute GARBAGE
+		// always take the raw, CORRECT width and just handle the spacing ourselves
+		font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.width );
+		// SPC will have a 0 width, so we have to use the hinted value for that
+		if (!font->pitches[i])
+			font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.horiAdvance );
 		if (font->pitches[i] > font->maxpitch)
 			font->maxpitch = font->pitches[i];
 		w += font->pitches[i];
@@ -173,7 +176,6 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 	float s = 0;
 	for (i = 0; i < GLYPHS_PER_FONT; ++i) {
 		FT_Load_Char( face, i + GLYPH_START, FT_LOAD_DEFAULT );
-		//FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
 		FT_Outline_Translate( &face->glyph->outline,
 				-face->glyph->metrics.horiBearingX + FLOAT_TO_FTPOS(s * w),
 				-face->size->metrics.descender );
