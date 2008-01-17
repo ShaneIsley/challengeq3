@@ -93,7 +93,7 @@ typedef struct {
 #ifdef __USEA3D
 	void    (*A3D_RenderGeometry) (void *pVoidA3D, void *pVoidGeom, void *pVoidMat, void *pVoidGeomStatus);
 #endif
-	qbool (*RegisterFont)( const char* fontName, int pointSize, fontInfo_t* font );
+	const fontInfo_t* (*RegisterFont)( const char* fontName, int pointSize );
 	qbool (*GetEntityToken)( char *buffer, int size );
 	qbool (*inPVS)( const vec3_t p1, const vec3_t p2 );
 

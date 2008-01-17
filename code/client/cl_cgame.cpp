@@ -523,7 +523,7 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 	case CG_R_REGISTERSHADERNOMIP:
 		return re.RegisterShaderNoMip( VMA(1) );
 	case CG_R_REGISTERFONT:
-		return re.RegisterFont( VMA(1), args[2], VMA(3) );
+		return (intptr_t)re.RegisterFont( VMA(1), args[2] );
 	case CG_R_CLEARSCENE:
 		re.ClearScene();
 		return 0;

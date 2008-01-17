@@ -58,7 +58,7 @@ static const RegisteredFont* R_GetFont( const char* name, int pointsize )
 }
 
 
-static void R_AddFont( const char* name, int pointsize, const fontInfo_t* info )
+static const fontInfo_t* R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
 {
 	if (iNextFreeFontSlot == MAX_FONTS)
 		ri.Error( ERR_DROP, "R_AddFont: MAX_FONTS hit\n" );
@@ -69,7 +69,9 @@ static void R_AddFont( const char* name, int pointsize, const fontInfo_t* info )
 	RegisteredFont* p = &aRegisteredFonts[iNextFreeFontSlot++];
 	strcpy( p->name, name );
 	p->pointsize = pointsize;
-	p->info = *info;
+	p->info = info;
+
+	return &p->info;
 }
 
 
@@ -118,75 +120,10 @@ static __inline unsigned int CeilPO2( unsigned int x )
 }
 
 
-#define GLYPH_TRUNC(x)  ((x) >> 6)
+// why the FUCK is this sort of thing not in the FT headers, sigh
+#define FLOAT_TO_FTPOS(x)  ((x) * 64.0f)
+#define FTPOS_TO_FLOAT(x)  ((x) / 64.0f)
 
-#define FLOAT_TO_FTPOS(x)  ((x) * 64) // why the FUCK is this not in the FT headers, sigh
-
-
-// there are basically two ways you can rasterise a font
-// stuffing all the chars into a single texture is MUCH more performant
-//  but can ONLY be used at the point size it was loaded for or higher, or will mip+alias to SHIT
-// loading each char into its own texture is MUCH slower to render (and more resource heavy)
-//  but is the ONLY way to get acceptable results if you want to draw resized characters
-
-
-///////////////////////////////////////////////////////////////
-
-#if defined( GLYPH_PER_TEXURE )
-
-static qbool R_UploadGlyph( FT_Face& face, fontInfo_t* font, int i, const char* s )
-{
-	FT_Error err;
-	err = FT_Load_Char( face, i, FT_LOAD_DEFAULT );
-	if (face->glyph->format != ft_glyph_format_outline) {
-		ri.Printf( PRINT_ALL, "R_RenderGlyph: Format %d not supported\n", face->glyph->format );
-		return qfalse;
-	}
-	FT_Outline_Embolden( &face->glyph->outline, 32 ); // 25% extra weight (stupid 26.6 numbers)
-
-	FT_Bitmap ftb;
-	ftb.pixel_mode = ft_pixel_mode_grays;
-	ftb.num_grays = 256;
-
-	FT_Outline_Translate( &face->glyph->outline, -face->glyph->metrics.horiBearingX, -face->size->metrics.descender );
-	ftb.rows = font->vpitch;
-	ftb.width = GLYPH_TRUNC( face->glyph->metrics.width );
-	ftb.pitch = ftb.width;
-	// several fonts have pitch<width on some chars, which obviously doesn't work very well...
-	font->pitches[i - GLYPH_START] = max( ftb.pitch, (int)GLYPH_TRUNC( face->glyph->metrics.horiAdvance ) );
-	if (font->pitches[i - GLYPH_START] > font->maxpitch)
-		font->maxpitch = font->pitches[i - GLYPH_START];
-
-	ftb.buffer = (byte*)Z_Malloc( ftb.pitch * ftb.rows );
-	FT_Outline_Get_Bitmap( ft, &face->glyph->outline, &ftb );
-
-	int w = CeilPO2( ftb.pitch );
-	font->widths[i - GLYPH_START] = w;
-
-	byte* img = (byte*)Z_Malloc( 4 * w * font->height );
-
-	const byte* src = ftb.buffer;
-	for (int y = 0; y < ftb.rows; ++y) {
-		byte* dst = img + (4 * y * w);
-		for (int x = 0; x < ftb.pitch; ++x) {
-			*dst++ = 255;
-			*dst++ = 255;
-			*dst++ = 255;
-			*dst++ = *src++;
-		}
-	}
-
-	image_t* image = R_CreateImage( s, img, w, font->height, GL_RGBA, qfalse, qfalse, GL_CLAMP_TO_EDGE );
-	font->shaders[i - GLYPH_START] = RE_RegisterShaderFromImage( s, LIGHTMAP_2D, image, qfalse );
-
-	Z_Free( img );
-
-	Z_Free( ftb.buffer );
-
-	return qtrue;
-}
-
-#else
 
 static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage )
 {
@@ -197,10 +134,10 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 		FT_Outline_Translate( &face->glyph->outline, -face->glyph->metrics.horiBearingX, -face->size->metrics.descender );
 		// TTF hinting is invariably absolute GARBAGE
 		// always take the raw, CORRECT width and just handle the spacing ourselves
-		font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.width );
+		font->pitches[i] = FTPOS_TO_FLOAT( face->glyph->metrics.width );
 		// SPC will have a 0 width, so we have to use the hinted value for that
 		if (!font->pitches[i])
-			font->pitches[i] = GLYPH_TRUNC( face->glyph->metrics.horiAdvance );
+			font->pitches[i] = FTPOS_TO_FLOAT( face->glyph->metrics.horiAdvance );
 		if (font->pitches[i] > font->maxpitch)
 			font->maxpitch = font->pitches[i];
 		w += font->pitches[i] + 1; // pad cells to avoid blerp filter bleeds
@@ -252,18 +189,21 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 	return qtrue;
 }
 
-#endif
 
+// giving a mod a pointer to engine memory, even if const, is somewhat less than ideal
+// but since the original version of this didn't work, its design was unusably broken
+// the behavior of ALL RegisterX calls exposed to the mod allows use of them as "FindX" as well
+// which is critical for fonts since UI and CGAME *MUST* be able to share instances of them
+// and this is the only fix i could come up with that didn't require additional traps
 
-qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
+const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
 {
 	const RegisteredFont* p = R_GetFont( fontName, pointSize );
-	if (p) {
-		*font = p->info;
-		return qtrue;
-	}
+	if (p)
+		return &p->info;
 
-	Com_Memset( font, 0, sizeof(fontInfo_t) );
+	fontInfo_t font;
+	Com_Memset( &font, 0, sizeof(font) );
 
 	byte* pTTF;
 	int len = ri.FS_ReadFile( va("fonts/%s.ttf", fontName), (void**)&pTTF );
@@ -282,25 +222,15 @@ qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 	// except that every damn TTF out there is already stupidly thin  :(
 	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidWidth / 640, pointSize * glConfig.vidHeight / 480 );
 
-	font->vpitch = GLYPH_TRUNC( face->size->metrics.height );
-	font->height = CeilPO2( font->vpitch );
+	font.vpitch = FTPOS_TO_FLOAT( face->size->metrics.height );
+	font.height = CeilPO2( font.vpitch );
 
-#if defined( GLYPH_PER_TEXURE )
-	for (int i = GLYPH_START; i <= GLYPH_END; ++i) {
-		// we don't really WANT this stuff named, but the system can't cope with anon images+shaders. yet.  :P
-		const char* s = va( "Font-%s-%02d-%02X", fontName, pointSize, i );
-		R_UploadGlyph( face, font, i, s );
-	}
-#else
-	R_UploadGlyphs( face, font, va( "Font-%s-%02d", fontName, pointSize ) );
-#endif
+	R_UploadGlyphs( face, &font, va( "Font-%s-%02d", fontName, pointSize ) );
 
 	FT_Done_Face( face );
 
 	ri.Printf( PRINT_DEVELOPER, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
 
-	R_AddFont( fontName, pointSize, font );
-
-	return qtrue;
+	return R_AddFont( fontName, pointSize, font );
 }
 
