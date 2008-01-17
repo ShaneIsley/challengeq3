@@ -328,7 +328,7 @@ int BotReachabilityArea(vec3_t origin, int client)
 			reachnum = AAS_NextModelReachability(0, modelnum);
 			if (reachnum)
 			{
-				AAS_ReachabilityFromNum(reachnum, &reach);
+				AAS_ReachabilityFromNum(reachnum, reach);
 				return reach.areanum;
 			} //end if
 		} //end else if
@@ -783,7 +783,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 		} //end if
 #endif //AVOIDREACH
 		//get the reachability from the number
-		AAS_ReachabilityFromNum(reachnum, &reach);
+		AAS_ReachabilityFromNum(reachnum, reach);
 		//NOTE: do not go back to the previous area if the goal didn't change
 		//NOTE: is this actually avoidance of local routing minima between two areas???
 		if (lastgoalareanum == goal->areanum && reach.areanum == lastareanum) continue;
@@ -860,7 +860,7 @@ int BotMovementViewTarget(int movestate, bot_goal_t *goal, int travelflags, floa
 	dist = 0;
 	while(reachnum && dist < lookahead)
 	{
-		AAS_ReachabilityFromNum(reachnum, &reach);
+		AAS_ReachabilityFromNum(reachnum, reach);
 		if (BotAddToTarget(end, reach.start, lookahead, &dist, target)) return qtrue;
 		//never look beyond teleporters
 		if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_TELEPORT) return qtrue;
@@ -938,7 +938,7 @@ int BotPredictVisiblePosition(vec3_t origin, int areanum, bot_goal_t *goal, int 
 							avoidreach, avoidreachtimes, avoidreachtries,
 									goal, travelflags, travelflags, NULL, 0, NULL);
 		if (!reachnum) return qfalse;
-		AAS_ReachabilityFromNum(reachnum, &reach);
+		AAS_ReachabilityFromNum(reachnum, reach);
 		//
 		if (BotVisible(goal->entitynum, goal->origin, reach.start))
 		{
@@ -2529,7 +2529,7 @@ void BotResetGrapple(bot_movestate_t *ms)
 {
 	aas_reachability_t reach;
 
-	AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
+	AAS_ReachabilityFromNum(ms->lastreachnum, reach);
 	//if not using the grapple hook reachability anymore
 	if ((reach.traveltype & TRAVELTYPE_MASK) != TRAVEL_GRAPPLEHOOK)
 	{
@@ -3062,7 +3062,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 
 				if (modeltype == MODELTYPE_FUNC_PLAT)
 				{
-					AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
+					AAS_ReachabilityFromNum(ms->lastreachnum, reach);
 					//if the bot is Not using the elevator
 					if ((reach.traveltype & TRAVELTYPE_MASK) != TRAVEL_ELEVATOR ||
 						//NOTE: the face number is the plat model number
@@ -3072,7 +3072,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 						if (reachnum)
 						{
 							//botimport.Print(PRT_MESSAGE, "client %d: accidentally ended up on func_plat\n", ms->client);
-							AAS_ReachabilityFromNum(reachnum, &reach);
+							AAS_ReachabilityFromNum(reachnum, reach);
 							ms->lastreachnum = reachnum;
 							ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
 						} //end if
@@ -3092,7 +3092,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				} //end if
 				else if (modeltype == MODELTYPE_FUNC_BOB)
 				{
-					AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
+					AAS_ReachabilityFromNum(ms->lastreachnum, reach);
 					//if the bot is Not using the func bobbing
 					if ((reach.traveltype & TRAVELTYPE_MASK) != TRAVEL_FUNCBOB ||
 						//NOTE: the face number is the func_bobbing model number
@@ -3102,7 +3102,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 						if (reachnum)
 						{
 							//botimport.Print(PRT_MESSAGE, "client %d: accidentally ended up on func_bobbing\n", ms->client);
-							AAS_ReachabilityFromNum(reachnum, &reach);
+							AAS_ReachabilityFromNum(reachnum, reach);
 							ms->lastreachnum = reachnum;
 							ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
 						} //end if
@@ -3152,7 +3152,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 	{
 		//botimport.Print(PRT_MESSAGE, "%s: onground, swimming or against ladder\n", ClientName(ms->entitynum-1));
 		//
-		AAS_ReachabilityFromNum(ms->lastreachnum, &lastreach);
+		AAS_ReachabilityFromNum(ms->lastreachnum, lastreach);
 		//reachability area the bot is in
 		//ms->areanum = BotReachabilityArea(ms->origin, ((lastreach.traveltype & TRAVELTYPE_MASK) != TRAVEL_ELEVATOR));
 		ms->areanum = BotFuzzyPointReachabilityArea(ms->origin);
@@ -3176,7 +3176,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 		//if there is a last reachability
 		if (reachnum)
 		{
-			AAS_ReachabilityFromNum(reachnum, &reach);
+			AAS_ReachabilityFromNum(reachnum, reach);
 			//check if the reachability is still valid
 			if (!(AAS_TravelFlagForType(reach.traveltype) & travelflags))
 			{
@@ -3264,7 +3264,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			//if there is a reachability to the goal
 			if (reachnum)
 			{
-				AAS_ReachabilityFromNum(reachnum, &reach);
+				AAS_ReachabilityFromNum(reachnum, reach);
 				//set a timeout for this reachability
 				ms->reachability_time = AAS_Time() + BotReachabilityTime(&reach);
 				//
@@ -3301,7 +3301,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 		if (reachnum)
 		{
 			//get the reachability from the number
-			AAS_ReachabilityFromNum(reachnum, &reach);
+			AAS_ReachabilityFromNum(reachnum, reach);
 			result->traveltype = reach.traveltype;
 			//
 #ifdef DEBUG_AI_MOVE
@@ -3391,7 +3391,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 						lastreachnum = AAS_NextAreaReachability(areas[i], lastreachnum))
 					{
 						//get the reachability from the number
-						AAS_ReachabilityFromNum(lastreachnum, &reach);
+						AAS_ReachabilityFromNum(lastreachnum, reach);
 						if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_JUMPPAD)
 						{
 							ms->lastreachnum = lastreachnum;
@@ -3416,7 +3416,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 		if (ms->lastreachnum)
 		{
 			//botimport.Print(PRT_MESSAGE, "%s: NOT onground, swimming or against ladder\n", ClientName(ms->entitynum-1));
-			AAS_ReachabilityFromNum(ms->lastreachnum, &reach);
+			AAS_ReachabilityFromNum(ms->lastreachnum, reach);
 			result->traveltype = reach.traveltype;
 #ifdef DEBUG
 			//botimport.Print(PRT_MESSAGE, "client %d finish: ", ms->client);

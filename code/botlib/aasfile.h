@@ -164,10 +164,10 @@ typedef int aas_portalindex_t;
 //cluster
 typedef struct aas_cluster_s
 {
-	int numareas;						//number of areas in the cluster
-	int numreachabilityareas;			//number of areas with reachabilities
-	int numportals;						//number of cluster portals
-	int firstportal;					//first cluster portal in the index
+	size_t numareas;						//number of areas in the cluster
+	size_t numreachabilityareas;			//number of areas with reachabilities
+	size_t numportals;						//number of cluster portals
+	size_t firstportal;					//first cluster portal in the index
 } aas_cluster_t;
 
 //============ 3d definition ============

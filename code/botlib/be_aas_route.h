@@ -50,15 +50,15 @@ int AAS_AreaContentsTravelFlags(int areanum);
 //returns the index of the next reachability for the given area
 int AAS_NextAreaReachability(int areanum, int reachnum);
 //returns the reachability with the given index
-void AAS_ReachabilityFromNum(int num, struct aas_reachability_s *reach);
+void AAS_ReachabilityFromNum(int num, struct aas_reachability_s& reach);
 //returns a random goal area and goal origin
-int AAS_RandomGoalArea(int areanum, int travelflags, int *goalareanum, vec3_t goalorigin);
+int AAS_RandomGoalArea(int areanum, int travelflags, int& goalareanum, vec3_t goalorigin);
 //enable or disable an area for routing
 int AAS_EnableRoutingArea(int areanum, int enable);
 //returns the travel time from the area to the goal area using the given travel flags
 int AAS_AreaTravelTimeToGoalArea(int areanum, const vec3_t origin, int goalareanum, int travelflags);
 //predict a route up to a stop event
-int AAS_PredictRoute(struct aas_predictroute_s *route, int areanum, vec3_t origin,
+int AAS_PredictRoute(struct aas_predictroute_s *route, int areanum, const vec3_t origin,
 							int goalareanum, int travelflags, int maxareas, int maxtime,
 							int stopevent, int stopcontents, int stoptfl, int stopareanum);
 
