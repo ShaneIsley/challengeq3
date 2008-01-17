@@ -1658,7 +1658,7 @@ void RE_TakeVideoFrame( int width, int height,
 // font stuff
 void R_InitFreeType();
 void R_DoneFreeType();
-const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize );
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font );
 
 // renderer allocs are always on the low heap
 template <class T> T* RI_New() { return (T*)ri.Hunk_Alloc(sizeof(T), h_low); }

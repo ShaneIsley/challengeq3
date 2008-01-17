@@ -58,7 +58,7 @@ static const RegisteredFont* R_GetFont( const char* name, int pointsize )
 }
 
 
-static const fontInfo_t* R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
+static void R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
 {
 	if (iNextFreeFontSlot == MAX_FONTS)
 		ri.Error( ERR_DROP, "R_AddFont: MAX_FONTS hit\n" );
@@ -70,8 +70,6 @@ static const fontInfo_t* R_AddFont( const char* name, int pointsize, const fontI
 	strcpy( p->name, name );
 	p->pointsize = pointsize;
 	p->info = info;
-
-	return &p->info;
 }
 
 
@@ -190,26 +188,26 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 }
 
 
-// giving a mod a pointer to engine memory, even if const, is somewhat less than ideal
-// but since the original version of this didn't work, its design was unusably broken
-// the behavior of ALL RegisterX calls exposed to the mod allows use of them as "FindX" as well
-// which is critical for fonts since UI and CGAME *MUST* be able to share instances of them
-// and this is the only fix i could come up with that didn't require additional traps
-
-const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
+/*
+since the original version of this didn't work, its design is hopelessly broken  :(
+the behavior of ALL RegisterX calls exposed to the mod also allows use of them as "FindX"
+THIS one doesn't, which means the MOD has to screw around maintaining its OWN list as well
+*/
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 {
 	const RegisteredFont* p = R_GetFont( fontName, pointSize );
-	if (p)
-		return &p->info;
+	if (p) {
+		*font = p->info;
+		return qtrue;
+	}
 
-	fontInfo_t font;
-	Com_Memset( &font, 0, sizeof(font) );
+	Com_Memset( font, 0, sizeof(*font) );
 
 	byte* pTTF;
 	int len = ri.FS_ReadFile( va("fonts/%s.ttf", fontName), (void**)&pTTF );
 	if (!pTTF) {
 		ri.Printf( PRINT_WARNING, "RE_RegisterFont: couldn't open fonts/%s.ttf\n", fontName );
-		return 0;
+		return qfalse;
 	}
 
 	FT_Face face;
@@ -218,7 +216,7 @@ const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
 
 	if (err != FT_Err_Ok) {
 		ri.Printf( PRINT_ALL, "RE_RegisterFont: %s(%dpt) Failed (%d)\n", fontName, pointSize, err );
-		return 0;
+		return qfalse;
 	}
 
 	// no, this isn't a typo: we want to precompensate for the screen's aspect ratio
@@ -226,15 +224,17 @@ const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
 	// except that every damn TTF out there is already stupidly thin  :(
 	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidWidth / 640, pointSize * glConfig.vidHeight / 480 );
 
-	font.vpitch = FTPOS_TO_FLOAT( face->size->metrics.height );
-	font.height = CeilPO2( font.vpitch );
+	font->vpitch = FTPOS_TO_FLOAT( face->size->metrics.height );
+	font->height = CeilPO2( font->vpitch );
 
-	R_UploadGlyphs( face, &font, va( "Font-%s-%02d", fontName, pointSize ) );
+	R_UploadGlyphs( face, font, va( "Font-%s-%02d", fontName, pointSize ) );
 
 	FT_Done_Face( face );
 
 	ri.Printf( PRINT_DEVELOPER, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
 
-	return R_AddFont( fontName, pointSize, font );
+	R_AddFont( fontName, pointSize, *font );
+
+	return qtrue;
 }
 
