@@ -672,10 +672,10 @@ image_t* R_CreateImage( const char* name, byte* pic, int width, int height, GLen
 						qbool mipmap, qbool allowPicmip, int glWrapClampMode )
 {
 	if (strlen(name) >= MAX_QPATH)
-		ri.Error(ERR_DROP, "R_CreateImage: \"%s\" is too long\n", name);
+		ri.Error( ERR_DROP, "R_CreateImage: \"%s\" is too long\n", name );
 
 	if ( tr.numImages == MAX_DRAWIMAGES )
-		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit\n");
+		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit\n" );
 
 	image_t* image = tr.images[tr.numImages] = RI_New<image_t>();
 	image->texnum = 1024 + tr.numImages;
