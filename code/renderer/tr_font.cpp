@@ -207,6 +207,10 @@ const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
 
 	byte* pTTF;
 	int len = ri.FS_ReadFile( va("fonts/%s.ttf", fontName), (void**)&pTTF );
+	if (!pTTF) {
+		ri.Printf( PRINT_WARNING, "RE_RegisterFont: couldn't open fonts/%s.ttf\n", fontName );
+		return 0;
+	}
 
 	FT_Face face;
 	FT_Error err = FT_New_Memory_Face( ft, pTTF, len, 0, &face );
@@ -214,7 +218,7 @@ const fontInfo_t* RE_RegisterFont( const char* fontName, int pointSize )
 
 	if (err != FT_Err_Ok) {
 		ri.Printf( PRINT_ALL, "RE_RegisterFont: %s(%dpt) Failed (%d)\n", fontName, pointSize, err );
-		return qfalse;
+		return 0;
 	}
 
 	// no, this isn't a typo: we want to precompensate for the screen's aspect ratio
