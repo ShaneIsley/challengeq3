@@ -32,37 +32,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static FT_Library ft = NULL;
 
 
-static const font_t* R_GetFont( const char* name, int pointsize )
-{
-	for (int i = 0; i < tr.numFonts; ++i) {
-		const font_t* font = tr.fonts[i];
-		if ( (font->pointsize == pointsize) && !Q_stricmp( font->name, name ) ) {
-			return font;
-		}
-	}
-	return 0;
-}
-
-
-static void R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
-{
-	if (tr.numFonts == MAX_FONTS)
-		ri.Error( ERR_DROP, "R_AddFont: MAX_FONTS hit\n" );
-
-	if (strlen(name) >= MAX_QPATH)
-		ri.Error( ERR_DROP, "R_AddFont: \"%s\" is too long\n", name );
-
-	font_t* font = RI_New<font_t>();
-	tr.fonts[tr.numFonts++] = font;
-	strcpy( font->name, name );
-	font->pointsize = pointsize;
-	font->info = info;
-}
-
-
-///////////////////////////////////////////////////////////////
-
-
 void R_InitFreeType()
 {
 	tr.numFonts = 0;
@@ -180,15 +149,23 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 /*
 since the original version of this didn't work, its design is hopelessly broken  :(
 the behavior of ALL RegisterX calls exposed to the mod also allows use of them as "FindX"
-THIS one doesn't, which means the MOD has to screw around maintaining its OWN list as well
+THIS one doesn't, which means the MOD has to screw around maintaining its own list as well
 */
 qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* info )
 {
-	const font_t* font = R_GetFont( fontName, pointSize );
-	if (font) {
-		*info = font->info;
-		return qtrue;
+	for (int i = 0; i < tr.numFonts; ++i) {
+		const font_t* font = tr.fonts[i];
+		if ( (font->pointsize == pointSize) && !Q_stricmp( font->name, fontName ) ) {
+			*info = font->info;
+			return qtrue;
+		}
 	}
+
+	if (tr.numFonts == MAX_FONTS)
+		ri.Error( ERR_DROP, "RE_RegisterFont: MAX_FONTS hit\n" );
+
+	if (strlen(fontName) >= MAX_QPATH)
+		ri.Error( ERR_DROP, "RE_RegisterFont: \"%s\" is too long\n", fontName );
 
 	Com_Memset( info, 0, sizeof(*info) );
 
@@ -222,7 +199,11 @@ qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* info )
 
 	ri.Printf( PRINT_DEVELOPER, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
 
-	R_AddFont( fontName, pointSize, *info );
+	font_t* font = RI_New<font_t>();
+	tr.fonts[tr.numFonts++] = font;
+	strcpy( font->name, fontName );
+	font->pointsize = pointSize;
+	font->info = *info;
 
 	return qtrue;
 }
