@@ -319,10 +319,9 @@ R_AddBrushModelSurfaces
 void R_AddBrushModelSurfaces ( trRefEntity_t *ent ) {
 	bmodel_t	*bmodel;
 	int			clip;
-	model_t		*pModel;
 	int			i;
 
-	pModel = R_GetModelByHandle( ent->e.hModel );
+	const model_t* pModel = R_GetModelByHandle( ent->e.hModel );
 
 	bmodel = pModel->bmodel;
 

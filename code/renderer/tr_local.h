@@ -766,21 +766,39 @@ typedef struct model_s {
 
 #define	MAX_MOD_KNOWN	1024
 
-void		R_ModelInit (void);
-model_t		*R_GetModelByHandle( qhandle_t hModel );
+void R_ModelInit();
+const model_t* R_GetModelByHandle( qhandle_t hModel );
 int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame, 
 					 float frac, const char *tagName );
 void		R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs );
 
 void		R_Modellist_f (void);
 
-//====================================================
+
+///////////////////////////////////////////////////////////////
+
+
+struct font_t {
+	char name[MAX_QPATH];
+	int pointsize;
+	fontInfo_t info;
+};
+
+const int MAX_FONTS = 64;
+
+void R_InitFreeType();
+void R_DoneFreeType();
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* info );
+
+
+///////////////////////////////////////////////////////////////
+
+
 extern	refimport_t		ri;
 
 #define	MAX_DRAWIMAGES			2048
 #define	MAX_LIGHTMAPS			256
 #define	MAX_SKINS				1024
-
 
 #define	MAX_DRAWSURFS			0x10000
 #define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
@@ -919,7 +937,7 @@ typedef struct {
 	trRefEntity_t			worldEntity;		// point currentEntity at this when rendering world
 	int						currentEntityNum;
 	int						shiftedEntityNum;	// currentEntityNum << QSORT_ENTITYNUM_SHIFT
-	model_t					*currentModel;
+	const model_t* currentModel;
 
 	viewParms_t				viewParms;
 
@@ -948,6 +966,9 @@ typedef struct {
 
 	int						numImages;
 	image_t					*images[MAX_DRAWIMAGES];
+
+	int numFonts;
+	font_t* fonts[MAX_FONTS];
 
 	// shader indexes from other modules will be looked up in tr.shaders[]
 	// shader indexes from drawsurfs will be looked up in sortedShaders[]
@@ -1198,9 +1219,9 @@ void		RE_Shutdown( qbool destroyWindow );
 
 qbool	R_GetEntityToken( char *buffer, int size );
 
-model_t		*R_AllocModel( void );
+model_t* R_AllocModel();
 
-void		R_Init();
+void	R_Init();
 qbool	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );
@@ -1655,10 +1676,6 @@ int SaveJPGToBuffer( byte *buffer, int quality,
 void RE_TakeVideoFrame( int width, int height,
 		byte *captureBuffer, byte *encodeBuffer, qbool motionJpeg );
 
-// font stuff
-void R_InitFreeType();
-void R_DoneFreeType();
-qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font );
 
 // renderer allocs are always on the low heap
 template <class T> T* RI_New() { return (T*)ri.Hunk_Alloc(sizeof(T), h_low); }

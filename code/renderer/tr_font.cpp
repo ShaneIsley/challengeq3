@@ -31,27 +31,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static FT_Library ft = NULL;
 
-struct RegisteredFont {
-	char name[MAX_QPATH];
-	int pointsize;
-	fontInfo_t info;
-};
 
-// although this seems a pointlessly high number, it's not unreasonable
-// because TTFs *ONLY* "work" at the pointsize they were actually genned for
-// so if you want to RENDER at 8pt, 16pt, and 24pt without artifacts
-// you NEED 3 "different" fonts registered even if they're from the same TTF data
-static const int MAX_FONTS = 64;
-static RegisteredFont aRegisteredFonts[MAX_FONTS];
-static int iNextFreeFontSlot = 0;
-
-
-static const RegisteredFont* R_GetFont( const char* name, int pointsize )
+static const font_t* R_GetFont( const char* name, int pointsize )
 {
-	for (int i = 0; i < iNextFreeFontSlot; ++i) {
-		const RegisteredFont* p = &aRegisteredFonts[i];
-		if ( (p->pointsize == pointsize) && !Q_stricmp( p->name, name ) ) {
-			return p;
+	for (int i = 0; i < tr.numFonts; ++i) {
+		const font_t* font = tr.fonts[i];
+		if ( (font->pointsize == pointsize) && !Q_stricmp( font->name, name ) ) {
+			return font;
 		}
 	}
 	return 0;
@@ -60,16 +46,17 @@ static const RegisteredFont* R_GetFont( const char* name, int pointsize )
 
 static void R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
 {
-	if (iNextFreeFontSlot == MAX_FONTS)
+	if (tr.numFonts == MAX_FONTS)
 		ri.Error( ERR_DROP, "R_AddFont: MAX_FONTS hit\n" );
 
 	if (strlen(name) >= MAX_QPATH)
 		ri.Error( ERR_DROP, "R_AddFont: \"%s\" is too long\n", name );
 
-	RegisteredFont* p = &aRegisteredFonts[iNextFreeFontSlot++];
-	strcpy( p->name, name );
-	p->pointsize = pointsize;
-	p->info = info;
+	font_t* font = RI_New<font_t>();
+	tr.fonts[tr.numFonts++] = font;
+	strcpy( font->name, name );
+	font->pointsize = pointsize;
+	font->info = info;
 }
 
 
@@ -78,6 +65,8 @@ static void R_AddFont( const char* name, int pointsize, const fontInfo_t& info )
 
 void R_InitFreeType()
 {
+	tr.numFonts = 0;
+
 	if (ft)
 		ri.Error( ERR_DROP, "R_InitFreeType: Multiple initialization\n" );
 
@@ -193,15 +182,15 @@ since the original version of this didn't work, its design is hopelessly broken 
 the behavior of ALL RegisterX calls exposed to the mod also allows use of them as "FindX"
 THIS one doesn't, which means the MOD has to screw around maintaining its OWN list as well
 */
-qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
+qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* info )
 {
-	const RegisteredFont* p = R_GetFont( fontName, pointSize );
-	if (p) {
-		*font = p->info;
+	const font_t* font = R_GetFont( fontName, pointSize );
+	if (font) {
+		*info = font->info;
 		return qtrue;
 	}
 
-	Com_Memset( font, 0, sizeof(*font) );
+	Com_Memset( info, 0, sizeof(*info) );
 
 	byte* pTTF;
 	int len = ri.FS_ReadFile( va("fonts/%s.ttf", fontName), (void**)&pTTF );
@@ -224,16 +213,16 @@ qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 	// except that every damn TTF out there is already stupidly thin  :(
 	FT_Set_Pixel_Sizes( face, pointSize * glConfig.vidWidth / 640, pointSize * glConfig.vidHeight / 480 );
 
-	font->vpitch = FTPOS_TO_FLOAT( face->size->metrics.height );
-	font->height = CeilPO2( font->vpitch );
+	info->vpitch = FTPOS_TO_FLOAT( face->size->metrics.height );
+	info->height = CeilPO2( info->vpitch );
 
-	R_UploadGlyphs( face, font, va( "Font-%s-%02d", fontName, pointSize ) );
+	R_UploadGlyphs( face, info, va( "Font-%s-%02d", fontName, pointSize ) );
 
 	FT_Done_Face( face );
 
 	ri.Printf( PRINT_DEVELOPER, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
 
-	R_AddFont( fontName, pointSize, *font );
+	R_AddFont( fontName, pointSize, *info );
 
 	return qtrue;
 }

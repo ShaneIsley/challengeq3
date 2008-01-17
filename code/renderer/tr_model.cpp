@@ -31,28 +31,21 @@ static qbool R_LoadMD4 (model_t *mod, void *buffer, const char *name );
 static qbool R_LoadMDR (model_t *mod, void *buffer, int filesize, const char *name );
 #endif
 
-model_t	*loadmodel;
+static model_t* loadmodel;
 
-/*
-** R_GetModelByHandle
-*/
-model_t	*R_GetModelByHandle( qhandle_t index ) {
-	model_t		*mod;
 
-	// out of range gets the defualt model
+const model_t* R_GetModelByHandle( qhandle_t index )
+{
+	// out of range gets the default model
 	if ( index < 1 || index >= tr.numModels ) {
 		return tr.models[0];
 	}
 
-	mod = tr.models[index];
-
-	return mod;
+	return tr.models[index];
 }
 
-//===============================================================================
 
-
-model_t* R_AllocModel( void )
+model_t* R_AllocModel()
 {
 	if ( tr.numModels == MAX_MOD_KNOWN )
 		return NULL;
@@ -876,19 +869,13 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 
 //=============================================================================
 
-/*
-===============
-R_ModelInit
-===============
-*/
-void R_ModelInit( void ) {
-	model_t		*mod;
 
+void R_ModelInit()
+{
 	// leave a space for NULL model
-	tr.numModels = 0;
-
-	mod = R_AllocModel();
+	model_t* mod = R_AllocModel();
 	mod->type = MOD_BAD;
+	tr.numModels = 0;
 }
 
 
@@ -1011,9 +998,8 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 #endif
 	int		i;
 	float		frontLerp, backLerp;
-	model_t		*model;
 
-	model = R_GetModelByHandle( handle );
+	const model_t* model = R_GetModelByHandle( handle );
 	if ( !model->md3[0] )
 	{
 #ifdef RAVENMD4
@@ -1027,11 +1013,9 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 		else
 #endif
 		{
-
 			AxisClear( tag->axis );
 			VectorClear( tag->origin );
 			return qfalse;
-
 		}
 	}
 	else
@@ -1061,17 +1045,9 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 }
 
 
-/*
-====================
-R_ModelBounds
-====================
-*/
-void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs ) {
-	model_t		*model;
-	md3Header_t	*header;
-	md3Frame_t	*frame;
-
-	model = R_GetModelByHandle( handle );
+void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs )
+{
+	const model_t* model = R_GetModelByHandle( handle );
 
 	if ( model->bmodel ) {
 		VectorCopy( model->bmodel->bounds[0], mins );
@@ -1085,9 +1061,8 @@ void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs ) {
 		return;
 	}
 
-	header = model->md3[0];
-
-	frame = (md3Frame_t *)( (byte *)header + header->ofsFrames );
+	const md3Header_t* header = model->md3[0];
+	const md3Frame_t* frame = (md3Frame_t *)( (byte *)header + header->ofsFrames );
 
 	VectorCopy( frame->bounds[0], mins );
 	VectorCopy( frame->bounds[1], maxs );
