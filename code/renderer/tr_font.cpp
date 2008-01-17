@@ -31,6 +31,50 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static FT_Library ft = NULL;
 
+struct RegisteredFont {
+	char name[MAX_QPATH];
+	int pointsize;
+	fontInfo_t info;
+};
+
+// although this seems a pointlessly high number, it's not unreasonable
+// because TTFs *ONLY* "work" at the pointsize they were actually genned for
+// so if you want to RENDER at 8pt, 16pt, and 24pt without artifacts
+// you NEED 3 "different" fonts registered even if they're from the same TTF data
+static const int MAX_FONTS = 64;
+static RegisteredFont aRegisteredFonts[MAX_FONTS];
+static int iNextFreeFontSlot = 0;
+
+
+static const RegisteredFont* R_GetFont( const char* name, int pointsize )
+{
+	for (int i = 0; i < iNextFreeFontSlot; ++i) {
+		const RegisteredFont* p = &aRegisteredFonts[i];
+		if ( (p->pointsize == pointsize) && !Q_stricmp( p->name, name ) ) {
+			return p;
+		}
+	}
+	return 0;
+}
+
+
+static void R_AddFont( const char* name, int pointsize, const fontInfo_t* info )
+{
+	if (iNextFreeFontSlot == MAX_FONTS)
+		ri.Error( ERR_DROP, "R_AddFont: MAX_FONTS hit\n" );
+
+	if (strlen(name) >= MAX_QPATH)
+		ri.Error( ERR_DROP, "R_AddFont: \"%s\" is too long\n", name );
+
+	RegisteredFont* p = &aRegisteredFonts[iNextFreeFontSlot++];
+	strcpy( p->name, name );
+	p->pointsize = pointsize;
+	p->info = *info;
+}
+
+
+///////////////////////////////////////////////////////////////
+
 
 void R_InitFreeType()
 {
@@ -213,6 +257,12 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 
 qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 {
+	const RegisteredFont* p = R_GetFont( fontName, pointSize );
+	if (p) {
+		*font = p->info;
+		return qtrue;
+	}
+
 	Com_Memset( font, 0, sizeof(fontInfo_t) );
 
 	byte* pTTF;
@@ -247,7 +297,10 @@ qbool RE_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font )
 
 	FT_Done_Face( face );
 
-	ri.Printf( PRINT_ALL, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
+	ri.Printf( PRINT_DEVELOPER, "Loaded %s TTF (%dpt)\n", fontName, pointSize );
+
+	R_AddFont( fontName, pointSize, font );
+
 	return qtrue;
 }
 
