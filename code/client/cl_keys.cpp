@@ -1056,14 +1056,6 @@ void CL_KeyEvent (int key, qbool down, unsigned time) {
 		return;
 	}
 
-
-	// keys can still be used for bound actions
-	if ( down && ( key < 128 || key == K_MOUSE1 ) && ( clc.demoplaying || cls.state == CA_CINEMATIC ) && !cls.keyCatchers) {
-		Cvar_Set ("nextdemo","");
-		key = K_ESCAPE;
-	}
-
-
 	// escape is always handled special
 	if ( key == K_ESCAPE && down ) {
 		if ( cls.keyCatchers & KEYCATCH_MESSAGE ) {
@@ -1075,7 +1067,7 @@ void CL_KeyEvent (int key, qbool down, unsigned time) {
 		// escape always gets out of CGAME stuff
 		if (cls.keyCatchers & KEYCATCH_CGAME) {
 			cls.keyCatchers &= ~KEYCATCH_CGAME;
-			VM_Call (cgvm, CG_EVENT_HANDLING, CGAME_EVENT_NONE);
+			VM_Call( cgvm, CG_KEY_EVENT, key, down );
 			return;
 		}
 
