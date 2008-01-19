@@ -9,6 +9,8 @@ improved TTF overhead a LOT: now as fast as crappy bitmap fonts  :D
 
 removed the stupidity of every key aborting demo playback: now ESC only
 
+only play the id logo cin the FIRST time, not every fkn time
+
 
 19 Dec 07 - 1.40
 
