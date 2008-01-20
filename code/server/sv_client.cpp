@@ -1373,8 +1373,9 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qbool delta ) {
 		oldcmd = cmd;
 	}
 
-	// save time for ping calculation
-	cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked = svs.time;
+	// save time for ping calculation if this is the first ack of a given snap
+	if ( cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked <= 0 )
+		cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked = svs.time;
 
 	// TTimo
 	// catch the no-cp-yet situation before SV_ClientEnterWorld
