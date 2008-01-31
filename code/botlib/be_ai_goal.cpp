@@ -856,9 +856,9 @@ void BotSetAvoidGoalTime(int goalstate, int number, float avoidtime)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-int BotGetLevelItemGoal(int index, char *name, bot_goal_t *goal)
+int BotGetLevelItemGoal( int index, const char* name, bot_goal_t* goal )
 {
-	levelitem_t *li;
+	const levelitem_t* li;
 
 	if (!itemconfig) return -1;
 	li = levelitems;
