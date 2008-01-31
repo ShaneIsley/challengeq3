@@ -31,7 +31,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GIB_HEALTH			-40
 #define	ARMOR_PROTECTION	0.66
 
-#define	MAX_ITEMS			256
+#define	MAX_ITEMS			256		// HOPELESSLY wrong: should be "bg_numItems + headroom"
+
+#define MAX_LOCATIONS		64
+
+#define MAX_SAY_TEXT		150
 
 #define	RANK_TIED_FLAG		0x4000
 

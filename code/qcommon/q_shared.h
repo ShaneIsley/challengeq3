@@ -66,6 +66,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #if defined(__cplusplus) && !defined(min)
 	template <typename T> __inline T min( T a, T b ) { return (a < b) ? a : b; }
 	template <typename T> __inline T max( T a, T b ) { return (a > b) ? a : b; }
+#elif defined(Q3_VM) // #elif !defined(min) doesn't work here, because the VC headers are shit
+	#define min( a, b ) ((a) < (b) ? (a) : (b))
+	#define max( a, b ) ((a) > (b) ? (a) : (b))
 #endif
 
 
@@ -437,6 +440,10 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 
 
 #if !defined( Q3_VM ) || defined( __Q3_VM_MATH )
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4514)		// unreferenced inline
+#endif
 
 static ID_INLINE qboolean VectorCompare( const vec3_t v1, const vec3_t v2 )
 {
@@ -1184,15 +1191,7 @@ typedef enum {
 #define CDCHKSUM_LEN 2
 
 
-// game/cgame/ui-specific crap that has no business being in here
-
-#define MAX_LOCATIONS	64
-
-#define MAX_SAY_TEXT	150
-
-#define SAY_ALL		0
-#define SAY_TEAM	1
-#define SAY_TELL	2
+// game/cgame/ui-specific SHIT that has no business being in here
 
 // font rendering values used by ui and cgame
 
