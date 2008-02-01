@@ -381,7 +381,7 @@ void BotImport_DebugLineDelete(int line) {
 BotImport_DebugLineShow
 ==================
 */
-void BotImport_DebugLineShow(int line, vec3_t start, vec3_t end, int color) {
+void BotImport_DebugLineShow(int line, const vec3_t start, const vec3_t end, int color) {
 	vec3_t points[4], dir, cross, up = {0, 0, 1};
 	float dot;
 

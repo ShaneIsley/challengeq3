@@ -198,7 +198,7 @@ typedef struct botlib_import_s
 	//debug visualisation stuff
 	int			(*DebugLineCreate)(void);
 	void		(*DebugLineDelete)(int line);
-	void		(*DebugLineShow)(int line, vec3_t start, vec3_t end, int color);
+	void		(*DebugLineShow)(int line, const vec3_t start, const vec3_t end, int color);
 	//
 	int			(*DebugPolygonCreate)(int color, int numPoints, vec3_t *points);
 	void		(*DebugPolygonDelete)(int id);

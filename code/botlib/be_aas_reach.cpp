@@ -2195,7 +2195,7 @@ int AAS_Reachability_Jump(int area1num, int area2num)
 			speed = 400;
 			traveltype = TRAVEL_WALKOFFLEDGE;
 		} //end if
-		else if (AAS_HorizontalVelocityForJump(0, beststart, bestend, &speed))
+		else if (AAS_HorizontalVelocityForJump(0, beststart, bestend, speed))
 		{
 			//FIXME: why multiply with 1.2???
 			speed *= 1.2f;
@@ -2205,7 +2205,7 @@ int AAS_Reachability_Jump(int area1num, int area2num)
 		{
 			//get the horizontal speed for the jump, if it isn't possible to calculate this
 			//speed (the jump is not possible) then there's no jump reachability created
-			if (!AAS_HorizontalVelocityForJump(phys_jumpvel, beststart, bestend, &speed))
+			if (!AAS_HorizontalVelocityForJump(phys_jumpvel, beststart, bestend, speed))
 				return qfalse;
 			speed *= 1.05f;
 			traveltype = TRAVEL_JUMP;
@@ -3233,7 +3233,7 @@ aas_lreachability_t *AAS_FindFaceReachabilities(vec3_t *facepoints, int numpoint
 		if (hordist > 32)
 		{
 			//check for walk off ledge
-			if (!AAS_HorizontalVelocityForJump(0, beststart, bestend, &speed)) continue;
+			if (!AAS_HorizontalVelocityForJump(0, beststart, bestend, speed)) continue;
 		} //end if
 		//
 		beststart[2] += 1;
@@ -3708,7 +3708,7 @@ void AAS_Reachability_JumpPad(void)
 				zvel = velocity[2];
 				//get the horizontal speed for the jump, if it isn't possible to calculate this
 				//speed
-				ret = AAS_HorizontalVelocityForJump(zvel, areastart, facecenter, &speed);
+				ret = AAS_HorizontalVelocityForJump(zvel, areastart, facecenter, speed);
 				if (ret && speed < 150)
 				{
 					//direction towards the face center
@@ -4051,7 +4051,7 @@ int AAS_Reachability_WeaponJump(int area1num, int area2num)
 			else zvel = AAS_RocketJumpZVelocity(areastart);
 			//get the horizontal speed for the jump, if it isn't possible to calculate this
 			//speed (the jump is not possible) then there's no jump reachability created
-			ret = AAS_HorizontalVelocityForJump(zvel, areastart, facecenter, &speed);
+			ret = AAS_HorizontalVelocityForJump(zvel, areastart, facecenter, speed);
 			if (ret && speed < 300)
 			{
 				//direction towards the face center

@@ -1633,7 +1633,7 @@ bot_moveresult_t BotTravel_WalkOffLedge(bot_movestate_t *ms, aas_reachability_t 
 		{
 			speed = 100;
 		} //end if
-		else if (!AAS_HorizontalVelocityForJump(0, reach->start, reach->end, &speed))
+		else if (!AAS_HorizontalVelocityForJump(0, reach->start, reach->end, speed))
 		{
 			speed = 400;
 		} //end if
@@ -1858,7 +1858,7 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 	return result;
 } //end of the function BotTravel_Jump*/
 //*
-bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
+bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, const aas_reachability_t& reach)
 {
 	vec3_t hordir, dir1, dir2, start, end, runstart;
 //	vec3_t runstart, dir1, dir2, hordir;
@@ -1868,14 +1868,14 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 	//
 	AAS_JumpReachRunStart(reach, runstart);
 	//*
-	hordir[0] = runstart[0] - reach->start[0];
-	hordir[1] = runstart[1] - reach->start[1];
+	hordir[0] = runstart[0] - reach.start[0];
+	hordir[1] = runstart[1] - reach.start[1];
 	hordir[2] = 0;
 	VectorNormalize(hordir);
 	//
-	VectorCopy(reach->start, start);
+	VectorCopy(reach.start, start);
 	start[2] += 1;
-	VectorMA(reach->start, 80, hordir, runstart);
+	VectorMA(reach.start, 80, hordir, runstart);
 	//check for a gap
 	for (dist1 = 0; dist1 < 80; dist1 += 10)
 	{
@@ -1883,9 +1883,9 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 		end[2] += 1;
 		if (AAS_PointAreaNum(end) != ms->reachareanum) break;
 	} //end for
-	if (dist1 < 80) VectorMA(reach->start, dist1, hordir, runstart);
+	if (dist1 < 80) VectorMA(reach.start, dist1, hordir, runstart);
 	//
-	VectorSubtract(ms->origin, reach->start, dir1);
+	VectorSubtract(ms->origin, reach.start, dir1);
 	dir1[2] = 0;
 	dist1 = VectorNormalize(dir1);
 	VectorSubtract(ms->origin, runstart, dir2);
@@ -1895,8 +1895,8 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 	if (DotProduct(dir1, dir2) < -0.8 || dist2 < 5)
 	{
 //		botimport.Print(PRT_MESSAGE, "between jump start and run start point\n");
-		hordir[0] = reach->end[0] - ms->origin[0];
-		hordir[1] = reach->end[1] - ms->origin[1];
+		hordir[0] = reach.end[0] - ms->origin[0];
+		hordir[1] = reach.end[1] - ms->origin[1];
 		hordir[2] = 0;
 		VectorNormalize(hordir);
 		//elemantary action jump
@@ -3322,7 +3322,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				case TRAVEL_BARRIERJUMP: *result = BotTravel_BarrierJump(ms, &reach); break;
 				case TRAVEL_LADDER: *result = BotTravel_Ladder(ms, &reach); break;
 				case TRAVEL_WALKOFFLEDGE: *result = BotTravel_WalkOffLedge(ms, &reach); break;
-				case TRAVEL_JUMP: *result = BotTravel_Jump(ms, &reach); break;
+				case TRAVEL_JUMP: *result = BotTravel_Jump(ms, reach); break;
 				case TRAVEL_SWIM: *result = BotTravel_Swim(ms, &reach); break;
 				case TRAVEL_WATERJUMP: *result = BotTravel_WaterJump(ms, &reach); break;
 				case TRAVEL_TELEPORT: *result = BotTravel_Teleport(ms, &reach); break;

@@ -253,18 +253,18 @@ void AAS_SetMovedir(vec3_t angles, vec3_t movedir)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-void AAS_JumpReachRunStart(aas_reachability_t *reach, vec3_t runstart)
+void AAS_JumpReachRunStart(const aas_reachability_t& reach, vec3_t runstart)
 {
 	vec3_t hordir, start, cmdmove;
 	aas_clientmove_t move;
 
 	//
-	hordir[0] = reach->start[0] - reach->end[0];
-	hordir[1] = reach->start[1] - reach->end[1];
+	hordir[0] = reach.start[0] - reach.end[0];
+	hordir[1] = reach.start[1] - reach.end[1];
 	hordir[2] = 0;
 	VectorNormalize(hordir);
 	//start point
-	VectorCopy(reach->start, start);
+	VectorCopy(reach.start, start);
 	start[2] += 1;
 	//get command movement
 	VectorScale(hordir, 400, cmdmove);
@@ -287,7 +287,7 @@ void AAS_JumpReachRunStart(aas_reachability_t *reach, vec3_t runstart)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-float AAS_WeaponJumpZVelocity(vec3_t origin, float radiusdamage)
+static float AAS_WeaponJumpZVelocity(const vec3_t origin, float radiusdamage)
 {
 	vec3_t kvel, v, start, end, forward, right, viewangles, dir;
 	float	mass, knockback, points;
@@ -338,7 +338,7 @@ float AAS_WeaponJumpZVelocity(vec3_t origin, float radiusdamage)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-float AAS_RocketJumpZVelocity(vec3_t origin)
+float AAS_RocketJumpZVelocity(const vec3_t origin)
 {
 	//rocket radius damage is 120 (p_weapon.c: Weapon_RocketLauncher_Fire)
 	return AAS_WeaponJumpZVelocity(origin, 120);
@@ -1059,11 +1059,10 @@ void AAS_TestMovementPrediction(int entnum, vec3_t origin, vec3_t dir)
 // Returns:				qfalse if too high or too far from start to end
 // Changes Globals:		-
 //===========================================================================
-int AAS_HorizontalVelocityForJump(float zvel, vec3_t start, vec3_t end, float *velocity)
+int AAS_HorizontalVelocityForJump(float zvel, const vec3_t start, const vec3_t end, float& velocity)
 {
 	float phys_gravity, phys_maxvelocity;
 	float maxjump, height2fall, t, top;
-	vec3_t dir;
 
 	phys_gravity = aassettings.phys_gravity;
 	phys_maxvelocity = aassettings.phys_maxvelocity;
@@ -1077,24 +1076,25 @@ int AAS_HorizontalVelocityForJump(float zvel, vec3_t start, vec3_t end, float *v
 	//if the goal is to high to jump to
 	if (height2fall < 0)
 	{
-		*velocity = phys_maxvelocity;
+		velocity = phys_maxvelocity;
 		return 0;
 	} //end if
 	//time a player takes to fall the height
 	t = sqrt(height2fall / (0.5 * phys_gravity));
   	//direction from start to end
+	vec3_t dir;
 	VectorSubtract(end, start, dir);
 	//
 	if ( (t + zvel / phys_gravity) == 0.0f ) {
-		*velocity = phys_maxvelocity;
+		velocity = phys_maxvelocity;
 		return 0;
 	}
 	//calculate horizontal speed
-	*velocity = sqrt(dir[0]*dir[0] + dir[1]*dir[1]) / (t + zvel / phys_gravity);
+	velocity = sqrt(dir[0]*dir[0] + dir[1]*dir[1]) / (t + zvel / phys_gravity);
 	//the horizontal speed must be lower than the max speed
-	if (*velocity > phys_maxvelocity)
+	if (velocity > phys_maxvelocity)
 	{
-		*velocity = phys_maxvelocity;
+		velocity = phys_maxvelocity;
 		return 0;
 	} //end if
 	return 1;
