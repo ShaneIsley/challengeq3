@@ -1904,7 +1904,7 @@ static void R_CreateFogImage()
 }
 
 
-const int DEFAULT_SIZE = 16;
+static const int DEFAULT_SIZE = 16;
 
 
 static void R_CreateDefaultImage()
@@ -1947,8 +1947,8 @@ static void R_CreateBuiltinImages()
 	R_CreateDefaultImage();
 
 	// we use a solid white image instead of disabling texturing
-	Com_Memset( data, 255, sizeof( data ) );
-	tr.whiteImage = R_CreateImage( "*white", (byte*)data, 8, 8, GL_RGBA, qfalse, qfalse, GL_REPEAT );
+	Com_Memset( data, 255, 4 );
+	tr.whiteImage = R_CreateImage( "*white", (byte*)data, 1, 1, GL_RGBA, qfalse, qfalse, GL_REPEAT );
 
 	// with overbright bits active, we need an image which is some fraction of full color,
 	// for default lightmaps, etc

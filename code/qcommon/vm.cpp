@@ -471,7 +471,7 @@ vm_t *VM_Restart( vm_t *vm ) {
 	if ( vm->dllHandle ) {
 		char	name[MAX_QPATH];
 		intptr_t	(*systemCall)( intptr_t *parms );
-		
+
 		systemCall = vm->systemCall;	
 		Q_strncpyz( name, vm->name, sizeof( name ) );
 
