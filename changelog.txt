@@ -1,5 +1,5 @@
 
-Jan 08 - 1.41
+Feb 08 - 1.41
 
 removed all bs references to GT_SINGLE_PLAYER and ui_singlePlayerActive
 (except from the bot code, which has bigger problems)
@@ -10,6 +10,8 @@ improved TTF overhead a LOT: now as fast as crappy bitmap fonts  :D
 removed the stupidity of every key aborting demo playback: now ESC only
 
 only play the id logo cin the FIRST time, not every fkn time
+
+removed the broken stencil/projection shadow code
 
 
 19 Dec 07 - 1.40

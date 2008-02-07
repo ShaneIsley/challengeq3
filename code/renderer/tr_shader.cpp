@@ -975,11 +975,6 @@ static void ParseDeform( const char** text )
 	deformStage_t* ds = &shader.deforms[ shader.numDeforms ];
 	shader.numDeforms++;
 
-	if ( !Q_stricmp( token, "projectionShadow" ) ) {
-		ds->deformation = DEFORM_PROJECTION_SHADOW;
-		return;
-	}
-
 	if ( !Q_stricmp( token, "autosprite" ) ) {
 		ds->deformation = DEFORM_AUTOSPRITE;
 		return;
@@ -1093,7 +1088,8 @@ static void ParseDeform( const char** text )
 		return;
 	}
 
-	ri.Printf( PRINT_WARNING, "WARNING: unknown deformVertexes subtype '%s' found in shader '%s'\n", token, shader.name );
+	//ri.Printf( PRINT_WARNING, "WARNING: unknown deformVertexes subtype '%s' found in shader '%s'\n", token, shader.name );
+	ri.Error( ERR_FATAL, "unknown deformVertexes subtype '%s' found in shader '%s'\n", token, shader.name );
 }
 
 
@@ -2702,17 +2698,11 @@ static void CreateInternalShaders()
 	stages[0].active = qtrue;
 	stages[0].stateBits = GLS_DEFAULT;
 	tr.defaultShader = FinishShader();
-
-	// shadow shader is just a marker
-	Q_strncpyz( shader.name, "<stencil shadow>", sizeof( shader.name ) );
-	shader.sort = SS_STENCIL_SHADOW;
-	tr.shadowShader = FinishShader();
 }
 
 
 static void CreateExternalShaders()
 {
-	tr.projectionShadowShader = R_FindShader( "projectionShadow", LIGHTMAP_NONE, qtrue );
 	tr.flareShader = R_FindShader( "flareShader", LIGHTMAP_NONE, qtrue );
 
 	// Hack to make fogging work correctly on flares. Fog colors are calculated

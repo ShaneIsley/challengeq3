@@ -529,7 +529,7 @@ void RB_DeformTessGeometry()
 			RB_CalcMoveVertexes( ds );
 			break;
 		case DEFORM_PROJECTION_SHADOW:
-			RB_ProjectionShadowDeform();
+			//RB_ProjectionShadowDeform();
 			break;
 		case DEFORM_AUTOSPRITE:
 			AutospriteDeform();

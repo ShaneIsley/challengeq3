@@ -924,8 +924,6 @@ typedef struct {
 	image_t					*identityLightImage;	// full of tr.identityLightByte
 
 	shader_t				*defaultShader;
-	shader_t				*shadowShader;
-	shader_t				*projectionShadowShader;
 
 	shader_t				*flareShader;
 	shader_t				*sunShader;
@@ -1095,7 +1093,6 @@ extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
 extern	cvar_t	*r_shownormals;					// draws wireframe normals
 extern	cvar_t	*r_clear;						// force screen clear every frame
 
-extern	cvar_t	*r_shadows;						// controls shadows: 0 = none, 1 = blur, 2 = stencil, 3 = black planar projection
 extern	cvar_t	*r_flares;						// light flares
 
 extern	cvar_t	*r_intensity;
@@ -1385,18 +1382,6 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent );
 void R_TransformDlights( int count, dlight_t *dl, orientationr_t *or );
 qbool R_LightForPoint( const vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 
-
-/*
-============================================================
-
-SHADOWS
-
-============================================================
-*/
-
-void RB_ShadowTessEnd( void );
-void RB_ShadowFinish( void );
-void RB_ProjectionShadowDeform( void );
 
 /*
 ============================================================
