@@ -13,6 +13,8 @@ only play the id logo cin the FIRST time, not every fkn time
 
 removed the broken stencil/projection shadow code
 
+avis produced by \video actually work (bug+fix both from ioq3)
+
 
 19 Dec 07 - 1.40
 

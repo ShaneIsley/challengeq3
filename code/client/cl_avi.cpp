@@ -168,7 +168,7 @@ static ID_INLINE void END_CHUNK( void )
   afd.chunkStackTop--;
   bufIndex = afd.chunkStack[ afd.chunkStackTop ];
   bufIndex += 4;
-  WRITE_4BYTES( endIndex - bufIndex - 1 );
+  WRITE_4BYTES( endIndex - bufIndex - 4 );
   bufIndex = endIndex;
   bufIndex = PAD( bufIndex, 2 );
 }

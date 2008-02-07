@@ -2216,46 +2216,22 @@ static void CL_SetModel_f()
 
 static void CL_Video_f()
 {
-  char  filename[ MAX_OSPATH ];
-  int   i, last;
+	char s[ MAX_OSPATH ];
 
-  if( Cmd_Argc( ) == 2 )
-  {
-    // explicit filename
-    Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
-  }
-  else
-  {
-    // scan for a free filename
-    for( i = 0; i <= 9999; i++ )
-    {
-      int a, b, c, d;
+	if( Cmd_Argc( ) == 2 )
+	{
+		Com_sprintf( s, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
+	}
+	else
+	{
+		qtime_t t;
+		Com_RealTime( &t );
+		Com_sprintf( s, sizeof(s), "videos/%d_%02d_%02d-%02d_%02d_%02d.avi",
+				1900+t.tm_year, 1+t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec );
+	}
 
-      last = i;
-
-      a = last / 1000;
-      last -= a * 1000;
-      b = last / 100;
-      last -= b * 100;
-      c = last / 10;
-      last -= c * 10;
-      d = last;
-
-      Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
-          a, b, c, d );
-
-      if( !FS_FileExists( filename ) )
-        break; // file doesn't exist
-    }
-
-    if( i > 9999 )
-    {
-      Com_Printf( S_COLOR_RED "ERROR: no free file names to create video\n" );
-      return;
-    }
-  }
-
-  CL_OpenAVIForWriting( filename );
+	Com_Printf( "recording to %s\n", s );
+	CL_OpenAVIForWriting( s );
 }
 
 
