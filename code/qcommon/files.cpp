@@ -230,12 +230,12 @@ typedef struct searchpath_s {
 } searchpath_t;
 
 static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
-static	cvar_t		*fs_debug = NULL;
-static	cvar_t		*fs_homepath = NULL;
-static	cvar_t		*fs_basepath = NULL;
-static	cvar_t		*fs_basegame = NULL;
-static	cvar_t		*fs_gamedirvar = NULL;
-static	searchpath_t	*fs_searchpaths = NULL;
+static	cvar_t		*fs_debug;
+static	cvar_t		*fs_homepath;
+static	cvar_t		*fs_basepath;
+static	cvar_t		*fs_basegame;
+static	cvar_t		*fs_gamedirvar;
+static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
 static	int			fs_loadStack;			// total files in memory
@@ -841,7 +841,7 @@ Ignore case and seprator char distinctions
 */
 qbool FS_FilenameCompare( const char *s1, const char *s2 ) {
 	int		c1, c2;
-	
+
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
@@ -859,12 +859,12 @@ qbool FS_FilenameCompare( const char *s1, const char *s2 ) {
 		if ( c2 == '\\' || c2 == ':' ) {
 			c2 = '/';
 		}
-		
+
 		if (c1 != c2) {
 			return qtrue;		// strings not equal
 		}
 	} while (c1);
-	
+
 	return qfalse;		// strings are equal
 }
 
@@ -921,7 +921,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 				} while(pakFile != NULL);
 			} else if ( search->dir ) {
 				dir = search->dir;
-			
 				netpath = FS_BuildOSPath( dir->path, dir->gamedir, filename );
 				temp = fopen (netpath, "rb");
 				if ( !temp ) {
@@ -1058,10 +1057,8 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
       // I had the problem on https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=8
       // turned out I used FS_FileExists instead
 			if ( fs_numServerPaks ) {
-				if ( Q_stricmp( filename + l - 4, ".cfg" )		// for config files
-					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
-					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
-					&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
+				if (   Q_stricmp( filename + l - 4, ".cfg" )
+					&& Q_stricmp( filename + l - 4, ".ttf" )
 					&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 					continue;
 				}
@@ -1075,10 +1072,8 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 				continue;
 			}
 
-			if ( Q_stricmp( filename + l - 4, ".cfg" )		// for config files
-				&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
-				&& Q_stricmp( filename + l - 5, ".game" )	// menu files
-				&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
+			if (   Q_stricmp( filename + l - 4, ".cfg" )
+				&& Q_stricmp( filename + l - 4, ".ttf" )
 				&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
 				fs_fakeChkSum = random();
 			}
@@ -3019,12 +3014,12 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 			fs_serverReferencedPakNames[i] = CopyString( Cmd_Argv( i ) );
 		}
 	}
-	
+
 	// ensure that there are as many checksums as there are pak names.
 	if(d < c)
 		c = d;
-	
-	fs_numServerReferencedPaks = c;	
+
+	fs_numServerReferencedPaks = c;
 }
 
 /*
@@ -3036,8 +3031,6 @@ is resetting due to a game change
 ================
 */
 void FS_InitFilesystem( void ) {
-	Com_Memset( fsh, 0, sizeof(fsh) );
-
 	// allow command line parms to override our defaults
 	// we have to specially handle this, because normal command
 	// line variable sets don't happen until after the filesystem
