@@ -515,7 +515,7 @@ void	FS_FreeFileList( char **list );
 
 qbool FS_FileExists( const char *file );
 
-char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
+char* FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 
 int		FS_LoadStack( void );
 

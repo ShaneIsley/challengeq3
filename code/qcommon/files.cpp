@@ -2083,7 +2083,7 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 ////////////////////////////////////////////////////////////////
 
 
-void FS_Dir_f( void )
+static void FS_Dir_f()
 {
 	char	**dirnames;
 	int		ndirs;
@@ -2105,6 +2105,7 @@ void FS_Dir_f( void )
 	for ( i = 0; i < ndirs; i++ ) {
 		Com_Printf( "%s\n", dirnames[i] );
 	}
+
 	FS_FreeFileList( dirnames );
 }
 
@@ -2182,7 +2183,7 @@ static void FS_SortFileList(char **filelist, int numfiles)
 }
 
 
-void FS_NewDir_f( void )
+static void FS_NewDir_f()
 {
 	char	**dirnames;
 	int		ndirs;
@@ -2209,15 +2210,11 @@ void FS_NewDir_f( void )
 	FS_FreeFileList( dirnames );
 }
 
-/*
-============
-FS_Path_f
 
-============
-*/
-void FS_Path_f( void ) {
-	searchpath_t	*s;
-	int				i;
+static void FS_Path_f()
+{
+	int i;
+	const searchpath_t* s;
 
 	Com_Printf ("Current search path:\n");
 	for (s = fs_searchpaths; s; s = s->next) {
@@ -2771,7 +2768,6 @@ const char *FS_ReferencedPakChecksums( void ) {
 	searchpath_t *search;
 
 	info[0] = 0;
-
 
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		// is the element a pak file?
