@@ -178,20 +178,11 @@ or configs will never get loaded from disk!
 
 */
 
-#define	DEMOGAME			"demota"
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
 #define	DEMO_PAK0_CHECKSUM	2985612116u
-#define	PAK0_CHECKSUM				1566731103u
-
-// if this is defined, the executable positively won't work with any paks other
-// than the demo pak, even if productid is present.  This is only used for our
-// last demo release to prevent the mac and linux users from using the demo
-// executable with the production windows pak before the mac/linux products
-// hit the shelves a little later
-// NOW defined in build files
-//#define PRE_RELEASE_TADEMO
+#define	PAK0_CHECKSUM		1566731103u
 
 #define MAX_ZPATH			256
 #define	MAX_SEARCH_PATHS	4096
@@ -1699,12 +1690,9 @@ static int FS_ReturnPath( const char *zname, char *zpath, int *depth ) {
 	return len;
 }
 
-/*
-==================
-FS_AddFileToList
-==================
-*/
-static int FS_AddFileToList( char *name, char *list[MAX_FOUND_FILES], int nfiles ) {
+
+static int FS_AddFileToList( const char *name, char *list[MAX_FOUND_FILES], int nfiles )
+{
 	int		i;
 
 	if ( nfiles == MAX_FOUND_FILES - 1 ) {
@@ -2120,12 +2108,9 @@ void FS_Dir_f( void )
 	FS_FreeFileList( dirnames );
 }
 
-/*
-===========
-FS_ConvertPath
-===========
-*/
-void FS_ConvertPath( char *s ) {
+
+static void FS_ConvertPath( char *s )
+{
 	while (*s) {
 		if ( *s == '\\' || *s == ':' ) {
 			*s = '/';
@@ -2134,16 +2119,13 @@ void FS_ConvertPath( char *s ) {
 	}
 }
 
-/*
-===========
-FS_PathCmp
 
-Ignore case and seprator char distinctions
-===========
-*/
-int FS_PathCmp( const char *s1, const char *s2 ) {
+// ignore case and seprator char distinctions
+
+int FS_PathCmp( const char *s1, const char *s2 )
+{
 	int		c1, c2;
-	
+
 	do {
 		c1 = *s1++;
 		c2 = *s2++;
@@ -2161,24 +2143,20 @@ int FS_PathCmp( const char *s1, const char *s2 ) {
 		if ( c2 == '\\' || c2 == ':' ) {
 			c2 = '/';
 		}
-		
+
 		if (c1 < c2) {
-			return -1;		// strings not equal
+			return -1;
 		}
 		if (c1 > c2) {
 			return 1;
 		}
 	} while (c1);
-	
+
 	return 0;		// strings are equal
 }
 
-/*
-================
-FS_SortFileList
-================
-*/
-void FS_SortFileList(char **filelist, int numfiles)
+
+static void FS_SortFileList(char **filelist, int numfiles)
 {
 	int i, j, k;
 
@@ -2198,6 +2176,7 @@ void FS_SortFileList(char **filelist, int numfiles)
 		sortedlist[j] = filelist[i];
 		numsortedfiles++;
 	}
+
 	Com_Memcpy(filelist, sortedlist, numfiles * sizeof( *filelist ) );
 	Z_Free(sortedlist);
 }
