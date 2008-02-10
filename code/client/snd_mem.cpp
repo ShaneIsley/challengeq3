@@ -101,14 +101,11 @@ void SND_setup(void) {
 	Com_Printf("Sound memory manager started\n");
 }
 
-/*
-================
-ResampleSfx
 
-resample / decimate to the current source rate
-================
-*/
-static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qbool compressed ) {
+// resample / decimate to the current source rate
+
+static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data )
+{
 	int		outcount;
 	int		srcsample;
 	float	stepscale;
@@ -116,7 +113,7 @@ static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, qbool 
 	int		sample, samplefrac, fracstep;
 	int			part;
 	sndBuffer	*chunk;
-	
+
 	stepscale = (float)inrate / dma.speed;	// this is usually 0.5, 1, or 2
 
 	outcount = sfx->soundLength / stepscale;
@@ -189,7 +186,7 @@ qbool S_LoadSound( sfx_t *sfx )
 
 	sfx->soundLength = info.samples;
 	sfx->soundData = NULL;
-	ResampleSfx( sfx, info.rate, info.width, data + info.dataofs, qfalse );
+	ResampleSfx( sfx, info.rate, info.width, data + info.dataofs );
 
 	Hunk_FreeTempMemory(samples);
 	Z_Free(data);
