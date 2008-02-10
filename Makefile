@@ -841,11 +841,9 @@ Q3OBJ = \
   $(B)/client/net_ip.o \
   $(B)/client/huffman.o \
   \
-  $(B)/client/snd_adpcm.o \
   $(B)/client/snd_dma.o \
   $(B)/client/snd_mem.o \
   $(B)/client/snd_mix.o \
-  $(B)/client/snd_wavelet.o \
   \
   $(B)/client/snd_main.o \
   $(B)/client/snd_codec.o \
@@ -1044,12 +1042,10 @@ $(B)/client/cl_parse.o : $(CDIR)/cl_parse.cpp; $(DO_CC)
 $(B)/client/cl_scrn.o : $(CDIR)/cl_scrn.cpp; $(DO_CC)
 $(B)/client/cl_ui.o : $(CDIR)/cl_ui.cpp; $(DO_CC)
 $(B)/client/cl_avi.o : $(CDIR)/cl_avi.cpp; $(DO_CC)
-$(B)/client/snd_adpcm.o : $(CDIR)/snd_adpcm.cpp; $(DO_CC)
 $(B)/client/snd_dma.o : $(CDIR)/snd_dma.cpp; $(DO_CC)
 $(B)/client/snd_mem.o : $(CDIR)/snd_mem.cpp; $(DO_CC)
 $(B)/client/snd_mixa.o : $(UDIR)/snd_mixa.s; $(DO_AS)
 $(B)/client/snd_mix.o : $(CDIR)/snd_mix.cpp; $(DO_CC)
-$(B)/client/snd_wavelet.o : $(CDIR)/snd_wavelet.cpp; $(DO_CC)
 
 $(B)/client/snd_main.o : $(CDIR)/snd_main.cpp; $(DO_CC)
 $(B)/client/snd_codec.o : $(CDIR)/snd_codec.cpp; $(DO_CC)
