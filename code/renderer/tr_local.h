@@ -1122,8 +1122,6 @@ extern	cvar_t	*r_printShaders;
 
 //====================================================================
 
-long R_Hash( const char* s, int size );
-
 float R_NoiseGet4f( float x, float y, float z, float t );
 void  R_NoiseInit( void );
 

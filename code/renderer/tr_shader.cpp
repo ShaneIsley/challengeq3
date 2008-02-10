@@ -1869,7 +1869,7 @@ static shader_t* GeneratePermanentShader()
 
 	SortNewShader();
 
-	hash = R_Hash(newShader->name, FILE_HASH_SIZE);
+	hash = Q_FileHash(newShader->name, FILE_HASH_SIZE);
 	newShader->next = hashTable[hash];
 	hashTable[hash] = newShader;
 
@@ -2157,7 +2157,7 @@ static const char* FindShaderInShaderText( const char* shadername )
 	const char* p;
 	const char* token;
 
-	int hash = R_Hash(shadername, MAX_SHADERTEXT_HASH);
+	int hash = Q_FileHash(shadername, MAX_SHADERTEXT_HASH);
 
 	for (int i = 0; shaderTextHashTable[hash][i]; i++) {
 		p = shaderTextHashTable[hash][i];
@@ -2237,7 +2237,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 
 	COM_StripExtension(name, strippedName, sizeof(strippedName));
 
-	hash = R_Hash(strippedName, FILE_HASH_SIZE);
+	hash = Q_FileHash(strippedName, FILE_HASH_SIZE);
 
 	//
 	// see if the shader is already loaded
@@ -2373,7 +2373,7 @@ qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, image
 
 	// see if the shader is already loaded
 	const shader_t* sh;
-	int hash = R_Hash(name, FILE_HASH_SIZE);
+	int hash = Q_FileHash(name, FILE_HASH_SIZE);
 	for (shader_t* sh = hashTable[hash]; sh; sh = sh->next) {
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
@@ -2654,7 +2654,7 @@ static void ScanAndLoadShaderFiles()
 		token = COM_ParseExt( (const char**)&p, qtrue );
 		if ( token[0] == 0 )
 			break;
-		hash = R_Hash( token, MAX_SHADERTEXT_HASH );
+		hash = Q_FileHash( token, MAX_SHADERTEXT_HASH );
 		shaderTextHashTableSizes[hash]++;
 		size++;
 		SkipBracedSection( (const char**)&p );
@@ -2676,7 +2676,7 @@ static void ScanAndLoadShaderFiles()
 		token = COM_ParseExt( (const char**)&p, qtrue );
 		if ( token[0] == 0 )
 			break;
-		hash = R_Hash( token, MAX_SHADERTEXT_HASH );
+		hash = Q_FileHash( token, MAX_SHADERTEXT_HASH );
 		shaderTextHashTable[hash][shaderTextHashTableSizes[hash]++] = oldp;
 		SkipBracedSection( (const char**)&p );
 	}

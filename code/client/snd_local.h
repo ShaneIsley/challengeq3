@@ -38,25 +38,25 @@ typedef struct {
 } portable_samplepair_t;
 
 typedef struct adpcm_state {
-    short	sample;		/* Previous output value */
-    char	index;		/* Index into stepsize table */
+	short	sample;		/* Previous output value */
+	char	index;		/* Index into stepsize table */
 } adpcm_state_t;
 
 typedef	struct sndBuffer_s {
 	short					sndChunk[SND_CHUNK_SIZE];
 	struct sndBuffer_s		*next;
-    int						size;
+	int						size;
 	adpcm_state_t			adpcm;
 } sndBuffer;
 
 typedef struct sfx_s {
 	sndBuffer		*soundData;
-	qbool		defaultSound;			// couldn't be loaded, so use buzz
-	qbool		inMemory;				// not in Memory
-	qbool		soundCompressed;		// not in Memory
-	int				soundCompressionMethod;	
-	int 			soundLength;
-	char 			soundName[MAX_QPATH];
+	qbool			defaultSound;	// couldn't be loaded, so use buzz
+	qbool			inMemory;
+	qbool			soundCompressed;
+	int				soundCompressionMethod;
+	int				soundLength;
+	char			soundName[MAX_QPATH];
 	int				lastTimeUsed;
 	struct sfx_s	*next;
 } sfx_t;
@@ -129,7 +129,7 @@ typedef struct
 	void (*StopAllSounds)( void );
 	void (*ClearLoopingSounds)( qbool killall );
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
+	qbool (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
 	void (*Respatialize)( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
@@ -174,9 +174,6 @@ extern	int		numLoopChannels;
 
 extern	int		s_paintedtime;
 extern	int		s_rawend;
-extern	vec3_t	listener_forward;
-extern	vec3_t	listener_right;
-extern	vec3_t	listener_up;
 extern	dma_t	dma;
 
 #define	MAX_RAW_SAMPLES	16384

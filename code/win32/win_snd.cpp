@@ -276,10 +276,10 @@ void SNDDMA_BeginPainting( void ) {
 	if ( pDSBuf->GetStatus(&dwStatus) != DS_OK ) {
 		Com_Printf ("Couldn't get sound buffer status\n");
 	}
-	
+
 	if (dwStatus & DSBSTATUS_BUFFERLOST)
 		pDSBuf->Restore();
-	
+
 	if (!(dwStatus & DSBSTATUS_PLAYING))
 		pDSBuf->Play( 0, 0, DSBPLAY_LOOPING );
 

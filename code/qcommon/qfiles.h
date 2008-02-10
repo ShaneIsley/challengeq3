@@ -67,31 +67,6 @@ typedef struct {
 /*
 ========================================================================
 
-PCX files are used for 8 bit images
-
-========================================================================
-*/
-
-typedef struct {
-    char	manufacturer;
-    char	version;
-    char	encoding;
-    char	bits_per_pixel;
-    unsigned short	xmin,ymin,xmax,ymax;
-    unsigned short	hres,vres;
-    unsigned char	palette[48];
-    char	reserved;
-    char	color_planes;
-    unsigned short	bytes_per_line;
-    unsigned short	palette_type;
-    char	filler[58];
-    unsigned char	data;			// unbounded
-} pcx_t;
-
-
-/*
-========================================================================
-
 .MD3 triangle model file format
 
 ========================================================================
@@ -136,7 +111,7 @@ typedef struct md3Tag_s {
 ** XyzNormals		sizeof( md3XyzNormal_t ) * numVerts * numFrames
 */
 typedef struct {
-	int		ident;				// 
+	int		ident;
 
 	char	name[MAX_QPATH];	// polyset name
 
@@ -183,7 +158,7 @@ typedef struct {
 	int			flags;
 
 	int			numFrames;
-	int			numTags;			
+	int			numTags;
 	int			numSurfaces;
 
 	int			numSkins;

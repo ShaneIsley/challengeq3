@@ -281,6 +281,24 @@ static char lastValidGame[MAX_OSPATH];
 FILE*		missingFiles = NULL;
 #endif
 
+
+int Q_FileHash( const char* s, int tablesize )
+{
+	int ch, hash = 0;
+
+	for (int i = 0; s[i]; ++i) {
+		ch = tolower(s[i]);
+		if (ch == '.')
+			break;			// don't include extension
+		if (ch =='\\')
+			ch = '/';		// damn path names
+		hash += ch * (i+119);
+	}
+
+	return (hash & (tablesize-1));
+}
+
+
 /*
 ==============
 FS_Initialized

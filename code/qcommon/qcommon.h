@@ -486,6 +486,9 @@ issues.
 ==============================================================
 */
 
+// hash a filename as a case- and OS- insensitive string with no extension
+int Q_FileHash( const char* s, int tablesize );
+
 // referenced flags
 // these are in loop specific order so don't change the order
 #define FS_GENERAL_REF	0x01
