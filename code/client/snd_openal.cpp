@@ -29,6 +29,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qal.h"
 
+typedef enum
+{
+	SRCPRI_AMBIENT = 0,	// Ambient sound effects
+	SRCPRI_ENTITY,			// Entity sound effects
+	SRCPRI_ONESHOT,			// One-shot sounds
+	SRCPRI_LOCAL,				// Local sounds
+	SRCPRI_STREAM				// Streams (music, cutscenes)
+} alSrcPriority_t;
+
+typedef int srcHandle_t;
+
 // Console variables specific to OpenAL
 cvar_t *s_alPrecache;
 cvar_t *s_alGain;

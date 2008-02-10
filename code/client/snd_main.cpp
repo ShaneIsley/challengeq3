@@ -69,7 +69,7 @@ static qbool S_ValidSoundInterface( soundInterface_t *si )
 S_StartSound
 =================
 */
-void S_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx )
+void S_StartSound( const vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx )
 {
 	if( si.StartSound ) {
 		si.StartSound( origin, entnum, entchannel, sfx );
@@ -423,7 +423,7 @@ void S_Shutdown( void )
 	Com_Memset( &si, 0, sizeof( soundInterface_t ) );
 
 	Cmd_RemoveCommand( "play" );
-	Cmd_RemoveCommand( "music");
+	Cmd_RemoveCommand( "music" );
 	Cmd_RemoveCommand( "s_list" );
 	Cmd_RemoveCommand( "s_stop" );
 	Cmd_RemoveCommand( "s_info" );

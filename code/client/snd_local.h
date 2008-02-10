@@ -53,8 +53,6 @@ typedef struct sfx_s {
 	sndBuffer		*soundData;
 	qbool			defaultSound;	// couldn't be loaded, so use buzz
 	qbool			inMemory;
-	qbool			soundCompressed;
-	int				soundCompressionMethod;
 	int				soundLength;
 	char			soundName[MAX_QPATH];
 	int				lastTimeUsed;
@@ -121,7 +119,7 @@ typedef struct {
 typedef struct
 {
 	void (*Shutdown)(void);
-	void (*StartSound)( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
+	void (*StartSound)( const vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
 	void (*StartLocalSound)( sfxHandle_t sfx, int channelNum );
 	void (*StartBackgroundTrack)( const char *intro, const char *loop );
 	void (*StopBackgroundTrack)( void );
@@ -129,7 +127,7 @@ typedef struct
 	void (*StopAllSounds)( void );
 	void (*ClearLoopingSounds)( qbool killall );
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-	qbool (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
+	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
 	void (*Respatialize)( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
@@ -198,42 +196,12 @@ portable_samplepair_t *S_GetRawSamplePointer( void );
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
 
-// adpcm functions
-int  S_AdpcmMemoryNeeded( const wavinfo_t *info );
-void S_AdpcmEncodeSound( sfx_t *sfx, short *samples );
-void S_AdpcmGetSamples(sndBuffer *chunk, short *to);
-
-// wavelet function
-
-#define SENTINEL_MULAW_ZERO_RUN 127
-#define SENTINEL_MULAW_FOUR_BIT_RUN 126
-
 void S_FreeOldestSound( void );
-
-#define	NXStream byte
-
-void encodeWavelet(sfx_t *sfx, short *packets);
-void decodeWavelet( sndBuffer *stream, short *packets);
-
-void encodeMuLaw( sfx_t *sfx, short *packets);
-extern short mulawToShort[256];
 
 extern short *sfxScratchBuffer;
 extern sfx_t *sfxScratchPointer;
-extern int	   sfxScratchIndex;
+extern int    sfxScratchIndex;
 
 qbool S_Base_Init( soundInterface_t *si );
-
-// OpenAL stuff
-typedef enum
-{
-	SRCPRI_AMBIENT = 0,	// Ambient sound effects
-	SRCPRI_ENTITY,			// Entity sound effects
-	SRCPRI_ONESHOT,			// One-shot sounds
-	SRCPRI_LOCAL,				// Local sounds
-	SRCPRI_STREAM				// Streams (music, cutscenes)
-} alSrcPriority_t;
-
-typedef int srcHandle_t;
 
 qbool S_AL_Init( soundInterface_t *si );
