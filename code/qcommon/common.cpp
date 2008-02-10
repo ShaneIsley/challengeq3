@@ -1780,16 +1780,13 @@ static void Com_InitJournaling()
 	}
 }
 
-/*
-=================
-Com_GetRealEvent
-=================
-*/
-sysEvent_t	Com_GetRealEvent( void ) {
+
+static sysEvent_t Com_GetRealEvent()
+{
 	int			r;
 	sysEvent_t	ev;
 
-	// either get an event from the system or the journal file
+	// get an event from either the system or the journal file
 	if ( com_journal->integer == 2 ) {
 		r = FS_Read( &ev, sizeof(ev), com_journalFile );
 		if ( r != sizeof(ev) ) {
@@ -2002,18 +1999,18 @@ Com_Milliseconds
 Can be used for profiling, but will be journaled accurately
 ================
 */
-int Com_Milliseconds (void) {
-	sysEvent_t	ev;
+int Com_Milliseconds()
+{
+	sysEvent_t ev;
 
 	// get events and push them until we get a null event with the current time
 	do {
-
 		ev = Com_GetRealEvent();
 		if ( ev.evType != SE_NONE ) {
 			Com_PushEvent( &ev );
 		}
 	} while ( ev.evType != SE_NONE );
-	
+
 	return ev.evTime;
 }
 

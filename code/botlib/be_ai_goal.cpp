@@ -176,22 +176,22 @@ typedef struct bot_goalstate_s
 	float avoidgoaltimes[MAX_AVOIDGOALS];		//times to avoid the goals
 } bot_goalstate_t;
 
-bot_goalstate_t *botgoalstates[MAX_CLIENTS + 1]; // bk001206 - FIXME: init?
-//item configuration
-itemconfig_t *itemconfig = NULL; // bk001206 - init
-//level items
-levelitem_t *levelitemheap = NULL; // bk001206 - init
-levelitem_t *freelevelitems = NULL; // bk001206 - init
-levelitem_t *levelitems = NULL; // bk001206 - init
-int numlevelitems = 0;
-//map locations
-maplocation_t *maplocations = NULL; // bk001206 - init
-//camp spots
-campspot_t *campspots = NULL; // bk001206 - init
-//the game type
-int g_gametype = 0; // bk001206 - init
-//additional dropped item weight
-libvar_t *droppedweight = NULL; // bk001206 - init
+static bot_goalstate_t* botgoalstates[MAX_CLIENTS + 1];
+
+static itemconfig_t* itemconfig;
+static levelitem_t* levelitemheap;
+static levelitem_t* freelevelitems;
+static levelitem_t* levelitems;
+static int numlevelitems = 0;
+
+static maplocation_t* maplocations;
+static campspot_t* campspots;
+
+// additional dropped item weight: set to 1000 but actually worthless in VQ3
+static libvar_t* droppedweight;
+
+static int g_gametype;
+
 
 //========================================================================
 //
@@ -385,13 +385,9 @@ void InitLevelItemHeap(void)
 	//
 	freelevelitems = levelitemheap;
 } //end of the function InitLevelItemHeap
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-levelitem_t *AllocLevelItem(void)
+
+
+static levelitem_t* AllocLevelItem()
 {
 	levelitem_t *li;
 
@@ -400,23 +396,21 @@ levelitem_t *AllocLevelItem(void)
 	{
 		botimport.Print(PRT_FATAL, "out of level items\n");
 		return NULL;
-	} //end if
-	//
+	}
+
 	freelevelitems = freelevelitems->next;
 	Com_Memset(li, 0, sizeof(levelitem_t));
 	return li;
-} //end of the function AllocLevelItem
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-void FreeLevelItem(levelitem_t *li)
+}
+
+
+static void FreeLevelItem( levelitem_t* li )
 {
 	li->next = freelevelitems;
 	freelevelitems = li;
-} //end of the function FreeLevelItem
+}
+
+
 //===========================================================================
 //
 // Parameter:				-

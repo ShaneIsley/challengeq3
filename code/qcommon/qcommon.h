@@ -681,7 +681,7 @@ void		QDECL Com_DPrintf( const char *fmt, ... );
 void		QDECL Com_Error( int code, const char *fmt, ... );
 void		Com_Quit_f( void );
 int			Com_EventLoop( void );
-int			Com_Milliseconds( void );	// will be journaled properly
+int			Com_Milliseconds();	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length);
 int			Com_HashKey(char *string, int maxlen);
