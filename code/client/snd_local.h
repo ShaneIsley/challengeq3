@@ -98,15 +98,6 @@ typedef struct
 #define	WAV_FORMAT_PCM		1
 
 
-typedef struct {
-	int			format;
-	int			rate;
-	int			width;
-	int			channels;
-	int			samples;
-	int			dataofs;		// chunk starts this many bytes from file start
-} wavinfo_t;
-
 // Interface between Q3 sound "api" and the sound backend
 typedef struct
 {
