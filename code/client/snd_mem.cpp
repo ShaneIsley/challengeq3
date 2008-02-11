@@ -74,14 +74,12 @@ redo:
 	return v;
 }
 
-void SND_setup(void) {
+void SND_setup()
+{
 	sndBuffer *p, *q;
-	cvar_t	*cv;
-	int scs;
 
-	cv = Cvar_Get( "com_soundMegs", DEF_COMSOUNDMEGS, CVAR_LATCH | CVAR_ARCHIVE );
-
-	scs = (cv->integer*1536);
+	const cvar_t* cv = Cvar_Get( "com_soundMegs", DEF_COMSOUNDMEGS, CVAR_LATCH | CVAR_ARCHIVE );
+	int scs = (cv->integer*1536); // !!! on what planet is that a MEG?  :P
 
 	// KHB !!!  erm, leak much?
 	buffer = (sndBuffer*)malloc(scs*sizeof(sndBuffer) );
@@ -94,7 +92,7 @@ void SND_setup(void) {
 	q = p + scs;
 	while (--q > p)
 		*(sndBuffer **)q = q-1;
-	
+
 	*(sndBuffer **)q = NULL;
 	freelist = p + scs - 1;
 
