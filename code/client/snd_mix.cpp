@@ -485,7 +485,7 @@ void S_PaintChannels( int endtime ) {
 	int 	i;
 	int 	end;
 	channel_t *ch;
-	sfx_t	*sc;
+	const sfx_t* sfx;
 	int		ltime, count;
 	int		sampleOffset;
 
@@ -536,16 +536,16 @@ void S_PaintChannels( int endtime ) {
 			}
 
 			ltime = s_paintedtime;
-			sc = ch->thesfx;
+			sfx = ch->thesfx;
 
 			sampleOffset = ltime - ch->startSample;
 			count = end - ltime;
-			if ( sampleOffset + count > sc->soundLength ) {
-				count = sc->soundLength - sampleOffset;
+			if ( sampleOffset + count > sfx->soundLength ) {
+				count = sfx->soundLength - sampleOffset;
 			}
 
 			if ( count > 0 ) {
-				S_PaintChannelFrom16( ch, sc, count, sampleOffset, ltime - s_paintedtime );
+				S_PaintChannelFrom16( ch, sfx, count, sampleOffset, ltime - s_paintedtime );
 			}
 		}
 
@@ -557,24 +557,24 @@ void S_PaintChannels( int endtime ) {
 			}
 
 			ltime = s_paintedtime;
-			sc = ch->thesfx;
+			sfx = ch->thesfx;
 
-			if (sc->soundData==NULL || sc->soundLength==0) {
+			if (sfx->soundData==NULL || sfx->soundLength==0) {
 				continue;
 			}
 			// we might have to make two passes if it
 			// is a looping sound effect and the end of
 			// the sample is hit
 			do {
-				sampleOffset = (ltime % sc->soundLength);
+				sampleOffset = (ltime % sfx->soundLength);
 
 				count = end - ltime;
-				if ( sampleOffset + count > sc->soundLength ) {
-					count = sc->soundLength - sampleOffset;
+				if ( sampleOffset + count > sfx->soundLength ) {
+					count = sfx->soundLength - sampleOffset;
 				}
 
 				if ( count > 0 ) {
-					S_PaintChannelFrom16( ch, sc, count, sampleOffset, ltime - s_paintedtime );
+					S_PaintChannelFrom16( ch, sfx, count, sampleOffset, ltime - s_paintedtime );
 					ltime += count;
 				}
 			} while ( ltime < end);

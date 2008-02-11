@@ -29,8 +29,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	PAINTBUFFER_SIZE		4096					// this is in samples
 
 #define SND_CHUNK_SIZE			1024					// samples
-#define SND_CHUNK_SIZE_FLOAT	(SND_CHUNK_SIZE/2)		// floats
-#define SND_CHUNK_SIZE_BYTE		(SND_CHUNK_SIZE*2)		// floats
 
 typedef struct {
 	int			left;	// the final values will be clamped to +/- 0x00ffff00 and shifted down
@@ -88,12 +86,12 @@ typedef struct
 	int			leftvol;		// 0-255 volume after spatialization
 	int			rightvol;		// 0-255 volume after spatialization
 	int			master_vol;		// 0-255 volume before spatialization
+	vec3_t		origin;			// only use if fixed_origin is set
+	qbool		fixed_origin;	// use origin instead of fetching entnum's origin
+	const sfx_t* thesfx;		// sfx structure
+	qbool		doppler;
 	float		dopplerScale;
 	float		oldDopplerScale;
-	vec3_t		origin;			// only use if fixed_origin is set
-	qbool	fixed_origin;	// use origin instead of fetching entnum's origin
-	sfx_t		*thesfx;		// sfx structure
-	qbool	doppler;
 } channel_t;
 
 
