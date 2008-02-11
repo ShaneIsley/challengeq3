@@ -1005,7 +1005,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 
 	// check for a remove
 	if ( MSG_ReadBits( msg, 1 ) == 1 ) {
-		Com_Memset( to, 0, sizeof( *to ) );	
+		Com_Memset( to, 0, sizeof( *to ) );
 		to->number = MAX_GENTITIES - 1;
 		if ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) {
 			Com_Printf( "%3i: #%-3i remove\n", msg->readcount, number );

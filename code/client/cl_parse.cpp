@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
-char *svc_strings[256] = {
+static const char* svc_strings[256] = {
 	"svc_bad",
 
 	"svc_nop",
@@ -35,9 +35,10 @@ char *svc_strings[256] = {
 	"svc_snapshot"
 };
 
-void SHOWNET( msg_t *msg, char *s) {
-	if ( cl_shownet->integer >= 2) {
-		Com_Printf ("%3i:%s\n", msg->readcount-1, s);
+static void SHOWNET( const msg_t* msg, const char* s )
+{
+	if ( cl_shownet->integer >= 2 ) {
+		Com_Printf( "%3i:%s\n", msg->readcount-1, s );
 	}
 }
 
@@ -50,16 +51,11 @@ MESSAGE PARSING
 =========================================================================
 */
 
-/*
-==================
-CL_DeltaEntity
 
-Parses deltas from the given base and adds the resulting entity
-to the current frame
-==================
-*/
-void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old, 
-					 qbool unchanged) {
+// parses deltas from the given base and adds the resulting entity to the current frame
+
+static void CL_DeltaEntity( msg_t* msg, clSnapshot_t *frame, int newnum, entityState_t *old, qbool unchanged )
+{
 	entityState_t	*state;
 
 	// save the parsed entity state into the big circular buffer so
@@ -75,17 +71,14 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 	if ( state->number == (MAX_GENTITIES-1) ) {
 		return;		// entity was delta removed
 	}
+
 	cl.parseEntitiesNum++;
 	frame->numEntities++;
 }
 
-/*
-==================
-CL_ParsePacketEntities
 
-==================
-*/
-void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *newframe) {
+static void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *newframe)
+{
 	int			newnum;
 	entityState_t	*oldstate;
 	int			oldindex, oldnum;
@@ -126,7 +119,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 				Com_Printf ("%3i:  unchanged: %i\n", msg->readcount, oldnum);
 			}
 			CL_DeltaEntity( msg, newframe, oldnum, oldstate, qtrue );
-			
+
 			oldindex++;
 
 			if ( oldindex >= oldframe->numEntities ) {
@@ -174,7 +167,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 			Com_Printf ("%3i:  unchanged: %i\n", msg->readcount, oldnum);
 		}
 		CL_DeltaEntity( msg, newframe, oldnum, oldstate, qtrue );
-		
+
 		oldindex++;
 
 		if ( oldindex >= oldframe->numEntities ) {
@@ -189,15 +182,12 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 
 
 /*
-================
-CL_ParseSnapshot
-
 If the snapshot is parsed properly, it will be copied to
 cl.snap and saved in cl.snapshots[].  If the snapshot is invalid
 for any reason, no changes to the state will be made at all.
-================
 */
-void CL_ParseSnapshot( msg_t *msg ) {
+static void CL_ParseSnapshot( msg_t *msg )
+{
 	int			len;
 	clSnapshot_t	*old;
 	clSnapshot_t	newSnap;
@@ -255,13 +245,13 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read areamask
 	len = MSG_ReadByte( msg );
-	
+
 	if(len > sizeof(newSnap.areamask))
 	{
 		Com_Error (ERR_DROP,"CL_ParseSnapshot: Invalid size %d for areamask.", len);
 		return;
 	}
-	
+
 	MSG_ReadData( msg, &newSnap.areamask, len);
 
 	// read playerinfo
@@ -323,16 +313,13 @@ void CL_ParseSnapshot( msg_t *msg ) {
 int cl_connectedToPureServer;
 
 /*
-==================
-CL_SystemInfoChanged
-
 The systeminfo configstring has been changed, so parse
 new information out of it.  This will happen at every
 gamestate, and possibly during gameplay.
-==================
 */
-void CL_SystemInfoChanged( void ) {
-	char			*systemInfo;
+void CL_SystemInfoChanged()
+{
+	const char		*systemInfo;
 	const char		*s, *t;
 	char			key[BIG_INFO_KEY];
 	char			value[BIG_INFO_VALUE];
@@ -342,7 +329,7 @@ void CL_SystemInfoChanged( void ) {
 	// NOTE TTimo:
 	// when the serverId changes, any further messages we send to the server will use this new serverId
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
-	// in some cases, outdated cp commands might get sent with this news serverId
+	// in some cases, outdated cp commands might get sent with this new serverId
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
 
 	// don't set any vars when playing a demo
@@ -404,26 +391,22 @@ void CL_SystemInfoChanged( void ) {
 	cl_connectedToPureServer = Cvar_VariableValue( "sv_pure" );
 }
 
-static void CL_ParseServerInfo( void ) {
-	const char *serverInfo;
 
-	serverInfo = cl.gameState.stringData
-		+ cl.gameState.stringOffsets[ CS_SERVERINFO ];
+#if defined(USE_CURL)
 
-	clc.sv_allowDownload = atoi(Info_ValueForKey(serverInfo,
-		"sv_allowDownload"));
-	Q_strncpyz(clc.sv_dlURL,
-		Info_ValueForKey(serverInfo, "sv_dlURL"),
-		sizeof(clc.sv_dlURL));
+static void CL_ParseServerInfo()
+{
+	const char *serverInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SERVERINFO ];
+
+	clc.sv_allowDownload = atoi(Info_ValueForKey(serverInfo, "sv_allowDownload"));
+	Q_strncpyz(clc.sv_dlURL, Info_ValueForKey(serverInfo, "sv_dlURL"), sizeof(clc.sv_dlURL));
 }
 
+#endif
 
-/*
-==================
-CL_ParseGamestate
-==================
-*/
-void CL_ParseGamestate( msg_t *msg ) {
+
+static void CL_ParseGamestate( msg_t *msg )
+{
 	int				i;
 	entityState_t	*es;
 	int				newnum;
@@ -449,7 +432,7 @@ void CL_ParseGamestate( msg_t *msg ) {
 		if ( cmd == svc_EOF ) {
 			break;
 		}
-		
+
 		if ( cmd == svc_configstring ) {
 			int		len;
 
@@ -485,8 +468,10 @@ void CL_ParseGamestate( msg_t *msg ) {
 	// read the checksum feed
 	clc.checksumFeed = MSG_ReadLong( msg );
 
-	// Parse valuse for cURL downloads
+#if defined(USE_CURL)
+	// Parse values for cURL downloads
 	CL_ParseServerInfo();
+#endif
 
 	// parse serverId and other cvars
 	CL_SystemInfoChanged();
@@ -504,14 +489,11 @@ void CL_ParseGamestate( msg_t *msg ) {
 
 //=====================================================================
 
-/*
-=====================
-CL_ParseDownload
 
-A download message has been received from the server
-=====================
-*/
-void CL_ParseDownload ( msg_t *msg ) {
+// a download message has been received from the server
+
+static void CL_ParseDownload( msg_t *msg )
+{
 	int		size;
 	unsigned char data[MAX_MSGLEN];
 	int block;
@@ -523,18 +505,18 @@ void CL_ParseDownload ( msg_t *msg ) {
 	}
 
 	// read the data
-	block = MSG_ReadShort ( msg );
+	block = MSG_ReadShort( msg );
 
 	if ( !block )
 	{
 		// block zero is special, contains file size
-		clc.downloadSize = MSG_ReadLong ( msg );
+		clc.downloadSize = MSG_ReadLong( msg );
 
 		Cvar_SetValue( "cl_downloadSize", clc.downloadSize );
 
 		if (clc.downloadSize < 0)
 		{
-			Com_Error(ERR_DROP, MSG_ReadString( msg ) );
+			Com_Error( ERR_DROP, MSG_ReadString( msg ) );
 			return;
 		}
 	}
@@ -542,14 +524,14 @@ void CL_ParseDownload ( msg_t *msg ) {
 	size = MSG_ReadShort ( msg );
 	if (size < 0 || size > sizeof(data))
 	{
-		Com_Error(ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk.", size);
+		Com_Error( ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk.", size );
 		return;
 	}
 
-	MSG_ReadData(msg, data, size);
+	MSG_ReadData( msg, data, size );
 
 	if (clc.downloadBlock != block) {
-		Com_DPrintf( "CL_ParseDownload: Expected block %d, got %d\n", clc.downloadBlock, block);
+		Com_DPrintf( "CL_ParseDownload: Expected block %d, got %d\n", clc.downloadBlock, block );
 		return;
 	}
 
@@ -557,7 +539,6 @@ void CL_ParseDownload ( msg_t *msg ) {
 	if (!clc.download)
 	{
 		clc.download = FS_SV_FOpenFileWrite( clc.downloadTempName );
-
 		if (!clc.download) {
 			Com_Printf( "Could not create %s\n", clc.downloadTempName );
 			CL_AddReliableCommand( "stopdl" );
@@ -583,7 +564,7 @@ void CL_ParseDownload ( msg_t *msg ) {
 			clc.download = 0;
 
 			// rename the file
-			FS_SV_Rename ( clc.downloadTempName, clc.downloadName );
+			FS_SV_Rename( clc.downloadTempName, clc.downloadName );
 		}
 		*clc.downloadTempName = *clc.downloadName = 0;
 		Cvar_Set( "cl_downloadName", "" );
@@ -601,39 +582,29 @@ void CL_ParseDownload ( msg_t *msg ) {
 	}
 }
 
-/*
-=====================
-CL_ParseCommandString
 
+/*
 Command strings are just saved off until cgame asks for them
 when it transitions a snapshot
-=====================
 */
-void CL_ParseCommandString( msg_t *msg ) {
-	char	*s;
-	int		seq;
-	int		index;
+static void CL_ParseCommandString( msg_t* msg )
+{
+	int seq = MSG_ReadLong( msg );
+	const char* s = MSG_ReadString( msg );
 
-	seq = MSG_ReadLong( msg );
-	s = MSG_ReadString( msg );
-
-	// see if we have already executed stored it off
+	// see if we have already stored it off
 	if ( clc.serverCommandSequence >= seq ) {
 		return;
 	}
 	clc.serverCommandSequence = seq;
 
-	index = seq & (MAX_RELIABLE_COMMANDS-1);
+	int index = seq & (MAX_RELIABLE_COMMANDS-1);
 	Q_strncpyz( clc.serverCommands[ index ], s, sizeof( clc.serverCommands[ index ] ) );
 }
 
 
-/*
-=====================
-CL_ParseServerMessage
-=====================
-*/
-void CL_ParseServerMessage( msg_t *msg ) {
+void CL_ParseServerMessage( msg_t *msg )
+{
 	int			cmd;
 
 	if ( cl_shownet->integer == 1 ) {
@@ -642,11 +613,11 @@ void CL_ParseServerMessage( msg_t *msg ) {
 		Com_Printf ("------------------\n");
 	}
 
-	MSG_Bitstream(msg);
+	MSG_Bitstream( msg );
 
 	// get the reliable sequence acknowledge number
 	clc.reliableAcknowledge = MSG_ReadLong( msg );
-	// 
+
 	if ( clc.reliableAcknowledge < clc.reliableSequence - MAX_RELIABLE_COMMANDS ) {
 		clc.reliableAcknowledge = clc.reliableSequence;
 	}
@@ -674,11 +645,10 @@ void CL_ParseServerMessage( msg_t *msg ) {
 				SHOWNET( msg, svc_strings[cmd] );
 			}
 		}
-	
-	// other commands
+
 		switch ( cmd ) {
 		default:
-			Com_Error (ERR_DROP,"CL_ParseServerMessage: Illegible server message\n");
+			Com_Error( ERR_DROP, "CL_ParseServerMessage: Illegible server message\n" );
 			break;
 		case svc_nop:
 			break;

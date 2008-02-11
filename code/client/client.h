@@ -189,23 +189,24 @@ typedef struct {
 
 	// file transfer from server
 	fileHandle_t download;
-	char		downloadTempName[MAX_OSPATH];
-	char		downloadName[MAX_OSPATH];
-	int		sv_allowDownload;
-	char		sv_dlURL[MAX_CVAR_VALUE_STRING];
-	int			downloadNumber;
-	int			downloadBlock;	// block we are waiting for
-	int			downloadCount;	// how many bytes we got
-	int			downloadSize;	// how many bytes we got
-	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
-	qbool	downloadRestart;	// if qtrue, we need to do another FS_Restart because we downloaded a pak
+	char	downloadTempName[MAX_OSPATH];
+	char	downloadName[MAX_OSPATH];
+	int		downloadNumber;
+	int		downloadBlock;	// block we are waiting for
+	int		downloadCount;	// how many bytes we got
+	int		downloadSize;	// how many bytes we got
+	char	downloadList[MAX_INFO_STRING]; // list of paks we need to download
+	qbool	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
+
 #if defined(USE_CURL)
 	qbool	cURLEnabled;
 	qbool	cURLUsed;
 	qbool	cURLDisconnected;
-	char		downloadURL[MAX_OSPATH];
-	CURL		*downloadCURL;
-	CURLM		*downloadCURLM;
+	int		sv_allowDownload;
+	char	sv_dlURL[MAX_CVAR_VALUE_STRING];
+	char	downloadURL[MAX_OSPATH];
+	CURL	*downloadCURL;
+	CURLM	*downloadCURLM;
 #endif
 
 	// demo information
@@ -430,7 +431,7 @@ const char* Key_KeynumToString( int keynum );
 //
 extern int cl_connectedToPureServer;
 
-void CL_SystemInfoChanged( void );
+void CL_SystemInfoChanged();
 void CL_ParseServerMessage( msg_t *msg );
 
 //====================================================================
