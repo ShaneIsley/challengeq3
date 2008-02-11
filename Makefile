@@ -28,7 +28,7 @@ endif
 
 BUILD_SERVER     =
 # the client is boned ATM
-BUILD_CLIENT     = 
+BUILD_CLIENT     =
 # this should probably be deleted/merged anyway
 BUILD_CLIENT_SMP = 0
 # the baseq3 vm is worthless
@@ -191,7 +191,7 @@ ifeq ($(PLATFORM),linux)
 
   BASE_CFLAGS = -Wall -Weffc++ -fno-operator-names -fno-strict-aliasing -Wimplicit -pipe
 	BASE_CFLAGS += $(shell freetype-config --cflags)
-	CLIENT_LDFLAGS += $(shell freetype-config --libs)
+	CLIENT_LDFLAGS += -lfreetype $(shell freetype-config --libs)
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL=1
@@ -258,7 +258,7 @@ ifeq ($(PLATFORM),linux)
   SHLIBLDFLAGS=-shared $(LDFLAGS)
 
   THREAD_LDFLAGS=-lpthread
-  LDFLAGS=-ldl -lm -lfreetype
+  LDFLAGS=-ldl -lm
 
   ifeq ($(USE_SDL),1)
     CLIENT_LDFLAGS += $(shell sdl-config --libs)
