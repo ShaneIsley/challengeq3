@@ -15,6 +15,11 @@ removed the broken stencil/projection shadow code
 
 avis produced by \video actually work (bug+fix both from ioq3)
 
+fixed some ABSURD buffer overruns and broken code in snd_dma
+which caused random dropped sounds for no reason
+it's a miracle it doesn't segfault any real OS
+also dumped the unused-since-TA adpcm/mulaw/etc cruft
+
 
 19 Dec 07 - 1.40
 
