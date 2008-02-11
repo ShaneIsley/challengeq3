@@ -955,7 +955,6 @@ Q3OBJ = \
   $(B)/client/tr_shade.o \
   $(B)/client/tr_shade_calc.o \
   $(B)/client/tr_shader.o \
-  $(B)/client/tr_shadows.o \
   $(B)/client/tr_sky.o \
   $(B)/client/tr_surface.o \
   $(B)/client/tr_world.o \
@@ -1168,7 +1167,6 @@ $(B)/client/tr_scene.o : $(RDIR)/tr_scene.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_shade.o : $(RDIR)/tr_shade.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_shader.o : $(RDIR)/tr_shader.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_shade_calc.o : $(RDIR)/tr_shade_calc.cpp; $(DO_CC)  $(GL_CFLAGS)
-$(B)/client/tr_shadows.o : $(RDIR)/tr_shadows.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_sky.o : $(RDIR)/tr_sky.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_smp.o : $(RDIR)/tr_smp.cpp; $(DO_CC)   $(GL_CFLAGS)
 $(B)/client/tr_stripify.o : $(RDIR)/tr_stripify.cpp; $(DO_CC)   $(GL_CFLAGS)
