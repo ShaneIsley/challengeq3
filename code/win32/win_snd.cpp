@@ -150,7 +150,7 @@ static qbool SNDDMA_InitDS()
 	format.nSamplesPerSec = dma.speed;
 	format.nBlockAlign = format.nChannels * format.wBitsPerSample / 8;
 	format.cbSize = 0;
-	format.nAvgBytesPerSec = format.nSamplesPerSec*format.nBlockAlign; 
+	format.nAvgBytesPerSec = format.nSamplesPerSec*format.nBlockAlign;
 
 	memset (&dsbuf, 0, sizeof(dsbuf));
 	dsbuf.dwSize = sizeof(DSBUFFERDESC);
@@ -341,5 +341,4 @@ void SNDDMA_Activate( void )
 		SNDDMA_Shutdown();
 	}
 }
-
 
