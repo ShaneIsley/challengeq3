@@ -101,7 +101,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
 
 
-void MSG_ReportChangeVectors_f( void );
+// void MSG_ReportChangeVectors_f( void );
 
 //============================================================================
 

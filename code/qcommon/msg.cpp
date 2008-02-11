@@ -26,7 +26,7 @@ static huffman_t		msgHuff;
 
 static qbool			msgInit = qfalse;
 
-int pcount[256];
+//static int pcount[256];
 
 /*
 ==============================================================================
@@ -39,7 +39,7 @@ Handles byte ordering and avoids alignment errors
 
 int oldsize = 0;
 
-void MSG_initHuffman( void );
+static void MSG_initHuffman();
 
 void MSG_Init( msg_t *buf, byte *data, int length ) {
 	if (!msgInit) {
@@ -763,17 +763,14 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 =============================================================================
 
 entityState_t communication
-  
+
 =============================================================================
 */
 
-/*
-=================
-MSG_ReportChangeVectors_f
 
+/*
 Prints out a table from the current statistics for copying to code
-=================
-*/
+
 void MSG_ReportChangeVectors_f( void ) {
 	int i;
 	for(i=0;i<256;i++) {
@@ -782,6 +779,8 @@ void MSG_ReportChangeVectors_f( void ) {
 		}
 	}
 }
+*/
+
 
 typedef struct {
 	const char* name;
@@ -1456,7 +1455,11 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 	}
 }
 
-int msg_hData[256] = {
+
+///////////////////////////////////////////////////////////////
+
+
+static const int msg_hData[256] = {
 250315,			// 0
 41193,			// 1
 6292,			// 2
@@ -1715,7 +1718,9 @@ int msg_hData[256] = {
 13504,			// 255
 };
 
-void MSG_initHuffman( void ) {
+
+static void MSG_initHuffman()
+{
 	int i,j;
 
 	msgInit = qtrue;
@@ -1763,4 +1768,3 @@ void MSG_NUinitHuffman() {
 }
 */
 
-//===========================================================================

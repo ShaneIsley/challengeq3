@@ -2313,9 +2313,10 @@ void Com_Init( char *commandLine )
 		Cmd_AddCommand("error", Com_Error_f);
 		Cmd_AddCommand("crash", Com_Crash_f);
 		Cmd_AddCommand("freeze", Com_Freeze_f);
+		//Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
 	}
+
 	Cmd_AddCommand ("quit", Com_Quit_f);
-	Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
 	Cmd_AddCommand ("writeconfig", Com_WriteConfig_f );
 
 	const char* s = va( "%s %s %s", Q3_VERSION, PLATFORM_STRING, __DATE__ );
