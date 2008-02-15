@@ -2388,35 +2388,6 @@ static void Com_WriteConfigToFile( const char* filename )
 }
 
 
-// writes key bindings and archived cvars to config file if modified
-
-static void Com_WriteConfiguration()
-{
-	// if we are quiting without fully initializing, make sure we don't write out anything
-	if ( !com_fullyInitialized )
-		return;
-
-	if ( !(cvar_modifiedFlags & CVAR_ARCHIVE ) )
-		return;
-
-	cvar_modifiedFlags &= ~CVAR_ARCHIVE;
-
-	Com_WriteConfigToFile( "q3config.cfg" );
-
-/* KHB 15 Oct 06  this is SO horribly wrong
-	// bk001119 - tentative "not needed for dedicated"
-#ifndef DEDICATED
-	const cvar_t* fs = Cvar_Get( "fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
-		Com_WriteCDKey( fs->string, &cl_cdkey[16] );
-	} else {
-		Com_WriteCDKey( BASEGAME, cl_cdkey );
-	}
-#endif
-*/
-}
-
-
 // write the config file to a specific name
 
 static void Com_WriteConfig_f()
@@ -2491,9 +2462,6 @@ void Com_Frame( void )
 	int timeBeforeEvents =0;
 	int timeBeforeClient = 0;
 	int timeAfter = 0;
-
-	// write config file if anything changed
-	Com_WriteConfiguration();
 
 	// if "viewlog" has been modified, show or hide the log console
 	if ( com_viewlog->modified ) {

@@ -20,6 +20,10 @@ which caused random dropped sounds for no reason
 it's a miracle it doesn't segfault any real OS
 also dumped the unused-since-TA adpcm/mulaw/etc cruft
 
+q3config is NEVER autowritten just because of bind/cvar changes
+it sucks if you're playing and it sucks even more if you're on GTV
+UI/SP code should write it EXPLICITLY if they want to save something
+
 
 19 Dec 07 - 1.40
 
@@ -151,3 +155,4 @@ pak list made fs_debug 1
 removed the TA cvars that were hacked into the engine
 
 reordered demo_protocols to reduce spew
+
