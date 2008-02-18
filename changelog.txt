@@ -1,11 +1,11 @@
 
-Feb 08 - 1.41
+18 Feb 08 - 1.41
 
 removed all bs references to GT_SINGLE_PLAYER and ui_singlePlayerActive
 (except from the bot code, which has bigger problems)
 added sv_singleplayer
 
-improved TTF overhead a LOT: now as fast as crappy bitmap fonts  :D
+improved TTF overhead a lot: now as fast as crappy bitmap fonts  :D
 
 removed the stupidity of every key aborting demo playback: now ESC only
 
