@@ -63,14 +63,10 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 void Conbuf_AppendText( const char *msg );
 
-void SNDDMA_Activate( void );
+void SNDDMA_Activate();
 
 typedef struct
 {
-	
-	HINSTANCE		reflib_library;		// Handle to refresh DLL 
-	qbool		reflib_active;
-
 	HWND			hWnd;
 	HINSTANCE		hInstance;
 	qbool		activeApp;

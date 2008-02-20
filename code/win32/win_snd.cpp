@@ -330,7 +330,7 @@ SNDDMA_Activate
 When we change windows we need to do this
 =================
 */
-void SNDDMA_Activate( void )
+void SNDDMA_Activate()
 {
 	if ( !pDS ) {
 		return;
