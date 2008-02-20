@@ -551,21 +551,12 @@ continuous looping sounds are added each frame
 */
 
 
-static void S_Base_StopLoopingSound( int entityNum )
-{
-	loopSounds[entityNum].active = qfalse;
-//	loopSounds[entityNum].sfx = 0;
-	loopSounds[entityNum].kill = qfalse;
-}
-
-
 static void S_Base_ClearLoopingSounds( qbool killall )
 {
 	int i;
 	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
-		if (killall || loopSounds[i].kill == qtrue || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
-			loopSounds[i].kill = qfalse;
-			S_Base_StopLoopingSound(i);
+		if (killall || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
+			loopSounds[i].active = qfalse;
 		}
 	}
 	numLoopChannels = 0;
@@ -611,7 +602,6 @@ static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const ve
 	if ( !S_Base_InitLoopingSound( entityNum, origin, velocity, sfxHandle ) )
 		return;
 
-	loopSounds[entityNum].kill = qtrue;
 	loopSounds[entityNum].oldDopplerScale = 1.0;
 	loopSounds[entityNum].dopplerScale = 1.0;
 
@@ -641,12 +631,14 @@ static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const ve
 
 
 /*
-Spatialize all of the looping sounds.
+Spatialize all of the looping (ie ambient) sounds.
 All sounds are on the same cycle, so any duplicates can just
 sum up the channel multipliers.
 */
 static void S_AddLoopSounds()
 {
+	const int AMBIENT_VOLUME = 96; // 25% quieter than normal sounds
+
 	int			i, j, time;
 	int			left_total, right_total, left, right;
 	channel_t	*ch;
@@ -665,11 +657,7 @@ static void S_AddLoopSounds()
 			continue;	// already merged into an earlier sound
 		}
 
-		if (loop->kill) {
-			S_SpatializeOrigin( loop->origin, 127, &left_total, &right_total);			// 3d
-		} else {
-			S_SpatializeOrigin( loop->origin, 90,  &left_total, &right_total);			// sphere
-		}
+		S_SpatializeOrigin( loop->origin, AMBIENT_VOLUME, &left_total, &right_total );
 
 		loop->sfx->lastTimeUsed = time;
 
@@ -680,11 +668,7 @@ static void S_AddLoopSounds()
 			}
 			loop2->mergeFrame = loopFrame;
 
-			if (loop2->kill) {
-				S_SpatializeOrigin( loop2->origin, 127, &left, &right);				// 3d
-			} else {
-				S_SpatializeOrigin( loop2->origin, 90,  &left, &right);				// sphere
-			}
+			S_SpatializeOrigin( loop2->origin, AMBIENT_VOLUME, &left, &right );
 
 			loop2->sfx->lastTimeUsed = time;
 			left_total += left;

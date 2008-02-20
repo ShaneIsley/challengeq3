@@ -69,9 +69,8 @@ typedef struct loopSound_s {
 	vec3_t		velocity;
 	sfx_t		*sfx;
 	int			mergeFrame;
-	qbool	active;
-	qbool	kill;
-	qbool	doppler;
+	qbool		active;
+	qbool		doppler;
 	float		dopplerScale;
 	float		oldDopplerScale;
 	int			framenum;
