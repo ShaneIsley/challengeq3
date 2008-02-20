@@ -139,7 +139,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	if(!Q_stricmp(fext, "mdr"))
 	{
 		int filesize;
-		
+
 		filesize = ri.FS_ReadFile(name, (void **) &buf);
 		if(!buf)
 		{
@@ -147,7 +147,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 			mod->type = MOD_BAD;
 			return 0;
 		}
-		
+
 		ident = LittleLong(*(unsigned *)buf);
 		if(ident == MDR_IDENT)
 			loaded = R_LoadMDR(mod, buf, filesize, name);
@@ -160,7 +160,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 			mod->type = MOD_BAD;
 			return 0;
 		}
-		
+
 		return mod->index;
 	}
 #endif
@@ -177,9 +177,9 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		if ( !buf ) {
 			continue;
 		}
-		
+
 		loadmodel = mod;
-		
+
 		ident = LittleLong(*(unsigned *)buf);
 		if ( ident == MD4_IDENT ) {
 			loaded = R_LoadMD4( mod, buf, name );
@@ -188,10 +188,9 @@ qhandle_t RE_RegisterModel( const char *name ) {
 				ri.Printf (PRINT_WARNING,"RE_RegisterModel: unknown fileid for %s\n", name);
 				goto fail;
 			}
-
 			loaded = R_LoadMD3( mod, lod, buf, name );
 		}
-		
+
 		ri.FS_FreeFile (buf);
 
 		if ( !loaded ) {
@@ -213,13 +212,12 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	}
 
 	if ( numLoaded ) {
-		// duplicate into higher lod spots that weren't
-		// loaded, in case the user changes r_lodbias on the fly
+		// duplicate into higher lod spots that weren't loaded
+		// in case the user changes r_lodbias on the fly
 		for ( lod-- ; lod >= 0 ; lod-- ) {
 			mod->numLods++;
 			mod->md3[lod] = mod->md3[lod+1];
 		}
-
 		return mod->index;
 	}
 #ifdef _DEBUG
@@ -872,10 +870,10 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 
 void R_ModelInit()
 {
+	tr.numModels = 0;
 	// leave a space for NULL model
 	model_t* mod = R_AllocModel();
 	mod->type = MOD_BAD;
-	tr.numModels = 0;
 }
 
 
