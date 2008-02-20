@@ -21,29 +21,26 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-void S_Init( void );
-void S_Shutdown( void );
+void S_Init();
+void S_Shutdown();
 
 // if origin is NULL, the sound will be dynamically sourced from the entity
 void S_StartSound( const vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
 void S_StartLocalSound( sfxHandle_t sfx, int channelNum );
 
-void S_StartBackgroundTrack( const char *intro, const char *loop );
-void S_StopBackgroundTrack( void );
+void S_StartBackgroundTrack( const char* intro, const char* loop );
+void S_StopBackgroundTrack();
 
 // cinematics and voice-over-network will send raw samples
 // 1.0 volume will be direct output of source samples
-void S_RawSamples (int samples, int rate, int width, int channels, 
-				   const byte *data, float volume);
+void S_RawSamples( int samples, int rate, int width, int channels, const byte *data, float volume );
 
 // stop all sounds and the background track
-void S_StopAllSounds( void );
+void S_StopAllSounds();
 
 // all continuous looping sounds must be added before calling S_Update
 void S_ClearLoopingSounds( qbool killall );
 void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-void S_StopLoopingSound(int entityNum );
 
 // recompute the reletive volumes for all running sounds
 // reletive to the given entityNum / orientation
@@ -52,20 +49,19 @@ void S_Respatialize( int entityNum, const vec3_t origin, const vec3_t axis[3], i
 // let the sound system know where an entity currently is
 void S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 
-void S_Update( void );
+void S_Update();
 
-void S_DisableSounds( void );
+void S_DisableSounds();
 
-void S_BeginRegistration( void );
+void S_BeginRegistration();
 
-// RegisterSound will allways return a valid sample, even if it
-// has to create a placeholder.  This prevents continuous filesystem
-// checks for missing files
-sfxHandle_t	S_RegisterSound( const char *sample, qbool compressed );
+// RegisterSound will allways return a valid sample, even if it has to create a placeholder
+// this prevents continuous filesystem checks for missing files
+sfxHandle_t S_RegisterSound( const char* sample );
 
-void S_DisplayFreeMemory(void);
+void S_DisplayFreeMemory();
 
-void S_ClearSoundBuffer( void );
+void S_ClearSoundBuffer();
 
-void SNDDMA_Activate( void );
+void SNDDMA_Activate();
 

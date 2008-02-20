@@ -1004,39 +1004,7 @@ void S_AL_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velo
 {
 	S_AL_SanitiseVector( (vec_t *)origin );
 	S_AL_SanitiseVector( (vec_t *)velocity );
-	S_AL_SrcLoop(SRCPRI_ENTITY, sfx, origin, velocity, entityNum);
-}
-
-/*
-=================
-S_AL_AddRealLoopingSound
-=================
-*/
-static
-void S_AL_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx )
-{
-	S_AL_SanitiseVector( (vec_t *)origin );
-	S_AL_SanitiseVector( (vec_t *)velocity );
-
-	// There are certain maps (*cough* Q3:TA mpterra*) that have large quantities
-	// of ET_SPEAKERS in the PVS at any given time. OpenAL can't cope with mixing
-	// large numbers of sounds, so this culls them by distance
-	if (DistanceSquared( origin, lastListenerOrigin ) > Square(s_alMaxDistance->value))
-		return;
-
 	S_AL_SrcLoop(SRCPRI_AMBIENT, sfx, origin, velocity, entityNum);
-}
-
-/*
-=================
-S_AL_StopLoopingSound
-=================
-*/
-static
-void S_AL_StopLoopingSound(int entityNum )
-{
-	if(entityList[entityNum].srcAllocated)
-		S_AL_SrcKill(entityList[entityNum].srcIndex);
 }
 
 /*

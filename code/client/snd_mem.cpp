@@ -57,7 +57,7 @@ void	SND_free(sndBuffer *v) {
 	inUse += sizeof(sndBuffer);
 }
 
-sndBuffer*	SND_malloc(void) {
+sndBuffer*	SND_malloc() {
 	sndBuffer *v;
 redo:
 	if (freelist == NULL) {

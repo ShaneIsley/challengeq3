@@ -101,26 +101,24 @@ typedef struct
 // Interface between Q3 sound "api" and the sound backend
 typedef struct
 {
-	void (*Shutdown)(void);
+	void (*Shutdown)();
 	void (*StartSound)( const vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
 	void (*StartLocalSound)( sfxHandle_t sfx, int channelNum );
 	void (*StartBackgroundTrack)( const char *intro, const char *loop );
-	void (*StopBackgroundTrack)( void );
-	void (*RawSamples)(int samples, int rate, int width, int channels, const byte *data, float volume);
-	void (*StopAllSounds)( void );
+	void (*StopBackgroundTrack)();
+	void (*RawSamples)( int samples, int rate, int width, int channels, const byte *data, float volume );
+	void (*StopAllSounds)();
 	void (*ClearLoopingSounds)( qbool killall );
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-	void (*StopLoopingSound)(int entityNum );
 	void (*Respatialize)( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
-	void (*Update)( void );
-	void (*DisableSounds)( void );
-	void (*BeginRegistration)( void );
-	sfxHandle_t (*RegisterSound)( const char *sample, qbool compressed );
-	void (*ClearSoundBuffer)( void );
-	void (*SoundInfo)( void );
-	void (*SoundList)( void );
+	void (*Update)();
+	void (*DisableSounds)();
+	void (*BeginRegistration)();
+	sfxHandle_t (*RegisterSound)( const char* sample );
+	void (*ClearSoundBuffer)();
+	void (*SoundInfo)();
+	void (*SoundList)();
 } soundInterface_t;
 
 
@@ -169,17 +167,15 @@ extern cvar_t *s_testsound;
 qbool S_LoadSound( sfx_t *sfx );
 
 void		SND_free(sndBuffer *v);
-sndBuffer*	SND_malloc( void );
+sndBuffer*	SND_malloc();
 void		SND_setup();
 
 void S_PaintChannels(int endtime);
 
-portable_samplepair_t *S_GetRawSamplePointer( void );
-
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
 
-void S_FreeOldestSound( void );
+void S_FreeOldestSound();
 
 extern short *sfxScratchBuffer;
 extern sfx_t *sfxScratchPointer;

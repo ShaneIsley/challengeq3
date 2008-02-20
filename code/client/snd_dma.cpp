@@ -235,13 +235,9 @@ static void S_memoryLoad( sfx_t* sfx )
 
 
 // creates a default buzz sound if the file can't be loaded
-// the second arg used to mean "convert to ADPCM", which sounds like shit
-// and causes a *5000%* slowdown on a 2.8GHz C2D
 
-static sfxHandle_t S_Base_RegisterSound( const char *name, qbool )
+static sfxHandle_t S_Base_RegisterSound( const char* name )
 {
-	sfx_t	*sfx;
-
 	if (!s_soundStarted) {
 		return 0;
 	}
@@ -251,7 +247,7 @@ static sfxHandle_t S_Base_RegisterSound( const char *name, qbool )
 		return 0;
 	}
 
-	sfx = S_FindName( name );
+	sfx_t* sfx = S_FindName( name );
 	if ( sfx->soundData ) {
 		if ( sfx->defaultSound ) {
 			Com_Printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
@@ -276,15 +272,13 @@ static void S_Base_BeginRegistration()
 {
 	s_soundMuted = qfalse;		// we can play again
 
-	if (s_numSfx == 0) {
-		SND_setup();
+	SND_setup();
 
-		s_numSfx = 0;
-		Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
-		Com_Memset(sfxHash, 0, sizeof(sfx_t *)*SFX_HASH_SIZE);
+	s_numSfx = 0;
+	Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
+	Com_Memset( sfxHash, 0, sizeof(sfx_t *)*SFX_HASH_SIZE );
 
-		S_Base_RegisterSound( "sound/world/buzzer.wav", qfalse );
-	}
+	S_Base_RegisterSound( "sound/world/buzzer.wav" );
 }
 
 
@@ -606,19 +600,6 @@ static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, const 
 	loopSounds[entityNum].doppler = qfalse;
 
 	return qtrue;
-}
-
-
-// add a truly-permanent looping sound
-// (over)used by retarded mappers to put 5000 ambient noise effects in a map
-// and rape performance while annoying the hell out of everyone (cf every 3W map ever)
-
-static void S_Base_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle )
-{
-	if ( !S_Base_InitLoopingSound( entityNum, origin, velocity, sfxHandle ) )
-		return;
-
-	loopSounds[entityNum].kill = qfalse;
 }
 
 
@@ -1268,29 +1249,25 @@ static void S_Base_Shutdown()
 
 qbool S_Base_Init( soundInterface_t *si )
 {
-	if( !si ) {
-		return qfalse;
-	}
+	Com_Memset( si, 0, sizeof(*si) );
 
-	s_khz = Cvar_Get ("s_khz", "22", CVAR_ARCHIVE);
-	s_mixahead = Cvar_Get ("s_mixahead", "0.2", CVAR_ARCHIVE);
-	s_mixPreStep = Cvar_Get ("s_mixPreStep", "0.05", CVAR_ARCHIVE);
-	s_show = Cvar_Get ("s_show", "0", CVAR_CHEAT);
-	s_testsound = Cvar_Get ("s_testsound", "0", CVAR_CHEAT);
+	s_khz = Cvar_Get( "s_khz", "22", CVAR_ARCHIVE );
+	s_mixahead = Cvar_Get( "s_mixahead", "0.2", CVAR_ARCHIVE );
+	s_mixPreStep = Cvar_Get( "s_mixPreStep", "0.05", CVAR_ARCHIVE );
+	s_show = Cvar_Get( "s_show", "0", CVAR_CHEAT );
+	s_testsound = Cvar_Get( "s_testsound", "0", CVAR_CHEAT );
 
 	if (!SNDDMA_Init())
 		return qfalse;
 
 	s_soundStarted = qtrue;
 	s_soundMuted = qtrue;
-//	s_numSfx = 0;
+	s_numSfx = 0;
 
-	Com_Memset(sfxHash, 0, sizeof(sfx_t *)*SFX_HASH_SIZE);
+	Com_Memset( sfxHash, 0, sizeof(sfx_t *)*SFX_HASH_SIZE );
 
 	s_soundtime = 0;
 	s_paintedtime = 0;
-
-	S_Base_StopAllSounds();
 
 	si->Shutdown = S_Base_Shutdown;
 	si->StartSound = S_Base_StartSound;
@@ -1301,8 +1278,6 @@ qbool S_Base_Init( soundInterface_t *si )
 	si->StopAllSounds = S_Base_StopAllSounds;
 	si->ClearLoopingSounds = S_Base_ClearLoopingSounds;
 	si->AddLoopingSound = S_Base_AddLoopingSound;
-	si->AddRealLoopingSound = S_Base_AddRealLoopingSound;
-	si->StopLoopingSound = S_Base_StopLoopingSound;
 	si->Respatialize = S_Base_Respatialize;
 	si->UpdateEntityPosition = S_Base_UpdateEntityPosition;
 	si->Update = S_Base_Update;
@@ -1312,6 +1287,8 @@ qbool S_Base_Init( soundInterface_t *si )
 	si->ClearSoundBuffer = S_Base_ClearSoundBuffer;
 	si->SoundInfo = S_Base_SoundInfo;
 	si->SoundList = S_Base_SoundList;
+
+	S_Base_StopAllSounds();
 
 	return qtrue;
 }
