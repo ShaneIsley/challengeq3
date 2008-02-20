@@ -394,7 +394,8 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 	for ( i = 0; i < MAX_CHANNELS ; i++, ch++ ) {
 		if (ch->entnum == entityNum && ch->thesfx == sfx) {
 			// the WORLD can very legitimately have multiple instances of the same sound at the same time
-			// and it's important that they DO play if possible
+			// and it's important that they DO play if possible even if simultaneous
+			// because a bullet hitting 2ft away and one hitting 50ft away are not the same thing
 			if ( (entityNum != ENTITYNUM_WORLD) && (time == ch->allocTime) ) {
 //				if (Cvar_VariableValue( "cg_showmiss" )) {
 //					Com_Printf("double sound start: %d %s\n", entityNum, sfx->soundName);
