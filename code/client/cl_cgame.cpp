@@ -490,7 +490,7 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 		S_StartLocalSound( args[1], args[2] );
 		return 0;
 	case CG_S_CLEARLOOPINGSOUNDS:
-		S_ClearLoopingSounds(args[1]);
+		S_ClearLoopingSounds();
 		return 0;
 	case CG_S_ADDLOOPINGSOUND:
 		S_AddLoopingSound( args[1], VMA(2), VMA(3), args[4] );

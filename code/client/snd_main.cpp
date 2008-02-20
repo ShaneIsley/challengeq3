@@ -101,10 +101,10 @@ void S_StopAllSounds()
 }
 
 
-void S_ClearLoopingSounds( qbool killall )
+void S_ClearLoopingSounds()
 {
 	if (si.ClearLoopingSounds)
-		si.ClearLoopingSounds( killall );
+		si.ClearLoopingSounds();
 }
 
 

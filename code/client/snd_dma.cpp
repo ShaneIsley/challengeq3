@@ -551,14 +551,10 @@ continuous looping sounds are added each frame
 */
 
 
-static void S_Base_ClearLoopingSounds( qbool killall )
+static void S_Base_ClearLoopingSounds()
 {
-	int i;
-	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
-		if (killall || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
-			loopSounds[i].active = qfalse;
-		}
-	}
+	for (int i = 0; i < MAX_GENTITIES; ++i)
+		loopSounds[i].active = qfalse;
 	numLoopChannels = 0;
 }
 

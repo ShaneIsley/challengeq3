@@ -39,7 +39,7 @@ void S_RawSamples( int samples, int rate, int width, int channels, const byte *d
 void S_StopAllSounds();
 
 // all continuous looping sounds must be added before calling S_Update
-void S_ClearLoopingSounds( qbool killall );
+void S_ClearLoopingSounds();
 void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 
 // recompute the reletive volumes for all running sounds

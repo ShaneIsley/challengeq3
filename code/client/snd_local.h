@@ -107,7 +107,7 @@ typedef struct
 	void (*StopBackgroundTrack)();
 	void (*RawSamples)( int samples, int rate, int width, int channels, const byte *data, float volume );
 	void (*StopAllSounds)();
-	void (*ClearLoopingSounds)( qbool killall );
+	void (*ClearLoopingSounds)();
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*Respatialize)( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );

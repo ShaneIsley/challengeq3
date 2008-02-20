@@ -923,7 +923,7 @@ S_AL_ClearLoopingSounds
 =================
 */
 static
-void S_AL_ClearLoopingSounds( qbool killall )
+void S_AL_ClearLoopingSounds()
 {
 	int i;
 	for(i = 0; i < srcCount; i++)
