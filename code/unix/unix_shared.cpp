@@ -52,8 +52,8 @@ unsigned long sys_timeBase = 0;
      0x7fffffff ms - ~24 days
    although timeval:tv_usec is an int, I'm not sure wether it is actually used as an unsigned int
      (which would affect the wrap period) */
-int curtime;
-int Sys_Milliseconds (void)
+unsigned long curtime;
+unsigned long	Sys_Milliseconds ()
 {
 	struct timeval tp;
 
