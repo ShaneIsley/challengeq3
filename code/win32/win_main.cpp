@@ -769,9 +769,9 @@ EVENT LOOP
 #define	MAX_QUED_EVENTS		512
 #define	MASK_QUED_EVENTS	( MAX_QUED_EVENTS - 1 )
 
-sysEvent_t	eventQue[MAX_QUED_EVENTS];
-int			eventHead, eventTail;
-byte		sys_packetReceived[MAX_MSGLEN];
+static sysEvent_t	eventQue[MAX_QUED_EVENTS];
+static int			eventHead=0, eventTail=0;
+static byte			sys_packetReceived[MAX_MSGLEN];
 
 /*
 ================
@@ -817,18 +817,13 @@ Sys_GetEvent
 */
 sysEvent_t Sys_GetEvent( void )
 {
-	MSG			msg;
-	sysEvent_t	ev;
-	char		*s;
-	msg_t		netmsg;
-	netadr_t	adr;
-
 	// return if we have data
 	if ( eventHead > eventTail ) {
 		eventTail++;
 		return eventQue[ ( eventTail - 1 ) & MASK_QUED_EVENTS ];
 	}
 
+	MSG			msg;
 	// pump the message loop
 	while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
 		if ( !GetMessage (&msg, NULL, 0, 0) ) {
@@ -843,8 +838,7 @@ sysEvent_t Sys_GetEvent( void )
 	}
 
 	// check for console commands
-	s = Sys_ConsoleInput();
-	if ( s ) {
+	if ( char *s = Sys_ConsoleInput() ) {
 		int len = strlen( s ) + 1;
 		char* b = (char*)Z_Malloc( len );
 		Q_strncpyz( b, s, len-1 );
@@ -852,6 +846,8 @@ sysEvent_t Sys_GetEvent( void )
 	}
 
 	// check for network packets
+	msg_t		netmsg = {0};
+	netadr_t	adr;
 	MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
 	if ( Sys_GetPacket ( &adr, &netmsg ) ) {
 		// copy out to a seperate buffer for qeueing
@@ -870,9 +866,9 @@ sysEvent_t Sys_GetEvent( void )
 	}
 
 	// create an empty event to return
-
-	memset( &ev, 0, sizeof( ev ) );
-	ev.evTime = timeGetTime();
+	sysEvent_t	ev;
+	//memset( &ev, 0, sizeof( ev ) );
+	ev.evTime = Sys_Milliseconds();//timeGetTime();
 
 	return ev;
 }

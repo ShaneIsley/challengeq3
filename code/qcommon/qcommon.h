@@ -908,13 +908,16 @@ typedef enum {
 	SE_PACKET	// evPtr is a netadr_t followed by data bytes to evPtrLength
 } sysEventType_t;
 
-typedef struct {
-	int				evTime;
+struct sysEvent_t {
+	unsigned long	evTime;
 	sysEventType_t	evType;
 	int				evValue, evValue2;
 	int				evPtrLength;	// bytes of data pointed to by evPtr, for journaling
 	void			*evPtr;			// this must be manually freed if not NULL
-} sysEvent_t;
+
+	sysEvent_t() : evTime(0), evType(SE_NONE), evValue(0), evValue2(0), evPtrLength(0), evPtr(0) {}
+	sysEvent_t(const sysEvent_t& rhs) : evTime(rhs.evTime), evType(rhs.evType), evValue(rhs.evValue), evValue2(rhs.evValue2), evPtrLength(rhs.evPtrLength), evPtr(rhs.evPtr) {}
+};
 
 sysEvent_t	Sys_GetEvent( void );
 
@@ -946,7 +949,7 @@ void	Sys_Print( const char *msg );
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-int		Sys_Milliseconds (void);
+unsigned long		Sys_Milliseconds ();
 
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( qbool show );
