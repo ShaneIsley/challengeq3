@@ -1364,10 +1364,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\botlib\l_utils.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\qcommon\q_shared.h"
 				>
 			</File>
