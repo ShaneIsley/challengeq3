@@ -52,14 +52,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "be_ai_char.h"
 #include "be_ai_gen.h"
 
-//library globals in a structure
 botlib_globals_t botlibglobals;
 
 botlib_export_t be_botlib_export;
 botlib_import_t botimport;
-//
+
 int bot_developer;
-//qtrue if the library is setup
 int botlibsetup = qfalse;
 
 //===========================================================================
@@ -68,64 +66,35 @@ int botlibsetup = qfalse;
 //
 //===========================================================================
 
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-int Sys_MilliSeconds(void)
+
+// the botlib SHOULD use Com/Sys_MilliSeconds, but hey, it's the botlib...  :/
+
+int BL_MilliSeconds()
 {
 	return clock() * 1000 / CLOCKS_PER_SEC;
-} //end of the function Sys_MilliSeconds
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-qbool ValidClientNumber(int num, char *str)
-{
-	if (num < 0 || num > botlibglobals.maxclients)
-	{
-		//weird: the disabled stuff results in a crash
-		botimport.Print(PRT_ERROR, "%s: invalid client number %d, [0, %d]\n",
-										str, num, botlibglobals.maxclients);
-		return qfalse;
-	} //end if
-	return qtrue;
-} //end of the function BotValidateClientNumber
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-qbool ValidEntityNumber(int num, char *str)
+}
+
+
+static qbool BL_ValidEntityNumber(int num, char *str)
 {
 	if (num < 0 || num > botlibglobals.maxentities)
 	{
-		botimport.Print(PRT_ERROR, "%s: invalid entity number %d, [0, %d]\n",
-										str, num, botlibglobals.maxentities);
+		botimport.Print( PRT_ERROR, "%s: invalid entity number %d, [0, %d]\n", str, num, botlibglobals.maxentities );
 		return qfalse;
-	} //end if
+	}
 	return qtrue;
-} //end of the function BotValidateClientNumber
-//===========================================================================
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-qbool BotLibSetup(char *str)
+}
+
+
+static qbool BotLibSetup( const char* s )
 {
 	if (!botlibglobals.botlibsetup)
 	{
-		botimport.Print(PRT_ERROR, "%s: bot library used before being setup\n", str);
+		botimport.Print( PRT_ERROR, "%s: bot library used before being setup\n", s );
 		return qfalse;
-	} //end if
+	}
 	return qtrue;
-} //end of the function BotLibSetup
+}
 
 //===========================================================================
 //
@@ -269,7 +238,7 @@ int Export_BotLibStartFrame(float time)
 int Export_BotLibLoadMap(const char *mapname)
 {
 #ifdef DEBUG
-	int starttime = Sys_MilliSeconds();
+	int starttime = BL_MilliSeconds();
 #endif
 	int errnum;
 
@@ -285,7 +254,7 @@ int Export_BotLibLoadMap(const char *mapname)
 	//
 	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
 #ifdef DEBUG
-	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", Sys_MilliSeconds() - starttime);
+	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", BL_MilliSeconds() - starttime);
 #endif
 	//
 	return BLERR_NOERROR;
@@ -299,7 +268,7 @@ int Export_BotLibLoadMap(const char *mapname)
 int Export_BotLibUpdateEntity(int ent, bot_entitystate_t *state)
 {
 	if (!BotLibSetup("BotUpdateEntity")) return BLERR_LIBRARYNOTSETUP;
-	if (!ValidEntityNumber(ent, "BotUpdateEntity")) return BLERR_INVALIDENTITYNUMBER;
+	if (!BL_ValidEntityNumber(ent, "BotUpdateEntity")) return BLERR_INVALIDENTITYNUMBER;
 
 	return AAS_UpdateEntity(ent, state);
 } //end of the function Export_BotLibUpdateEntity

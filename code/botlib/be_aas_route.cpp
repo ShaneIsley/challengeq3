@@ -404,7 +404,7 @@ void AAS_InitAreaContentsTravelFlags(void)
 void AAS_CreateReversedReachability()
 {
 #ifdef DEBUG
-	int starttime = Sys_MilliSeconds();
+	int starttime = BL_MilliSeconds();
 #endif
 	//free reversed links that have already been created
 	if (aasworld.reversedreachability) FreeMemory(aasworld.reversedreachability);
@@ -440,7 +440,7 @@ void AAS_CreateReversedReachability()
 		} //end for
 	} //end for
 #ifdef DEBUG
-	botimport.Print(PRT_MESSAGE, "reversed reachability %d msec\n", Sys_MilliSeconds() - starttime);
+	botimport.Print(PRT_MESSAGE, "reversed reachability %d msec\n", BL_MilliSeconds() - starttime);
 #endif
 } //end of the function AAS_CreateReversedReachability
 //===========================================================================

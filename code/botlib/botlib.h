@@ -43,6 +43,8 @@ struct bot_moveresult_s;
 struct bot_initmove_s;
 struct weaponinfo_s;
 
+extern int BL_MilliSeconds();
+
 #define BOTFILESBASEFOLDER		"botfiles"
 //debug line colors
 #define LINECOLOR_NONE			-1

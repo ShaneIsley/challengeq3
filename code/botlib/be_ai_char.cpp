@@ -387,7 +387,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 #ifdef DEBUG
 	int starttime;
 
-	starttime = Sys_MilliSeconds();
+	starttime = BL_MilliSeconds();
 #endif //DEBUG
 
 	//find a free spot for a character
@@ -418,7 +418,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 #ifdef DEBUG
 		if (bot_developer)
 		{
-			botimport.Print(PRT_MESSAGE, "skill %d loaded in %d msec from %s\n", intskill, Sys_MilliSeconds() - starttime, charfile);
+			botimport.Print(PRT_MESSAGE, "skill %d loaded in %d msec from %s\n", intskill, BL_MilliSeconds() - starttime, charfile);
 		} //end if
 #endif //DEBUG
 		return handle;
