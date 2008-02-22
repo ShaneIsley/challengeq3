@@ -52,6 +52,3 @@ extern botlib_globals_t botlibglobals;
 extern botlib_import_t botimport;
 extern int bot_developer;					//qtrue if developer is on
 
-//
-unsigned long		Sys_Milliseconds (); 
-
