@@ -692,7 +692,7 @@ Called by CL_MapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate, the
 ways a client gets into a game
 Also called by Com_Error
 */
-void CL_FlushMemory( void )
+void CL_FlushMemory()
 {
 	// shutdown all the client stuff
 	CL_ShutdownAll();
@@ -2971,7 +2971,6 @@ qbool CL_CDKeyValidate( const char *key, const char *checksum )
 
 	return qfalse;
 }
-
 
 
 void CL_Init()

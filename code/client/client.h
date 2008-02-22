@@ -376,8 +376,8 @@ extern	cvar_t	*cl_inGameVideo;
 // cl_main
 //
 
-void CL_Init (void);
-void CL_FlushMemory(void);
+void CL_Init();
+void CL_FlushMemory();
 void CL_ShutdownAll(void);
 void CL_AddReliableCommand( const char *cmd );
 

@@ -680,7 +680,7 @@ void		QDECL Com_Printf( const char *fmt, ... );
 void		QDECL Com_DPrintf( const char *fmt, ... );
 void		QDECL Com_Error( int code, const char *fmt, ... );
 void		Com_Quit_f( void );
-int			Com_EventLoop( void );
+int			Com_EventLoop();
 int			Com_Milliseconds();	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length);
@@ -688,7 +688,7 @@ int			Com_HashKey(char *string, int maxlen);
 int			Com_Filter( const char* filter, const char* name );
 int			Com_FilterPath( const char* filter, const char* name );
 int			Com_RealTime(qtime_t *qtime);
-qbool	Com_SafeMode( void );
+qbool	Com_SafeMode();
 
 void		Com_StartupVariable( const char *match );
 // checks for and removes command line "+set var arg" constructs
@@ -772,31 +772,29 @@ void *Z_Malloc( int size );			// returns 0 filled memory
 void *S_Malloc( int size );			// NOT 0 filled memory only for small allocations
 #endif
 void Z_Free( void *ptr );
-void Z_FreeTags( int tag );
 int Z_AvailableMemory( void );
 // deliberately NOT overloading global new here
 //void* operator new( size_t size ) { return Z_Malloc(size); }
 template <class T> T* Z_New() { return (T*)Z_Malloc(sizeof(T)); }
 template <class T> T* Z_New( int c ) { return (T*)Z_Malloc(sizeof(T) * c); }
 
-void Hunk_Clear( void );
-void Hunk_ClearToMark( void );
-void Hunk_SetMark( void );
-qbool Hunk_CheckMark( void );
-void Hunk_ClearTempMemory( void );
-void *Hunk_AllocateTempMemory( int size );
-void Hunk_FreeTempMemory( void *buf );
-int Hunk_MemoryRemaining( void );
-void Hunk_Log( void);
+void Hunk_Clear();
+void Hunk_ClearToMark();
+void Hunk_SetMark();
+qbool Hunk_CheckMark();
+void Hunk_ClearTempMemory();
+void* Hunk_AllocateTempMemory( int size );
+void Hunk_FreeTempMemory( void* buf );
+int Hunk_MemoryRemaining();
 template <class T> T* H_New( ha_pref heap ) { return (T*)Hunk_Alloc(sizeof(T), heap); }
 template <class T> T* H_New( int c, ha_pref heap ) { return static_cast<T*>(Hunk_Alloc(sizeof(T) * c, heap)); }
 
-void Com_TouchMemory( void );
+void Com_TouchMemory();
 
 // commandLine should not include the executable name (argv[0])
 void Com_Init( char *commandLine );
-void Com_Frame( void );
-void Com_Shutdown( void );
+void Com_Frame();
+void Com_Shutdown();
 
 
 /*
@@ -849,7 +847,7 @@ void CL_CDDialog( void );
 void CL_ShutdownAll( void );
 // shutdown all the client stuff
 
-void CL_FlushMemory( void );
+void CL_FlushMemory();
 // dump all memory on an error
 
 void CL_StartHunkUsers( void );
@@ -908,16 +906,13 @@ typedef enum {
 	SE_PACKET	// evPtr is a netadr_t followed by data bytes to evPtrLength
 } sysEventType_t;
 
-struct sysEvent_t {
-	unsigned long	evTime;
+typedef struct {
+	int				evTime;
 	sysEventType_t	evType;
 	int				evValue, evValue2;
 	int				evPtrLength;	// bytes of data pointed to by evPtr, for journaling
 	void			*evPtr;			// this must be manually freed if not NULL
-
-	sysEvent_t() : evTime(0), evType(SE_NONE), evValue(0), evValue2(0), evPtrLength(0), evPtr(0) {}
-	sysEvent_t(const sysEvent_t& rhs) : evTime(rhs.evTime), evType(rhs.evType), evValue(rhs.evValue), evValue2(rhs.evValue2), evPtrLength(rhs.evPtrLength), evPtr(rhs.evPtr) {}
-};
+} sysEvent_t;
 
 sysEvent_t	Sys_GetEvent( void );
 
@@ -949,7 +944,7 @@ void	Sys_Print( const char *msg );
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-unsigned long		Sys_Milliseconds ();
+int		Sys_Milliseconds (void);
 
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( qbool show );
