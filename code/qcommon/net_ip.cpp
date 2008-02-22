@@ -227,7 +227,7 @@ qbool Sys_GetPacket( netadr_t* net_from, msg_t* net_message )
 	++recvfromCount;
 #endif
 
-	struct sockaddr from = {0};
+	struct sockaddr from;
 	socklen_t fromlen = sizeof(from);
 	int ret = recvfrom( ip_socket, (char*)net_message->data, net_message->maxsize, 0, (struct sockaddr *)&from, &fromlen );
 	if (ret == SOCKET_ERROR) {
