@@ -34,9 +34,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <conio.h>
 
 
-unsigned long Sys_Milliseconds()
+int Sys_Milliseconds()
 {
-	static unsigned long sys_timeBase = 0;
+	static int sys_timeBase = 0;
 
 	if (!sys_timeBase)
 		sys_timeBase = timeGetTime();

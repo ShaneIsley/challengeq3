@@ -914,16 +914,15 @@ typedef struct {
 	void			*evPtr;			// this must be manually freed if not NULL
 } sysEvent_t;
 
-sysEvent_t	Sys_GetEvent( void );
+sysEvent_t Sys_GetEvent();
 
 void Sys_Init();
 void Sys_Quit();
 
 // general development dll loading for virtual machine testing
-// fqpath param added 7/20/02 by T.Ray - Sys_LoadDll is only called in vm.c at this time
-void	* QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **entryPoint)(int, ...),
-				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
-void	Sys_UnloadDll( void *dllHandle );
+void* QDECL Sys_LoadDll( const char* name, char* fqpath,
+		intptr_t (QDECL **entryPoint)(int, ...), intptr_t (QDECL *systemcalls)(intptr_t, ...) );
+void Sys_UnloadDll( void* dllHandle );
 
 void	Sys_UnloadGame( void );
 void	*Sys_GetGameAPI( void *parms );
@@ -944,7 +943,7 @@ void	Sys_Print( const char *msg );
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-int		Sys_Milliseconds (void);
+int		Sys_Milliseconds();
 
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( qbool show );
@@ -968,7 +967,7 @@ qbool	Sys_StringToAdr( const char *s, netadr_t *a );
 qbool	Sys_IsLANAddress( const netadr_t& adr );
 void	Sys_ShowIP();
 
-void	Sys_Mkdir( const char *path );
+void Sys_Mkdir( const char* path );
 const char* Sys_Cwd();
 const char* Sys_GetCurrentUser();
 const char* Sys_DefaultHomePath();

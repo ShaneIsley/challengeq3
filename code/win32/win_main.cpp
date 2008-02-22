@@ -19,7 +19,6 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-// win_main.c
 
 #include "../client/client.h"
 #include "../qcommon/qcommon.h"
@@ -33,72 +32,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <io.h>
 #include <conio.h>
 
-#define	CD_BASEDIR	"quake3"
-#define	CD_EXE		"quake3.exe"
-#define	CD_BASEDIR_LINUX	"bin\\x86\\glibc-2.1"
-#define	CD_EXE_LINUX "quake3"
+
 #define MEM_THRESHOLD 96*1024*1024
 
-static char		sys_cmdline[MAX_STRING_CHARS];
-
-// define this to use alternate spanking method
-// I found out that the regular way doesn't work on my box for some reason
-// see the associated spank.sh script
-#define ALT_SPANK
-#ifdef ALT_SPANK
-#include <stdio.h>
-#include <sys/stat.h>
-
-int fh = 0;
-
-void Spk_Open(char *name)
+qbool Sys_LowPhysicalMemory()
 {
-  fh = _open( name, O_TRUNC | O_CREAT | O_WRONLY, S_IREAD | S_IWRITE );
-};
-
-void Spk_Close(void)
-{
-  if (!fh)
-    return;
-
-  _close( fh );
-  fh = 0;
-}
-
-void Spk_Printf (const char *text, ...)
-{
-  va_list argptr;
-  char buf[32768];
-
-  if (!fh)
-    return;
-
-  va_start (argptr,text);
-  vsprintf (buf, text, argptr);
-  _write(fh, buf, strlen(buf));
-  _commit(fh);
-  va_end (argptr);
-
-};
-#endif
-
-/*
-==================
-Sys_LowPhysicalMemory()
-==================
-*/
-
-qbool Sys_LowPhysicalMemory() {
 	MEMORYSTATUS stat;
-  GlobalMemoryStatus (&stat);
-	return (stat.dwTotalPhys <= MEM_THRESHOLD) ? qtrue : qfalse;
+	GlobalMemoryStatus( &stat );
+	return (stat.dwTotalPhys <= MEM_THRESHOLD);
 }
 
-/*
-==================
-Sys_BeginProfiling
-==================
-*/
+
 void Sys_BeginProfiling( void ) {
 	// this is just used on the mac build
 }
@@ -155,13 +99,9 @@ void Sys_Print( const char *msg )
 }
 
 
-/*
-==============
-Sys_Mkdir
-==============
-*/
-void Sys_Mkdir( const char *path ) {
-	_mkdir (path);
+void Sys_Mkdir( const char* path )
+{
+	_mkdir( path );
 }
 
 
@@ -186,7 +126,8 @@ DIRECTORY SCANNING
 
 #define	MAX_FOUND_FILES	0x1000
 
-static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, const char *filter, char **list, int *numfiles ) {
+static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, const char *filter, char **list, int *numfiles )
+{
 	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
 	char		filename[MAX_OSPATH];
 	int			findhandle;
@@ -233,28 +174,9 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, con
 	_findclose (findhandle);
 }
 
-static qbool strgtr(const char *s0, const char *s1) {
-	int l0, l1, i;
 
-	l0 = strlen(s0);
-	l1 = strlen(s1);
-
-	if (l1<l0) {
-		l0 = l1;
-	}
-
-	for(i=0;i<l0;i++) {
-		if (s1[i] > s0[i]) {
-			return qtrue;
-		}
-		if (s1[i] < s0[i]) {
-			return qfalse;
-		}
-	}
-	return qfalse;
-}
-
-char **Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qbool wantsubs ) {
+char **Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qbool wantsubs )
+{
 	char		search[MAX_OSPATH];
 	int			nfiles;
 	char		**listCopy;
@@ -337,7 +259,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, const char *
 	do {
 		flag = 0;
 		for(i=1; i<nfiles; i++) {
-			if (strgtr(listCopy[i-1], listCopy[i])) {
+			if ( strcmp( listCopy[i-1], listCopy[i] ) == 1 ) {
 				char *temp = listCopy[i];
 				listCopy[i] = listCopy[i-1];
 				listCopy[i-1] = temp;
@@ -349,7 +271,9 @@ char **Sys_ListFiles( const char *directory, const char *extension, const char *
 	return listCopy;
 }
 
-void	Sys_FreeFileList( char **list ) {
+
+void Sys_FreeFileList( char **list )
+{
 	int		i;
 
 	if ( !list ) {
@@ -363,15 +287,13 @@ void	Sys_FreeFileList( char **list ) {
 	Z_Free( list );
 }
 
-//========================================================
-
 
 char *Sys_GetClipboardData( void )
 {
 	char *data = NULL;
 	char *cliptext;
 
-	if ( OpenClipboard( NULL ) != 0 ) {
+	if ( OpenClipboard( NULL ) ) {
 		HANDLE hClipboardData;
 
 		if ( ( hClipboardData = GetClipboardData( CF_TEXT ) ) != 0 ) {
@@ -379,12 +301,13 @@ char *Sys_GetClipboardData( void )
 				data = (char*)Z_Malloc( GlobalSize( hClipboardData ) + 1 );
 				Q_strncpyz( data, cliptext, GlobalSize( hClipboardData ) );
 				GlobalUnlock( hClipboardData );
-				
 				strtok( data, "\n\r\b" );
 			}
 		}
+
 		CloseClipboard();
 	}
+
 	return data;
 }
 
@@ -397,13 +320,9 @@ LOAD/UNLOAD DLL
 ========================================================================
 */
 
-/*
-=================
-Sys_UnloadDll
 
-=================
-*/
-void Sys_UnloadDll( void *dllHandle ) {
+void Sys_UnloadDll( void *dllHandle )
+{
 	if ( !dllHandle ) {
 		return;
 	}
@@ -412,35 +331,26 @@ void Sys_UnloadDll( void *dllHandle ) {
 	}
 }
 
-/*
-=================
-Sys_LoadDll
 
-Used to load a development dll instead of a virtual machine
-
-TTimo: added some verbosity in debug
-=================
-*/
-
+// used to load a development dll instead of a virtual machine
 // fqpath param added 7/20/02 by T.Ray - Sys_LoadDll is only called in vm.c at this time
 // fqpath will be empty if dll not loaded, otherwise will hold fully qualified path of dll module loaded
 // fqpath buffersize must be at least MAX_QPATH+1 bytes long
-void * QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **entryPoint)(intptr_t, ...),
-				  intptr_t (QDECL *systemcalls)(intptr_t, ...) )
+
+void* QDECL Sys_LoadDll( const char* name, char* fqpath,
+		intptr_t (QDECL **entryPoint)(intptr_t, ...), intptr_t (QDECL *systemcalls)(intptr_t, ...) )
 {
-	void	(QDECL *dllEntry)( intptr_t (QDECL *syscallptr)(intptr_t, ...) );
 #ifdef NDEBUG
 	static int	lastWarning = 0;
-	int		timestamp;
 #endif
-	char	filename[MAX_QPATH];
 
-	*fqpath = 0 ;		// added 7/20/02 by T.Ray
+	*fqpath = 0;
 
+	char filename[MAX_QPATH];
 	Com_sprintf( filename, sizeof( filename ), "%sx86.dll", name );
 
 #ifdef NDEBUG
-	timestamp = Sys_Milliseconds();
+	int timestamp = Sys_Milliseconds();
 	if( ((timestamp - lastWarning) > (5 * 60000)) && !Cvar_VariableIntegerValue( "dedicated" )
 		&& !Cvar_VariableIntegerValue( "com_blindlyLoadDLLs" ) ) {
 		if (FS_FileExists(filename)) {
@@ -482,6 +392,7 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **ent
 	}
 #endif
 
+	void (QDECL *dllEntry)( intptr_t (QDECL *syscallptr)(intptr_t, ...) );
 	dllEntry = ( void (QDECL *)(intptr_t (QDECL *)( intptr_t, ... ) ) )GetProcAddress( libHandle, "dllEntry" ); 
 	*entryPoint = (intptr_t (QDECL *)(intptr_t,...))GetProcAddress( libHandle, "vmMain" );
 	if ( !*entryPoint || !dllEntry ) {
@@ -490,7 +401,8 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **ent
 	}
 	dllEntry( systemcalls );
 
-	if ( libHandle ) Q_strncpyz ( fqpath , filename , MAX_QPATH ) ;		// added 7/20/02 by T.Ray
+	Q_strncpyz( fqpath, filename, MAX_QPATH );
+
 	return libHandle;
 }
 
@@ -758,6 +670,10 @@ void Sys_StreamSeek( fileHandle_t f, int offset, int origin ) {
 
 #endif
 
+
+///////////////////////////////////////////////////////////////
+
+
 /*
 ========================================================================
 
@@ -770,22 +686,16 @@ EVENT LOOP
 #define	MASK_QUED_EVENTS	( MAX_QUED_EVENTS - 1 )
 
 static sysEvent_t	eventQue[MAX_QUED_EVENTS];
-static int			eventHead=0, eventTail=0;
-static byte			sys_packetReceived[MAX_MSGLEN];
+static int			eventHead, eventTail;
 
-/*
-================
-Sys_QueEvent
 
-A time of 0 will get the current time
-Ptr should either be null, or point to a block of data that can
-be freed by the game later.
-================
-*/
-void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr ) {
-	sysEvent_t	*ev;
+// a time of 0 will get the current time
+// ptr should either be null, or point to a block of data that can be freed by the game later
 
-	ev = &eventQue[ eventHead & MASK_QUED_EVENTS ];
+void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr )
+{
+	sysEvent_t* ev = &eventQue[ eventHead & MASK_QUED_EVENTS ];
+
 	if ( eventHead - eventTail >= MAX_QUED_EVENTS ) {
 		Com_Printf("Sys_QueEvent: overflow\n");
 		// we are discarding an event, but don't leak memory
@@ -809,36 +719,34 @@ void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptr
 	ev->evPtr = ptr;
 }
 
-/*
-================
-Sys_GetEvent
 
-================
-*/
-sysEvent_t Sys_GetEvent( void )
+sysEvent_t Sys_GetEvent()
 {
+	static byte sys_packetReceived[MAX_MSGLEN]; // static or it'll blow half the stack
+
 	// return if we have data
 	if ( eventHead > eventTail ) {
 		eventTail++;
 		return eventQue[ ( eventTail - 1 ) & MASK_QUED_EVENTS ];
 	}
 
-	MSG			msg;
 	// pump the message loop
-	while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)) {
-		if ( !GetMessage (&msg, NULL, 0, 0) ) {
+	MSG msg;
+	while (PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE )) {
+		if (!GetMessage( &msg, NULL, 0, 0 )) {
 			Com_Quit_f();
 		}
 
 		// save the msg time, because wndprocs don't have access to the timestamp
 		g_wv.sysMsgTime = msg.time;
 
-		TranslateMessage (&msg);
-		DispatchMessage (&msg);
+		TranslateMessage( &msg );
+		DispatchMessage( &msg );
 	}
 
 	// check for console commands
-	if ( char *s = Sys_ConsoleInput() ) {
+	const char* s = Sys_ConsoleInput();
+	if ( s ) {
 		int len = strlen( s ) + 1;
 		char* b = (char*)Z_Malloc( len );
 		Q_strncpyz( b, s, len-1 );
@@ -846,10 +754,10 @@ sysEvent_t Sys_GetEvent( void )
 	}
 
 	// check for network packets
-	msg_t		netmsg = {0};
+	msg_t		netmsg;
 	netadr_t	adr;
 	MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
-	if ( Sys_GetPacket ( &adr, &netmsg ) ) {
+	if ( Sys_GetPacket( &adr, &netmsg ) ) {
 		// copy out to a seperate buffer for qeueing
 		// the readcount stepahead is for SOCKS support
 		int len = sizeof( netadr_t ) + netmsg.cursize - netmsg.readcount;
@@ -866,48 +774,31 @@ sysEvent_t Sys_GetEvent( void )
 	}
 
 	// create an empty event to return
-	sysEvent_t	ev;
-	//memset( &ev, 0, sizeof( ev ) );
-	ev.evTime = Sys_Milliseconds();//timeGetTime();
-
+	sysEvent_t ev;
+	memset( &ev, 0, sizeof( ev ) );
+	ev.evTime = Sys_Milliseconds();
 	return ev;
 }
 
-//================================================================
 
-/*
-=================
-Sys_In_Restart_f
+///////////////////////////////////////////////////////////////
 
-Restart the input subsystem
-=================
-*/
-void Sys_In_Restart_f( void ) {
+
+static void Sys_In_Restart_f( void )
+{
 	IN_Shutdown();
 	IN_Init();
 }
 
 
-/*
-=================
-Sys_Net_Restart_f
-
-Restart the network subsystem
-=================
-*/
-void Sys_Net_Restart_f( void ) {
+static void Sys_Net_Restart_f( void )
+{
 	NET_Restart();
 }
 
 
-/*
-================
-Sys_Init
+// called after the common systems (cvars, files, etc) are initialized
 
-Called after the common systems (cvars, files, etc)
-are initialized
-================
-*/
 #define OSR2_BUILD_NUMBER 1111
 #define WIN98_BUILD_NUMBER 1998
 
@@ -916,8 +807,8 @@ void Sys_Init()
 	// make sure the timer is high precision, otherwise NT gets 18ms resolution
 	timeBeginPeriod( 1 );
 
-	Cmd_AddCommand ("in_restart", Sys_In_Restart_f);
-	Cmd_AddCommand ("net_restart", Sys_Net_Restart_f);
+	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
+	Cmd_AddCommand( "net_restart", Sys_Net_Restart_f );
 
 	g_wv.osversion.dwOSVersionInfoSize = sizeof( g_wv.osversion );
 
@@ -995,8 +886,7 @@ qbool Sys_DetectAltivec( void )
 }
 
 
-
-//=======================================================================
+///////////////////////////////////////////////////////////////
 
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
@@ -1006,7 +896,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		return 0;
 
 	g_wv.hInstance = hInstance;
-	Q_strncpyz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
 
 	// done before Com/Sys_Init since we need this for error output
 	Sys_CreateConsole();
@@ -1019,7 +908,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	Sys_InitStreamThread();
 
+	char sys_cmdline[MAX_STRING_CHARS];
+	Q_strncpyz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
 	Com_Init( sys_cmdline );
+
 	NET_Init();
 
 	char cwd[MAX_OSPATH];
@@ -1054,5 +946,3 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// never gets here
 }
-
-
