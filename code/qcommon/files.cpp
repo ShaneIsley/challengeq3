@@ -467,32 +467,29 @@ char *FS_BuildOSPath( const char *base, const char *game, const char *qpath ) {
 }
 
 
-/*
-============
-FS_CreatePath
+// creates any directories needed to store the given filename
 
-Creates any directories needed to store the given filename
-============
-*/
-static qbool FS_CreatePath (char *OSPath) {
-	char	*ofs;
+static qbool FS_CreatePath( char* OSPath )
+{
 	
 	// make absolutely sure that it can't back up the path
 	// FIXME: is c: allowed???
 	if ( strstr( OSPath, ".." ) || strstr( OSPath, "::" ) ) {
 		Com_Printf( "WARNING: refusing to create relative path \"%s\"\n", OSPath );
-		return qtrue;
+		return qfalse;
 	}
 
+	char* ofs;
 	for (ofs = OSPath+1 ; *ofs ; ofs++) {
-		if (*ofs == PATH_SEP) {	
+		if (*ofs == PATH_SEP) {
 			// create the directory
 			*ofs = 0;
-			Sys_Mkdir (OSPath);
+			Sys_Mkdir( OSPath );
 			*ofs = PATH_SEP;
 		}
 	}
-	return qfalse;
+
+	return qtrue;
 }
 
 
@@ -586,7 +583,7 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename ) {
 		Com_Printf( "FS_SV_FOpenFileWrite: %s\n", ospath );
 	}
 
-	if( FS_CreatePath( ospath ) ) {
+	if (!FS_CreatePath( ospath )) {
 		return 0;
 	}
 
@@ -783,7 +780,7 @@ fileHandle_t FS_FOpenFileWrite( const char *filename ) {
 		Com_Printf( "FS_FOpenFileWrite: %s\n", ospath );
 	}
 
-	if( FS_CreatePath( ospath ) ) {
+	if (!FS_CreatePath( ospath )) {
 		return 0;
 	}
 
@@ -829,7 +826,7 @@ fileHandle_t FS_FOpenFileAppend( const char *filename ) {
 		Com_Printf( "FS_FOpenFileAppend: %s\n", ospath );
 	}
 
-	if( FS_CreatePath( ospath ) ) {
+	if (!FS_CreatePath( ospath )) {
 		return 0;
 	}
 
