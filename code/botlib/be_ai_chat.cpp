@@ -35,7 +35,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_script.h"
 #include "l_precomp.h"
 #include "l_struct.h"
-#include "l_utils.h"
 #include "l_log.h"
 #include "aasfile.h"
 #include "botlib.h"
