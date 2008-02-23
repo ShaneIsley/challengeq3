@@ -384,7 +384,6 @@ void CL_AddReliableCommand( const char *cmd );
 void CL_StartHunkUsers( void );
 
 void CL_Disconnect_f (void);
-void CL_GetChallengePacket (void);
 void CL_StartDemoLoop( void );
 void CL_NextDemo( void );
 void CL_ReadDemoMessage( void );
@@ -509,8 +508,6 @@ void CL_ShutdownCGame( void );
 qbool CL_GameCommand( void );
 void CL_CGameRendering( stereoFrame_t stereo );
 void CL_SetCGameTime( void );
-void CL_FirstSnapshot( void );
-void CL_ShaderStateChanged(void);
 
 //
 // cl_ui.c

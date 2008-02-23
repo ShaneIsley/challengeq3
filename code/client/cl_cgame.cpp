@@ -829,12 +829,8 @@ void CL_AdjustTimeDelta( void ) {
 }
 
 
-/*
-==================
-CL_FirstSnapshot
-==================
-*/
-void CL_FirstSnapshot( void ) {
+static void CL_FirstSnapshot()
+{
 	// ignore snapshots that don't have entities
 	if ( cl.snap.snapFlags & SNAPFLAG_NOT_ACTIVE ) {
 		return;

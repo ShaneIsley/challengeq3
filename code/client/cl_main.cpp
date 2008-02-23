@@ -170,23 +170,15 @@ static void CL_WriteDemoMessage ( msg_t *msg, int headerBytes )
 }
 
 
-/*
-====================
-CL_StopRecording_f
-
-stop recording a demo
-====================
-*/
-void CL_StopRecord_f( void ) {
-	int		len;
-
+static void CL_StopRecord_f( void )
+{
 	if ( !clc.demorecording ) {
 		Com_Printf ("Not recording a demo.\n");
 		return;
 	}
 
 	// finish up
-	len = -1;
+	int len = -1;
 	FS_Write (&len, 4, clc.demofile);
 	FS_Write (&len, 4, clc.demofile);
 	FS_FCloseFile (clc.demofile);
@@ -812,8 +804,8 @@ void CL_Disconnect( qbool showMainMenu ) {
 		CL_WritePacket();
 		CL_WritePacket();
 	}
-	
-	CL_ClearState ();
+
+	CL_ClearState();
 
 	// wipe the client connection
 	Com_Memset( &clc, 0, sizeof( clc ) );
@@ -995,26 +987,20 @@ static void CL_Connect_f()
 	Cvar_Set( "cl_currentServerAddress", server );
 }
 
+
 #define MAX_RCON_MESSAGE 1024
 
-/*
-=====================
-CL_Rcon_f
+// send the rest of the command line over as an unconnected command
 
-  Send the rest of the command line over as
-  an unconnected command.
-=====================
-*/
-void CL_Rcon_f( void ) {
-	char	message[MAX_RCON_MESSAGE];
-	netadr_t	to;
-
+static void CL_Rcon_f( void )
+{
 	if ( !rcon_client_password->string ) {
 		Com_Printf ("You must set 'rconpassword' before\n"
 					"issuing an rcon command.\n");
 		return;
 	}
 
+	char message[MAX_RCON_MESSAGE];
 	message[0] = -1;
 	message[1] = -1;
 	message[2] = -1;
@@ -1029,6 +1015,7 @@ void CL_Rcon_f( void ) {
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 	Q_strcat (message, MAX_RCON_MESSAGE, Cmd_Cmd()+5);
 
+	netadr_t to;
 	if ( cls.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress;
 	} else {
@@ -1048,64 +1035,39 @@ void CL_Rcon_f( void ) {
 	NET_SendPacket (NS_CLIENT, strlen(message)+1, message, to);
 }
 
-/*
-=================
-CL_SendPureChecksums
-=================
-*/
-void CL_SendPureChecksums( void ) {
-	const char *pChecksums;
+
+// if we are pure we need to send back a command with our referenced pk3 checksums
+
+static void CL_SendPureChecksums()
+{
 	char cMsg[MAX_INFO_VALUE];
-	int i;
-
-	// if we are pure we need to send back a command with our referenced pk3 checksums
-	pChecksums = FS_ReferencedPakPureChecksums();
-
-	// "cp"
-	// "Yf"
-	Com_sprintf(cMsg, sizeof(cMsg), "Yf ");
-	Q_strcat(cMsg, sizeof(cMsg), va("%d ", cl.serverId) );
-	Q_strcat(cMsg, sizeof(cMsg), pChecksums);
-	for (i = 0; i < 2; i++) {
-		cMsg[i] += 10;
-	}
+	Com_sprintf( cMsg, sizeof(cMsg), "cp " );
+	Q_strcat( cMsg, sizeof(cMsg), va("%d ", cl.serverId) );
+	Q_strcat( cMsg, sizeof(cMsg), FS_ReferencedPakPureChecksums() );
 	CL_AddReliableCommand( cMsg );
 }
 
-/*
-=================
-CL_ResetPureClientAtServer
-=================
-*/
-void CL_ResetPureClientAtServer( void ) {
-	CL_AddReliableCommand( va("vdr") );
+
+static void CL_ResetPureClientAtServer()
+{
+	CL_AddReliableCommand( "vdr" );
 }
 
 
-/*
-==================
-CL_PK3List_f
-==================
-*/
-void CL_OpenedPK3List_f( void ) {
-	Com_Printf("Opened PK3 Names: %s\n", FS_LoadedPakNames());
+static void CL_OpenedPK3List_f( void )
+{
+	Com_Printf( "Opened PK3 Names: %s\n", FS_LoadedPakNames() );
 }
 
-/*
-==================
-CL_PureList_f
-==================
-*/
-void CL_ReferencedPK3List_f( void ) {
-	Com_Printf("Referenced PK3 Names: %s\n", FS_ReferencedPakNames());
+
+static void CL_ReferencedPK3List_f( void )
+{
+	Com_Printf( "Referenced PK3 Names: %s\n", FS_ReferencedPakNames() );
 }
 
-/*
-==================
-CL_Configstrings_f
-==================
-*/
-void CL_Configstrings_f( void ) {
+
+static void CL_Configstrings_f( void )
+{
 	int		i;
 	int		ofs;
 
@@ -1123,32 +1085,23 @@ void CL_Configstrings_f( void ) {
 	}
 }
 
-/*
-==============
-CL_Clientinfo_f
-==============
-*/
-void CL_Clientinfo_f( void ) {
+
+static void CL_Clientinfo_f( void )
+{
 	Com_Printf( "--------- Client Information ---------\n" );
 	Com_Printf( "state: %i\n", cls.state );
 	Com_Printf( "Server: %s\n", cls.servername );
-	Com_Printf ("User info settings:\n");
+	Com_Printf( "User info settings:\n" );
 	Info_Print( Cvar_InfoString( CVAR_USERINFO ) );
 	Com_Printf( "--------------------------------------\n" );
 }
 
 
-//====================================================================
+///////////////////////////////////////////////////////////////
 
-/*
-=================
-CL_DownloadsComplete
 
-Called when all downloading has been completed
-=================
-*/
-void CL_DownloadsComplete( void ) {
-
+static void CL_DownloadsComplete()
+{
 #if defined(USE_CURL)
 	// if we downloaded using cURL
 	if( clc.cURLUsed ) {
@@ -1170,7 +1123,7 @@ void CL_DownloadsComplete( void ) {
 	if (clc.downloadRestart) {
 		clc.downloadRestart = qfalse;
 
-		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
+		FS_Restart(clc.checksumFeed); // we possibly downloaded a pak, restart the file system to load it
 
 		// inform the server so we get new gamestate info
 		CL_AddReliableCommand( "donedl" );
@@ -1213,16 +1166,12 @@ void CL_DownloadsComplete( void ) {
 	CL_WritePacket();
 }
 
-/*
-=================
-CL_BeginDownload
 
-Requests a file to download from the server.  Stores it in the current
-game directory.
-=================
-*/
-void CL_BeginDownload( const char *localName, const char *remoteName ) {
+// requests a file to download from the server
+// stores it in the current game directory
 
+static void CL_BeginDownload( const char *localName, const char *remoteName )
+{
 	Com_DPrintf("***** CL_BeginDownload *****\n"
 				"Localname: %s\n"
 				"Remotename: %s\n"
@@ -1237,11 +1186,12 @@ void CL_BeginDownload( const char *localName, const char *remoteName ) {
 	Cvar_Set( "cl_downloadCount", "0" );
 	Cvar_SetValue( "cl_downloadTime", cls.realtime );
 
-	clc.downloadBlock = 0; // Starting new file
+	clc.downloadBlock = 0;
 	clc.downloadCount = 0;
 
 	CL_AddReliableCommand( va("download %s", remoteName) );
 }
+
 
 /*
 =================
@@ -1327,6 +1277,7 @@ void CL_NextDownload(void) {
 
 	CL_DownloadsComplete();
 }
+
 
 /*
 =================
@@ -1558,7 +1509,7 @@ static void CL_ServersResponsePacket( const netadr_t& from, msg_t *msg )
 }
 
 
-void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg )
+static void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg )
 {
 	char	info[MAX_INFO_STRING];
 	int		i, l, score, ping;
@@ -1816,17 +1767,14 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 }
 
 
-void CL_CheckTimeout( void )
+static void CL_CheckTimeout()
 {
 	if (clc.demoplaying && (com_timescale->value == 0)) {
 		cl.timeoutcount = 0;
 		return;
 	}
 
-	//
-	// check timeout
-	//
-	if ( ( !cl_paused->integer || !sv_paused->integer ) 
+	if ( ( !cl_paused->integer || !sv_paused->integer )
 		&& cls.state >= CA_CONNECTED && cls.state != CA_CINEMATIC
 		&& cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
@@ -1860,14 +1808,9 @@ static void CL_CheckUserinfo()
 	}
 }
 
-/*
-==================
-CL_Frame
 
-==================
-*/
-void CL_Frame ( int msec ) {
-
+void CL_Frame( int msec )
+{
 	if ( !com_cl_running->integer ) {
 		return;
 	}
@@ -1907,8 +1850,7 @@ void CL_Frame ( int msec ) {
 		// save the current screen
 		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
 			CL_TakeVideoFrame( );
-
-			// fixed time for next frame'
+			// fixed time for next frame
 			msec = (int)ceil( (1000.0f / cl_aviFrameRate->value) * com_timescale->value );
 			if (msec == 0) {
 				msec = 1;
@@ -1971,7 +1913,7 @@ DLL glue
 void QDECL CL_RefPrintf( int print_level, const char *fmt, ...) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
-	
+
 	va_start (argptr,fmt);
 	Q_vsnprintf (msg, sizeof(msg), fmt, argptr);
 	va_end (argptr);
@@ -2118,7 +2060,7 @@ static void CL_InitRef()
 
 	re = *ret;
 
-	// unpause so the cgame definately gets a snapshot and renders a frame
+	// unpause so the cgame definitely gets a snapshot and renders a frame
 	Cvar_Set( "cl_paused", "0" );
 }
 
@@ -2142,9 +2084,9 @@ static void CL_Vid_Restart_f()
 	CL_ShutdownCGame();
 	CL_ShutdownRef();
 
-	// client is no longer pure untill new checksums are sent
+	// client is no longer pure until new checksums are sent
 	CL_ResetPureClientAtServer();
-	// clear pak references
+
 	FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
 	// reinitialize the filesystem if the game directory or checksum has changed
 	FS_ConditionalRestart( clc.checksumFeed );
@@ -2542,7 +2484,7 @@ void CL_GlobalServers_f( void ) {
 	int			count;
 	char		*buffptr;
 	char		command[1024];
-	
+
 	if ( Cmd_Argc() < 3) {
 		Com_Printf( "usage: globalservers <master# 0-1> <protocol> [keywords]\n");
 		return;
