@@ -59,14 +59,13 @@ int			numLoopChannels;
 static qbool	s_soundStarted;
 static qbool	s_soundMuted;
 
-dma_t		dma;
-
 static int			listener_number;
 static vec3_t		listener_origin;
 static vec3_t		listener_axis[3];
 
-int			s_soundtime;		// sample PAIRS
-int			s_paintedtime; 		// sample PAIRS
+dma_t		dma;
+int			s_soundtime;
+int			s_paintedtime;
 
 // MAX_SFX may be larger than MAX_SOUNDS because of custom player sounds
 #define MAX_SFX 4096
@@ -76,14 +75,13 @@ static int s_numSfx = 0;
 #define SFX_HASH_SIZE 128
 static sfx_t* sfxHash[SFX_HASH_SIZE];
 
-cvar_t		*s_testsound;
-cvar_t		*s_khz;
-cvar_t		*s_show;
-cvar_t		*s_mixahead;
-cvar_t		*s_mixPreStep;
+static cvar_t* s_show;
+static cvar_t* s_mixahead;
+static cvar_t* s_mixPreStep;
+const cvar_t* s_testsound;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
-static	channel_t		*freelist = NULL;
+static channel_t		*freelist = NULL;
 
 int						s_rawend;
 portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
@@ -1232,7 +1230,6 @@ qbool S_Base_Init( soundInterface_t *si )
 {
 	Com_Memset( si, 0, sizeof(*si) );
 
-	s_khz = Cvar_Get( "s_khz", "22", CVAR_ARCHIVE );
 	s_mixahead = Cvar_Get( "s_mixahead", "0.2", CVAR_ARCHIVE );
 	s_mixPreStep = Cvar_Get( "s_mixPreStep", "0.05", CVAR_ARCHIVE );
 	s_show = Cvar_Get( "s_show", "0", CVAR_CHEAT );

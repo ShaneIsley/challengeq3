@@ -52,6 +52,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MAX_VIDEO_HANDLES	16
 
+extern	int		s_soundtime;
 extern	int		s_paintedtime;
 extern	int		s_rawend;
 
@@ -134,9 +135,6 @@ static cinematics_t		cin;
 static cin_cache		cinTable[MAX_VIDEO_HANDLES];
 static int				currentHandle = -1;
 static int				CL_handle = -1;
-
-extern int				s_soundtime;		// sample PAIRS
-extern int   			s_paintedtime; 		// sample PAIRS
 
 
 void CIN_CloseAllVideos(void) {
