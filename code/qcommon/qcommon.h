@@ -724,7 +724,6 @@ extern	int		com_frameTime;
 
 extern	qbool	com_errorEntered;
 
-extern	fileHandle_t	com_journalFile;
 extern	fileHandle_t	com_journalDataFile;
 
 typedef enum {

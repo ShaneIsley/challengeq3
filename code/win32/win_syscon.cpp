@@ -474,21 +474,20 @@ void Sys_ShowConsole( int visLevel, qbool quitOnClose )
 	}
 }
 
-/*
-** Sys_ConsoleInput
-*/
-char *Sys_ConsoleInput( void )
+
+const char* Sys_ConsoleInput()
 {
 	if ( s_wcd.consoleText[0] == 0 )
 	{
 		return NULL;
 	}
-		
+
 	strcpy( s_wcd.returnedText, s_wcd.consoleText );
 	s_wcd.consoleText[0] = 0;
-	
+
 	return s_wcd.returnedText;
 }
+
 
 /*
 ** Conbuf_AppendText

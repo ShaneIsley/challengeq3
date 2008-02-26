@@ -19,10 +19,11 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-#include <float.h>
 
 #include "../client/snd_local.h"
 #include "win_local.h"
+
+#include <dsound.h>
 
 HRESULT (WINAPI *pDirectSoundCreate)(GUID FAR *lpGUID, LPDIRECTSOUND FAR *lplpDS, IUnknown FAR *pUnkOuter);
 #define iDirectSoundCreate(a,b,c)	pDirectSoundCreate(a,b,c)

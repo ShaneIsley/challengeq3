@@ -24,11 +24,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "q_shared.h"
 #include "qcommon.h"
 #include <setjmp.h>
+
 #ifndef _WIN32
 #include <netinet/in.h>
 #include <sys/stat.h> // umask
-#else
-#include <winsock.h>
 #endif
 
 
@@ -46,7 +45,7 @@ jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
 static fileHandle_t logfile = 0;
-fileHandle_t	com_journalFile = 0;			// events are written here
+static fileHandle_t com_journalFile = 0;		// events are written here
 fileHandle_t	com_journalDataFile = 0;		// config files are written here
 
 cvar_t	*com_viewlog = 0;

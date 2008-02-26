@@ -21,46 +21,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // win_local.h: Win32-specific Quake3 header file
 
-#if (_MSC_VER >= 1200)
-#pragma warning( push )
-#pragma warning( disable : 4201 )
-#endif
 #include <windows.h>
-#if (_MSC_VER >= 1200)
-#pragma warning( pop )
-#endif
 
-#define DIRECTINPUT_VERSION 0x0800
-
-#include <dinput.h>
-#include <dsound.h>
-#include <winsock.h>
-
-void	IN_MouseEvent (int mstate);
 
 void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 
 void	Sys_CreateConsole( void );
 void	Sys_DestroyConsole( void );
+const char* Sys_ConsoleInput();
+void Conbuf_AppendText( const char *msg );
 
-char	*Sys_ConsoleInput (void);
-
-// Input subsystem
 
 void	IN_Init();
 void	IN_Activate( qbool active );
 void	IN_Frame();
 void	IN_Shutdown();
+void	IN_MouseEvent( int mstate );
 
-void	IN_Move (usercmd_t *cmd);
-// add additional non keyboard / non mouse movement on top of the keyboard move cmd
-
-
-LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-
-void Conbuf_AppendText( const char *msg );
 
 void SNDDMA_Activate();
+
+LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 typedef struct
 {
@@ -70,8 +51,8 @@ typedef struct
 	qbool		isMinimized;
 	OSVERSIONINFO	osversion;
 
-	// when we get a windows message, we store the time off so keyboard processing
-	// can know the exact time of an event
+	// when we get a windows message, we store the time off
+	// so keyboard processing can know the exact time of an event
 	unsigned		sysMsgTime;
 } WinVars_t;
 

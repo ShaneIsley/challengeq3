@@ -25,6 +25,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/client.h"
 #include "win_local.h"
 
+#define DIRECTINPUT_VERSION 0x0800
+
+#include <dinput.h>
+
 //dwl: buffered input - for big dpi mouses
 #define	DX_MOUSE_BUFFER_SIZE	64
 #define MAX_MOUSE_BUTTONS 8
@@ -54,36 +58,9 @@ static int	window_center_x, window_center_y;
 
 static void IN_StartupMIDI();
 static void IN_ShutdownMIDI();
-static void MidiInfo_f( void );
 
 static void IN_StartupJoystick();
 static void IN_JoyMove();
-
-#define MAX_MIDIIN_DEVICES	8
-
-typedef struct {
-	int			numDevices;
-	MIDIINCAPS	caps[MAX_MIDIIN_DEVICES];
-	HMIDIIN		hMidiIn;
-} MidiInfo_t;
-
-static MidiInfo_t s_midiInfo;
-
-
-#define	JOY_MAX_AXES		6				// X, Y, Z, R, U, V
-
-typedef struct {
-	qbool	avail;
-	int			id;			// joystick number
-	JOYCAPS		jc;
-
-	int			oldbuttonstate;
-	int			oldpovstate;
-
-	JOYINFOEX	ji;
-} joystickInfo_t;
-
-static	joystickInfo_t	joy;
 
 
 cvar_t* in_mouse;
@@ -393,15 +370,15 @@ MOUSE CONTROL
 
 static void IN_ActivateMouse()
 {
-	if (!s_wmv.mouseInitialized ) {
+	if ( !s_wmv.mouseInitialized ) {
 		return;
 	}
-	if ( !in_mouse->integer ) 
+	if ( !in_mouse->integer )
 	{
 		s_wmv.mouseActive = qfalse;
 		return;
 	}
-	if ( s_wmv.mouseActive ) 
+	if ( s_wmv.mouseActive )
 	{
 		return;
 	}
@@ -419,10 +396,10 @@ static void IN_ActivateMouse()
 
 static void IN_DeactivateMouse()
 {
-	if (!s_wmv.mouseInitialized ) {
+	if ( !s_wmv.mouseInitialized ) {
 		return;
 	}
-	if (!s_wmv.mouseActive ) {
+	if ( !s_wmv.mouseActive ) {
 		return;
 	}
 	s_wmv.mouseActive = qfalse;
@@ -464,7 +441,6 @@ static void IN_StartupMouse()
 			return;
 		}
 		Com_Printf ("Falling back to Win32 mouse support...\n");
-		Cvar_Set( "in_mouse", "-1" );
 	}
 
 	s_wmv.mouseInitialized = qtrue;
@@ -612,6 +588,20 @@ JOYSTICK
 
 =========================================================================
 */
+
+
+typedef struct {
+	qbool	avail;
+	int			id;			// joystick number
+	JOYCAPS		jc;
+
+	int			oldbuttonstate;
+	int			oldpovstate;
+
+	JOYINFOEX	ji;
+} joystickInfo_t;
+
+static	joystickInfo_t	joy;
 
 
 static const cvar_t* in_joyBallScale;
@@ -832,6 +822,17 @@ MIDI
 
 =========================================================================
 */
+
+
+#define MAX_MIDIIN_DEVICES	8
+
+typedef struct {
+	int			numDevices;
+	MIDIINCAPS	caps[MAX_MIDIIN_DEVICES];
+	HMIDIIN		hMidiIn;
+} MidiInfo_t;
+
+static MidiInfo_t s_midiInfo;
 
 
 static const cvar_t* in_midiport;
