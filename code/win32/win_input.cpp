@@ -41,37 +41,35 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 typedef struct {
-	int			oldButtonState;
-
+	int		oldButtonState;
 	qbool	mouseActive;
 	qbool	mouseInitialized;
-  qbool  mouseStartupDelayed; // delay mouse init to try DI again when we have a window
+	qbool	mouseStartupDelayed; // delay mouse init to try DI again when we have a window
 } WinMouseVars_t;
 
 static WinMouseVars_t s_wmv;
 
 static int	window_center_x, window_center_y;
 
-//
-// MIDI definitions
-//
-static void IN_StartupMIDI( void );
-static void IN_ShutdownMIDI( void );
+
+static void IN_StartupMIDI();
+static void IN_ShutdownMIDI();
+static void MidiInfo_f( void );
+
+static void IN_StartupJoystick();
+static void IN_JoyMove();
 
 #define MAX_MIDIIN_DEVICES	8
 
 typedef struct {
 	int			numDevices;
 	MIDIINCAPS	caps[MAX_MIDIIN_DEVICES];
-
 	HMIDIIN		hMidiIn;
 } MidiInfo_t;
 
 static MidiInfo_t s_midiInfo;
 
-//
-// Joystick definitions
-//
+
 #define	JOY_MAX_AXES		6				// X, Y, Z, R, U, V
 
 typedef struct {
@@ -88,25 +86,10 @@ typedef struct {
 static	joystickInfo_t	joy;
 
 
+cvar_t* in_mouse;
+cvar_t* in_joystick;
+cvar_t* in_midi;
 
-cvar_t	*in_midi;
-cvar_t	*in_midiport;
-cvar_t	*in_midichannel;
-cvar_t	*in_mididevice;
-
-cvar_t	*in_mouse;
-cvar_t	*in_joystick;
-cvar_t	*in_joyBallScale;
-cvar_t	*in_debugJoystick;
-cvar_t	*joy_threshold;
-
-qbool	in_appactive;
-
-// forward-referenced functions
-void IN_StartupJoystick (void);
-void IN_JoyMove(void);
-
-static void MidiInfo_f( void );
 
 /*
 ============================================================
@@ -116,29 +99,9 @@ WIN32 MOUSE CONTROL
 ============================================================
 */
 
-/*
-================
-IN_InitWin32Mouse
-================
-*/
-void IN_InitWin32Mouse( void ) 
+
+static void IN_ActivateWin32Mouse()
 {
-}
-
-/*
-================
-IN_ShutdownWin32Mouse
-================
-*/
-void IN_ShutdownWin32Mouse( void ) {
-}
-
-/*
-================
-IN_ActivateWin32Mouse
-================
-*/
-void IN_ActivateWin32Mouse( void ) {
 	int			width, height;
 	RECT		window_rect;
 
@@ -157,40 +120,33 @@ void IN_ActivateWin32Mouse( void ) {
 	window_center_x = (window_rect.right + window_rect.left)/2;
 	window_center_y = (window_rect.top + window_rect.bottom)/2;
 
-	SetCursorPos (window_center_x, window_center_y);
+	SetCursorPos( window_center_x, window_center_y );
 
-	SetCapture ( g_wv.hWnd );
-	ClipCursor (&window_rect);
-	while (ShowCursor (FALSE) >= 0)
+	SetCapture( g_wv.hWnd );
+	ClipCursor( &window_rect );
+	while (ShowCursor(FALSE) >= 0)
 		;
 }
 
-/*
-================
-IN_DeactivateWin32Mouse
-================
-*/
-void IN_DeactivateWin32Mouse( void ) 
+
+static void IN_DeactivateWin32Mouse()
 {
-	ClipCursor (NULL);
-	ReleaseCapture ();
-	while (ShowCursor (TRUE) < 0)
+	ClipCursor(NULL);
+	ReleaseCapture();
+	while (ShowCursor(TRUE) < 0)
 		;
 }
 
-/*
-================
-IN_Win32Mouse
-================
-*/
-void IN_Win32Mouse( int *mx, int *my ) {
-	POINT		current_pos;
+
+static void IN_Win32Mouse( int *mx, int *my )
+{
+	POINT current_pos;
 
 	// find mouse movement
-	GetCursorPos (&current_pos);
+	GetCursorPos( &current_pos );
 
 	// force the mouse to the center, so there's room to move
-	SetCursorPos (window_center_x, window_center_y);
+	SetCursorPos( window_center_x, window_center_y );
 
 	*mx = current_pos.x - window_center_x;
 	*my = current_pos.y - window_center_y;
@@ -208,22 +164,18 @@ DIRECT INPUT MOUSE CONTROL
 #define iDirectInputCreate(a,b,c,d)	pDirectInputCreate(a,b,c,d)
 
 HRESULT (WINAPI *pDirectInputCreate)(HINSTANCE hinst, DWORD dwVersion,
-	LPDIRECTINPUT * lplpDirectInput, LPUNKNOWN punkOuter);
+	LPDIRECTINPUT* lplpDirectInput, LPUNKNOWN punkOuter);
 
 static HINSTANCE			hInstDI;
 static LPDIRECTINPUT		g_pdi;
 static LPDIRECTINPUTDEVICE	g_pMouse;
 
-void IN_DIMouse( int *mx, int *my );
+static void IN_DIMouse( int *mx, int *my );
 
-/*
-========================
-IN_InitDIMouse
-========================
-*/
-qbool IN_InitDIMouse( void ) {
-    HRESULT		hr;
-	int			x, y;
+
+static qbool IN_InitDIMouse()
+{
+	HRESULT		hr;
 	DIPROPDWORD	dipdw = {
 		{
 			sizeof(DIPROPDWORD),        // diph.dwSize
@@ -238,7 +190,6 @@ qbool IN_InitDIMouse( void ) {
 
 	if (!hInstDI) {
 		hInstDI = LoadLibrary("dinput.dll");
-		
 		if (hInstDI == NULL) {
 			Com_Printf ("Couldn't load dinput.dll\n");
 			return qfalse;
@@ -272,11 +223,11 @@ qbool IN_InitDIMouse( void ) {
 	}
 
 	// set the data format to "mouse format".
-	//dwl: as Ttimo say - would be easier using c_dfDIMouse or c_dfDIMouse2 
+	//dwl: as Ttimo say - would be easier using c_dfDIMouse or c_dfDIMouse2
 	//dwl: DIMOUSESTATE2(8 mouse buttons) structure to IDirectInputDevice::GetDeviceState.
 	hr = IDirectInputDevice_SetDataFormat(g_pMouse, &c_dfDIMouse2 );
 
-	if (FAILED(hr)) 	{
+	if (FAILED(hr)) {
 		Com_Printf ("Couldn't set DI mouse format\n");
 		return qfalse;
 	}
@@ -302,6 +253,7 @@ qbool IN_InitDIMouse( void ) {
 	}
 
 	// clear any pending samples
+	int x, y;
 	IN_DIMouse( &x, &y );
 	IN_DIMouse( &x, &y );
 
@@ -309,37 +261,29 @@ qbool IN_InitDIMouse( void ) {
 	return qtrue;
 }
 
-/*
-==========================
-IN_ShutdownDIMouse
-==========================
-*/
-void IN_ShutdownDIMouse( void ) {
-    if (g_pMouse) {
+
+static void IN_ShutdownDIMouse()
+{
+	if (g_pMouse) {
 		IDirectInputDevice_Release(g_pMouse);
 		g_pMouse = NULL;
 	}
 
-    if (g_pdi) {
+	if (g_pdi) {
 		IDirectInput_Release(g_pdi);
 		g_pdi = NULL;
 	}
 }
 
-/*
-==========================
-IN_ActivateDIMouse
-==========================
-*/
-void IN_ActivateDIMouse( void ) {
-	HRESULT		hr;
 
+static void IN_ActivateDIMouse()
+{
 	if (!g_pMouse) {
 		return;
 	}
 
 	// we may fail to reacquire if the window has been recreated
-	hr = IDirectInputDevice_Acquire( g_pMouse );
+	HRESULT hr = IDirectInputDevice_Acquire( g_pMouse );
 	if (FAILED(hr)) {
 		if ( !IN_InitDIMouse() ) {
 			Com_Printf ("Falling back to Win32 mouse support...\n");
@@ -348,12 +292,9 @@ void IN_ActivateDIMouse( void ) {
 	}
 }
 
-/*
-==========================
-IN_DeactivateDIMouse
-==========================
-*/
-void IN_DeactivateDIMouse( void ) {
+
+static void IN_DeactivateDIMouse()
+{
 	if (!g_pMouse) {
 		return;
 	}
@@ -361,17 +302,10 @@ void IN_DeactivateDIMouse( void ) {
 }
 
 
-/*
-===================
-IN_DIMouse
-===================
-*/
-void IN_DIMouse( int *mx, int *my ) {
-	DIDEVICEOBJECTDATA od[ DX_MOUSE_BUFFER_SIZE ];  // Receives buffered data  
-	DIMOUSESTATE2		state;
-	//DIMOUSESTATE		state;
-	DWORD				dwElements;
-	HRESULT				hr;
+static void IN_DIMouse( int *mx, int *my )
+{
+	DIDEVICEOBJECTDATA od[ DX_MOUSE_BUFFER_SIZE ];  // receives buffered data
+	HRESULT hr;
 	int value;
 
 	if ( !g_pMouse ) {
@@ -381,7 +315,7 @@ void IN_DIMouse( int *mx, int *my ) {
 	// fetch new events
 	for (;;)
 	{
-		dwElements = DX_MOUSE_BUFFER_SIZE;
+		DWORD dwElements = DX_MOUSE_BUFFER_SIZE;
 
 		hr = IDirectInputDevice_GetDeviceData(g_pMouse, sizeof(DIDEVICEOBJECTDATA), od, &dwElements, 0);
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED)) {
@@ -433,9 +367,9 @@ void IN_DIMouse( int *mx, int *my ) {
 		}
 	}
 
-	// read the raw delta counter and ignore
-	// the individual sample time / values
-	hr = IDirectInputDevice_GetDeviceState(g_pMouse, sizeof(state), &state);
+	// read the raw delta counter and ignore the individual sample time / values
+	DIMOUSESTATE2 state;
+	hr = IDirectInputDevice_GetDeviceState( g_pMouse, sizeof(state), &state );
 	if ( FAILED(hr) ) {
 		*mx = *my = 0;
 		return;
@@ -445,22 +379,19 @@ void IN_DIMouse( int *mx, int *my ) {
 	*my = state.lY;
 }
 
+
 /*
 ============================================================
 
-  MOUSE CONTROL
+MOUSE CONTROL
 
 ============================================================
 */
 
-/*
-===========
-IN_ActivateMouse
 
-Called when the window gains focus or changes in some way
-===========
-*/
-void IN_ActivateMouse( void ) 
+// called when the window gains focus or changes in some way
+
+static void IN_ActivateMouse()
 {
 	if (!s_wmv.mouseInitialized ) {
 		return;
@@ -484,14 +415,10 @@ void IN_ActivateMouse( void )
 }
 
 
-/*
-===========
-IN_DeactivateMouse
+// called when the window loses focus
 
-Called when the window loses focus
-===========
-*/
-void IN_DeactivateMouse( void ) {
+static void IN_DeactivateMouse()
+{
 	if (!s_wmv.mouseInitialized ) {
 		return;
 	}
@@ -505,16 +432,10 @@ void IN_DeactivateMouse( void ) {
 }
 
 
-
-/*
-===========
-IN_StartupMouse
-===========
-*/
-void IN_StartupMouse( void ) 
+static void IN_StartupMouse()
 {
 	s_wmv.mouseInitialized = qfalse;
-  s_wmv.mouseStartupDelayed = qfalse;
+	s_wmv.mouseStartupDelayed = qfalse;
 
 	if ( in_mouse->integer == 0 ) {
 		Com_Printf ("Mouse control not active.\n");
@@ -532,61 +453,51 @@ void IN_StartupMouse( void )
 	if ( in_mouse->integer == -1 ) {
 		Com_Printf ("Skipping check for DirectInput\n");
 	} else {
-    if (!g_wv.hWnd)
-    {
-      Com_Printf ("No window for DirectInput mouse init, delaying\n");
-      s_wmv.mouseStartupDelayed = qtrue;
-      return;
-    }
+		if (!g_wv.hWnd)
+		{
+			Com_Printf ("No window for DirectInput mouse init, delaying\n");
+			s_wmv.mouseStartupDelayed = qtrue;
+			return;
+		}
 		if ( IN_InitDIMouse() ) {
-	    s_wmv.mouseInitialized = qtrue;
+			s_wmv.mouseInitialized = qtrue;
 			return;
 		}
 		Com_Printf ("Falling back to Win32 mouse support...\n");
+		Cvar_Set( "in_mouse", "-1" );
 	}
+
 	s_wmv.mouseInitialized = qtrue;
-	IN_InitWin32Mouse();
 }
 
-/*
-===========
-IN_MouseEvent
-===========
-*/
-void IN_MouseEvent (int mstate)
+
+void IN_MouseEvent( int mstate )
 {
 	int		i;
 
 	if ( !s_wmv.mouseInitialized )
 		return;
 
-// perform button actions
-	for  (i = 0 ; i < MAX_MOUSE_BUTTONS ; i++ )
+	for (i = 0 ; i < MAX_MOUSE_BUTTONS ; i++ )
 	{
-		if ( (mstate & (1<<i)) &&
-			!(s_wmv.oldButtonState & (1<<i)) )
+		if ( (mstate & (1<<i)) && !(s_wmv.oldButtonState & (1<<i)) )
 		{
 			Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MOUSE1 + i, qtrue, 0, NULL );
 		}
 
-		if ( !(mstate & (1<<i)) &&
-			(s_wmv.oldButtonState & (1<<i)) )
+		if ( !(mstate & (1<<i)) && (s_wmv.oldButtonState & (1<<i)) )
 		{
 			Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, K_MOUSE1 + i, qfalse, 0, NULL );
 		}
-	}	
+	}
 
 	s_wmv.oldButtonState = mstate;
 }
 
 
-/*
-===========
-IN_MouseMove
-===========
-*/
-void IN_MouseMove ( void ) {
-	int		mx, my;
+static void IN_MouseMove()
+{
+	int mx, my;
 
 	if ( g_pMouse ) {
 		IN_DIMouse( &mx, &my );
@@ -602,79 +513,52 @@ void IN_MouseMove ( void ) {
 }
 
 
-/*
-=========================================================================
+///////////////////////////////////////////////////////////////
 
-=========================================================================
-*/
 
-/*
-===========
-IN_Startup
-===========
-*/
-void IN_Startup( void ) {
-	Com_Printf ("\n------- Input Initialization -------\n");
-	IN_StartupMouse ();
-	IN_StartupJoystick ();
+static void IN_Startup()
+{
+	Com_Printf( "\n------- Input Initialization -------\n" );
+	IN_StartupMouse();
+	IN_StartupJoystick();
 	IN_StartupMIDI();
-	Com_Printf ("------------------------------------\n");
+	Com_Printf( "------------------------------------\n" );
 
 	in_mouse->modified = qfalse;
 	in_joystick->modified = qfalse;
 }
 
-/*
-===========
-IN_Shutdown
-===========
-*/
-void IN_Shutdown( void ) {
+
+void IN_Shutdown()
+{
 	IN_DeactivateMouse();
 	IN_ShutdownDIMouse();
 	IN_ShutdownMIDI();
-	Cmd_RemoveCommand("midiinfo" );
 }
 
 
-/*
-===========
-IN_Init
-===========
-*/
-void IN_Init( void ) {
-	// MIDI input controler variables
-	in_midi					= Cvar_Get ("in_midi",					"0",		CVAR_ARCHIVE);
-	in_midiport				= Cvar_Get ("in_midiport",				"1",		CVAR_ARCHIVE);
-	in_midichannel			= Cvar_Get ("in_midichannel",			"1",		CVAR_ARCHIVE);
-	in_mididevice			= Cvar_Get ("in_mididevice",			"0",		CVAR_ARCHIVE);
-
-	Cmd_AddCommand( "midiinfo", MidiInfo_f );
-
-	// mouse variables
-	in_mouse				= Cvar_Get ("in_mouse",					"1",		CVAR_ARCHIVE|CVAR_LATCH);
-
-	// joystick variables
-	in_joystick				= Cvar_Get ("in_joystick",				"0",		CVAR_ARCHIVE|CVAR_LATCH);
-	in_joyBallScale			= Cvar_Get ("in_joyBallScale",			"0.02",		CVAR_ARCHIVE);
-	in_debugJoystick		= Cvar_Get ("in_debugjoystick",			"0",		CVAR_TEMP);
-
-	joy_threshold			= Cvar_Get ("joy_threshold",			"0.15",		CVAR_ARCHIVE);
+void IN_Init()
+{
+	in_midi		= Cvar_Get( "in_midi",		"0", CVAR_ARCHIVE );
+	in_mouse	= Cvar_Get( "in_mouse",		"1", CVAR_ARCHIVE|CVAR_LATCH );
+	in_joystick	= Cvar_Get( "in_joystick",	"0", CVAR_ARCHIVE|CVAR_LATCH );
 
 	IN_Startup();
 }
 
 
-/*
-===========
-IN_Activate
+///////////////////////////////////////////////////////////////
 
+static qbool in_appactive;
+
+
+/*
 Called when the main window gains or loses focus.
 The window may have been destroyed and recreated
 between a deactivate and an activate.
-===========
 */
-void IN_Activate (qbool active) {
+void IN_Activate( qbool active )
+{
 	in_appactive = active;
 
 	if ( !active )
@@ -684,22 +568,18 @@ void IN_Activate (qbool active) {
 }
 
 
-/*
-==================
-IN_Frame
+// called every frame, even if not generating commands
 
-Called every frame, even if not generating commands
-==================
-*/
-void IN_Frame (void) {
+void IN_Frame()
+{
 	// post joystick events
 	IN_JoyMove();
 
 	if ( !s_wmv.mouseInitialized ) {
-    if (s_wmv.mouseStartupDelayed && g_wv.hWnd)
+		if (s_wmv.mouseStartupDelayed && g_wv.hWnd)
 		{
 			Com_Printf("Proceeding with delayed mouse init\n");
-      IN_StartupMouse();
+			IN_StartupMouse();
 			s_wmv.mouseStartupDelayed = qfalse;
 		}
 		return;
@@ -708,13 +588,13 @@ void IN_Frame (void) {
 	if ( cls.keyCatchers & KEYCATCH_CONSOLE ) {
 		// temporarily deactivate if not in the game and running on the desktop
 		if (!Cvar_VariableValue("r_fullscreen")) {
-			IN_DeactivateMouse ();
+			IN_DeactivateMouse();
 			return;
 		}
 	}
 
 	if ( !in_appactive ) {
-		IN_DeactivateMouse ();
+		IN_DeactivateMouse();
 		return;
 	}
 
@@ -722,18 +602,6 @@ void IN_Frame (void) {
 
 	// post events to the system que
 	IN_MouseMove();
-
-}
-
-
-/*
-===================
-IN_ClearStates
-===================
-*/
-void IN_ClearStates (void) 
-{
-	s_wmv.oldButtonState = 0;
 }
 
 
@@ -745,32 +613,32 @@ JOYSTICK
 =========================================================================
 */
 
-/* 
-=============== 
-IN_StartupJoystick 
-=============== 
-*/  
-void IN_StartupJoystick (void) { 
-	int			numdevs;
-	MMRESULT	mmr;
 
+static const cvar_t* in_joyBallScale;
+static const cvar_t* in_debugJoystick;
+static const cvar_t* joy_threshold;
+
+
+static void IN_StartupJoystick()
+{
 	// assume no joystick
-	joy.avail = qfalse; 
+	joy.avail = qfalse;
 
-	if (! in_joystick->integer ) {
+	if ( !in_joystick->integer ) {
 		Com_Printf ("Joystick is not active.\n");
 		return;
 	}
 
 	// verify joystick driver is present
-	if ((numdevs = joyGetNumDevs ()) == 0)
+	int numdevs;
+	if ((numdevs = joyGetNumDevs()) == 0)
 	{
 		Com_Printf ("joystick not found -- driver not present\n");
 		return;
 	}
 
 	// cycle through the joystick ids for the first valid one
-	mmr = 0;
+	MMRESULT mmr = !JOYERR_NOERROR;
 	for (joy.id=0 ; joy.id<numdevs ; joy.id++)
 	{
 		Com_Memset (&joy.ji, 0, sizeof(joy.ji));
@@ -779,7 +647,7 @@ void IN_StartupJoystick (void) {
 
 		if ((mmr = joyGetPosEx (joy.id, &joy.ji)) == JOYERR_NOERROR)
 			break;
-	} 
+	}
 
 	// abort startup if we didn't find a valid joystick
 	if (mmr != JOYERR_NOERROR)
@@ -796,6 +664,11 @@ void IN_StartupJoystick (void) {
 		Com_Printf ("joystick not found -- invalid joystick capabilities (%x)\n", mmr); 
 		return;
 	}
+
+	// activate and archive the cvars since they actually want joystick support
+	in_debugJoystick	= Cvar_Get ("in_debugjoystick",			"0",		CVAR_TEMP);
+	in_joyBallScale		= Cvar_Get ("in_joyBallScale",			"0.02",		CVAR_ARCHIVE);
+	joy_threshold		= Cvar_Get ("joy_threshold",			"0.15",		CVAR_ARCHIVE);
 
 	Com_Printf( "Joystick found.\n" );
 	Com_Printf( "Pname: %s\n", joy.jc.szPname );
@@ -816,57 +689,44 @@ void IN_StartupJoystick (void) {
 	joy.oldpovstate = 0;
 
 	// mark the joystick as available
-	joy.avail = qtrue; 
+	joy.avail = qtrue;
 }
 
-/*
-===========
-JoyToF
-===========
-*/
-float JoyToF( int value ) {
+
+static float JoyToF( int value )
+{
 	float	fValue;
 
 	// move centerpoint to zero
 	value -= 32768;
 
-	// convert range from -32768..32767 to -1..1 
+	// convert range from -32768..32767 to -1..1
 	fValue = (float)value / 32768.0;
 
-	if ( fValue < -1 ) {
-		fValue = -1;
-	}
-	if ( fValue > 1 ) {
-		fValue = 1;
-	}
-	return fValue;
+	return Com_Clamp( -1, 1, fValue );
 }
 
-int JoyToI( int value ) {
+
+static int JoyToI( int value )
+{
 	// move centerpoint to zero
-	value -= 32768;
-
-	return value;
+	return (value - 32768);
 }
 
-int	joyDirectionKeys[16] = {
+
+static const int joyDirectionKeys[16] = {
 	K_LEFTARROW, K_RIGHTARROW,
 	K_UPARROW, K_DOWNARROW,
 	K_JOY16, K_JOY17,
 	K_JOY18, K_JOY19,
 	K_JOY20, K_JOY21,
 	K_JOY22, K_JOY23,
-
 	K_JOY24, K_JOY25,
 	K_JOY26, K_JOY27
 };
 
-/*
-===========
-IN_JoyMove
-===========
-*/
-void IN_JoyMove( void )
+
+static void IN_JoyMove()
 {
 	float	fAxisValue;
 	UINT i;
@@ -893,7 +753,7 @@ void IN_JoyMove( void )
 	}
 
 	if ( in_debugJoystick->integer ) {
-		Com_Printf( "%8x %5i %5.2f %5.2f %5.2f %5.2f %6i %6i\n", 
+		Com_Printf( "%8x %5i %5.2f %5.2f %5.2f %5.2f %6i %6i\n",
 			joy.ji.dwButtons,
 			joy.ji.dwPOV,
 			JoyToF( joy.ji.dwXpos ), JoyToF( joy.ji.dwYpos ),
@@ -964,6 +824,7 @@ void IN_JoyMove( void )
 	}
 }
 
+
 /*
 =========================================================================
 
@@ -971,6 +832,12 @@ MIDI
 
 =========================================================================
 */
+
+
+static const cvar_t* in_midiport;
+static const cvar_t* in_midichannel;
+static const cvar_t* in_mididevice;
+
 
 static void MIDI_NoteOff( int note )
 {
@@ -999,8 +866,7 @@ static void MIDI_NoteOn( int note, int velocity )
 	Sys_QueEvent( g_wv.sysMsgTime, SE_KEY, qkey, qtrue, 0, NULL );
 }
 
-static void CALLBACK MidiInProc( HMIDIIN hMidiIn, UINT uMsg, DWORD dwInstance, 
-								 DWORD dwParam1, DWORD dwParam2 )
+static void CALLBACK MidiInProc( HMIDIIN hMidiIn, UINT uMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2 )
 {
 	int message;
 
@@ -1012,8 +878,6 @@ static void CALLBACK MidiInProc( HMIDIIN hMidiIn, UINT uMsg, DWORD dwInstance,
 		break;
 	case MIM_DATA:
 		message = dwParam1 & 0xff;
-
-		// note on
 		if ( ( message & 0xf0 ) == 0x90 )
 		{
 			if ( ( ( message & 0x0f ) + 1 ) == in_midichannel->integer )
@@ -1047,6 +911,7 @@ static void MidiInfo_f( void )
 	Com_Printf( "channel:            %d\n", in_midichannel->integer );
 	Com_Printf( "current device:     %d\n", in_mididevice->integer );
 	Com_Printf( "number of devices:  %d\n", s_midiInfo.numDevices );
+
 	for ( i = 0; i < s_midiInfo.numDevices; i++ )
 	{
 		if ( i == Cvar_VariableValue( "in_mididevice" ) )
@@ -1056,12 +921,11 @@ static void MidiInfo_f( void )
 		Com_Printf(    "device %2d:       %s\n", i, s_midiInfo.caps[i].szPname );
 		Com_Printf( "...manufacturer ID: 0x%hx\n", s_midiInfo.caps[i].wMid );
 		Com_Printf( "...product ID:      0x%hx\n", s_midiInfo.caps[i].wPid );
-
 		Com_Printf( "\n" );
 	}
 }
 
-static void IN_StartupMIDI( void )
+static void IN_StartupMIDI()
 {
 	int i;
 
@@ -1078,11 +942,18 @@ static void IN_StartupMIDI( void )
 		midiInGetDevCaps( i, &s_midiInfo.caps[i], sizeof( s_midiInfo.caps[i] ) );
 	}
 
+	// activate and archive the cvars since they actually want midi support
+	in_midiport		= Cvar_Get ("in_midiport",				"1",		CVAR_ARCHIVE);
+	in_midichannel	= Cvar_Get ("in_midichannel",			"1",		CVAR_ARCHIVE);
+	in_mididevice	= Cvar_Get ("in_mididevice",			"0",		CVAR_ARCHIVE);
+
+	Cmd_AddCommand( "midiinfo", MidiInfo_f );
+
 	//
 	// open the MIDI IN port
 	//
-	if ( midiInOpen( &s_midiInfo.hMidiIn, 
-		             in_mididevice->integer,
+	if ( midiInOpen( &s_midiInfo.hMidiIn,
+					 in_mididevice->integer,
 					 ( unsigned long ) MidiInProc,
 					 ( unsigned long ) NULL,
 					 CALLBACK_FUNCTION ) != MMSYSERR_NOERROR )
@@ -1094,12 +965,13 @@ static void IN_StartupMIDI( void )
 	midiInStart( s_midiInfo.hMidiIn );
 }
 
-static void IN_ShutdownMIDI( void )
+static void IN_ShutdownMIDI()
 {
 	if ( s_midiInfo.hMidiIn )
 	{
 		midiInClose( s_midiInfo.hMidiIn );
 	}
 	Com_Memset( &s_midiInfo, 0, sizeof( s_midiInfo ) );
+	Cmd_RemoveCommand("midiinfo" );
 }
 

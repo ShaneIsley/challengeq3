@@ -1,4 +1,9 @@
 
+Mar 08 - 1.42
+
+legacy cack like joystick/midi support only pollutes configs if enabled
+
+
 18 Feb 08 - 1.41
 
 removed all bs references to GT_SINGLE_PLAYER and ui_singlePlayerActive
