@@ -26,7 +26,7 @@ equ	trap_GetServerinfo		-23
 equ	trap_SetBrushModel		-24
 equ	trap_Trace				-25
 equ	trap_PointContents		-26
-equ trap_InPVS				-27
+equ	trap_InPVS				-27
 equ	trap_InPVSIgnorePortals	-28
 equ	trap_AdjustAreaPortalState	-29
 equ	trap_AreasConnected		-30
@@ -42,10 +42,10 @@ equ	trap_FS_GetFileList		-39
 equ trap_DebugPolygonCreate	-40
 equ trap_DebugPolygonDelete	-41
 equ trap_RealTime			-42
-equ DO_NOT_WANT_trap_SnapVector			-43
+equ shit_SnapVector			-43
 equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
-equ trap_FS_Seek -46
+equ trap_FS_Seek			-46
 
 equ	memset					-101
 equ	memcpy					-102
@@ -54,10 +54,10 @@ equ	sin						-104
 equ	cos						-105
 equ	atan2					-106
 equ	sqrt					-107
-equ floor					-111
+equ	floor					-111
 equ	ceil					-112
-equ	testPrintInt			-113
-equ	testPrintFloat			-114
+equ	shit_PrintInt			-113
+equ	shit_PrintFloat			-114
 
 
 
@@ -72,14 +72,13 @@ equ trap_BotLibUpdateEntity				-208
 equ trap_BotLibTest						-209
 
 equ trap_BotGetSnapshotEntity			-210
-equ trap_BotGetServerCommand		-211
+equ trap_BotGetServerCommand			-211
 equ trap_BotUserCommand					-212
 
 
-
-equ trap_AAS_EnableRoutingArea		-301
-equ trap_AAS_BBoxAreas				-302
-equ trap_AAS_AreaInfo				-303
+equ trap_AAS_EnableRoutingArea			-301
+equ trap_AAS_BBoxAreas					-302
+equ trap_AAS_AreaInfo					-303
 equ trap_AAS_EntityInfo					-304
 
 equ trap_AAS_Initialized				-305
@@ -102,7 +101,6 @@ equ trap_AAS_AreaTravelTimeToGoalArea	-317
 
 equ trap_AAS_Swimming					-318
 equ trap_AAS_PredictClientMovement		-319
-
 
 
 equ trap_EA_Say							-401
@@ -132,7 +130,6 @@ equ trap_EA_View						-421
 equ trap_EA_EndRegular					-422
 equ trap_EA_GetInput					-423
 equ trap_EA_ResetInput					-424
-
 
 
 equ trap_BotLoadCharacter				-501
@@ -222,4 +219,4 @@ equ trap_BotLibLoadSource				-579
 equ trap_BotLibFreeSource				-580
 equ trap_BotLibReadToken				-581
 equ trap_BotLibSourceFileAndLine		-582
- 
+
