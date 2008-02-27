@@ -67,9 +67,9 @@ typedef enum {
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
+
 //============================================================================
 
-typedef struct gentity_s gentity_t;
 
 struct gentity_s {
 	entityState_t	s;				// communicated by server to clients
