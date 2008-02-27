@@ -396,10 +396,6 @@ void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
 
-qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
-	return syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );
-}
-
 qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( CG_R_INPVS, p1, p2 );
 }
