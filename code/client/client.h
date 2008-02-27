@@ -26,8 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../renderer/tr_public.h"
 #include "keys.h"
 #include "snd_public.h"
-#include "../ui/ui_public.h"
 #include "../qcommon/cg_public.h"
+#include "../qcommon/ui_public.h"
 #include "../game/bg_public.h"
 
 /* fucking amateur hour garbage code - best to just externC the whole pile i expect
