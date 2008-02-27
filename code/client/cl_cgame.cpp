@@ -25,16 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/vm_local.h"
 #include "../qcommon/vm_shim.h"
 
-/*
-#include "../botlib/botlib.h"
-
-extern	botlib_export_t	*botlib_export;
-
-extern qbool loadCamera(const char *name);
-extern void startCamera(int time);
-extern qbool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
-*/
-
 
 static void CL_GetGameState( gameState_t* gs )
 {
@@ -323,25 +313,6 @@ rescan:
 		// the restart to the cgame
 		Con_ClearNotify();
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
-		return qtrue;
-	}
-
-	// the clientLevelShot command is used during development
-	// to generate 128*128 screenshots from the intermission
-	// point of levels for the menu system to use
-	// we pass it along to the cgame to make apropriate adjustments,
-	// but we also clear the console and notify lines here
-	if ( !strcmp( cmd, "clientLevelShot" ) ) {
-		// don't do it if we aren't running the server locally,
-		// otherwise malicious remote servers could overwrite
-		// the existing thumbnails
-		if ( !com_sv_running->integer ) {
-			return qfalse;
-		}
-		// close the console
-		Con_Close();
-		// take a special screenshot next frame
-		Cbuf_AddText( "wait ; wait ; wait ; wait ; screenshot levelshot\n" );
 		return qtrue;
 	}
 

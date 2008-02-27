@@ -24,11 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/vm_local.h"
 #include "../qcommon/vm_shim.h"
 
-//#include "../botlib/botlib.h"
-//extern	botlib_export_t	*botlib_export;
-
-#include "../ui/ui_public.h"
-
 vm_t *uivm;
 
 /*
@@ -739,7 +734,7 @@ static int GetConfigString(int index, char *buf, int size)
 	}
 
 	Q_strncpyz( buf, cl.gameState.stringData+offset, size);
- 
+
 	return qtrue;
 }
 
