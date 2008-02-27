@@ -634,7 +634,7 @@ int trap_BotItemGoalInVisButNotVisible(int viewer, vec3_t eye, vec3_t viewangles
 	return syscall( BOTLIB_AI_ITEM_GOAL_IN_VIS_BUT_NOT_VISIBLE, viewer, eye, viewangles, goal );
 }
 
-int trap_BotGetLevelItemGoal(int index, char *classname, void /* struct bot_goal_s */ *goal) {
+int trap_BotGetLevelItemGoal(int index, const char* classname, void /* struct bot_goal_s */ *goal) {
 	return syscall( BOTLIB_AI_GET_LEVEL_ITEM_GOAL, index, classname, goal );
 }
 
