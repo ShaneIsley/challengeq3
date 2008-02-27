@@ -191,20 +191,12 @@ void	trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( CG_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
-void	trap_S_ClearLoopingSounds( qboolean killall ) {
-	syscall( CG_S_CLEARLOOPINGSOUNDS, killall );
+void	trap_S_ClearLoopingSounds( qboolean ignored ) {
+	syscall( CG_S_CLEARLOOPINGSOUNDS, qtrue );
 }
 
 void	trap_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx ) {
 	syscall( CG_S_ADDLOOPINGSOUND, entityNum, origin, velocity, sfx );
-}
-
-void	trap_S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx ) {
-	syscall( CG_S_ADDREALLOOPINGSOUND, entityNum, origin, velocity, sfx );
-}
-
-void	trap_S_StopLoopingSound( int entityNum ) {
-	syscall( CG_S_STOPLOOPINGSOUND, entityNum );
 }
 
 void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
@@ -243,8 +235,8 @@ qhandle_t trap_R_RegisterShaderNoMip( const char *name ) {
 	return syscall( CG_R_REGISTERSHADERNOMIP, name );
 }
 
-void trap_R_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
-	syscall(CG_R_REGISTERFONT, fontName, pointSize, font );
+qboolean trap_R_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font ) {
+	return syscall( CG_R_REGISTERFONT, fontName, pointSize, font );
 }
 
 void	trap_R_ClearScene( void ) {
@@ -403,20 +395,6 @@ void trap_CIN_DrawCinematic (int handle) {
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
-
-/*
-qboolean trap_loadCamera( const char *name ) {
-	return syscall( CG_LOADCAMERA, name );
-}
-
-void trap_startCamera(int time) {
-	syscall(CG_STARTCAMERA, time);
-}
-
-qboolean trap_getCameraInfo( int time, vec3_t *origin, vec3_t *angles) {
-	return syscall( CG_GETCAMERAINFO, time, origin, angles );
-}
-*/
 
 qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
 	return syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );
