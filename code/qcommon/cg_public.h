@@ -52,6 +52,13 @@ typedef struct {
 } snapshot_t;
 
 
+// allow a lot of command backups for very fast systems
+// multiple commands may be combined into a single packet, so this
+// needs to be larger than PACKET_BACKUP
+#define	CMD_BACKUP		64
+#define	CMD_MASK		(CMD_BACKUP - 1)
+
+
 /*
 ==================================================================
 
