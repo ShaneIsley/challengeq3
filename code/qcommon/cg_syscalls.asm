@@ -64,11 +64,11 @@ equ trap_Key_IsDown						-61
 equ trap_Key_GetCatcher					-62
 equ trap_Key_SetCatcher					-63
 equ trap_Key_GetKey						-64
-equ trap_PC_AddGlobalDefine				-65
-equ trap_PC_LoadSource					-66
-equ trap_PC_FreeSource					-67
-equ trap_PC_ReadToken					-68
-equ trap_PC_SourceFileAndLine			-69
+equ shit_PC_AddGlobalDefine				-65
+equ shit_PC_LoadSource					-66
+equ shit_PC_FreeSource					-67
+equ shit_PC_ReadToken					-68
+equ shit_PC_SourceFileAndLine			-69
 equ trap_S_StopBackgroundTrack			-70
 equ trap_RealTime						-71
 equ shit_SnapVector						-72
