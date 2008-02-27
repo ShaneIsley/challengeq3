@@ -1608,6 +1608,9 @@ typedef enum {
 } renderCommand_t;
 
 
+#define	MAX_DLIGHTS		32			// can't be increased, because bit flags are used on surfaces
+#define	MAX_REFENTITIES	1023		// can't be increased without changing drawsurf bit packing
+
 // these are sort of arbitrary limits.
 // the limits apply to the sum of all scenes in a frame --
 // the main view, all the 3D icons, etc
@@ -1621,7 +1624,7 @@ typedef enum {
 typedef struct {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
 	dlight_t	dlights[MAX_DLIGHTS];
-	trRefEntity_t	entities[MAX_ENTITIES];
+	trRefEntity_t	entities[MAX_REFENTITIES];
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
 	renderCommandList_t	commands;

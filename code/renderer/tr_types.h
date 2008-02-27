@@ -24,9 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __TR_TYPES_H
 
 
-#define	MAX_DLIGHTS		32			// can't be increased, because bit flags are used on surfaces
-#define	MAX_ENTITIES	1023		// can't be increased without changing drawsurf bit packing
-
 // renderfx flags
 #define	RF_MINLIGHT			1		// allways have some light (viewmodel, some items)
 #define	RF_THIRD_PERSON		2		// don't draw through eyes, only mirrors (player bodies, chat sprites)
@@ -186,23 +183,5 @@ typedef struct {
 
 extern glconfig_t glConfig;
 
-
-// FIXME: VM should be OS agnostic .. in theory
-/* then, duh, move these into sys_glimp where they belong...
-#if defined(Q3_VM) || defined(_WIN32)
-
-#define OPENGL_DRIVER_NAME	"opengl32"
-
-#elif defined(MACOS_X)
-
-#define OPENGL_DRIVER_NAME	"/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
-
-#else
-
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=524
-#define OPENGL_DRIVER_NAME	"libGL.so.1"
-
-#endif	// !defined _WIN32
-*/
 
 #endif	// __TR_TYPES_H
