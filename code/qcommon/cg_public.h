@@ -166,8 +166,8 @@ typedef enum {
 	CG_SQRT,
 	CG_FLOOR,
 	CG_CEIL,
-	CG_TESTPRINTINT,
-	CG_TESTPRINTFLOAT,
+	DO_NOT_WANT_CG_TESTPRINTINT,
+	DO_NOT_WANT_CG_TESTPRINTFLOAT,
 	CG_ACOS
 } cgameImport_t;
 
@@ -327,10 +327,6 @@ qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );
-
-// aids for VM testing
-void		testPrintInt( char *string, int i );
-void		testPrintFloat( char *string, float f );
 
 int			trap_MemoryRemaining( void );
 qboolean	trap_R_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font );
