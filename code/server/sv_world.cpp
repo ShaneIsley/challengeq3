@@ -117,7 +117,7 @@ static worldSector_t* SV_CreateworldSector( int depth, const vec3_t mins, const 
 		anode->children[0] = anode->children[1] = NULL;
 		return anode;
 	}
-	
+
 	VectorSubtract (maxs, mins, size);
 	if (size[0] > size[1]) {
 		anode->axis = 0;
@@ -267,7 +267,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 		}
 	} else {
 		// normal
-		VectorAdd (origin, gEnt->r.mins, gEnt->r.absmin);	
+		VectorAdd (origin, gEnt->r.mins, gEnt->r.absmin);
 		VectorAdd (origin, gEnt->r.maxs, gEnt->r.absmax);
 	}
 
@@ -300,7 +300,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	for (i=0 ; i<num_leafs ; i++) {
 		area = CM_LeafArea (leafs[i]);
 		if (area != -1) {
-			// doors may legally straggle two areas,
+			// doors may legally straddle two areas,
 			// but nothing should ever need more than that
 			if (ent->areanum != -1 && ent->areanum != area) {
 				if (ent->areanum2 != -1 && ent->areanum2 != area && sv.state == SS_LOADING) {
@@ -445,7 +445,7 @@ int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int 
 typedef struct {
 	vec3_t		boxmins, boxmaxs;// enclose the test object along entire move
 	const float	*mins;
-	const float *maxs;	// size of the moving object
+	const float	*maxs;	// size of the moving object
 	const float	*start;
 	vec3_t		end;
 	trace_t		trace;
@@ -487,9 +487,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
-	CM_TransformedBoxTrace ( trace, (float *)start, (float *)end,
-		(float *)mins, (float *)maxs, clipHandle,  contentmask,
-		origin, angles, capsule);
+	CM_TransformedBoxTrace( trace, start, end, mins, maxs, clipHandle, contentmask, origin, angles, capsule );
 
 	if ( trace->fraction < 1 ) {
 		trace->entityNum = touch->s.number;
@@ -554,9 +552,9 @@ static void SV_ClipMoveToEntities( moveclip_t *clip )
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
-		CM_TransformedBoxTrace ( &trace, (float *)clip->start, (float *)clip->end,
-			(float *)clip->mins, (float *)clip->maxs, clipHandle,  clip->contentmask,
-			origin, angles, clip->capsule);
+		CM_TransformedBoxTrace( &trace, clip->start, clip->end,
+			clip->mins, clip->maxs, clipHandle, clip->contentmask,
+			origin, angles, clip->capsule );
 
 		if ( trace.allsolid ) {
 			clip->trace.allsolid = qtrue;
@@ -678,5 +676,4 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 
 	return contents;
 }
-
 
