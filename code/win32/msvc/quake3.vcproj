@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="quake3"
 	ProjectGUID="{81CB51C4-B434-4E12-B69B-BAEE102F2852}"
 	RootNamespace="quake3"
@@ -76,7 +76,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="winmm.lib wsock32.lib gdi32.lib opengl32.lib kernel32.lib user32.lib ole32.lib"
-				OutputFile="$(Q3DEST)\cnq3.exe"
+				OutputFile="..\..\..\..\cnq3.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateManifest="false"
@@ -2251,7 +2251,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\game\g_public.h"
+				RelativePath="..\..\qcommon\g_public.h"
 				>
 			</File>
 			<File
