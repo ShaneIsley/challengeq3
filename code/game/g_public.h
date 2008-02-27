@@ -556,7 +556,7 @@ int		trap_BotTouchingGoal(vec3_t origin, void /* struct bot_goal_s */ *goal);
 int		trap_BotItemGoalInVisButNotVisible(int viewer, vec3_t eye, vec3_t viewangles, void /* struct bot_goal_s */ *goal);
 int		trap_BotGetNextCampSpotGoal(int num, void /* struct bot_goal_s */ *goal);
 int		trap_BotGetMapLocationGoal(char *name, void /* struct bot_goal_s */ *goal);
-int		trap_BotGetLevelItemGoal(int index, char *classname, void /* struct bot_goal_s */ *goal);
+int		trap_BotGetLevelItemGoal(int index, const char* classname, void /* struct bot_goal_s */ *goal);
 float	trap_BotAvoidGoalTime(int goalstate, int number);
 void	trap_BotSetAvoidGoalTime(int goalstate, int number, float avoidtime);
 void	trap_BotInitLevelItems(void);
