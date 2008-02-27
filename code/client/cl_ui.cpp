@@ -1091,9 +1091,6 @@ static intptr_t CL_UISystemCalls( intptr_t* args )
 		CIN_SetExtents(args[1], args[2], args[3], args[4], args[5]);
 		return 0;
 
-	case UI_R_REMAP_SHADER:
-		return 0;
-
 	case UI_VERIFY_CDKEY:
 		return CL_CDKeyValidate(VMA(1), VMA(2));
 
