@@ -54,8 +54,13 @@ void	trap_Error( const char *fmt ) {
 }
 
 int		trap_Milliseconds( void ) {
-	return syscall( G_MILLISECONDS ); 
+	return syscall( G_MILLISECONDS );
 }
+
+int trap_RealTime( qtime_t *qtime ) {
+	return syscall( G_REAL_TIME, qtime );
+}
+
 int		trap_Argc( void ) {
 	return syscall( G_ARGC );
 }
@@ -221,10 +226,6 @@ int trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points) {
 
 void trap_DebugPolygonDelete(int id) {
 	syscall( G_DEBUG_POLYGON_DELETE, id );
-}
-
-int trap_RealTime( qtime_t *qtime ) {
-	return syscall( G_REAL_TIME, qtime );
 }
 
 // BotLib traps start here
