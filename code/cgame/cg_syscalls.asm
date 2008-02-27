@@ -6,7 +6,7 @@ equ	trap_Milliseconds					-3
 equ	trap_Cvar_Register					-4
 equ	trap_Cvar_Update					-5
 equ	trap_Cvar_Set						-6
-equ trap_Cvar_VariableStringBuffer		-7
+equ	trap_Cvar_VariableStringBuffer		-7
 equ	trap_Argc							-8
 equ	trap_Argv							-9
 equ	trap_Args							-10
@@ -65,13 +65,13 @@ equ trap_Key_GetCatcher					-62
 equ trap_Key_SetCatcher					-63
 equ trap_Key_GetKey						-64
 equ trap_PC_AddGlobalDefine				-65
-equ	trap_PC_LoadSource					-66
+equ trap_PC_LoadSource					-66
 equ trap_PC_FreeSource					-67
 equ trap_PC_ReadToken					-68
 equ trap_PC_SourceFileAndLine			-69
 equ trap_S_StopBackgroundTrack			-70
 equ trap_RealTime						-71
-equ DO_NOT_WANT_trap_SnapVector						-72
+equ shit_SnapVector						-72
 equ trap_RemoveCommand					-73
 equ trap_R_LightForPoint				-74
 equ trap_CIN_PlayCinematic				-75
@@ -79,15 +79,15 @@ equ trap_CIN_StopCinematic				-76
 equ trap_CIN_RunCinematic 				-77
 equ trap_CIN_DrawCinematic				-78
 equ trap_CIN_SetExtents					-79
-equ DO_NOT_WANT_trap_R_RemapShader					-80
-equ	trap_S_AddRealLoopingSound			-81
-equ trap_S_StopLoopingSound				-82
+equ shit_R_RemapShader					-80
+equ shit_S_AddRealLoopingSound			-81
+equ shit_S_StopLoopingSound				-82
 equ trap_CM_TempCapsuleModel			-83
 equ trap_CM_CapsuleTrace				-84
 equ trap_CM_TransformedCapsuleTrace		-85
 equ trap_R_AddAdditiveLightToScene		-86
 equ trap_GetEntityToken					-87
-equ	trap_R_AddPolysToScene				-88
+equ trap_R_AddPolysToScene				-88
 equ trap_R_inPVS						-89
 equ trap_FS_Seek			-90
 
@@ -98,9 +98,9 @@ equ	sin							-104
 equ	cos							-105
 equ	atan2						-106
 equ	sqrt						-107
-equ floor						-108
+equ	floor						-108
 equ	ceil						-109
 equ	testPrintInt				-110
 equ	testPrintFloat				-111
-equ acos						-112
+equ	acos						-112
 
