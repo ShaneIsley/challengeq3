@@ -738,18 +738,8 @@ static int GetConfigString(int index, char *buf, int size)
 	return qtrue;
 }
 
-/*
-====================
-FloatAsInt
-====================
-*/
-static int FloatAsInt( float f ) {
-	int		temp;
 
-	*(float *)&temp = f;
-
-	return temp;
-}
+///////////////////////////////////////////////////////////////
 
 
 // the ui module is making a system call
@@ -781,7 +771,7 @@ static intptr_t CL_UISystemCalls( intptr_t* args )
 		return 0;
 
 	case UI_CVAR_VARIABLEVALUE:
-		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
+		return PASSFLOAT( Cvar_VariableValue( VMA(1) ) );
 
 	case UI_CVAR_VARIABLESTRINGBUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
@@ -1033,22 +1023,22 @@ static intptr_t CL_UISystemCalls( intptr_t* args )
 		return args[1];
 
 	case UI_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
+		return PASSFLOAT( sin( VMF(1) ) );
 
 	case UI_COS:
-		return FloatAsInt( cos( VMF(1) ) );
+		return PASSFLOAT( cos( VMF(1) ) );
 
 	case UI_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+		return PASSFLOAT( atan2( VMF(1), VMF(2) ) );
 
 	case UI_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
+		return PASSFLOAT( sqrt( VMF(1) ) );
 
 	case UI_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
+		return PASSFLOAT( floor( VMF(1) ) );
 
 	case UI_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
+		return PASSFLOAT( ceil( VMF(1) ) );
 
 	case UI_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();

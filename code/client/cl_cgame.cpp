@@ -347,13 +347,8 @@ void CL_ShutdownCGame( void ) {
 	cgvm = NULL;
 }
 
-static int	FloatAsInt( float f ) {
-	int		temp;
 
-	*(float *)&temp = f;
-
-	return temp;
-}
+///////////////////////////////////////////////////////////////
 
 
 // the cgame module is making a system call
@@ -566,19 +561,19 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 		strncpy( VMA(1), VMA(2), args[3] );
 		return args[1];
 	case CG_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
+		return PASSFLOAT( sin( VMF(1) ) );
 	case CG_COS:
-		return FloatAsInt( cos( VMF(1) ) );
+		return PASSFLOAT( cos( VMF(1) ) );
 	case CG_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+		return PASSFLOAT( atan2( VMF(1), VMF(2) ) );
 	case CG_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
+		return PASSFLOAT( sqrt( VMF(1) ) );
 	case CG_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
+		return PASSFLOAT( floor( VMF(1) ) );
 	case CG_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
+		return PASSFLOAT( ceil( VMF(1) ) );
 	case CG_ACOS:
-		return FloatAsInt( Q_acos( VMF(1) ) );
+		return PASSFLOAT( Q_acos( VMF(1) ) );
 
 	case CG_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();

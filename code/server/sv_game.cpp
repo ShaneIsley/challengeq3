@@ -228,19 +228,6 @@ static void SV_GetUsercmd( int clientNum, usercmd_t* cmd )
 ///////////////////////////////////////////////////////////////
 
 
-static int FloatAsInt( float f )
-{
-	union
-	{
-		int i;
-		float f;
-	} temp;
-
-	temp.f = f;
-	return temp.i;
-}
-
-
 // the game module is making a system call
 
 static intptr_t SV_GameSystemCalls( intptr_t* args )
@@ -432,7 +419,7 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 		botlib_export->aas.AAS_PresenceTypeBoundingBox( args[1], VMA(2), VMA(3) );
 		return 0;
 	case BOTLIB_AAS_TIME:
-		return FloatAsInt( botlib_export->aas.AAS_Time() );
+		return PASSFLOAT( botlib_export->aas.AAS_Time() );
 
 	case BOTLIB_AAS_POINT_AREA_NUM:
 		return botlib_export->aas.AAS_PointAreaNum( VMA(1) );
@@ -552,9 +539,9 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 		botlib_export->ai.BotFreeCharacter( args[1] );
 		return 0;
 	case BOTLIB_AI_CHARACTERISTIC_FLOAT:
-		return FloatAsInt( botlib_export->ai.Characteristic_Float( args[1], args[2] ) );
+		return PASSFLOAT( botlib_export->ai.Characteristic_Float( args[1], args[2] ) );
 	case BOTLIB_AI_CHARACTERISTIC_BFLOAT:
-		return FloatAsInt( botlib_export->ai.Characteristic_BFloat( args[1], args[2], VMF(3), VMF(4) ) );
+		return PASSFLOAT( botlib_export->ai.Characteristic_BFloat( args[1], args[2], VMF(3), VMF(4) ) );
 	case BOTLIB_AI_CHARACTERISTIC_INTEGER:
 		return botlib_export->ai.Characteristic_Integer( args[1], args[2] );
 	case BOTLIB_AI_CHARACTERISTIC_BINTEGER:
@@ -661,7 +648,7 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 	case BOTLIB_AI_GET_MAP_LOCATION_GOAL:
 		return botlib_export->ai.BotGetMapLocationGoal( VMA(1), VMA(2) );
 	case BOTLIB_AI_AVOID_GOAL_TIME:
-		return FloatAsInt( botlib_export->ai.BotAvoidGoalTime( args[1], args[2] ) );
+		return PASSFLOAT( botlib_export->ai.BotAvoidGoalTime( args[1], args[2] ) );
 	case BOTLIB_AI_SET_AVOID_GOAL_TIME:
 		botlib_export->ai.BotSetAvoidGoalTime( args[1], args[2], VMF(3));
 		return 0;
@@ -755,16 +742,16 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 		return args[1];
 
 	case TRAP_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
+		return PASSFLOAT( sin( VMF(1) ) );
 
 	case TRAP_COS:
-		return FloatAsInt( cos( VMF(1) ) );
+		return PASSFLOAT( cos( VMF(1) ) );
 
 	case TRAP_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+		return PASSFLOAT( atan2( VMF(1), VMF(2) ) );
 
 	case TRAP_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
+		return PASSFLOAT( sqrt( VMF(1) ) );
 
 	case TRAP_MATRIXMULTIPLY:
 		MatrixMultiply( VMA(1), VMA(2), VMA(3) );
@@ -779,10 +766,10 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 		return 0;
 
 	case TRAP_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
+		return PASSFLOAT( floor( VMF(1) ) );
 
 	case TRAP_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
+		return PASSFLOAT( ceil( VMF(1) ) );
 
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %i", args[0] );

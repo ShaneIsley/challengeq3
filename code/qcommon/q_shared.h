@@ -123,6 +123,8 @@ typedef qbool qboolean;
 #define ID_INLINE
 #include "../game/bg_lib.h"
 
+#define PASSFLOAT( x ) (*(const int*)&x)
+
 #else
 
 #include <assert.h>
@@ -137,7 +139,10 @@ typedef qbool qboolean;
 
 #include "../qcommon/q_platform.h"
 
+ID_INLINE int PASSFLOAT( float x ) { return (*(const int*)&x); }
+
 #endif
+
 
 //=============================================================
 
