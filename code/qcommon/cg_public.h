@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_public.h -- engine calls and types exposed to the cgame module
 // A user mod should never modify this file
 
+#include "../qcommon/tr_types.h"
+
 
 #define	MAX_ENTITIES_IN_SNAPSHOT	256
 
