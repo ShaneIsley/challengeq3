@@ -38,12 +38,8 @@ static void CL_GetGlconfig( glconfig_t* glconfig )
 }
 
 
-/*
-====================
-CL_GetUserCmd
-====================
-*/
-qbool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+static qbool CL_GetUserCmd( int cmdNumber, usercmd_t* ucmd )
+{
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -62,7 +58,9 @@ qbool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return qtrue;
 }
 
-int CL_GetCurrentCmdNumber( void ) {
+
+static int CL_GetCurrentCmdNumber()
+{
 	return cl.cmdNumber;
 }
 
@@ -582,19 +580,6 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 	case CG_ACOS:
 		return FloatAsInt( Q_acos( VMF(1) ) );
 
-/*
-	case CG_PC_ADD_GLOBAL_DEFINE:
-		return botlib_export->PC_AddGlobalDefine( VMA(1) );
-	case CG_PC_LOAD_SOURCE:
-		return botlib_export->PC_LoadSourceHandle( VMA(1) );
-	case CG_PC_FREE_SOURCE:
-		return botlib_export->PC_FreeSourceHandle( args[1] );
-	case CG_PC_READ_TOKEN:
-		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
-	case CG_PC_SOURCE_FILE_AND_LINE:
-		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
-*/
-
 	case CG_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();
 		return 0;
@@ -619,8 +604,6 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 		CIN_SetExtents(args[1], args[2], args[3], args[4], args[5]);
 		return 0;
 
-	case CG_GET_ENTITY_TOKEN:
-		return re.GetEntityToken( VMA(1), args[2] );
 	case CG_R_INPVS:
 		return re.inPVS( VMA(1), VMA(2) );
 

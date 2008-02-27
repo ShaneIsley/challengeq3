@@ -185,6 +185,8 @@ void		trap_Error( const char *fmt );
 // for anything game related.  Get time from the CG_DrawActiveFrame parameter
 int			trap_Milliseconds( void );
 
+int			trap_RealTime( qtime_t* qtime );
+
 // console variable interaction
 void		trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 void		trap_Cvar_Update( vmCvar_t *vmCvar );
@@ -341,8 +343,6 @@ e_status trap_CIN_StopCinematic(int handle);
 e_status trap_CIN_RunCinematic (int handle);
 void trap_CIN_DrawCinematic (int handle);
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
-
-qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 
 
 /*
