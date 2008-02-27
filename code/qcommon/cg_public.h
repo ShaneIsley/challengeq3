@@ -284,14 +284,15 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 void		trap_R_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts );
 void		trap_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
+void		trap_R_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 void		trap_R_RenderScene( const refdef_t *fd );
 void		trap_R_SetColor( const float *rgba );	// NULL = 1,1,1,1
-void		trap_R_DrawStretchPic( float x, float y, float w, float h, 
-			float s1, float t1, float s2, float t2, qhandle_t hShader );
+void		trap_R_DrawStretchPic( float x, float y, float w, float h,
+				float s1, float t1, float s2, float t2, qhandle_t hShader );
 void		trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
-int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, 
-					   float frac, const char *tagName );
+int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame,
+				float frac, const char *tagName );
 
 // The glconfig_t will not change during the life of a cgame.
 // If it needs to change, the entire cgame will be restarted, because
@@ -341,6 +342,8 @@ e_status trap_CIN_StopCinematic(int handle);
 e_status trap_CIN_RunCinematic (int handle);
 void trap_CIN_DrawCinematic (int handle);
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
+
+qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 );
 
 
 /*
