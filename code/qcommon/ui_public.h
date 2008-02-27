@@ -119,7 +119,7 @@ typedef enum {
 	UI_CIN_RUNCINEMATIC,
 	UI_CIN_DRAWCINEMATIC,
 	UI_CIN_SETEXTENTS,
-	UI_R_REMAP_SHADER,
+	DO_NOT_WANT_UI_R_REMAP_SHADER,
 	UI_VERIFY_CDKEY,
 	UI_LAN_SERVERSTATUS,
 	UI_LAN_GETSERVERPING,
@@ -144,6 +144,7 @@ typedef enum {
 void			trap_Print( const char *string );
 void			trap_Error( const char *string );
 int				trap_Milliseconds( void );
+int				trap_RealTime(qtime_t *qtime);
 void			trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 void			trap_Cvar_Update( vmCvar_t *vmCvar );
 void			trap_Cvar_Set( const char *var_name, const char *value );
@@ -160,11 +161,12 @@ int				trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void			trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void			trap_FS_Write( const void *buffer, int len, fileHandle_t f );
 void			trap_FS_FCloseFile( fileHandle_t f );
-int				trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
+int				trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
 int				trap_FS_Seek( fileHandle_t f, long offset, fsOrigin_t origin );
 qhandle_t		trap_R_RegisterModel( const char *name );
 qhandle_t		trap_R_RegisterSkin( const char *name );
 qhandle_t		trap_R_RegisterShaderNoMip( const char *name );
+void			trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
 void			trap_R_ClearScene( void );
 void			trap_R_AddRefEntityToScene( const refEntity_t *re );
 void			trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
@@ -189,6 +191,8 @@ void			trap_GetClipboardData( char *buf, int bufsize );
 void			trap_GetClientState( uiClientState_t *state );
 void			trap_GetGlconfig( glconfig_t *glconfig );
 int				trap_GetConfigString( int index, char* buff, int buffsize );
+int				trap_MemoryRemaining( void );
+
 int				trap_LAN_GetServerCount( int source );
 void			trap_LAN_GetServerAddressString( int source, int n, char *buf, int buflen );
 void			trap_LAN_GetServerInfo( int source, int n, char *buf, int buflen );
@@ -197,7 +201,16 @@ int				trap_LAN_ServerStatus( const char *serverAddress, char *serverStatus, int
 void			trap_LAN_ClearPing( int n );
 void			trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime );
 void			trap_LAN_GetPingInfo( int n, char *buf, int buflen );
-int				trap_MemoryRemaining( void );
+int				trap_LAN_GetServerPing( int source, int n );
+void			trap_LAN_LoadCachedServers();
+void			trap_LAN_SaveCachedServers();
+void			trap_LAN_MarkServerVisible(int source, int n, qboolean visible);
+int				trap_LAN_ServerIsVisible( int source, int n);
+qboolean		trap_LAN_UpdateVisiblePings( int source );
+int				trap_LAN_AddServer(int source, const char *name, const char *addr);
+void			trap_LAN_RemoveServer(int source, const char *addr);
+void			trap_LAN_ResetPings(int n);
+int				trap_LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
 
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
