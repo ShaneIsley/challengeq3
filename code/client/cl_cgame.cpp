@@ -648,17 +648,6 @@ static intptr_t CL_CgameSystemCalls( intptr_t *args )
 		CIN_SetExtents(args[1], args[2], args[3], args[4], args[5]);
 		return 0;
 
-/*
-	case CG_LOADCAMERA:
-		return loadCamera(VMA(1));
-
-	case CG_STARTCAMERA:
-		startCamera(args[1]);
-		return 0;
-
-	case CG_GETCAMERAINFO:
-		return getCameraInfo(args[1], VMA(2), VMA(3));
-*/
 	case CG_GET_ENTITY_TOKEN:
 		return re.GetEntityToken( VMA(1), args[2] );
 	case CG_R_INPVS:
