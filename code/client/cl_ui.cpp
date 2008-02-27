@@ -1122,8 +1122,6 @@ void CL_ShutdownUI( void ) {
 }
 
 
-#define UI_OLD_API_VERSION 4
-
 void CL_InitUI( void )
 {
 	// if sv_pure is set we only allow qvms to be loaded
@@ -1133,25 +1131,20 @@ void CL_InitUI( void )
 	if ( !uivm )
 		Com_Error( ERR_FATAL, "VM_Create on UI failed" );
 
-	// sanity check
+	// currently-pointless sanity check caused by TA poison, sigh
 	int v = VM_Call( uivm, UI_GETAPIVERSION );
-	if (v == UI_OLD_API_VERSION) {
-//		Com_Printf(S_COLOR_YELLOW "WARNING: loading old Quake III Arena User Interface version %d\n", v );
-		// init for this gamestate
-		VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE));
-	}
-	else if (v != UI_API_VERSION) {
+	if (v != UI_API_VERSION) {
 		Com_Error( ERR_DROP, "User Interface is version %d, expected %d", v, UI_API_VERSION );
 		cls.uiStarted = qfalse;
+		return;
 	}
-	else {
-		// init for this gamestate
-		VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
-	}
+
+	// init for this gamestate
+	VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
 }
 
 
-qbool UI_usesUniqueCDKey( void )
+qbool UI_usesUniqueCDKey()
 {
 	return (uivm && VM_Call( uivm, UI_HASUNIQUECDKEY ));
 }
@@ -1159,7 +1152,7 @@ qbool UI_usesUniqueCDKey( void )
 
 // see if the current console command is claimed by the ui
 
-qbool UI_GameCommand( void )
+qbool UI_GameCommand()
 {
 	return (uivm && VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime ));
 }

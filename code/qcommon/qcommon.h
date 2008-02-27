@@ -873,8 +873,8 @@ qbool SV_GameCommand();
 //
 // UI interface
 //
-qbool UI_GameCommand( void );
-qbool UI_usesUniqueCDKey(void);
+qbool UI_GameCommand();
+qbool UI_usesUniqueCDKey();
 
 /*
 ==============================================================
