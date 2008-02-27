@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../game/g_public.h"
-#include "../game/bg_public.h"
 
 //=============================================================================
 
@@ -279,7 +278,7 @@ void SV_SetUserinfo( int index, const char *val );
 void SV_GetUserinfo( int index, char *buffer, int bufferSize );
 
 void SV_ChangeMaxClients( void );
-void SV_SpawnServer( char *server, qbool killBots );
+void SV_SpawnServer( const char* mapname );
 
 
 
@@ -351,7 +350,7 @@ void BotImport_DebugPolygonDelete(int id);
 // high level object sorting to reduce interaction tests
 //
 
-void SV_ClearWorld (void);
+void SV_ClearWorld();
 // called after the world model has been loaded, before linking any entities
 
 void SV_UnlinkEntity( sharedEntity_t *ent );

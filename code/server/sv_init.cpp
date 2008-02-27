@@ -336,27 +336,22 @@ void SV_TouchCGame(void) {
 	}
 }
 
-/*
-================
-SV_SpawnServer
 
-Change the server to a new map, taking all connected
-clients along with it.
-This is NOT called for map_restart
-================
-*/
-void SV_SpawnServer( char *server, qbool killBots ) {
+// change the server to a new map, taking all connected clients along with it.
+// this is NOT called for map_restart
+
+void SV_SpawnServer( const char* mapname )
+{
 	int			i;
 	int			checksum;
-	qbool	isBot;
 	char		systemInfo[16384];
 	const char	*p;
 
 	// shut down the existing game if it is running
 	SV_ShutdownGameProgs();
 
-	Com_Printf ("------ Server Initialization ------\n");
-	Com_Printf ("Server: %s\n",server);
+	Com_Printf( "------ Server Initialization ------\n" );
+	Com_Printf( "Map: %s\n", mapname );
 
 	// if not running a dedicated server CL_MapLoading will connect the client to the server
 	// also print some status stuff
@@ -418,10 +413,10 @@ void SV_SpawnServer( char *server, qbool killBots ) {
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
 	FS_Restart( sv.checksumFeed );
 
-	CM_LoadMap( va("maps/%s.bsp", server), qfalse, &checksum );
+	CM_LoadMap( va("maps/%s.bsp", mapname), qfalse, &checksum );
 
 	// set serverinfo visible name
-	Cvar_Set( "mapname", server );
+	Cvar_Set( "mapname", mapname );
 
 	Cvar_Set( "sv_mapChecksum", va("%i",checksum) );
 
@@ -460,17 +455,7 @@ void SV_SpawnServer( char *server, qbool killBots ) {
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
 		// send the new gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
-			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
-				if ( killBots ) {
-					SV_DropClient( &svs.clients[i], "" );
-					continue;
-				}
-				isBot = qtrue;
-			}
-			else {
-				isBot = qfalse;
-			}
-
+			qbool isBot = ( svs.clients[i].netchan.remoteAddress.type == NA_BOT );
 			// connect the client again
 			const char* denied = (const char*)VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
 			if ( denied ) {

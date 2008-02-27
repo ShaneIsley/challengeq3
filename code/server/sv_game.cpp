@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/vm_local.h"
 #include "../botlib/botlib.h"
 
-#include "../cgame/cg_public.h" // needed for snapshot_t for the vm shim  :(
 #include "../qcommon/vm_shim.h"
 
 

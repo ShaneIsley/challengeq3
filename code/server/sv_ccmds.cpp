@@ -136,61 +136,56 @@ static client_t* SV_GetPlayerByNum()
 
 // restart the server on a different map
 
-static void SV_Map_f( void )
+static void SV_ChangeMap( qbool cheats )
 {
-	qbool	killBots, cheat;
-	char	expanded[MAX_QPATH];
-	char	mapname[MAX_QPATH];
-
 	const char* map = Cmd_Argv(1);
 	if ( !map ) {
 		return;
 	}
 
-	// make sure the level exists before trying to change, so that
-	// a typo at the server console won't end the game
-	Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
-	if ( FS_ReadFile (expanded, NULL) == -1 ) {
-		Com_Printf ("Can't find map %s\n", expanded);
+	// make sure the level exists before trying to change
+	// so that a typo at the server console won't end the game
+	const char* mapfile = va( "maps/%s.bsp", map );
+	if ( FS_ReadFile( mapfile, NULL ) == -1 ) {
+		Com_Printf( "Can't find map %s\n", mapfile );
 		return;
 	}
 
 	// force latched values to get set
 	Cvar_Get( "g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH );
 
-	const char* cmd = Cmd_Argv(0);
-	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) {
-		Cvar_SetValue( "g_gametype", GT_SINGLE_PLAYER );
-		Cvar_SetValue( "g_doWarmup", 0 );
-		// may not set sv_maxclients directly, always set latched
-		Cvar_SetLatched( "sv_maxclients", "8" );
-		cmd += 2;
-		cheat = qfalse;
-		killBots = qtrue;
-	}
-	else {
-		if ( !Q_stricmp( cmd, "devmap" ) || !Q_stricmp( cmd, "spdevmap" ) ) {
-			cheat = qtrue;
-			killBots = qtrue;
-		} else {
-			cheat = qfalse;
-			killBots = qfalse;
-		}
-	}
-
 	// save the map name here cause on a map restart we reload the q3config.cfg
 	// and thus nuke the arguments of the map command
-	Q_strncpyz(mapname, map, sizeof(mapname));
+	char mapname[MAX_QPATH];
+	Q_strncpyz( mapname, map, sizeof(mapname) );
 
 	// start up the map
-	SV_SpawnServer( mapname, killBots );
+	SV_SpawnServer( mapname );
 
-	// set the cheat value
-	// if the level was started with "map <levelname>", then
-	// cheats will not be allowed.  If started with "devmap <levelname>"
-	// then cheats will be allowed
-	Cvar_Set( "sv_cheats", cheat ? "1" : "0" );
+	Cvar_Set( "sv_cheats", cheats ? "1" : "0" );
 }
+
+
+static void SV_Map_f( void )
+{
+	SV_ChangeMap( qfalse );
+}
+
+
+static void SV_DevMap_f( void )
+{
+/* the id code kicks all bots on a devmap for no good reason
+	for (int i = 0; i < sv_maxclients->integer; ++i) {
+		if (svs.clients[i].state >= CS_CONNECTED) {
+			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
+				SV_DropClient( &svs.clients[i], "was kicked" );
+			}
+		}
+	}
+*/
+	SV_ChangeMap( qtrue );
+}
+
 
 /*
 ================
@@ -229,7 +224,8 @@ static void SV_MapRestart_f( void ) {
 	}
 	if( delay && !Cvar_VariableValue("g_doWarmup") ) {
 		sv.restartTime = sv.time + delay * 1000;
-		SV_SetConfigstring( CS_WARMUP, va("%i", sv.restartTime) );
+		// !!! what the FUCK is the engine doing changing this?!  >:(
+		//SV_SetConfigstring( CS_WARMUP, va("%i", sv.restartTime) );
 		return;
 	}
 
@@ -242,7 +238,7 @@ static void SV_MapRestart_f( void ) {
 		// restart the map the slow way
 		Q_strncpyz( mapname, Cvar_VariableString( "mapname" ), sizeof( mapname ) );
 
-		SV_SpawnServer( mapname, qfalse );
+		SV_SpawnServer( mapname );
 		return;
 	}
 
@@ -719,11 +715,7 @@ void SV_AddOperatorCommands()
 	Cmd_AddCommand ("map_restart", SV_MapRestart_f);
 	Cmd_AddCommand ("sectorlist", SV_SectorList_f);
 	Cmd_AddCommand ("map", SV_Map_f);
-#ifndef PRE_RELEASE_DEMO
-	Cmd_AddCommand ("devmap", SV_Map_f);
-	Cmd_AddCommand ("spmap", SV_Map_f);
-	Cmd_AddCommand ("spdevmap", SV_Map_f);
-#endif
+	Cmd_AddCommand ("devmap", SV_DevMap_f);
 	Cmd_AddCommand ("killserver", SV_KillServer_f);
 	if( com_dedicated->integer ) {
 		Cmd_AddCommand ("say", SV_ConSay_f);

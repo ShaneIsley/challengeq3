@@ -139,21 +139,15 @@ static worldSector_t* SV_CreateworldSector( int depth, const vec3_t mins, const 
 	return anode;
 }
 
-/*
-===============
-SV_ClearWorld
 
-===============
-*/
-void SV_ClearWorld( void ) {
-	clipHandle_t	h;
-	vec3_t			mins, maxs;
-
+void SV_ClearWorld()
+{
 	Com_Memset( sv_worldSectors, 0, sizeof(sv_worldSectors) );
 	sv_numworldSectors = 0;
 
 	// get world map bounds
-	h = CM_InlineModel( 0 );
+	vec3_t mins, maxs;
+	clipHandle_t h = CM_InlineModel( 0 );
 	CM_ModelBounds( h, mins, maxs );
 	SV_CreateworldSector( 0, mins, maxs );
 }
