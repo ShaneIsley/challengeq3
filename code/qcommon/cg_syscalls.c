@@ -20,21 +20,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
-// cg_syscalls.c -- this file is only included when building a dll
+
+// this file is only included when building a dll
 // cg_syscalls.asm is included instead when building a qvm
 #ifdef Q3_VM
 #error "Do not use in VM build"
 #endif
 
-#include "cg_local.h"
+
+#include "q_shared.h"
+#include "cg_public.h"
+
 
 static intptr_t (QDECL *syscall)( intptr_t arg, ... ) = (intptr_t (QDECL *)( intptr_t, ...))-1;
 
 
-void dllEntry( intptr_t (QDECL  *syscallptr)( intptr_t arg,... ) ) {
+void dllEntry( intptr_t (QDECL *syscallptr)( intptr_t arg,... ) ) {
 	syscall = syscallptr;
 }
-
 
 int PASSFLOAT( float x ) {
 	float	floatTemp;
