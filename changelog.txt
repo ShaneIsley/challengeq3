@@ -1,6 +1,8 @@
 
 Mar 08 - 1.42
 
+bots are no longer kicked by devmap
+
 legacy cack like joystick/midi support only pollutes configs if enabled
 
 
