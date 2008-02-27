@@ -41,7 +41,7 @@ equ	trap_Key_GetOverstrikeMode				-38
 equ	trap_Key_SetOverstrikeMode				-39
 equ	trap_Key_ClearStates					-40
 equ	trap_Key_GetCatcher						-41
-equ	trap_Key_SetCatcher						-42        
+equ	trap_Key_SetCatcher						-42
 equ	trap_GetClipboardData					-43
 equ	trap_GetGlconfig						-44
 equ	trap_GetClientState						-45
@@ -51,14 +51,14 @@ equ	trap_LAN_ClearPing						-48
 equ	trap_LAN_GetPing						-49
 equ	trap_LAN_GetPingInfo					-50
 equ	trap_Cvar_Register						-51
-equ trap_Cvar_Update						-52
-equ trap_MemoryRemaining					-53
+equ	trap_Cvar_Update						-52
+equ	trap_MemoryRemaining					-53
 equ	trap_GetCDKey							-54
 equ	trap_SetCDKey							-55
 equ trap_R_RegisterFont						-56
 equ trap_R_ModelBounds						-57
 equ trap_PC_AddGlobalDefine					-58
-equ	trap_PC_LoadSource						-59
+equ trap_PC_LoadSource						-59
 equ trap_PC_FreeSource						-60
 equ trap_PC_ReadToken						-61
 equ trap_PC_SourceFileAndLine				-62
@@ -86,8 +86,8 @@ equ trap_LAN_ServerStatus					-83
 equ trap_LAN_GetServerPing					-84
 equ trap_LAN_ServerIsVisible				-85
 equ trap_LAN_CompareServers					-86
-equ trap_FS_Seek		-87
-equ trap_SetPbClStatus -88
+equ trap_FS_Seek							-87
+equ trap_SetPbClStatus						-88
 
 equ	memset						-101
 equ	memcpy						-102
@@ -96,6 +96,6 @@ equ	sin							-104
 equ	cos							-105
 equ	atan2						-106
 equ	sqrt						-107
-equ floor						-108
+equ	floor						-108
 equ	ceil						-109
 
