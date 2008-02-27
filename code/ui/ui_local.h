@@ -980,7 +980,7 @@ int				trap_LAN_CompareServers( int source, int sortKey, int sortDir, int s1, in
 int				trap_MemoryRemaining( void );
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
-void			trap_R_RegisterFont(const char *pFontname, int pointSize, fontInfo_t *font);
+qboolean		trap_R_RegisterFont( const char* fontName, int pointSize, fontInfo_t* font );
 void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 int				trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
