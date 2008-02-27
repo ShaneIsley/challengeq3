@@ -71,8 +71,8 @@ typedef struct worldSector_s {
 #define	AREA_DEPTH	4
 #define	AREA_NODES	64
 
-worldSector_t	sv_worldSectors[AREA_NODES];
-int			sv_numworldSectors;
+static worldSector_t sv_worldSectors[AREA_NODES];
+static int sv_numworldSectors;
 
 
 /*
@@ -103,7 +103,8 @@ SV_CreateworldSector
 Builds a uniformly subdivided tree for the given world size
 ===============
 */
-worldSector_t *SV_CreateworldSector( int depth, vec3_t mins, vec3_t maxs ) {
+static worldSector_t* SV_CreateworldSector( int depth, const vec3_t mins, const vec3_t maxs )
+{
 	worldSector_t	*anode;
 	vec3_t		size;
 	vec3_t		mins1, maxs1, mins2, maxs2;
@@ -125,13 +126,13 @@ worldSector_t *SV_CreateworldSector( int depth, vec3_t mins, vec3_t maxs ) {
 	}
 
 	anode->dist = 0.5 * (maxs[anode->axis] + mins[anode->axis]);
-	VectorCopy (mins, mins1);	
-	VectorCopy (mins, mins2);	
-	VectorCopy (maxs, maxs1);	
-	VectorCopy (maxs, maxs2);	
-	
+	VectorCopy (mins, mins1);
+	VectorCopy (mins, mins2);
+	VectorCopy (maxs, maxs1);
+	VectorCopy (maxs, maxs2);
+
 	maxs1[anode->axis] = mins2[anode->axis] = anode->dist;
-	
+
 	anode->children[0] = SV_CreateworldSector (depth+1, mins2, maxs2);
 	anode->children[1] = SV_CreateworldSector (depth+1, mins1, maxs1);
 
@@ -300,7 +301,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 		area = CM_LeafArea (leafs[i]);
 		if (area != -1) {
 			// doors may legally straggle two areas,
-			// but nothing should evern need more than that
+			// but nothing should ever need more than that
 			if (ent->areanum != -1 && ent->areanum != area) {
 				if (ent->areanum2 != -1 && ent->areanum2 != area && sv.state == SS_LOADING) {
 					Com_DPrintf ("Object %i touching 3 areas at %f %f %f\n",
@@ -346,7 +347,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 		else
 			break;		// crosses the node
 	}
-	
+
 	// link it in
 	ent->worldSector = node;
 	ent->nextEntityInWorldSector = node->entities;
@@ -360,7 +361,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 
 AREA QUERY
 
-Fills in a list of all entities who's absmin / absmax intersects the given
+Fills in a list of all entities whose absmin / absmax intersects the given
 bounds.  This does NOT mean that they actually touch in the case of bmodels.
 ============================================================================
 */
@@ -373,13 +374,8 @@ typedef struct {
 } areaParms_t;
 
 
-/*
-====================
-SV_AreaEntities_r
-
-====================
-*/
-void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
+static void SV_AreaEntities_r( const worldSector_t *node, areaParms_t *ap )
+{
 	svEntity_t	*check, *next;
 	sharedEntity_t *gcheck;
 	int			count;
@@ -408,7 +404,7 @@ void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
 		ap->list[ap->count] = check - sv.svEntities;
 		ap->count++;
 	}
-	
+
 	if (node->axis == -1) {
 		return;		// terminal node
 	}
@@ -501,13 +497,8 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 }
 
 
-/*
-====================
-SV_ClipMoveToEntities
-
-====================
-*/
-void SV_ClipMoveToEntities( moveclip_t *clip ) {
+static void SV_ClipMoveToEntities( moveclip_t *clip )
+{
 	int			i, num;
 	int			touchlist[MAX_GENTITIES];
 	sharedEntity_t *touch;

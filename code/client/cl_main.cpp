@@ -227,11 +227,6 @@ static void CL_Record_f()
 		return;
 	}
 
-	// sync 0 doesn't prevent recording, so not forcing it off .. everyone does g_sync 1 ; record ; g_sync 0 ..
-	if ( NET_IsLocalAddress( clc.serverAddress ) && !Cvar_VariableValue( "g_synchronousClients" ) ) {
-		Com_Printf (S_COLOR_YELLOW "WARNING: You should set 'g_synchronousClients 1' for smoother demo recording\n");
-	}
-
 	const char* s;
 	if ( Cmd_Argc() == 2 ) {
 		Com_sprintf( name, sizeof(name), "demos/%s.dm_%d", Cmd_Argv(1), PROTOCOL_VERSION );
@@ -249,7 +244,7 @@ static void CL_Record_f()
 	Com_Printf( "recording to %s\n", s );
 	clc.demorecording = qtrue;
 	clc.showAnnoyingDemoRecordMessage = !Cvar_VariableValue("ui_recordSPDemo");
-	
+
 	Q_strncpyz( clc.demoName, s, sizeof( clc.demoName ) );
 
 	// don't start saving messages until a non-delta compressed message is received
