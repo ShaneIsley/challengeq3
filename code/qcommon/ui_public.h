@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // ui_public.h -- engine calls and types exposed to the ui module
 // A user mod should never modify this file
 
+#include "../qcommon/tr_types.h"
+
 
 #define UI_API_VERSION	4
 
