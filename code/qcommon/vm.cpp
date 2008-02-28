@@ -32,7 +32,7 @@ and one exported function: Perform
 */
 
 #include "vm_local.h"
-
+#include "qcommon.h" 
 
 int vm_debugLevel;
 vm_t* currentVM = NULL;
