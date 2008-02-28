@@ -5,6 +5,10 @@ bots are no longer kicked by devmap
 
 legacy cack like joystick/midi support only pollutes configs if enabled
 
+fixed a memory leak in the sound code
+
+made com_soundmegs SLIGHTLY less broken: now only 2x instead of 3x  :P
+
 
 18 Feb 08 - 1.41
 
