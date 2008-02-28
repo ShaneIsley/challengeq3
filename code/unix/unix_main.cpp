@@ -763,7 +763,7 @@ static void* try_dlopen(const char* base, const char* gamedir, const char* fname
 }
 
 void *Sys_LoadDll( const char *name, 
-                   intptr_t (**entryPoint)(int, ...),
+                   intptr_t (**entryPoint)(intptr_t, ...),
                    intptr_t (*systemcalls)(intptr_t, ...) ) 
 {
   void *libHandle;
@@ -804,10 +804,10 @@ void *Sys_LoadDll( const char *name,
 
 #if USE_SDL_VIDEO
   dllEntry = ( void (QDECL *)( int (QDECL *)( int, ... ) ) )SDL_LoadFunction( libHandle, "dllEntry" );
-  *entryPoint = (int (QDECL *)(int,...))SDL_LoadFunction( libHandle, "vmMain" );
+  *entryPoint = (int (QDECL *)(intptr_t,...))SDL_LoadFunction( libHandle, "vmMain" );
 #else
   dllEntry = ( void (QDECL *)( int (QDECL *)( int, ... ) ) )dlsym( libHandle, "dllEntry" );
-  *entryPoint = (int (QDECL *)(int,...))dlsym( libHandle, "vmMain" );
+  *entryPoint = (int (QDECL *)(intptr_t,...))dlsym( libHandle, "vmMain" );
 #endif
 
   if ( !*entryPoint || !dllEntry )
