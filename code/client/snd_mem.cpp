@@ -42,37 +42,34 @@ memory management
 ===============================================================================
 */
 
-static	sndBuffer	*sndbuffers = NULL;
-static	sndBuffer	*freelist = NULL;
-static	int sndmem_avail = 0;
-static	int sndmem_inuse = 0;
+static sndBuffer* sndbuffers = NULL;
+static sndBuffer* freelist = NULL;
+static int sndmem_avail = 0;
+static int sndmem_inuse = 0;
 
-short *sfxScratchBuffer = NULL;
-sfx_t *sfxScratchPointer = NULL;
-int	   sfxScratchIndex = 0;
 
-void	SND_free(sndBuffer *v) {
+void SND_free( sndBuffer* v )
+{
 	*(sndBuffer **)v = freelist;
 	freelist = (sndBuffer*)v;
 	sndmem_avail += sizeof(sndBuffer);
 }
 
-sndBuffer*	SND_malloc() {
-	sndBuffer *v;
-redo:
-	if (freelist == NULL) {
+sndBuffer* SND_malloc()
+{
+	while (!freelist) {
 		S_FreeOldestSound();
-		goto redo;
 	}
 
 	sndmem_avail -= sizeof(sndBuffer);
 	sndmem_inuse += sizeof(sndBuffer);
 
-	v = freelist;
+	sndBuffer* v = freelist;
 	freelist = *(sndBuffer **)freelist;
 	v->next = NULL;
 	return v;
 }
+
 
 void SND_setup()
 {
@@ -83,12 +80,8 @@ void SND_setup()
 	int scs = cv->integer * 1024;
 
 	sndbuffers = (sndBuffer*)Hunk_Alloc( scs * sizeof(sndBuffer), h_high );
-
-	// allocate the stack based hunk allocator
-	sfxScratchBuffer = (short*)Hunk_Alloc( SND_CHUNK_SIZE * sizeof(short) * 4, h_high );
-	sfxScratchPointer = NULL;
-
 	sndmem_avail = scs * sizeof(sndBuffer);
+
 	p = sndbuffers;
 	q = p + scs;
 	while (--q > p)

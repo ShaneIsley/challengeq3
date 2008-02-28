@@ -175,10 +175,6 @@ void S_Spatialize(channel_t *ch);
 
 void S_FreeOldestSound();
 
-extern short *sfxScratchBuffer;
-extern sfx_t *sfxScratchPointer;
-extern int    sfxScratchIndex;
-
 qbool S_Base_Init( soundInterface_t *si );
 
 qbool S_AL_Init( soundInterface_t *si );
