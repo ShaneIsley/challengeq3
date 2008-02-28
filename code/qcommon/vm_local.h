@@ -180,9 +180,8 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header );
 int VM_CallInterpreted( vm_t *vm, int *args );
 #endif
 
-vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value );
-int VM_SymbolToValue( vm_t *vm, const char *symbol );
-const char *VM_ValueToSymbol( vm_t *vm, int value );
+const char* VM_ValueToSymbol( const vm_t* vm, int value );
+const vmSymbol_t* VM_ValueToFunctionSymbol( const vm_t* vm, int value );
 void VM_LogSyscalls( int *args );
 
 intptr_t VM_ArgPtr( intptr_t intValue );

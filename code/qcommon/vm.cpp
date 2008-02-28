@@ -23,50 +23,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 
-
 intermix code and data
 symbol table
 
 a dll has one imported function: VM_SystemCall
 and one exported function: Perform
 
-
 */
 
 #include "vm_local.h"
 
 
-vm_t	*currentVM = NULL; // bk001212
-vm_t	*lastVM    = NULL; // bk001212
-int		vm_debugLevel;
+int vm_debugLevel;
+vm_t* currentVM = NULL;
+static vm_t* lastVM; // only used by profiling, which is useless anyway
 
 #define	MAX_VM		3
-vm_t	vmTable[MAX_VM];
+static vm_t vmTable[MAX_VM];
 
 
-void VM_VmInfo_f( void );
-void VM_VmProfile_f( void );
+static void VM_VmInfo_f( void );
+static void VM_VmProfile_f( void );
 
 
-
-#if 0 // 64bit!
-// converts a VM pointer to a C pointer and
-// checks to make sure that the range is acceptable
-void	*VM_VM2C( vmptr_t p, int length ) {
-	return (void *)p;
-}
-#endif
-
-void VM_Debug( int level ) {
-	vm_debugLevel = level;
-}
-
-/*
-==============
-VM_Init
-==============
-*/
-void VM_Init( void ) {
+void VM_Init()
+{
 	Cvar_Get( "vm_cgame", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
 	Cvar_Get( "vm_game", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
 	Cvar_Get( "vm_ui", "2", CVAR_ARCHIVE );		// !@# SHIP WITH SET TO 2
@@ -78,18 +59,17 @@ void VM_Init( void ) {
 }
 
 
-/*
-===============
-VM_ValueToSymbol
+void VM_Debug( int level )
+{
+	vm_debugLevel = level;
+}
 
-Assumes a program counter value
-===============
-*/
-const char *VM_ValueToSymbol( vm_t *vm, int value ) {
-	vmSymbol_t	*sym;
-	static char		text[MAX_TOKEN_CHARS];
 
-	sym = vm->symbols;
+// assumes a program counter value
+
+const char* VM_ValueToSymbol( const vm_t* vm, int value )
+{
+	const vmSymbol_t* sym = vm->symbols;
 	if ( !sym ) {
 		return "NO SYMBOLS";
 	}
@@ -103,23 +83,20 @@ const char *VM_ValueToSymbol( vm_t *vm, int value ) {
 		return sym->symName;
 	}
 
+	static char text[MAX_TOKEN_CHARS];
 	Com_sprintf( text, sizeof( text ), "%s+%i", sym->symName, value - sym->symValue );
 
 	return text;
 }
 
-/*
-===============
-VM_ValueToFunctionSymbol
 
-For profiling, find the symbol behind this value
-===============
-*/
-vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value ) {
-	vmSymbol_t	*sym;
-	static vmSymbol_t	nullSym;
+// for profiling, find the symbol behind this value
 
-	sym = vm->symbols;
+const vmSymbol_t* VM_ValueToFunctionSymbol( const vm_t* vm, int value )
+{
+	static vmSymbol_t nullSym;
+
+	const vmSymbol_t* sym = vm->symbols;
 	if ( !sym ) {
 		return &nullSym;
 	}
@@ -132,64 +109,10 @@ vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value ) {
 }
 
 
-/*
-===============
-VM_SymbolToValue
-===============
-*/
-int VM_SymbolToValue( vm_t *vm, const char *symbol ) {
-	vmSymbol_t	*sym;
+static int ParseHex( const char* text )
+{
+	int value = 0, c;
 
-	for ( sym = vm->symbols ; sym ; sym = sym->next ) {
-		if ( !strcmp( symbol, sym->symName ) ) {
-			return sym->symValue;
-		}
-	}
-	return 0;
-}
-
-
-/*
-=====================
-VM_SymbolForCompiledPointer
-=====================
-*/
-#if 0 // 64bit!
-const char *VM_SymbolForCompiledPointer( vm_t *vm, void *code ) {
-	int			i;
-
-	if ( code < (void *)vm->codeBase ) {
-		return "Before code block";
-	}
-	if ( code >= (void *)(vm->codeBase + vm->codeLength) ) {
-		return "After code block";
-	}
-
-	// find which original instruction it is after
-	for ( i = 0 ; i < vm->codeLength ; i++ ) {
-		if ( (void *)vm->instructionPointers[i] > code ) {
-			break;
-		}
-	}
-	i--;
-
-	// now look up the bytecode instruction pointer
-	return VM_ValueToSymbol( vm, i );
-}
-#endif
-
-
-
-/*
-===============
-ParseHex
-===============
-*/
-int	ParseHex( const char *text ) {
-	int		value;
-	int		c;
-
-	value = 0;
 	while ( ( c = *text++ ) != 0 ) {
 		if ( c >= '0' && c <= '9' ) {
 			value = value * 16 + c - '0';
@@ -203,13 +126,14 @@ int	ParseHex( const char *text ) {
 			value = value * 16 + 10 + c - 'A';
 			continue;
 		}
+		Com_Error( ERR_DROP, "Invalid hex value" );
 	}
 
 	return value;
 }
 
 
-void VM_LoadSymbols( vm_t* vm )
+static void VM_LoadSymbols( vm_t* vm )
 {
 	int		len;
 	char	*mapfile;
@@ -288,6 +212,7 @@ void VM_LoadSymbols( vm_t* vm )
 	Com_Printf( "%i symbols parsed from %s\n", count, symbols );
 	FS_FreeFile( mapfile );
 }
+
 
 /*
 ============
@@ -472,7 +397,7 @@ vm_t *VM_Restart( vm_t *vm ) {
 		char	name[MAX_QPATH];
 		intptr_t	(*systemCall)( intptr_t *parms );
 
-		systemCall = vm->systemCall;	
+		systemCall = vm->systemCall;
 		Q_strncpyz( name, vm->name, sizeof( name ) );
 
 		VM_Free( vm );
@@ -757,10 +682,13 @@ intptr_t	QDECL VM_Call( vm_t *vm, int callnum, ... ) {
 	return r;
 }
 
-//=================================================================
 
-static int QDECL VM_ProfileSort( const void *a, const void *b ) {
-	vmSymbol_t	*sa, *sb;
+///////////////////////////////////////////////////////////////
+
+
+static int QDECL VM_ProfileSort( const void *a, const void *b )
+{
+	const vmSymbol_t *sa, *sb;
 
 	sa = *(vmSymbol_t **)a;
 	sb = *(vmSymbol_t **)b;
@@ -774,14 +702,9 @@ static int QDECL VM_ProfileSort( const void *a, const void *b ) {
 	return 0;
 }
 
-/*
-==============
-VM_VmProfile_f
 
-==============
-*/
-void VM_VmProfile_f( void ) {
-	vm_t		*vm;
+static void VM_VmProfile_f( void )
+{
 	vmSymbol_t	**sorted, *sym;
 	int			i;
 	double		total;
@@ -790,8 +713,7 @@ void VM_VmProfile_f( void ) {
 		return;
 	}
 
-	vm = lastVM;
-
+	const vm_t* vm = lastVM;
 	if ( !vm->numSymbols ) {
 		return;
 	}
@@ -821,37 +743,38 @@ void VM_VmProfile_f( void ) {
 	Z_Free( sorted );
 }
 
-/*
-==============
-VM_VmInfo_f
 
-==============
-*/
-void VM_VmInfo_f( void ) {
-	vm_t	*vm;
-	int		i;
-
+static void VM_VmInfo_f( void )
+{
 	Com_Printf( "Registered virtual machines:\n" );
-	for ( i = 0 ; i < MAX_VM ; i++ ) {
-		vm = &vmTable[i];
+
+	for (int i = 0; i < MAX_VM; ++i) {
+		const vm_t* vm = &vmTable[i];
 		if ( !vm->name[0] ) {
 			break;
 		}
 		Com_Printf( "%s : ", vm->name );
+
 		if ( vm->dllHandle ) {
 			Com_Printf( "native\n" );
 			continue;
 		}
+
 		if ( vm->compiled ) {
 			Com_Printf( "compiled on load\n" );
 		} else {
 			Com_Printf( "interpreted\n" );
 		}
+
 		Com_Printf( "    code length : %7i\n", vm->codeLength );
 		Com_Printf( "    table length: %7i\n", vm->instructionPointersLength );
 		Com_Printf( "    data length : %7i\n", vm->dataMask + 1 );
 	}
 }
+
+
+///////////////////////////////////////////////////////////////
+
 
 /*
 ===============

@@ -393,7 +393,7 @@ void* QDECL Sys_LoadDll( const char* name, char* fqpath,
 #endif
 
 	void (QDECL *dllEntry)( intptr_t (QDECL *syscallptr)(intptr_t, ...) );
-	dllEntry = ( void (QDECL *)(intptr_t (QDECL *)( intptr_t, ... ) ) )GetProcAddress( libHandle, "dllEntry" ); 
+	dllEntry = ( void (QDECL *)(intptr_t (QDECL *)( intptr_t, ... ) ) )GetProcAddress( libHandle, "dllEntry" );
 	*entryPoint = (intptr_t (QDECL *)(intptr_t,...))GetProcAddress( libHandle, "vmMain" );
 	if ( !*entryPoint || !dllEntry ) {
 		FreeLibrary( libHandle );
