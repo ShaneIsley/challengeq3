@@ -510,7 +510,7 @@ static void Con_DrawNotify()
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-		if (cl.snap.ps.pm_type != PM_INTERMISSION && cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
+		if ( cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 			continue;
 		}
 
