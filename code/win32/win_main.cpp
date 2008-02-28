@@ -333,23 +333,19 @@ void Sys_UnloadDll( void *dllHandle )
 
 
 // used to load a development dll instead of a virtual machine
-// fqpath param added 7/20/02 by T.Ray - Sys_LoadDll is only called in vm.c at this time
-// fqpath will be empty if dll not loaded, otherwise will hold fully qualified path of dll module loaded
-// fqpath buffersize must be at least MAX_QPATH+1 bytes long
 
-void* QDECL Sys_LoadDll( const char* name, char* fqpath,
+void* QDECL Sys_LoadDll( const char* name,
 		intptr_t (QDECL **entryPoint)(intptr_t, ...), intptr_t (QDECL *systemcalls)(intptr_t, ...) )
 {
-#ifdef NDEBUG
-	static int	lastWarning = 0;
-#endif
-
-	*fqpath = 0;
-
 	char filename[MAX_QPATH];
 	Com_sprintf( filename, sizeof( filename ), "%sx86.dll", name );
 
+	const char* basepath = Cvar_VariableString( "fs_basepath" );
+	const char* gamedir = Cvar_VariableString( "fs_game" );
+	const char* fn = FS_BuildOSPath( basepath, gamedir, filename );
+
 #ifdef NDEBUG
+	static int lastWarning = 0;
 	int timestamp = Sys_Milliseconds();
 	if( ((timestamp - lastWarning) > (5 * 60000)) && !Cvar_VariableIntegerValue( "dedicated" )
 		&& !Cvar_VariableIntegerValue( "com_blindlyLoadDLLs" ) ) {
@@ -367,30 +363,14 @@ void* QDECL Sys_LoadDll( const char* name, char* fqpath,
 	}
 #endif
 
-	HINSTANCE libHandle;
+	HINSTANCE libHandle = LoadLibrary( fn );
 
 #ifndef NDEBUG
-	libHandle = LoadLibrary( filename );
-	Com_Printf( "LoadLibrary '%s' %s\n", filename, libHandle ? "ok" : "failed" );
-	if ( !libHandle ) {
+	Com_Printf( "LoadLibrary '%s' %s\n", fn, libHandle ? "ok" : "failed" );
 #endif
 
-		const char* basepath = Cvar_VariableString( "fs_basepath" );
-		const char* gamedir = Cvar_VariableString( "fs_game" );
-
-		const char* fn = FS_BuildOSPath( basepath, gamedir, filename );
-		libHandle = LoadLibrary( fn );
-
-#ifndef NDEBUG
-		Com_Printf( "LoadLibrary '%s' %s\n", fn, libHandle ? "ok" : "failed" );
-#endif
-
-		if ( !libHandle )
-			return NULL;
-
-#ifndef NDEBUG
-	}
-#endif
+	if ( !libHandle )
+		return NULL;
 
 	void (QDECL *dllEntry)( intptr_t (QDECL *syscallptr)(intptr_t, ...) );
 	dllEntry = ( void (QDECL *)(intptr_t (QDECL *)( intptr_t, ... ) ) )GetProcAddress( libHandle, "dllEntry" );
@@ -400,8 +380,6 @@ void* QDECL Sys_LoadDll( const char* name, char* fqpath,
 		return NULL;
 	}
 	dllEntry( systemcalls );
-
-	Q_strncpyz( fqpath, filename, MAX_QPATH );
 
 	return libHandle;
 }

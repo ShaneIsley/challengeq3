@@ -128,7 +128,7 @@ struct vm_s {
 	// DO NOT MOVE OR CHANGE THESE WITHOUT CHANGING THE VM_OFFSET_* DEFINES
 	// USED BY THE ASM CODE
 	int			programStack;		// the vm may be recursively entered
-	intptr_t			(*systemCall)( intptr_t *parms );
+	intptr_t	(*systemCall)( intptr_t *parms );
 
 	//------------------------------------
 
@@ -136,7 +136,7 @@ struct vm_s {
 
 	// for dynamic linked modules
 	void		*dllHandle;
-	intptr_t			(QDECL *entryPoint)( int callNum, ... );
+	intptr_t	(QDECL *entryPoint)( int callNum, ... );
 	void (*destroy)(vm_t* self);
 
 	// for interpreted modules
@@ -160,9 +160,6 @@ struct vm_s {
 	int			callLevel;			// for debug indenting
 	int			breakFunction;		// increment breakCount on function entry to this
 	int			breakCount;
-
-// fqpath member added 7/20/02 by T.Ray
-	char		fqpath[MAX_QPATH+1] ;
 
 	byte		*jumpTableTargets;
 	int			numJumpTableTargets;
