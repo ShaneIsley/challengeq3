@@ -42,7 +42,7 @@ memory management
 ===============================================================================
 */
 
-static	sndBuffer	*buffer = NULL;
+static	sndBuffer	*sndbuffers = NULL;
 static	sndBuffer	*freelist = NULL;
 static	int inUse = 0;
 static	int totalInUse = 0;
@@ -78,17 +78,18 @@ void SND_setup()
 {
 	sndBuffer *p, *q;
 
+	// a sndBuffer is actually 2K+, so this isn't even REMOTELY close to actual megs
 	const cvar_t* cv = Cvar_Get( "com_soundMegs", DEF_COMSOUNDMEGS, CVAR_LATCH | CVAR_ARCHIVE );
-	int scs = (cv->integer*1536); // !!! on what planet is that a MEG?  :P
+	int scs = cv->integer * 1024;
 
-	// KHB !!!  erm, leak much?
-	buffer = (sndBuffer*)malloc(scs*sizeof(sndBuffer) );
+	sndbuffers = (sndBuffer*)Hunk_Alloc( scs * sizeof(sndBuffer), h_high );
+
 	// allocate the stack based hunk allocator
-	sfxScratchBuffer = (short*)malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
+	sfxScratchBuffer = (short*)Hunk_Alloc( SND_CHUNK_SIZE * sizeof(short) * 4, h_high );
 	sfxScratchPointer = NULL;
 
-	inUse = scs*sizeof(sndBuffer);
-	p = buffer;;
+	inUse = scs * sizeof(sndBuffer);
+	p = sndbuffers;
 	q = p + scs;
 	while (--q > p)
 		*(sndBuffer **)q = q-1;
