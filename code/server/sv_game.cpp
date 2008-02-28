@@ -34,6 +34,10 @@ botlib_export_t	*botlib_export;
 // these functions must be used instead of pointer arithmetic, because
 // the game allocates gentities with private information after the server shared part
 
+// if at ANY point in time SV_GentityNum(i) is linked but (SV_GentityNum(i)->s.number != i)
+// the game vm is flat out broken, and has either failed to correctly G_InitGentity
+// or passed incorrect values to trap_LocateGameData
+
 int SV_NumForGentity( const sharedEntity_t* ent )
 {
 	return (((byte*)ent - (byte*)sv.gentities) / sv.gentitySize);
@@ -77,7 +81,7 @@ void SV_GameSendServerCommand( int clientNum, const char *text ) {
 		if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
 			return;
 		}
-		SV_SendServerCommand( svs.clients + clientNum, "%s", text );	
+		SV_SendServerCommand( svs.clients + clientNum, "%s", text );
 	}
 }
 
@@ -93,7 +97,7 @@ void SV_GameDropClient( int clientNum, const char *reason ) {
 	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
 		return;
 	}
-	SV_DropClient( svs.clients + clientNum, reason );	
+	SV_DropClient( svs.clients + clientNum, reason );
 }
 
 

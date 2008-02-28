@@ -264,12 +264,8 @@ static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
 }
 
 
-/*
-===============
-SV_AddEntToSnapshot
-===============
-*/
-static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums ) {
+static void SV_AddEntToSnapshot( svEntity_t *svEnt, const sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums )
+{
 	// if we have already added this entity to this snapshot, don't add again
 	if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
 		return;
@@ -285,22 +281,14 @@ static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapsh
 	eNums->numSnapshotEntities++;
 }
 
-/*
-===============
-SV_AddEntitiesVisibleFromPoint
-===============
-*/
-static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *frame, 
-									snapshotEntityNumbers_t *eNums, qbool portal ) {
+
+static void SV_AddEntitiesVisibleFromPoint( const vec3_t origin,
+		clientSnapshot_t *frame, snapshotEntityNumbers_t *eNums )
+{
 	int		e, i;
 	sharedEntity_t *ent;
 	svEntity_t	*svEnt;
 	int		l;
-	int		clientarea, clientcluster;
-	int		leafnum;
-	int		c_fullsend;
-	byte	*clientpvs;
-	byte	*bitvector;
 
 	// during an error shutdown message we may need to transmit
 	// the shutdown message after the server has shutdown, so
@@ -309,16 +297,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		return;
 	}
 
-	leafnum = CM_PointLeafnum (origin);
-	clientarea = CM_LeafArea (leafnum);
-	clientcluster = CM_LeafCluster (leafnum);
+	int leafnum = CM_PointLeafnum( origin );
+	int clientarea = CM_LeafArea( leafnum );
+	int clientcluster = CM_LeafCluster( leafnum );
+	const byte* clientpvs = CM_ClusterPVS( clientcluster );
 
 	// calculate the visible areas
 	frame->areabytes = CM_WriteAreaBits( frame->areabits, clientarea );
-
-	clientpvs = CM_ClusterPVS (clientcluster);
-
-	c_fullsend = 0;
 
 	for ( e = 0 ; e < sv.num_entities ; e++ ) {
 		ent = SV_GentityNum(e);
@@ -326,11 +311,6 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// never send entities that aren't linked in
 		if ( !ent->r.linked ) {
 			continue;
-		}
-
-		if (ent->s.number != e) {
-			Com_DPrintf ("FIXING ENT->S.NUMBER!!!\n");
-			ent->s.number = e;
 		}
 
 		// entities can be flagged to explicitly not be sent to the client
@@ -353,7 +333,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// entities can be flagged to be sent to a given mask of clients
 		if ( ent->r.svFlags & SVF_CLIENTMASK ) {
 			if (frame->ps.clientNum >= 32)
-				Com_Error( ERR_DROP, "SVF_CLIENTMASK: cientNum > 32\n" );
+				Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32\n" );
 			if (~ent->r.singleClient & (1 << frame->ps.clientNum))
 				continue;
 		}
@@ -381,8 +361,6 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			}
 		}
 
-		bitvector = clientpvs;
-
 		// check individual leafs
 		if ( !svEnt->numClusters ) {
 			continue;
@@ -390,7 +368,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		l = 0;
 		for ( i=0 ; i < svEnt->numClusters ; i++ ) {
 			l = svEnt->clusternums[i];
-			if ( bitvector[l >> 3] & (1 << (l&7) ) ) {
+			if ( clientpvs[l >> 3] & (1 << (l&7) ) ) {
 				break;
 			}
 		}
@@ -400,7 +378,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		if ( i == svEnt->numClusters ) {
 			if ( svEnt->lastCluster ) {
 				for ( ; l <= svEnt->lastCluster ; l++ ) {
-					if ( bitvector[l >> 3] & (1 << (l&7) ) ) {
+					if ( clientpvs[l >> 3] & (1 << (l&7) ) ) {
 						break;
 					}
 				}
@@ -424,11 +402,12 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 					continue;
 				}
 			}
-			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, qtrue );
+			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums );
 		}
 
 	}
 }
+
 
 /*
 =============
@@ -464,10 +443,8 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	// clear everything in this snapshot
 	entityNumbers.numSnapshotEntities = 0;
 	Com_Memset( frame->areabits, 0, sizeof( frame->areabits ) );
-
-  // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=62
 	frame->num_entities = 0;
-	
+
 	clent = client->gentity;
 	if ( !clent || client->state == CS_ZOMBIE ) {
 		return;
@@ -491,9 +468,9 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	VectorCopy( ps->origin, org );
 	org[2] += ps->viewheight;
 
-	// add all the entities directly visible to the eye, which
-	// may include portal entities that merge other viewpoints
-	SV_AddEntitiesVisibleFromPoint( org, frame, &entityNumbers, qfalse );
+	// add all the entities directly visible to the eye,
+	// which may include portal entities that merge other viewpoints
+	SV_AddEntitiesVisibleFromPoint( org, frame, &entityNumbers );
 
 	// if there were portals visible, there may be out of order entities
 	// in the list which will need to be resorted for the delta compression
