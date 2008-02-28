@@ -113,14 +113,11 @@ static void S_Base_SoundInfo()
 
 static void S_Base_SoundList()
 {
-	int total = 0;
-
 	const sfx_t* sfx = s_knownSfx;
 	for ( int i = 0; i < s_numSfx; ++i, ++sfx ) {
-		int size = sfx->soundLength;
-		total += size;
-		Com_Printf("%6i [%s] : %s\n", size, sfx->inMemory ? "MEM" : "PGD", sfx->soundName );
+		Com_Printf("%6i [%s] : %s\n", sfx->soundLength, sfx->inMemory ? "MEM" : "PGD", sfx->soundName );
 	}
+	Com_Printf("%d sounds loaded\n", s_numSfx );
 
 	S_DisplayFreeMemory();
 }

@@ -44,8 +44,8 @@ memory management
 
 static	sndBuffer	*sndbuffers = NULL;
 static	sndBuffer	*freelist = NULL;
-static	int inUse = 0;
-static	int totalInUse = 0;
+static	int sndmem_avail = 0;
+static	int sndmem_inuse = 0;
 
 short *sfxScratchBuffer = NULL;
 sfx_t *sfxScratchPointer = NULL;
@@ -54,7 +54,7 @@ int	   sfxScratchIndex = 0;
 void	SND_free(sndBuffer *v) {
 	*(sndBuffer **)v = freelist;
 	freelist = (sndBuffer*)v;
-	inUse += sizeof(sndBuffer);
+	sndmem_avail += sizeof(sndBuffer);
 }
 
 sndBuffer*	SND_malloc() {
@@ -65,8 +65,8 @@ redo:
 		goto redo;
 	}
 
-	inUse -= sizeof(sndBuffer);
-	totalInUse += sizeof(sndBuffer);
+	sndmem_avail -= sizeof(sndBuffer);
+	sndmem_inuse += sizeof(sndBuffer);
 
 	v = freelist;
 	freelist = *(sndBuffer **)freelist;
@@ -88,7 +88,7 @@ void SND_setup()
 	sfxScratchBuffer = (short*)Hunk_Alloc( SND_CHUNK_SIZE * sizeof(short) * 4, h_high );
 	sfxScratchPointer = NULL;
 
-	inUse = scs * sizeof(sndBuffer);
+	sndmem_avail = scs * sizeof(sndBuffer);
 	p = sndbuffers;
 	q = p + scs;
 	while (--q > p)
@@ -193,6 +193,8 @@ qbool S_LoadSound( sfx_t *sfx )
 	return qtrue;
 }
 
-void S_DisplayFreeMemory(void) {
-	Com_Printf("%d bytes free sound buffer memory, %d total used\n", inUse, totalInUse);
+
+void S_DisplayFreeMemory()
+{
+	Com_Printf( "%d bytes sound buffer memory in use, %d free \n", sndmem_inuse, sndmem_avail );
 }

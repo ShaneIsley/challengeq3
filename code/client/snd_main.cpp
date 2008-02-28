@@ -165,14 +165,14 @@ void S_ClearSoundBuffer()
 }
 
 
-void S_SoundInfo()
+static void S_SoundInfo()
 {
 	if (si.SoundInfo)
 		si.SoundInfo();
 }
 
 
-void S_SoundList()
+static void S_SoundList()
 {
 	if (si.SoundList)
 		si.SoundList();
