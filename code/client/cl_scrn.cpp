@@ -19,44 +19,23 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-// cl_scrn.c -- master for refresh, status bar, console, chat, notify, etc
+// cl_scrn.c -- master for refresh, console, chat, notify, etc
 
 #include "client.h"
 
-qbool	scr_initialized;		// ready to draw
+
+static qbool scr_initialized;	// ready to draw
 
 cvar_t		*cl_timegraph;
-cvar_t		*cl_debuggraph;
-cvar_t		*cl_graphheight;
-cvar_t		*cl_graphscale;
-cvar_t		*cl_graphshift;
-
-/*
-================
-SCR_DrawNamedPic
-
-Coordinates are 640*480 virtual values
-=================
-*/
-void SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname ) {
-	qhandle_t	hShader;
-
-	assert( width != 0 );
-
-	hShader = re.RegisterShader( picname );
-	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
-}
+static cvar_t* cl_graphheight;
+static cvar_t* cl_graphscale;
+static cvar_t* cl_graphshift;
 
 
-/*
-================
-SCR_AdjustFrom640
+// adjust for resolution and screen aspect ratio
 
-Adjusted for resolution and screen aspect ratio
-================
-*/
-void SCR_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+void SCR_AdjustFrom640( float *x, float *y, float *w, float *h )
+{
 	float	xscale;
 	float	yscale;
 
@@ -84,14 +63,11 @@ void SCR_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	}
 }
 
-/*
-================
-SCR_FillRect
 
-Coordinates are 640*480 virtual values
-=================
-*/
-void SCR_FillRect( float x, float y, float width, float height, const float *color ) {
+// coordinates are 640*480 virtual values
+
+void SCR_FillRect( float x, float y, float width, float height, const float *color )
+{
 	re.SetColor( color );
 
 	SCR_AdjustFrom640( &x, &y, &width, &height );
@@ -101,110 +77,46 @@ void SCR_FillRect( float x, float y, float width, float height, const float *col
 }
 
 
-/*
-================
-SCR_DrawPic
+// chars are drawn at native resolution, NOT the 640*480 virtual screen
+// the caller should have already preadjusted the position and size
 
-Coordinates are 640*480 virtual values
-=================
-*/
-void SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+static void SCR_DrawChar( float x, float y, float cw, float ch, int c )
+{
+	const float CELL_TCSIZE = 0.0625;
+
+	c &= 255;
+
+	if ( c == ' ' ) {
+		return;
+	}
+
+	int xcell = c & 15;
+	int ycell = c >> 4;
+
+	float s = xcell * CELL_TCSIZE;
+	float t = ycell * CELL_TCSIZE;
+
+	re.DrawStretchPic( x, y, cw, ch, s, t, s + CELL_TCSIZE, t + CELL_TCSIZE, cls.charSetShader );
 }
 
 
+// draws a string with a drop shadow, optionally with colorcodes
+// position and size are at 640*480 virtual resolution
 
-/*
-** SCR_DrawChar
-** chars are drawn at 640*480 virtual screen size
-*/
-static void SCR_DrawChar( int x, int y, float size, int ch ) {
-	int row, col;
-	float frow, fcol;
-	float	ax, ay, aw, ah;
+static void SCR_DrawStringExt( float x, float y, float cw, float ch, const char* string, qbool allowColor )
+{
+	float xx;
+	const char* s;
 
-	ch &= 255;
+	SCR_AdjustFrom640( &x, &y, &cw, &ch );
 
-	if ( ch == ' ' ) {
+	// don't bother if nothing will be visible
+	if ( y < -ch ) {
 		return;
 	}
-
-	if ( y < -size ) {
-		return;
-	}
-
-	ax = x;
-	ay = y;
-	aw = size;
-	ah = size;
-	SCR_AdjustFrom640( &ax, &ay, &aw, &ah );
-
-	row = ch>>4;
-	col = ch&15;
-
-	frow = row*0.0625;
-	fcol = col*0.0625;
-	size = 0.0625;
-
-	re.DrawStretchPic( ax, ay, aw, ah,
-					   fcol, frow, 
-					   fcol + size, frow + size, 
-					   cls.charSetShader );
-}
-
-/*
-** SCR_DrawSmallChar
-** small chars are drawn at native screen resolution
-*/
-void SCR_DrawSmallChar( int x, int y, int ch ) {
-	int row, col;
-	float frow, fcol;
-	float size;
-
-	ch &= 255;
-
-	if ( ch == ' ' ) {
-		return;
-	}
-
-	if ( y < -SMALLCHAR_HEIGHT ) {
-		return;
-	}
-
-	row = ch>>4;
-	col = ch&15;
-
-	frow = row*0.0625;
-	fcol = col*0.0625;
-	size = 0.0625;
-
-	re.DrawStretchPic( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT,
-					   fcol, frow, 
-					   fcol + size, frow + size, 
-					   cls.charSetShader );
-}
-
-
-/*
-==================
-SCR_DrawBigString[Color]
-
-Draws a multi-colored string with a drop shadow, optionally forcing
-to a fixed color.
-
-Coordinates are at 640 by 480 virtual resolution
-==================
-*/
-void SCR_DrawStringExt( int x, int y, float size, const char *string, const float *setColor, qbool forceColor ) {
-	vec4_t		color;
-	const char	*s;
-	int			xx;
 
 	// draw the drop shadow
-	color[0] = color[1] = color[2] = 0;
-	color[3] = setColor[3];
-	re.SetColor( color );
+	re.SetColor( colorBlack );
 	s = string;
 	xx = x;
 	while ( *s ) {
@@ -212,109 +124,67 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, const floa
 			s += 2;
 			continue;
 		}
-		SCR_DrawChar( xx+2, y+2, size, *s );
-		xx += size;
+		SCR_DrawChar( xx+2, y+2, cw, ch, *s );
+		xx += cw;
 		s++;
 	}
 
-
-	// draw the colored text
+	// draw the text, possibly with colors
 	s = string;
 	xx = x;
-	re.SetColor( setColor );
+	re.SetColor( colorWhite );
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
-			if ( !forceColor ) {
-				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
-				color[3] = setColor[3];
-				re.SetColor( color );
+			if ( allowColor ) {
+				re.SetColor( g_color_table[ColorIndex(*(s+1))] );
 			}
 			s += 2;
 			continue;
 		}
-		SCR_DrawChar( xx, y, size, *s );
-		xx += size;
+		SCR_DrawChar( xx, y, cw, ch, *s );
+		xx += cw;
 		s++;
 	}
+
 	re.SetColor( NULL );
 }
 
 
-void SCR_DrawBigString( int x, int y, const char *s, float alpha ) {
-	float	color[4];
-
-	color[0] = color[1] = color[2] = 1.0;
-	color[3] = alpha;
-	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qfalse );
-}
-
-void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color ) {
-	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, qtrue );
+void SCR_DrawBigString( int x, int y, const char* s )
+{
+	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, s, qtrue );
 }
 
 
-/*
-==================
-SCR_DrawSmallString[Color]
+// small chars are drawn at native screen resolution
+// which sucks ass if you run at "too" high or low a rez  :(
+// used exclusively by the console
 
-Draws a multi-colored string with a drop shadow, optionally forcing
-to a fixed color.
+void SCR_DrawSmallChar( int x, int y, int ch )
+{
+	SCR_DrawChar( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, ch );
+}
 
-Coordinates are at 640 by 480 virtual resolution
-==================
-*/
-void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qbool forceColor ) {
-	vec4_t		color;
-	const char	*s;
-	int			xx;
 
-	// draw the colored text
-	s = string;
-	xx = x;
-	re.SetColor( setColor );
+// draws a multi-colored string withOUT a drop shadow and NOT adjusted for screen rez
+// currently used exclusively by the console entry line
+
+void SCR_DrawSmallString( int x, int y, const char* s )
+{
+	re.SetColor( NULL );
+
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
-			if ( !forceColor ) {
-				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
-				color[3] = setColor[3];
-				re.SetColor( color );
-			}
+			re.SetColor( g_color_table[ColorIndex(*(s+1))] );
 			s += 2;
 			continue;
 		}
-		SCR_DrawSmallChar( xx, y, *s );
-		xx += SMALLCHAR_WIDTH;
+		SCR_DrawSmallChar( x, y, *s );
+		x += SMALLCHAR_WIDTH;
 		s++;
 	}
+
 	re.SetColor( NULL );
-}
-
-
-
-/*
-** SCR_Strlen -- skips color escape codes
-*/
-static int SCR_Strlen( const char *str ) {
-	const char *s = str;
-	int count = 0;
-
-	while ( *s ) {
-		if ( Q_IsColorString( s ) ) {
-			s += 2;
-		} else {
-			count++;
-			s++;
-		}
-	}
-
-	return count;
-}
-
-/*
-** SCR_GetBigStringWidth
-*/ 
-int	SCR_GetBigStringWidth( const char *str ) {
-	return SCR_Strlen( str ) * 16;
 }
 
 
@@ -323,15 +193,13 @@ int	SCR_GetBigStringWidth( const char *str ) {
 
 static void SCR_DrawDemoRecording()
 {
-	char string[1024];
-
 	if (!clc.demorecording || !clc.showAnnoyingDemoRecordMessage)
 		return;
 
 	int pos = FS_FTell( clc.demofile );
-	sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
+	const char* s = va( "RECORDING %s: %ik", clc.demoName, pos / 1024 );
 
-	SCR_DrawStringExt( 320 - strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue );
+	SCR_DrawStringExt( 320 - strlen(s) * 4, 20, 8, 8, s, qfalse );
 }
 
 
@@ -364,12 +232,8 @@ void SCR_DebugGraph (float value, int color)
 	current++;
 }
 
-/*
-==============
-SCR_DrawDebugGraph
-==============
-*/
-void SCR_DrawDebugGraph (void)
+
+static void SCR_DrawDebugGraph()
 {
 	int		a, x, y, w, i, h;
 	float	v;
@@ -392,7 +256,7 @@ void SCR_DrawDebugGraph (void)
 		v = values[i].value;
 		color = values[i].color;
 		v = v * cl_graphscale->integer + cl_graphshift->integer;
-		
+
 		if (v < 0)
 			v += cl_graphheight->integer * (1+(int)(-v / cl_graphheight->integer));
 		h = (int)v % cl_graphheight->integer;
@@ -400,16 +264,13 @@ void SCR_DrawDebugGraph (void)
 	}
 }
 
+
 //=============================================================================
 
-/*
-==================
-SCR_Init
-==================
-*/
-void SCR_Init( void ) {
+
+void SCR_Init( void )
+{
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
-	cl_debuggraph = Cvar_Get ("debuggraph", "0", CVAR_CHEAT);
 	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
 	cl_graphscale = Cvar_Get ("graphscale", "1", CVAR_CHEAT);
 	cl_graphshift = Cvar_Get ("graphshift", "0", CVAR_CHEAT);
@@ -494,8 +355,8 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	// console draws next
 	Con_DrawConsole ();
 
-	// debug graph can be drawn on top of anything
-	if ( cl_debuggraph->integer || cl_timegraph->integer || cl_debugMove->integer ) {
+	// debug graphs can be drawn on top of anything
+	if ( cl_timegraph->integer || cl_debugMove->integer ) {
 		SCR_DrawDebugGraph ();
 	}
 }

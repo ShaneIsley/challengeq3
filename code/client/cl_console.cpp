@@ -24,12 +24,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 
 
-int g_console_field_width = 78;
+#define CON_NOTIFYLINES	4
 
+#define CON_TEXTSIZE	32768
 
-#define	NUM_CON_TIMES 4
-
-#define		CON_TEXTSIZE	32768
 typedef struct {
 	qbool	initialized;
 
@@ -48,28 +46,21 @@ typedef struct {
 
 	int		vislines;		// in scanlines
 
-	int		times[NUM_CON_TIMES];	// cls.realtime time the line was generated
+	int		times[CON_NOTIFYLINES];	// cls.realtime time the line was generated
 								// for transparent notify lines
 } console_t;
 
-extern	console_t	con;
+static console_t con;
 
-console_t	con;
+static const cvar_t* con_conspeed;
+static const cvar_t* con_notifytime;
 
-cvar_t		*con_conspeed;
-cvar_t		*con_notifytime;
-
-#define	DEFAULT_CONSOLE_WIDTH	78
-
-vec4_t	console_color = {1.0, 1.0, 1.0, 1.0};
+#define DEFAULT_CONSOLE_WIDTH 78
+int g_console_field_width = DEFAULT_CONSOLE_WIDTH;
 
 
-/*
-================
-Con_ToggleConsole_f
-================
-*/
-void Con_ToggleConsole_f (void) {
+void Con_ToggleConsole_f( void )
+{
 	// closing a full screen console restarts the demo loop
 	if ( cls.state == CA_DISCONNECTED && cls.keyCatchers == KEYCATCH_CONSOLE ) {
 		CL_StartDemoLoop();
@@ -79,7 +70,7 @@ void Con_ToggleConsole_f (void) {
 	Field_Clear( &g_consoleField );
 	g_consoleField.widthInChars = g_console_field_width;
 
-	Con_ClearNotify ();
+	Con_ClearNotify();
 	cls.keyCatchers ^= KEYCATCH_CONSOLE;
 }
 
@@ -145,7 +136,7 @@ void Con_MessageMode4_f (void) {
 }
 
 
-void Con_Clear_f( void )
+static void Con_Clear_f( void )
 {
 	int		i;
 
@@ -209,35 +200,25 @@ void Con_Dump_f( void )
 				break;
 		}
 		strcat( buffer, "\n" );
-		FS_Write(buffer, strlen(buffer), f);
+		FS_Write( buffer, strlen(buffer), f );
 	}
 
 	FS_FCloseFile( f );
 }
 
 
-/*
-================
-Con_ClearNotify
-================
-*/
-void Con_ClearNotify( void ) {
-	int		i;
-	
-	for ( i = 0 ; i < NUM_CON_TIMES ; i++ ) {
+void Con_ClearNotify()
+{
+	for (int i = 0; i < CON_NOTIFYLINES; ++i) {
 		con.times[i] = 0;
 	}
 }
 
 
-/*
-================
-Con_CheckResize
+// if the line width has changed, reformat the buffer
+// KHB !!!  this is pointless other than at init, and the comment is a lie - the console is ALWAYS 78 chars wide
 
-If the line width has changed, reformat the buffer.
-================
-*/
-void Con_CheckResize (void)
+static void Con_CheckResize()
 {
 	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
 	short	tbuf[CON_TEXTSIZE];
@@ -253,7 +234,6 @@ void Con_CheckResize (void)
 		con.linewidth = width;
 		con.totallines = CON_TEXTSIZE / con.linewidth;
 		for(i=0; i<CON_TEXTSIZE; i++)
-
 			con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
 	}
 	else
@@ -274,9 +254,7 @@ void Con_CheckResize (void)
 
 		Com_Memcpy (tbuf, con.text, CON_TEXTSIZE * sizeof(short));
 		for(i=0; i<CON_TEXTSIZE; i++)
-
 			con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
-
 
 		for (i=0 ; i<numlines ; i++)
 		{
@@ -288,7 +266,7 @@ void Con_CheckResize (void)
 			}
 		}
 
-		Con_ClearNotify ();
+		Con_ClearNotify();
 	}
 
 	con.current = con.totallines - 1;
@@ -296,12 +274,8 @@ void Con_CheckResize (void)
 }
 
 
-/*
-================
-Con_Init
-================
-*/
-void Con_Init (void) {
+void Con_Init()
+{
 	int		i;
 
 	con_notifytime = Cvar_Get ("con_notifytime", "3", 0);
@@ -314,103 +288,82 @@ void Con_Init (void) {
 		historyEditLines[i].widthInChars = g_console_field_width;
 	}
 
-	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
-	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
-	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
-	Cmd_AddCommand ("messagemode3", Con_MessageMode3_f);
-	Cmd_AddCommand ("messagemode4", Con_MessageMode4_f);
-	Cmd_AddCommand ("clear", Con_Clear_f);
-	Cmd_AddCommand ("condump", Con_Dump_f);
+	Cmd_AddCommand( "toggleconsole", Con_ToggleConsole_f );
+	Cmd_AddCommand( "messagemode", Con_MessageMode_f );
+	Cmd_AddCommand( "messagemode2", Con_MessageMode2_f );
+	Cmd_AddCommand( "messagemode3", Con_MessageMode3_f );
+	Cmd_AddCommand( "messagemode4", Con_MessageMode4_f );
+	Cmd_AddCommand( "clear", Con_Clear_f );
+	Cmd_AddCommand( "condump", Con_Dump_f );
 }
 
 
-/*
-===============
-Con_Linefeed
-===============
-*/
-void Con_Linefeed (qbool skipnotify)
+static void Con_Linefeed()
 {
-	int		i;
-
 	// mark time for transparent overlay
-	if (con.current >= 0)
-	{
-		con.times[con.current % NUM_CON_TIMES] = skipnotify ? 0 : cls.realtime;
+	if (con.current >= 0) {
+		con.times[con.current % CON_NOTIFYLINES] = cls.realtime;
 	}
 
 	con.x = 0;
 	if (con.display == con.current)
 		con.display++;
 	con.current++;
-	for(i=0; i<con.linewidth; i++)
+
+	for ( int i = 0; i < con.linewidth; ++i ) {
 		con.text[(con.current%con.totallines)*con.linewidth+i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
+	}
 }
 
 
 /*
-================
-CL_ConsolePrint
-
 Handles cursor positioning, line wrapping, etc
 All console printing must go through this in order to be logged to disk
 If no console is visible, the text will appear at the top of the game window
-================
 */
-void CL_ConsolePrint( char *txt ) {
+void CL_ConsolePrint( const char* s )
+{
 	int		y;
-	int		c, l;
+	int		c, w;
 	int		color;
-	qbool skipnotify = qfalse;		// NERVE - SMF
-	int prev;							// NERVE - SMF
 
-	// TTimo - prefix for text that shows up in console but not in notify
-	// backported from RTCW
-	if ( !Q_strncmp( txt, "[skipnotify]", 12 ) ) {
-		skipnotify = qtrue;
-		txt += 12;
-	}
-
-	// for some demos we don't want to ever show anything on the console
+	// cl_noprint disables ALL console functionality
+	// use con_notifytime 0 to log the text without the annoying overlay
 	if ( cl_noprint && cl_noprint->integer ) {
 		return;
 	}
 
 	if (!con.initialized) {
 		con.linewidth = -1;
-		Con_CheckResize ();
+		Con_CheckResize();
 		con.initialized = qtrue;
 	}
 
 	color = ColorIndex(COLOR_WHITE);
 
-	while ( (c = *txt) != 0 ) {
-		if ( Q_IsColorString( txt ) ) {
-			color = ColorIndex( *(txt+1) );
-			txt += 2;
+	while ( c = *s ) {
+		if ( Q_IsColorString( s ) ) {
+			color = ColorIndex( *(s+1) );
+			s += 2;
 			continue;
 		}
 
-		// count word length
-		for (l=0 ; l< con.linewidth ; l++) {
-			if ( txt[l] <= ' ') {
+		// count word length and wordwrap if needed
+		for (w = 0; w < con.linewidth; ++w) {
+			if ( s[w] <= ' ') {
 				break;
 			}
-
+		}
+		if (w != con.linewidth && (con.x + w >= con.linewidth) ) {
+			Con_Linefeed();
 		}
 
-		// word wrap
-		if (l != con.linewidth && (con.x + l >= con.linewidth) ) {
-			Con_Linefeed(skipnotify);
-
-		}
-
-		txt++;
+		++s;
 
 		switch (c)
 		{
 		case '\n':
-			Con_Linefeed (skipnotify);
+			Con_Linefeed();
 			break;
 		case '\r':
 			con.x = 0;
@@ -420,26 +373,16 @@ void CL_ConsolePrint( char *txt ) {
 			con.text[y*con.linewidth+con.x] = (color << 8) | c;
 			con.x++;
 			if (con.x >= con.linewidth) {
-				Con_Linefeed(skipnotify);
+				Con_Linefeed();
 				con.x = 0;
 			}
 			break;
 		}
 	}
 
-
 	// mark time for transparent overlay
 	if (con.current >= 0) {
-		// NERVE - SMF
-		if ( skipnotify ) {
-			prev = con.current % NUM_CON_TIMES - 1;
-			if ( prev < 0 )
-				prev = NUM_CON_TIMES - 1;
-			con.times[prev] = 0;
-		}
-		else
-		// -NERVE - SMF
-			con.times[con.current % NUM_CON_TIMES] = cls.realtime;
+		con.times[con.current % CON_NOTIFYLINES] = cls.realtime;
 	}
 }
 
@@ -453,18 +396,7 @@ DRAWING
 */
 
 
-// changing colors every char is bad, but
-
-static void Con_DrawShadowedChar( int x, int y, int c, const vec4_t color )
-{
-	re.SetColor( colorBlack );
-	SCR_DrawSmallChar( x + 1, y + 1, c );
-	re.SetColor( color );
-	SCR_DrawSmallChar( x, y, c );
-}
-
-
-// Draw the editline after a ] prompt
+// draw the editline with a prompt in front of it
 
 static void Con_DrawInput()
 {
@@ -476,7 +408,10 @@ static void Con_DrawInput()
 
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 
-	Con_DrawShadowedChar( con.xadjust, y, ']', colorWhite );
+	re.SetColor( colorBlack );
+	SCR_DrawSmallChar( con.xadjust + 1, y + 1, ']' );
+	re.SetColor( colorWhite );
+	SCR_DrawSmallChar( con.xadjust, y, ']' );
 
 	Field_Draw( &g_consoleField, con.xadjust + SMALLCHAR_WIDTH, y,
 		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
@@ -492,17 +427,16 @@ static void Con_DrawNotify()
 	int		i;
 	int		time;
 	int		skip;
-	int		currentColor;
 
-	currentColor = 7;
+	int currentColor = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
 	re.SetColor( g_color_table[currentColor] );
 
 	v = 0;
-	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
+	for (i= con.current-CON_NOTIFYLINES+1 ; i<=con.current ; i++)
 	{
 		if (i < 0)
 			continue;
-		time = con.times[i % NUM_CON_TIMES];
+		time = con.times[i % CON_NOTIFYLINES];
 		if (time == 0)
 			continue;
 		time = cls.realtime - time;
@@ -539,12 +473,12 @@ static void Con_DrawNotify()
 	{
 		if (chat_team)
 		{
-			SCR_DrawBigString (8, v, "say_team:", 1.0f );
+			SCR_DrawBigString (8, v, "say_team:" );
 			skip = 10;
 		}
 		else
 		{
-			SCR_DrawBigString (8, v, "say:", 1.0f );
+			SCR_DrawBigString (8, v, "say:" );
 			skip = 5;
 		}
 
@@ -556,149 +490,6 @@ static void Con_DrawNotify()
 
 }
 
-
-///////////////////////////////////////////////////////////////
-
-#if 0 // not really finished with this yet
-
-static float CPMA_HUD_DrawChar( float x, float y, int ch )
-{
-	if (ch == GLYPH_START)
-		return cls.fontConsole.maxpitch;
-
-	if ((ch > GLYPH_START) && (ch <= GLYPH_END)) {
-		ch -= GLYPH_START;
-		//re.DrawStretchPic( con.xadjust + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
-		//return cls.fontConsole.pitches[ch];
-		int offset = 0.5 * (cls.fontConsole.maxpitch - cls.fontConsole.pitches[ch]);
-		re.DrawStretchPic( con.xadjust + offset + x, y, cls.fontConsole.widths[ch], cls.fontConsole.height, 0, 0, 1, 1, cls.fontConsole.shaders[ch] );
-		return cls.fontConsole.maxpitch;
-	}
-
-	return 0;
-}
-
-
-static float CPMA_HUD_StringWidth( const char* s )
-{
-	int ch;
-	float w = 0;
-	while (ch = *s++)
-		if ((ch >= GLYPH_START) && (ch <= GLYPH_END))
-			//w += cls.fontConsole.pitches[ch - GLYPH_START];
-			w += cls.fontConsole.maxpitch;
-	return w;
-}
-
-
-static void Con_DrawSolidConsole( float frac )
-{
-	int		i, x, y;
-	int		rows;
-	short	*text;
-	int		row;
-	vec4_t	color;
-
-	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
-	if (scanlines <= 0)
-		return;
-
-	// on wide screens, we will center the text
-	con.xadjust = 0;
-	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
-	con.xadjust += SMALLCHAR_WIDTH;
-
-	// draw the background
-	y = frac * SCREEN_HEIGHT - 2;
-	if ( y < 1 ) {
-		y = 0;
-	}
-	else {
-		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
-		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
-	}
-
-	MAKERGBA( color, 0.33f, 0.33f, 0.33f, 1.0 );
-	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
-
-	// draw the text
-	con.vislines = scanlines;
-	rows = (scanlines - cls.fontConsole.vpitch) / cls.fontConsole.vpitch;
-
-	y = scanlines - (cls.fontConsole.vpitch * 3);
-
-	i = 0;
-	x = cls.glconfig.vidWidth - CPMA_HUD_StringWidth(Q3_VERSION) - SMALLCHAR_WIDTH;
-	for (i = 0; Q3_VERSION[i]; ++i) {
-		x += CPMA_HUD_DrawChar( x, scanlines - cls.fontConsole.height, Q3_VERSION[i] );
-	}
-	re.SetColor( NULL );
-
-	// draw from the bottom up
-	if (con.display != con.current)
-	{
-		// draw arrows to show the buffer is backscrolled
-		re.SetColor( colorBlack );
-		for (x = 0; x < con.linewidth; x += 4)
-			CPMA_HUD_DrawChar( x * SMALLCHAR_WIDTH, y, '^' );
-		y -= cls.fontConsole.vpitch;
-		--rows;
-	}
-
-	row = con.display;
-
-	if ( con.x == 0 ) {
-		row--;
-	}
-
-	int colorCode = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
-	re.SetColor( g_color_table[colorCode] );
-
-	for (i = 0; i < rows; ++i, --row, y -= cls.fontConsole.vpitch )
-	{
-		if (row < 0)
-			break;
-		if (con.current - row >= con.totallines) {
-			// past scrollback wrap point
-			continue;
-		}
-
-		text = con.text + (row % con.totallines)*con.linewidth;
-
-/* grr - this can pass the 1Kverts surface limit now if you use a small enough font...  :P
-		// since fonts are now texture-per-char, minimize the glBinds rather than the glColors
-		x = 0;
-		for (int i = 0; i < con.linewidth; ++i) {
-			re.SetColor( colorBlack );
-			CPMA_HUD_DrawChar( 1 + x, y + 1, (text[i] & 0xFF) );
-			re.SetColor( colorWhite );
-			x += CPMA_HUD_DrawChar( x, y, (text[i] & 0xFF) );
-		}
-*/
-		re.SetColor( colorBlack );
-		x = 0;
-		for (int i = 0; i < con.linewidth; ++i) {
-			x += CPMA_HUD_DrawChar( 1 + x, 1 + y, (text[i] & 0xFF) );
-		}
-
-		re.SetColor( colorWhite );
-		x = 0;
-		for (int i = 0; i < con.linewidth; ++i) {
-			if ((text[i] >> 8) != colorCode) {
-				colorCode = (text[i] >> 8);
-				re.SetColor( g_color_table[colorCode] );
-			}
-			x += CPMA_HUD_DrawChar( x, y, (text[i] & 0xFF) );
-		}
-	}
-
-	// draw the input prompt, user text, and cursor if desired
-	Con_DrawInput();
-
-	re.SetColor( NULL );
-}
-
-#endif
 
 ///////////////////////////////////////////////////////////////
 
@@ -821,34 +612,30 @@ void Con_DrawConsole( void ) {
 	} else {
 		// draw notify lines
 		if ( cls.state == CA_ACTIVE ) {
-			Con_DrawNotify ();
+			Con_DrawNotify();
 		}
 	}
 }
 
 //================================================================
 
-/*
-==================
-Con_RunConsole
 
-Scroll it up or down
-==================
-*/
-void Con_RunConsole (void) {
+// slide the console onto/off the screen
+
+void Con_RunConsole()
+{
 	// decide on the destination height of the console
 	if ( cls.keyCatchers & KEYCATCH_CONSOLE )
 		con.finalFrac = 0.5;		// half screen
 	else
 		con.finalFrac = 0;				// none visible
-	
+
 	// scroll towards the destination height
 	if (con.finalFrac < con.displayFrac)
 	{
 		con.displayFrac -= con_conspeed->value*cls.realFrametime*0.001;
 		if (con.finalFrac > con.displayFrac)
 			con.displayFrac = con.finalFrac;
-
 	}
 	else if (con.finalFrac > con.displayFrac)
 	{
@@ -856,42 +643,49 @@ void Con_RunConsole (void) {
 		if (con.finalFrac < con.displayFrac)
 			con.displayFrac = con.finalFrac;
 	}
-
 }
 
 
-void Con_PageUp( void ) {
-	con.display -= 2;
+static const int CON_PAGELINES = 4;
+
+void Con_PageUp()
+{
+	con.display -= CON_PAGELINES;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_PageDown( void ) {
-	con.display += 2;
+void Con_PageDown()
+{
+	con.display += CON_PAGELINES;
 	if (con.display > con.current) {
 		con.display = con.current;
 	}
 }
 
-void Con_Top( void ) {
+
+void Con_Top()
+{
 	con.display = con.totallines;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_Bottom( void ) {
+void Con_Bottom()
+{
 	con.display = con.current;
 }
 
 
-void Con_Close( void ) {
+void Con_Close()
+{
 	if ( !com_cl_running->integer ) {
 		return;
 	}
 	Field_Clear( &g_consoleField );
-	Con_ClearNotify ();
+	Con_ClearNotify();
 	cls.keyCatchers &= ~KEYCATCH_CONSOLE;
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;

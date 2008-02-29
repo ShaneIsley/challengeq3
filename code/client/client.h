@@ -315,8 +315,6 @@ typedef struct {
 	glconfig_t	glconfig;
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
-
-	//fontInfo_t fontConsole;
 } clientStatic_t;
 
 extern	clientStatic_t		cls;
@@ -446,18 +444,16 @@ qbool CL_UpdateVisiblePings_f( int source );
 //
 void Con_DrawCharacter (int cx, int line, int num);
 
-void Con_CheckResize (void);
-void Con_Init (void);
-void Con_Clear_f (void);
-void Con_ToggleConsole_f (void);
-void Con_ClearNotify (void);
-void Con_RunConsole (void);
+void Con_Init();
+void Con_ToggleConsole_f( void );
+void Con_ClearNotify();
+void Con_RunConsole();
 void Con_DrawConsole (void);
-void Con_PageUp( void );
-void Con_PageDown( void );
-void Con_Top( void );
-void Con_Bottom( void );
-void Con_Close( void );
+void Con_PageUp();
+void Con_PageDown();
+void Con_Top();
+void Con_Bottom();
+void Con_Close();
 
 
 //
@@ -468,17 +464,11 @@ void	SCR_UpdateScreen (void);
 
 void	SCR_DebugGraph (float value, int color);
 
-int		SCR_GetBigStringWidth( const char *str );	// returns in virtual 640x480 coordinates
-
 void	SCR_AdjustFrom640( float *x, float *y, float *w, float *h );
-void	SCR_FillRect( float x, float y, float width, float height, 
-					 const float *color );
-void	SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
-void	SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname );
+void	SCR_FillRect( float x, float y, float width, float height, const float *color );
 
-void	SCR_DrawBigString( int x, int y, const char *s, float alpha );			// draws a string with embedded color control characters with fade
-void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color );	// ignores embedded color control characters
-void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qbool forceColor );
+void	SCR_DrawBigString( int x, int y, const char* s );
+void	SCR_DrawSmallString( int x, int y, const char* s );
 void	SCR_DrawSmallChar( int x, int y, int ch );
 
 

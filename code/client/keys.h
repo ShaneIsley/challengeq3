@@ -21,20 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "keycodes.h"
 
-#define	MAX_KEYS		256
-
-typedef struct {
-	qbool	down;
-	int			repeats;		// if > 1, it is autorepeating
-	char		*binding;
-} qkey_t;
-
-extern	qbool	key_overstrikeMode;
-extern	qkey_t		keys[MAX_KEYS];
 
 // NOTE TTimo the declaration of field_t and Field_Clear is now in qcommon/qcommon.h
-void Field_KeyDownEvent( field_t *edit, int key );
-void Field_CharEvent( field_t *edit, int ch );
 void Field_Draw( field_t *edit, int x, int y, int width, qbool showCursor );
 void Field_BigDraw( field_t *edit, int x, int y, int width, qbool showCursor );
 
@@ -48,10 +36,10 @@ extern	qbool	chat_team;
 extern	int			chat_playerNum;
 
 void Key_WriteBindings( fileHandle_t f );
-void Key_SetBinding( int keynum, const char *binding );
+void Key_SetBinding( int keynum, const char* binding );
 const char* Key_GetBinding( int keynum );
 qbool Key_IsDown( int keynum );
-qbool Key_GetOverstrikeMode( void );
+qbool Key_GetOverstrikeMode();
 void Key_SetOverstrikeMode( qbool state );
 void Key_ClearStates( void );
-int Key_GetKey(const char *binding);
+int Key_GetKey( const char* binding );
