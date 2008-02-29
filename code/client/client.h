@@ -23,9 +23,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
-#include "../renderer/tr_public.h"
 #include "keys.h"
 #include "snd_public.h"
+#include "../renderer/tr_public.h"
 #include "../qcommon/cg_public.h"
 #include "../qcommon/ui_public.h"
 
@@ -36,8 +36,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define USE_CURL_DLOPEN
 #include "cl_curl.h"
 */
-
-#define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
 
 // snapshots are a view of the server at a given time
@@ -61,7 +59,6 @@ typedef struct {
 	int				serverCommandNum;		// execute all commands up to this before
 											// making the snapshot current
 } clSnapshot_t;
-
 
 
 /*

@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cl_main.c  -- client main loop
 
 #include "client.h"
-#include <limits.h>
 
 
 cvar_t	*cl_debugMove;
@@ -45,14 +44,10 @@ cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
 
-cvar_t	*cl_freelook;
-
-cvar_t	*cl_showMouseRate;
-
 cvar_t	*cl_activeAction;
 
-cvar_t	*cl_motd;
-cvar_t	*cl_motdString;
+static cvar_t* cl_motd;
+static cvar_t* cl_motdString;
 
 cvar_t	*cl_allowDownload;
 cvar_t	*cl_conXOffset;
@@ -62,17 +57,16 @@ cvar_t	*cl_inGameVideo;
 cvar_t	*cl_dlURL;
 #endif
 
-cvar_t	*cl_serverStatusResendTime;
-
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
 vm_t				*cgvm;
 
-// Structure containing functions exported from refresh DLL
-refexport_t	re;
+refexport_t re; // functions exported from refresh DLL
 
-ping_t	cl_pinglist[MAX_PINGREQUESTS];
+
+static ping_t cl_pinglist[MAX_PINGREQUESTS];
+static const cvar_t* cl_serverStatusResendTime;
 
 typedef struct serverStatus_s
 {
@@ -90,6 +84,9 @@ int serverStatusCount;
 #if defined __USEA3D && defined __A3D_GEOM
 	void hA3Dg_ExportRenderGeom (refexport_t *incoming_re);
 #endif
+
+
+#define RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
 
 /*

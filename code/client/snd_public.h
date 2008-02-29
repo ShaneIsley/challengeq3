@@ -42,8 +42,8 @@ void S_StopAllSounds();
 void S_ClearLoopingSounds();
 void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 
-// recompute the reletive volumes for all running sounds
-// reletive to the given entityNum / orientation
+// recompute the volume levels of all active sounds
+// relative to the given entityNum / orientation
 void S_Respatialize( int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater );
 
 // let the sound system know where an entity currently is
