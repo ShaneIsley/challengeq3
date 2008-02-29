@@ -2336,10 +2336,6 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath="..\..\win32\qe3.ico"
-				>
-			</File>
-			<File
 				RelativePath="..\..\win32\winquake.rc"
 				>
 				<FileConfiguration
