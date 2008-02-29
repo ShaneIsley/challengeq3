@@ -895,6 +895,8 @@ static void Key_Bindlist_f( void )
 
 void CL_InitKeyCommands()
 {
+	COMPILE_TIME_ASSERT( K_LAST_KEY <= MAX_KEYS );
+
 	// register our functions
 	Cmd_AddCommand( "bind", Key_Bind_f );
 	Cmd_AddCommand( "unbind", Key_Unbind_f );
@@ -1149,22 +1151,15 @@ void CL_CharEvent( int key ) {
 }
 
 
-/*
-===================
-Key_ClearStates
-===================
-*/
-void Key_ClearStates (void)
+void Key_ClearStates()
 {
-	int		i;
-
-	anykeydown = 0;
-
-	for ( i=0 ; i < MAX_KEYS ; i++ ) {
+	for ( int i = 0; i < MAX_KEYS; ++i ) {
 		if ( keys[i].down ) {
 			CL_KeyEvent( i, qfalse, 0 );
 		}
 		keys[i].down = 0;
 		keys[i].repeats = 0;
 	}
+
+	anykeydown = 0;
 }

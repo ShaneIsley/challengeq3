@@ -41,5 +41,5 @@ const char* Key_GetBinding( int keynum );
 qbool Key_IsDown( int keynum );
 qbool Key_GetOverstrikeMode();
 void Key_SetOverstrikeMode( qbool state );
-void Key_ClearStates( void );
+void Key_ClearStates();
 int Key_GetKey( const char* binding );
