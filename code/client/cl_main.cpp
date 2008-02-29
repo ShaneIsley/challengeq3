@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 #include <limits.h>
 
-cvar_t	*cl_nodelta;
+
 cvar_t	*cl_debugMove;
 
 cvar_t	*cl_noprint;
@@ -46,16 +46,8 @@ cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
 
 cvar_t	*cl_freelook;
-cvar_t	*cl_sensitivity;
 
 cvar_t	*cl_showMouseRate;
-
-cvar_t	*m_accel;
-cvar_t	*m_pitch;
-cvar_t	*m_yaw;
-cvar_t	*m_forward;
-cvar_t	*m_side;
-cvar_t	*m_filter;
 
 cvar_t	*cl_activeAction;
 
@@ -2945,14 +2937,8 @@ void CL_Init()
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
-	cl_yawspeed = Cvar_Get ("cl_yawspeed", "140", CVAR_ARCHIVE);
-	cl_pitchspeed = Cvar_Get ("cl_pitchspeed", "140", CVAR_ARCHIVE);
-	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
-
 	cl_maxpackets = Cvar_Get ("cl_maxpackets", "30", CVAR_ARCHIVE );
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
-
-	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 #if defined(USE_CURL)
@@ -2971,21 +2957,6 @@ void CL_Init()
 #endif
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
-
-	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
-	m_accel = Cvar_Get ("m_accel", "0", CVAR_ARCHIVE);
-	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
-	m_yaw = Cvar_Get ("m_yaw", "0.022", CVAR_ARCHIVE);
-	m_forward = Cvar_Get ("m_forward", "0.25", CVAR_ARCHIVE);
-	m_side = Cvar_Get ("m_side", "0.25", CVAR_ARCHIVE);
-#ifdef MACOS_X
-	// Input is jittery on OS X w/o this
-	m_filter = Cvar_Get ("m_filter", "1", CVAR_ARCHIVE);
-#else
-	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
-#endif
-	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
-	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
 

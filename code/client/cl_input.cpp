@@ -23,8 +23,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 
+
+static const cvar_t* m_sensitivity;
+static const cvar_t* m_accel;
+static const cvar_t* m_pitch;
+static const cvar_t* m_yaw;
+static const cvar_t* m_forward;
+static const cvar_t* m_side;
+static const cvar_t* m_filter;
+
+static const cvar_t* cl_pitchspeed;
+static const cvar_t* cl_yawspeed;
+static const cvar_t* cl_run;
+static const cvar_t* cl_anglespeedkey;
+static const cvar_t* cl_freelook;
+
+static const cvar_t* cl_nodelta;
+static const cvar_t* cl_showMouseRate;
+
+
 static unsigned frame_msec;
 static int old_com_frameTime;
+
 
 /*
 ===============================================================================
@@ -47,12 +67,20 @@ at the same time.
 */
 
 
-kbutton_t	in_left, in_right, in_forward, in_back;
-kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
-kbutton_t	in_strafe, in_speed;
-kbutton_t	in_up, in_down;
+typedef struct {
+	int			down[2];		// key nums holding it down
+	unsigned	downtime;		// msec timestamp
+	unsigned	msec;			// msec down this frame if both a down and up happened
+	qbool		active;			// current state
+	qbool		wasPressed;		// set when down, not cleared when up
+} kbutton_t;
 
-kbutton_t	in_buttons[16];
+
+static kbutton_t	in_left, in_right, in_forward, in_back;
+static kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
+static kbutton_t	in_strafe, in_speed;
+static kbutton_t	in_up, in_down;
+static kbutton_t	in_buttons[16];
 
 
 static qbool in_mlooking;
@@ -177,78 +205,7 @@ static float CL_KeyState( kbutton_t *key )
 }
 
 
-
-void IN_UpDown(void) {IN_KeyDown(&in_up);}
-void IN_UpUp(void) {IN_KeyUp(&in_up);}
-void IN_DownDown(void) {IN_KeyDown(&in_down);}
-void IN_DownUp(void) {IN_KeyUp(&in_down);}
-void IN_LeftDown(void) {IN_KeyDown(&in_left);}
-void IN_LeftUp(void) {IN_KeyUp(&in_left);}
-void IN_RightDown(void) {IN_KeyDown(&in_right);}
-void IN_RightUp(void) {IN_KeyUp(&in_right);}
-void IN_ForwardDown(void) {IN_KeyDown(&in_forward);}
-void IN_ForwardUp(void) {IN_KeyUp(&in_forward);}
-void IN_BackDown(void) {IN_KeyDown(&in_back);}
-void IN_BackUp(void) {IN_KeyUp(&in_back);}
-void IN_LookupDown(void) {IN_KeyDown(&in_lookup);}
-void IN_LookupUp(void) {IN_KeyUp(&in_lookup);}
-void IN_LookdownDown(void) {IN_KeyDown(&in_lookdown);}
-void IN_LookdownUp(void) {IN_KeyUp(&in_lookdown);}
-void IN_MoveleftDown(void) {IN_KeyDown(&in_moveleft);}
-void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
-void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
-void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
-
-void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
-void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
-void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
-void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
-
-void IN_Button0Down(void) {IN_KeyDown(&in_buttons[0]);}
-void IN_Button0Up(void) {IN_KeyUp(&in_buttons[0]);}
-void IN_Button1Down(void) {IN_KeyDown(&in_buttons[1]);}
-void IN_Button1Up(void) {IN_KeyUp(&in_buttons[1]);}
-void IN_Button2Down(void) {IN_KeyDown(&in_buttons[2]);}
-void IN_Button2Up(void) {IN_KeyUp(&in_buttons[2]);}
-void IN_Button3Down(void) {IN_KeyDown(&in_buttons[3]);}
-void IN_Button3Up(void) {IN_KeyUp(&in_buttons[3]);}
-void IN_Button4Down(void) {IN_KeyDown(&in_buttons[4]);}
-void IN_Button4Up(void) {IN_KeyUp(&in_buttons[4]);}
-void IN_Button5Down(void) {IN_KeyDown(&in_buttons[5]);}
-void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
-void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
-void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
-void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
-void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
-void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
-void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
-void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
-void IN_Button9Up(void) {IN_KeyUp(&in_buttons[9]);}
-void IN_Button10Down(void) {IN_KeyDown(&in_buttons[10]);}
-void IN_Button10Up(void) {IN_KeyUp(&in_buttons[10]);}
-void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
-void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
-void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
-void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
-void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
-void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
-void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
-void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
-void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
-void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
-
-//==========================================================================
-
-cvar_t	*cl_upspeed;
-cvar_t	*cl_forwardspeed;
-cvar_t	*cl_sidespeed;
-
-cvar_t	*cl_yawspeed;
-cvar_t	*cl_pitchspeed;
-
-cvar_t	*cl_run;
-
-cvar_t	*cl_anglespeedkey;
+///////////////////////////////////////////////////////////////
 
 
 static signed char ClampChar( int i )
@@ -405,7 +362,7 @@ static void CL_MouseMove( usercmd_t *cmd )
 	cl.mouseDy[cl.mouseIndex] = 0;
 
 	rate = sqrt( mx * mx + my * my ) / (float)frame_msec;
-	accelSensitivity = cl_sensitivity->value + rate * m_accel->value;
+	accelSensitivity = m_sensitivity->value + rate * m_accel->value;
 
 	// scale by FOV
 	accelSensitivity *= cl.cgameSensitivity;
@@ -575,8 +532,8 @@ static qbool CL_ReadyToSendPacket()
 
 	// if we don't have a valid gamestate yet, only send
 	// one packet a second
-	if ( cls.state != CA_ACTIVE && 
-		cls.state != CA_PRIMED && 
+	if ( cls.state != CA_ACTIVE &&
+		cls.state != CA_PRIMED &&
 		!*clc.downloadTempName &&
 		cls.realtime - clc.lastPacketSentTime < 1000 ) {
 		return qfalse;
@@ -728,7 +685,7 @@ void CL_WritePacket( void ) {
 		Com_Printf( "%i ", buf.cursize );
 	}
 
-	CL_Netchan_Transmit (&clc.netchan, &buf);	
+	CL_Netchan_Transmit (&clc.netchan, &buf);
 
 	// clients never really should have messages large enough
 	// to fragment, but in case they do, fire them all off
@@ -769,6 +726,69 @@ void CL_SendCmd()
 
 	CL_WritePacket();
 }
+
+
+///////////////////////////////////////////////////////////////
+
+
+static void IN_UpDown(void) {IN_KeyDown(&in_up);}
+static void IN_UpUp(void) {IN_KeyUp(&in_up);}
+static void IN_DownDown(void) {IN_KeyDown(&in_down);}
+static void IN_DownUp(void) {IN_KeyUp(&in_down);}
+static void IN_LeftDown(void) {IN_KeyDown(&in_left);}
+static void IN_LeftUp(void) {IN_KeyUp(&in_left);}
+static void IN_RightDown(void) {IN_KeyDown(&in_right);}
+static void IN_RightUp(void) {IN_KeyUp(&in_right);}
+static void IN_ForwardDown(void) {IN_KeyDown(&in_forward);}
+static void IN_ForwardUp(void) {IN_KeyUp(&in_forward);}
+static void IN_BackDown(void) {IN_KeyDown(&in_back);}
+static void IN_BackUp(void) {IN_KeyUp(&in_back);}
+static void IN_LookupDown(void) {IN_KeyDown(&in_lookup);}
+static void IN_LookupUp(void) {IN_KeyUp(&in_lookup);}
+static void IN_LookdownDown(void) {IN_KeyDown(&in_lookdown);}
+static void IN_LookdownUp(void) {IN_KeyUp(&in_lookdown);}
+static void IN_MoveleftDown(void) {IN_KeyDown(&in_moveleft);}
+static void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
+static void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
+static void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
+
+static void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
+static void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
+static void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
+static void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
+
+static void IN_Button0Down(void) {IN_KeyDown(&in_buttons[0]);}
+static void IN_Button0Up(void) {IN_KeyUp(&in_buttons[0]);}
+static void IN_Button1Down(void) {IN_KeyDown(&in_buttons[1]);}
+static void IN_Button1Up(void) {IN_KeyUp(&in_buttons[1]);}
+static void IN_Button2Down(void) {IN_KeyDown(&in_buttons[2]);}
+static void IN_Button2Up(void) {IN_KeyUp(&in_buttons[2]);}
+static void IN_Button3Down(void) {IN_KeyDown(&in_buttons[3]);}
+static void IN_Button3Up(void) {IN_KeyUp(&in_buttons[3]);}
+static void IN_Button4Down(void) {IN_KeyDown(&in_buttons[4]);}
+static void IN_Button4Up(void) {IN_KeyUp(&in_buttons[4]);}
+static void IN_Button5Down(void) {IN_KeyDown(&in_buttons[5]);}
+static void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
+static void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
+static void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
+static void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
+static void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
+static void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
+static void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
+static void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
+static void IN_Button9Up(void) {IN_KeyUp(&in_buttons[9]);}
+static void IN_Button10Down(void) {IN_KeyDown(&in_buttons[10]);}
+static void IN_Button10Up(void) {IN_KeyUp(&in_buttons[10]);}
+static void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
+static void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
+static void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
+static void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
+static void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
+static void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
+static void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
+static void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
+static void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
+static void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
 
 
 void CL_InitInput()
@@ -834,6 +854,28 @@ void CL_InitInput()
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
 
-	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
-	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
+	m_sensitivity = Cvar_Get( "sensitivity", "5", CVAR_ARCHIVE );
+	m_accel = Cvar_Get( "m_accel", "0", CVAR_ARCHIVE );
+	m_pitch = Cvar_Get( "m_pitch", "0.022", CVAR_ARCHIVE );
+	m_yaw = Cvar_Get( "m_yaw", "0.022", CVAR_ARCHIVE );
+	m_forward = Cvar_Get( "m_forward", "0.25", CVAR_ARCHIVE );
+	m_side = Cvar_Get( "m_side", "0.25", CVAR_ARCHIVE );
+
+#ifdef MACOS_X
+	// input is jittery on OS X w/o this
+	m_filter = Cvar_Get( "m_filter", "1", CVAR_ARCHIVE );
+#else
+	m_filter = Cvar_Get( "m_filter", "0", CVAR_ARCHIVE );
+#endif
+
+	cl_pitchspeed = Cvar_Get( "cl_pitchspeed", "140", CVAR_ARCHIVE );
+	cl_yawspeed = Cvar_Get( "cl_yawspeed", "140", CVAR_ARCHIVE );
+	cl_anglespeedkey = Cvar_Get( "cl_anglespeedkey", "1.5", 0 );
+	cl_run = Cvar_Get( "cl_run", "1", CVAR_ARCHIVE );
+	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
+
+	cl_showMouseRate = Cvar_Get( "cl_showmouserate", "0", 0 );
+	cl_nodelta = Cvar_Get( "cl_nodelta", "0", 0 );
+
+	cl_debugMove = Cvar_Get( "cl_debugMove", "0", 0 );
 }
