@@ -492,27 +492,16 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 }
 
 
-/*
-===============
-R_PointInLeaf
-===============
-*/
-static mnode_t *R_PointInLeaf( const vec3_t p ) {
-	mnode_t		*node;
-	float		d;
-	cplane_t	*plane;
-	
+static mnode_t* R_PointInLeaf( const vec3_t p )
+{
 	if ( !tr.world ) {
-		ri.Error (ERR_DROP, "R_PointInLeaf: bad model");
+		ri.Error( ERR_DROP, "R_PointInLeaf: bad model" );
 	}
 
-	node = tr.world->nodes;
-	while( 1 ) {
-		if (node->contents != -1) {
-			break;
-		}
-		plane = node->plane;
-		d = DotProduct (p,plane->normal) - plane->dist;
+	mnode_t* node = tr.world->nodes;
+	while (node->contents == -1) {
+		const cplane_t* plane = node->plane;
+		float d = DotProduct (p,plane->normal) - plane->dist;
 		if (d > 0) {
 			node = node->children[0];
 		} else {
@@ -522,6 +511,7 @@ static mnode_t *R_PointInLeaf( const vec3_t p ) {
 
 	return node;
 }
+
 
 /*
 ==============
@@ -604,7 +594,7 @@ static void R_MarkLeaves (void) {
 	}
 
 	vis = R_ClusterPVS (tr.viewCluster);
-	
+
 	for (i=0,leaf=tr.world->nodes ; i<tr.world->numnodes ; i++, leaf++) {
 		cluster = leaf->cluster;
 		if ( cluster < 0 || cluster >= tr.world->numClusters ) {

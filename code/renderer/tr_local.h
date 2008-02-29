@@ -677,8 +677,8 @@ typedef struct mnode_s {
 	struct mnode_s	*parent;
 
 	// node specific
-	cplane_t	*plane;
-	struct mnode_s	*children[2];	
+	const cplane_t* plane;
+	struct mnode_s	*children[2];
 
 	// leaf specific
 	int			cluster;
