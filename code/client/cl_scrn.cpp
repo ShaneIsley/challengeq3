@@ -268,7 +268,7 @@ static void SCR_DrawDebugGraph()
 //=============================================================================
 
 
-void SCR_Init( void )
+void SCR_Init()
 {
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
 	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
@@ -281,14 +281,11 @@ void SCR_Init( void )
 
 //=======================================================
 
-/*
-==================
-SCR_DrawScreenField
 
-This will be called twice if rendering in stereo mode
-==================
-*/
-void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
+// this will be called twice if rendering in stereo mode
+
+static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
+{
 	re.BeginFrame( stereoFrame );
 
 	// wide aspect ratio screens need to have the sides cleared
@@ -333,7 +330,6 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 		case CA_PRIMED:
 			// draw the game information screen and loading progress
 			CL_CGameRendering( stereoFrame );
-
 			// also draw the connection information, so it doesn't
 			// flash away too briefly on local or lan games
 			// refresh to update the time
@@ -353,7 +349,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	}
 
 	// console draws next
-	Con_DrawConsole ();
+	Con_DrawConsole();
 
 	// debug graphs can be drawn on top of anything
 	if ( cl_timegraph->integer || cl_debugMove->integer ) {
@@ -361,25 +357,20 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	}
 }
 
-/*
-==================
-SCR_UpdateScreen
 
-This is called every frame, and can also be called explicitly to flush
-text to the screen.
-==================
-*/
-void SCR_UpdateScreen( void ) {
-	static int	recursive;
+// called every frame, and can also be called explicitly to flush text to the screen
+
+void SCR_UpdateScreen()
+{
+	static int recursive = 0;
 
 	if ( !scr_initialized ) {
 		return;				// not initialized yet
 	}
 
-	if ( ++recursive > 2 ) {
+	if ( ++recursive > 1 ) {
 		Com_Error( ERR_FATAL, "SCR_UpdateScreen: recursively called" );
 	}
-	recursive = 1;
 
 	// if running in stereo, we need to draw the frame twice
 	if ( cls.glconfig.stereoEnabled ) {
@@ -395,6 +386,6 @@ void SCR_UpdateScreen( void ) {
 		re.EndFrame( NULL, NULL );
 	}
 
-	recursive = 0;
+	--recursive;
 }
 

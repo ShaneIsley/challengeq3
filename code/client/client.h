@@ -436,19 +436,17 @@ void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
 void	CL_LocalServers_f( void );
 void	CL_GlobalServers_f( void );
 void	CL_FavoriteServers_f( void );
-qbool CL_UpdateVisiblePings_f( int source );
+qbool	CL_UpdateVisiblePings_f( int source );
 
 
 //
 // console
 //
-void Con_DrawCharacter (int cx, int line, int num);
-
 void Con_Init();
 void Con_ToggleConsole_f( void );
 void Con_ClearNotify();
 void Con_RunConsole();
-void Con_DrawConsole (void);
+void Con_DrawConsole();
 void Con_PageUp();
 void Con_PageDown();
 void Con_Top();
@@ -459,10 +457,8 @@ void Con_Close();
 //
 // cl_scrn.c
 //
-void	SCR_Init (void);
-void	SCR_UpdateScreen (void);
-
-void	SCR_DebugGraph (float value, int color);
+void	SCR_Init();
+void	SCR_UpdateScreen();
 
 void	SCR_AdjustFrom640( float *x, float *y, float *w, float *h );
 void	SCR_FillRect( float x, float y, float width, float height, const float *color );
@@ -470,6 +466,8 @@ void	SCR_FillRect( float x, float y, float width, float height, const float *col
 void	SCR_DrawBigString( int x, int y, const char* s );
 void	SCR_DrawSmallString( int x, int y, const char* s );
 void	SCR_DrawSmallChar( int x, int y, int ch );
+
+void	SCR_DebugGraph (float value, int color);
 
 
 //

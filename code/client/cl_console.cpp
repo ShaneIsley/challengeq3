@@ -590,14 +590,10 @@ static void Con_DrawSolidConsole( float frac )
 ///////////////////////////////////////////////////////////////
 
 
-/*
-==================
-Con_DrawConsole
-==================
-*/
-void Con_DrawConsole( void ) {
+void Con_DrawConsole()
+{
 	// check for console width changes from a vid mode change
-	Con_CheckResize ();
+	Con_CheckResize();
 
 	// if disconnected, render console full screen
 	if ( cls.state == CA_DISCONNECTED ) {
@@ -617,7 +613,8 @@ void Con_DrawConsole( void ) {
 	}
 }
 
-//================================================================
+
+///////////////////////////////////////////////////////////////
 
 
 // slide the console onto/off the screen
