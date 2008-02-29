@@ -90,7 +90,7 @@ const vec4_t g_color_table[MAX_CCODES] =
 	{ 1, 1, 1, 1 }, // y, white, duped so all colors can be expressed with this palette
 };
 
-vec3_t	bytedirs[NUMVERTEXNORMALS] =
+const vec3_t bytedirs[NUMVERTEXNORMALS] =
 {
 {-0.525731f, 0.000000f, 0.850651f}, {-0.442863f, 0.238856f, 0.864188f}, 
 {-0.295242f, 0.000000f, 0.955423f}, {-0.309017f, 0.500000f, 0.809017f}, 

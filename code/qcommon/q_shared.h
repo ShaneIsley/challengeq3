@@ -294,34 +294,25 @@ typedef float vec_t;
 typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
-
-typedef	int	fixed4_t;
-typedef	int	fixed8_t;
-typedef	int	fixed16_t;
+extern const vec3_t vec3_origin;
 
 #ifndef M_PI
-#define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
+#define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
 #endif
 
-#define NUMVERTEXNORMALS	162
-extern	vec3_t	bytedirs[NUMVERTEXNORMALS];
+#define NUMVERTEXNORMALS 162
+extern const vec3_t bytedirs[NUMVERTEXNORMALS];
 
 // all drawing is done to a 640*480 virtual screen size
 // and will be automatically scaled to the real resolution
-#define	SCREEN_WIDTH		640
-#define	SCREEN_HEIGHT		480
-
-#define TINYCHAR_WIDTH		(SMALLCHAR_WIDTH)
-#define TINYCHAR_HEIGHT		(SMALLCHAR_HEIGHT/2)
+#define SCREEN_WIDTH		640
+#define SCREEN_HEIGHT		480
 
 #define SMALLCHAR_WIDTH		8
 #define SMALLCHAR_HEIGHT	16
 
 #define BIGCHAR_WIDTH		16
 #define BIGCHAR_HEIGHT		16
-
-#define	GIANTCHAR_WIDTH		32
-#define	GIANTCHAR_HEIGHT	48
 
 extern const vec4_t colorBlack;
 extern const vec4_t colorRed;
@@ -362,10 +353,6 @@ int ColorIndex( char ccode );
 
 #define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
-
-struct cplane_s;
-
-extern const vec3_t vec3_origin;
 
 
 #if idppc
@@ -527,6 +514,8 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] );
 extern const vec3_t axisDefault[3];
 void AxisCopy( const vec3_t in[3], vec3_t out[3] );
 #endif
+
+struct cplane_s;
 
 void SetPlaneSignbits( struct cplane_s *out );
 #if !defined(__GNUC__)
