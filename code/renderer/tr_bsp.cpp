@@ -36,8 +36,6 @@ void RE_LoadWorldMap( const char *name );
 static	world_t		s_worldData;
 static	byte		*fileBase;
 
-int			c_subdivisions;
-int			c_gridVerts;
 
 //===============================================================================
 
@@ -1232,7 +1230,7 @@ static void R_LoadSubmodels( const lump_t* l )
 //==================================================================
 
 
-static void R_SetParent( mnode_t* node, mnode_t* parent)
+static void R_SetParent( mnode_t* node, mnode_t* parent )
 {
 	node->parent = parent;
 	if (node->contents != -1)
@@ -1576,7 +1574,6 @@ void RE_LoadWorldMap( const char* name )
 	Q_strncpyz( s_worldData.baseName, COM_SkipPath( s_worldData.name ), sizeof( s_worldData.name ) );
 	COM_StripExtension(s_worldData.baseName, s_worldData.baseName, sizeof(s_worldData.baseName));
 
-	c_gridVerts = 0;
 	dheader_t* header = (dheader_t*)buffer;
 	fileBase = (byte*)header;
 
