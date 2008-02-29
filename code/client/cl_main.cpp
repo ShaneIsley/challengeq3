@@ -26,8 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t	*cl_debugMove;
 
-cvar_t	*cl_noprint;
-
 cvar_t	*rcon_client_password;
 cvar_t	*rconAddress;
 
@@ -50,7 +48,6 @@ static cvar_t* cl_motd;
 static cvar_t* cl_motdString;
 
 cvar_t	*cl_allowDownload;
-cvar_t	*cl_conXOffset;
 cvar_t	*cl_inGameVideo;
 
 #if defined(USE_CURL)
@@ -2915,7 +2912,6 @@ void CL_Init()
 
 	// register our variables
 	//
-	cl_noprint = Cvar_Get( "cl_noprint", "0", 0 );
 	cl_motd = Cvar_Get ("cl_motd", "1", 0);
 
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
@@ -2945,7 +2941,6 @@ void CL_Init()
 #endif
 #endif
 
-	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 #ifdef MACOS_X
 	// In game video is REALLY slow in Mac OS X right now due to driver slowness
 	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "0", CVAR_ARCHIVE);

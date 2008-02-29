@@ -24,6 +24,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 
 
+static const cvar_t* con_conspeed;
+static const cvar_t* con_notifytime;
+static const cvar_t* cl_noprint;
+static const cvar_t* cl_conXOffset;
+
+
 #define CON_NOTIFYLINES	4
 
 #define CON_TEXTSIZE	32768
@@ -51,9 +57,6 @@ typedef struct {
 } console_t;
 
 static console_t con;
-
-static const cvar_t* con_conspeed;
-static const cvar_t* con_notifytime;
 
 #define DEFAULT_CONSOLE_WIDTH 78
 int g_console_field_width = DEFAULT_CONSOLE_WIDTH;
@@ -278,8 +281,10 @@ void Con_Init()
 {
 	int		i;
 
-	con_notifytime = Cvar_Get ("con_notifytime", "3", 0);
-	con_conspeed = Cvar_Get ("scr_conspeed", "3", 0);
+	con_notifytime = Cvar_Get( "con_notifytime", "3", 0 );
+	con_conspeed = Cvar_Get( "scr_conspeed", "3", 0 );
+	cl_noprint = Cvar_Get( "cl_noprint", "0", 0 );
+	cl_conXOffset = Cvar_Get( "cl_conXOffset", "0", 0 );
 
 	Field_Clear( &g_consoleField );
 	g_consoleField.widthInChars = g_console_field_width;
