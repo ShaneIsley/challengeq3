@@ -330,19 +330,13 @@ breaks every single mod except CPMA otherwise, but it IS wrong, and critically s
 }
 
 
-void Cvar_Set( const char *var_name, const char *value)
+void Cvar_Set( const char *var_name, const char *value )
 {
 	Cvar_Set2( var_name, value, qtrue );
 }
 
 
-void Cvar_SetLatched( const char *var_name, const char *value)
-{
-	Cvar_Set2( var_name, value, qfalse );
-}
-
-
-void Cvar_SetValue( const char *var_name, float value)
+void Cvar_SetValue( const char *var_name, float value )
 {
 	if ( value == (int)value ) {
 		Cvar_Set( var_name, va("%i", (int)value) );
@@ -404,7 +398,7 @@ qbool Cvar_Command()
 
 // toggles a cvar for easy single key binding
 
-void Cvar_Toggle_f( void )
+static void Cvar_Toggle_f( void )
 {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf ("usage: toggle <variable>\n");
@@ -419,7 +413,7 @@ void Cvar_Toggle_f( void )
 // Allows setting and defining of arbitrary cvars from console
 // even if they weren't declared in C code
 
-void Cvar_Set_f( void )
+static void Cvar_Set_f( void )
 {
 	char combined[MAX_STRING_TOKENS];
 
@@ -465,25 +459,25 @@ static void Cvar_SetAndFlag( const char* cmd, int flag )
 }
 
 
-void Cvar_SetU_f( void )
+static void Cvar_SetU_f( void )
 {
 	Cvar_SetAndFlag( "setu", CVAR_USERINFO );
 }
 
 
-void Cvar_SetS_f( void )
+static void Cvar_SetS_f( void )
 {
 	Cvar_SetAndFlag( "sets", CVAR_SERVERINFO );
 }
 
 
-void Cvar_SetA_f( void )
+static void Cvar_SetA_f( void )
 {
 	Cvar_SetAndFlag( "seta", CVAR_ARCHIVE );
 }
 
 
-void Cvar_Reset_f( void )
+static void Cvar_Reset_f( void )
 {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf ("usage: reset <variable>\n");
@@ -506,7 +500,7 @@ void Cvar_WriteVariables( fileHandle_t f )
 }
 
 
-void Cvar_List_f( void )
+static void Cvar_List_f( void )
 {
 	const char* match = (Cmd_Argc() > 1) ? Cmd_Argv(1) : NULL;
 
@@ -531,14 +525,11 @@ void Cvar_List_f( void )
 	Com_Printf("%i cvar indexes\n", cvar_numIndexes);
 }
 
-/*
-============
-Cvar_Restart_f
 
-Resets all cvars to their hardcoded values
-============
-*/
-void Cvar_Restart_f( void ) {
+// resets all cvars to their hardcoded values
+
+static void Cvar_Restart_f( void )
+{
 	cvar_t	*var;
 	cvar_t	**prev;
 
@@ -584,47 +575,42 @@ void Cvar_Restart_f( void ) {
 }
 
 
-
-/*
-=====================
-Cvar_InfoString
-=====================
-*/
-char	*Cvar_InfoString( int bit ) {
-	static char	info[MAX_INFO_STRING];
-	cvar_t	*var;
+const char* Cvar_InfoString( int bit )
+{
+	static char info[MAX_INFO_STRING];
 
 	info[0] = 0;
 
-	for (var = cvar_vars ; var ; var = var->next) {
+	for ( const cvar_t* var = cvar_vars ; var ; var = var->next ) {
 		if (var->flags & bit) {
-			Info_SetValueForKey (info, var->name, var->string);
+			Info_SetValueForKey( info, var->name, var->string );
 		}
 	}
+
 	return info;
 }
 
-/*
-=====================
-Cvar_InfoString_Big
 
-  handles large info strings ( CS_SYSTEMINFO )
-=====================
-*/
-char	*Cvar_InfoString_Big( int bit ) {
-	static char	info[BIG_INFO_STRING];
-	cvar_t	*var;
+// special version for very large infostrings, ie CS_SYSTEMINFO
+
+const char* Cvar_InfoString_Big( int bit )
+{
+	static char info[BIG_INFO_STRING];
 
 	info[0] = 0;
 
-	for (var = cvar_vars ; var ; var = var->next) {
+	for ( const cvar_t* var = cvar_vars ; var ; var = var->next ) {
 		if (var->flags & bit) {
-			Info_SetValueForKey_Big (info, var->name, var->string);
+			Info_SetValueForKey_Big( info, var->name, var->string );
 		}
 	}
+
 	return info;
 }
 
+
+// pointless function solely for the UI VM, which never uses it
+// but since it's not TECHNICALLY defective we'll keep it for now
 
 void Cvar_InfoStringBuffer( int bit, char* buff, int buffsize )
 {
@@ -646,7 +632,7 @@ void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultVa
 }
 
 
-// update an interpreted modules' version of a cvar
+// update an interpreted module's version of a cvar
 
 void Cvar_Update( vmCvar_t *vmCvar )
 {
@@ -666,10 +652,10 @@ void Cvar_Update( vmCvar_t *vmCvar )
 		return;		// variable might have been cleared by a cvar_restart
 	}
 	vmCvar->modificationCount = cv->modificationCount;
-	// bk001129 - mismatches.
-	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING ) 
+
+	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING )
 			Com_Error( ERR_DROP, "Cvar_Update: src %s length %d exceeds MAX_CVAR_VALUE_STRING",
-			cv->string, strlen(cv->string), sizeof(vmCvar->string) );
+			cv->string, strlen(cv->string) );
 
 	Q_strncpyz( vmCvar->string, cv->string,  MAX_CVAR_VALUE_STRING );
 	vmCvar->value = cv->value;
@@ -679,14 +665,14 @@ void Cvar_Update( vmCvar_t *vmCvar )
 
 void Cvar_Init()
 {
-	cvar_cheats = Cvar_Get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
+	cvar_cheats = Cvar_Get( "sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
 
-	Cmd_AddCommand ("toggle", Cvar_Toggle_f);
-	Cmd_AddCommand ("set", Cvar_Set_f);
-	Cmd_AddCommand ("sets", Cvar_SetS_f);
-	Cmd_AddCommand ("setu", Cvar_SetU_f);
-	Cmd_AddCommand ("seta", Cvar_SetA_f);
-	Cmd_AddCommand ("reset", Cvar_Reset_f);
-	Cmd_AddCommand ("cvarlist", Cvar_List_f);
-	Cmd_AddCommand ("cvar_restart", Cvar_Restart_f);
+	Cmd_AddCommand( "toggle", Cvar_Toggle_f );
+	Cmd_AddCommand( "set", Cvar_Set_f );
+	Cmd_AddCommand( "sets", Cvar_SetS_f );
+	Cmd_AddCommand( "setu", Cvar_SetU_f );
+	Cmd_AddCommand( "seta", Cvar_SetA_f );
+	Cmd_AddCommand( "reset", Cvar_Reset_f );
+	Cmd_AddCommand( "cvarlist", Cvar_List_f );
+	Cmd_AddCommand( "cvar_restart", Cvar_Restart_f );
 }
