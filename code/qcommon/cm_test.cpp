@@ -147,7 +147,7 @@ void CM_BoxLeafnums_r( leafList_t *ll, int nodenum ) {
 			ll->storeLeafs( ll, nodenum );
 			return;
 		}
-	
+
 		node = &cm.nodes[nodenum];
 		plane = node->plane;
 		s = BoxOnPlaneSide( ll->bounds[0], ll->bounds[1], plane );
@@ -207,7 +207,7 @@ int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int li
 	ll.storeLeafs = CM_StoreBrushes;
 	ll.lastLeaf = 0;
 	ll.overflowed = qfalse;
-	
+
 	CM_BoxLeafnums_r( &ll, 0 );
 
 	return ll.count;
@@ -311,7 +311,9 @@ PVS
 ===============================================================================
 */
 
-byte	*CM_ClusterPVS (int cluster) {
+
+const byte* CM_ClusterPVS( int cluster )
+{
 	if (cluster < 0 || cluster >= cm.numClusters || !cm.vised ) {
 		return cm.visibility;
 	}

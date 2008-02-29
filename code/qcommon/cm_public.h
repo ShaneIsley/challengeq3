@@ -45,7 +45,7 @@ void		CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t
 						  clipHandle_t model, int brushmask,
 						  const vec3_t origin, const vec3_t angles, int capsule );
 
-byte		*CM_ClusterPVS (int cluster);
+const byte* CM_ClusterPVS( int cluster );
 
 int			CM_PointLeafnum( const vec3_t p );
 
