@@ -783,8 +783,8 @@ static void CL_FirstSnapshot()
 
 	// if this is the first frame of active play,
 	// execute the contents of activeAction now
-	// this is to allow scripting a timedemo to start right
-	// after loading
+	// traditionally used for thinshaft scripts
+	const cvar_t* cl_activeAction = Cvar_Get( "activeAction", "", CVAR_TEMP );
 	if ( cl_activeAction->string[0] ) {
 		Cbuf_AddText( cl_activeAction->string );
 		Cvar_Set( "activeAction", "" );
