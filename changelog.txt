@@ -11,6 +11,10 @@ made com_soundmegs SLIGHTLY less broken: now only 2x instead of 3x  :P
 note that "soundmegs" are taken FROM THE HUNK now to fix the leak
 so you need to increase com_hunkmegs by 2x your com_soundmegs
 
+removed the explicit and incorrect "fastsky==1 == disable portals" test
+
+r_noportals is not a cheat var
+
 
 18 Feb 08 - 1.41
 
