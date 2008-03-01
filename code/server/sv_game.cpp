@@ -268,7 +268,7 @@ static intptr_t SV_GameSystemCalls( intptr_t* args )
 		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
 		return 0;
 	case G_SEND_CONSOLE_COMMAND:
-		Cbuf_ExecuteText( args[1], VMA(2) );
+		Cbuf_AddText( VMA(2) );
 		return 0;
 
 	case G_FS_FOPEN_FILE:

@@ -91,8 +91,8 @@ int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
 	return syscall( G_FS_SEEK, f, offset, origin );
 }
 
-void	trap_SendConsoleCommand( int exec_when, const char *text ) {
-	syscall( G_SEND_CONSOLE_COMMAND, exec_when, text );
+void	shit_SendConsoleCommand( int ignored, const char *text ) {
+	syscall( G_SEND_CONSOLE_COMMAND, 2, text );
 }
 
 void	trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) {

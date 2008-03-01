@@ -137,8 +137,6 @@ typedef struct {
 	int		(*Cmd_Argc) (void);
 	const char* (*Cmd_Argv) (int i);
 
-	void	(*Cmd_ExecuteText) (int exec_when, const char *text);
-
 	// visualization for debugging collision detection
 	void	(*CM_DrawDebugSurface)( void (*drawPoly)(int color, int numPoints, const float* points) );
 

@@ -759,7 +759,7 @@ static intptr_t CL_UISystemCalls( intptr_t* args )
 		return Sys_Milliseconds();
 
 	case UI_CVAR_REGISTER:
-		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
+		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] );
 		return 0;
 
 	case UI_CVAR_UPDATE:
@@ -801,7 +801,7 @@ static intptr_t CL_UISystemCalls( intptr_t* args )
 		return 0;
 
 	case UI_CMD_EXECUTETEXT:
-		Cbuf_ExecuteText( args[1], VMA(2) );
+		Cbuf_AddText( VMA(2) );
 		return 0;
 
 	case UI_FS_FOPENFILE:

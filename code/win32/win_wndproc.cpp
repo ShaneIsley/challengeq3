@@ -335,7 +335,7 @@ LONG WINAPI MainWndProc (
 		break;
 
 	case WM_CLOSE:
-		Cbuf_ExecuteText( EXEC_APPEND, "quit" );
+		Cbuf_AddText( "quit\n" );
 		break;
 
 	case WM_ACTIVATE:

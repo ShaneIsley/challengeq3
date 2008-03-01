@@ -101,8 +101,8 @@ void trap_Argv( int n, char *buffer, int bufferLength ) {
 	syscall( UI_ARGV, n, buffer, bufferLength );
 }
 
-void trap_Cmd_ExecuteText( int exec_when, const char *text ) {
-	syscall( UI_CMD_EXECUTETEXT, exec_when, text );
+void trap_Cmd_ExecuteText( int ignored, const char *text ) {
+	syscall( UI_CMD_EXECUTETEXT, 2, text );
 }
 
 int trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode ) {

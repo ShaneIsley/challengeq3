@@ -14,7 +14,7 @@ equ	trap_FS_FOpenFile		-11
 equ	trap_FS_Read			-12
 equ	trap_FS_Write			-13
 equ	trap_FS_FCloseFile		-14
-equ	trap_SendConsoleCommand	-15
+equ	shit_SendConsoleCommand	-15
 equ	trap_LocateGameData		-16
 equ	trap_DropClient			-17
 equ	trap_SendServerCommand	-18

@@ -33,23 +33,18 @@ typedef struct {
 	int		cursize;
 } cmd_t;
 
-int			cmd_wait;
-cmd_t		cmd_text;
-byte		cmd_text_buf[MAX_CMD_BUFFER];
+static int		cmd_wait;
+static cmd_t	cmd_text;
+static byte		cmd_text_buf[MAX_CMD_BUFFER];
 
-
-//=============================================================================
 
 /*
-============
-Cmd_Wait_f
-
 Causes execution of the remainder of the command buffer to be delayed until
 next frame.  This allows commands like:
 bind g "cmd use rocket ; +attack ; wait ; -attack ; cmd use blaster"
-============
 */
-void Cmd_Wait_f( void ) {
+static void Cmd_Wait_f( void )
+{
 	if ( Cmd_Argc() == 2 ) {
 		cmd_wait = atoi( Cmd_Argv( 1 ) );
 	} else {
@@ -66,49 +61,39 @@ void Cmd_Wait_f( void ) {
 =============================================================================
 */
 
-/*
-============
-Cbuf_Init
-============
-*/
-void Cbuf_Init (void)
+
+void Cbuf_Init()
 {
 	cmd_text.data = cmd_text_buf;
 	cmd_text.maxsize = MAX_CMD_BUFFER;
 	cmd_text.cursize = 0;
 }
 
-/*
-============
-Cbuf_AddText
 
-Adds command text at the end of the buffer, does NOT add a final \n
-============
-*/
-void Cbuf_AddText( const char *text ) {
-	int		l;
-	
-	l = strlen (text);
+// adds command text at the end of the buffer, does NOT add a final \n
+
+void Cbuf_AddText( const char *text )
+{
+	int l = strlen(text);
 
 	if (cmd_text.cursize + l >= cmd_text.maxsize)
 	{
-		Com_Printf ("Cbuf_AddText: overflow\n");
+		Com_Printf( "Cbuf_AddText: overflow\n" );
 		return;
 	}
-	Com_Memcpy(&cmd_text.data[cmd_text.cursize], text, l);
+
+	Com_Memcpy( &cmd_text.data[cmd_text.cursize], text, l );
 	cmd_text.cursize += l;
 }
 
 
 /*
-============
-Cbuf_InsertText
-
 Adds command text immediately after the current command
 Adds a \n to the text
-============
+should be (and now is) only EVER be used by config file chaining
 */
-void Cbuf_InsertText( const char *text ) {
+static void Cbuf_InsertText( const char *text )
+{
 	int		len;
 	int		i;
 
@@ -133,39 +118,7 @@ void Cbuf_InsertText( const char *text ) {
 }
 
 
-/*
-============
-Cbuf_ExecuteText
-============
-*/
-void Cbuf_ExecuteText (int exec_when, const char *text)
-{
-	switch (exec_when)
-	{
-	case EXEC_NOW:
-		if (text && strlen(text) > 0) {
-			Cmd_ExecuteString (text);
-		} else {
-			Cbuf_Execute();
-		}
-		break;
-	case EXEC_INSERT:
-		Cbuf_InsertText (text);
-		break;
-	case EXEC_APPEND:
-		Cbuf_AddText (text);
-		break;
-	default:
-		Com_Error (ERR_FATAL, "Cbuf_ExecuteText: bad exec_when");
-	}
-}
-
-/*
-============
-Cbuf_Execute
-============
-*/
-void Cbuf_Execute (void)
+void Cbuf_Execute()
 {
 	int		i;
 	char	*text;
@@ -649,10 +602,10 @@ static void Cmd_List_f()
 
 void Cmd_Init()
 {
-	Cmd_AddCommand( "cmdlist",Cmd_List_f );
-	Cmd_AddCommand( "exec",Cmd_Exec_f );
-	Cmd_AddCommand( "vstr",Cmd_Vstr_f );
-	Cmd_AddCommand( "echo",Cmd_Echo_f );
+	Cmd_AddCommand( "cmdlist", Cmd_List_f );
+	Cmd_AddCommand( "exec", Cmd_Exec_f );
+	Cmd_AddCommand( "vstr", Cmd_Vstr_f );
+	Cmd_AddCommand( "echo", Cmd_Echo_f );
 	Cmd_AddCommand( "wait", Cmd_Wait_f );
 }
 

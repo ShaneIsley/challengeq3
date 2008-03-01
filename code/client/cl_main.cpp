@@ -1993,7 +1993,6 @@ static void CL_InitRef()
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
 	ri.Cmd_Argc = Cmd_Argc;
 	ri.Cmd_Argv = Cmd_Argv;
-	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
 	ri.Printf = CL_RefPrintf;
 	ri.Error = Com_Error;
 	ri.Milliseconds = CL_ScaledMilliseconds;

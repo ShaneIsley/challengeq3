@@ -1273,7 +1273,7 @@ static void RoQShutdown( void ) {
 		// the time it was referenced
 		s = Cvar_VariableString( "nextmap" );
 		if ( s[0] ) {
-			Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", s) );
+			Cbuf_AddText( va("%s\n", s) );
 			Cvar_Set( "nextmap", "" );
 		}
 		CL_handle = -1;
