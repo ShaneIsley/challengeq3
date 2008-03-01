@@ -853,8 +853,9 @@ typedef struct {
 	int		msec;			// total msec for backend run
 } backEndCounters_t;
 
-// all state modified by the back end is seperated
-// from the front end state
+
+// all state modified by the back end is separated from the front end state
+
 typedef struct {
 	int			smpFrame;
 	trRefdef_t	refdef;
@@ -866,12 +867,12 @@ typedef struct {
 
 	qbool	projection2D;	// if qtrue, drawstretchpic doesn't need to change modes
 	byte		color2D[4];
-	qbool	vertexes2D;		// shader needs to be finished
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
 } backEndState_t;
 
+
 /*
-** trGlobals_t 
+** trGlobals_t
 **
 ** Most renderer globals are defined here.
 ** backend functions should never modify any of these fields,

@@ -15,6 +15,8 @@ removed the explicit and incorrect "fastsky==1 == disable portals" test
 
 r_noportals is not a cheat var
 
+hyperspace is a bit less annoying
+
 
 18 Feb 08 - 1.41
 
