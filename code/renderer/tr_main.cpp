@@ -38,14 +38,26 @@ const float s_flipMatrix[16] = {
 };
 
 
-/*
-=================
-R_CullLocalBox
+static void R_LocalPointToWorld( const vec3_t local, vec3_t world )
+{
+	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
+	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
+	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
+}
 
-Returns CULL_IN, CULL_CLIP, or CULL_OUT
-=================
-*/
-int R_CullLocalBox (vec3_t bounds[2]) {
+
+static void R_LocalNormalToWorld( const vec3_t local, vec3_t world )
+{
+	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
+	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
+	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
+}
+
+
+// returns CULL_IN, CULL_CLIP, or CULL_OUT
+
+int R_CullLocalBox( const vec3_t bounds[2] )
+{
 	int		i, j;
 	vec3_t	transformed[8];
 	float	dists[8];
@@ -101,26 +113,9 @@ int R_CullLocalBox (vec3_t bounds[2]) {
 	return CULL_CLIP;		// partially clipped
 }
 
-/*
-** R_CullLocalPointAndRadius
-*/
-int R_CullLocalPointAndRadius( vec3_t pt, float radius )
+
+int R_CullPointAndRadius( const vec3_t pt, float radius )
 {
-	vec3_t transformed;
-
-	R_LocalPointToWorld( pt, transformed );
-
-	return R_CullPointAndRadius( transformed, radius );
-}
-
-/*
-** R_CullPointAndRadius
-*/
-int R_CullPointAndRadius( vec3_t pt, float radius )
-{
-	int		i;
-	float	dist;
-	cplane_t	*frust;
 	qbool mightBeClipped = qfalse;
 
 	if ( r_nocull->integer ) {
@@ -128,16 +123,16 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 	}
 
 	// check against frustum planes
-	for (i = 0 ; i < 4 ; i++) 
+	for (int i = 0; i < 4; ++i) 
 	{
-		frust = &tr.viewParms.frustum[i];
+		const cplane_t* frust = &tr.viewParms.frustum[i];
+		float dist = DotProduct( pt, frust->normal) - frust->dist;
 
-		dist = DotProduct( pt, frust->normal) - frust->dist;
 		if ( dist < -radius )
 		{
 			return CULL_OUT;
 		}
-		else if ( dist <= radius ) 
+		else if ( dist <= radius )
 		{
 			mightBeClipped = qtrue;
 		}
@@ -152,29 +147,13 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 }
 
 
-/*
-=================
-R_LocalNormalToWorld
-
-=================
-*/
-void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
-	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
-	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
-	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
+int R_CullLocalPointAndRadius( const vec3_t pt, float radius )
+{
+	vec3_t transformed;
+	R_LocalPointToWorld( pt, transformed );
+	return R_CullPointAndRadius( transformed, radius );
 }
 
-/*
-=================
-R_LocalPointToWorld
-
-=================
-*/
-void R_LocalPointToWorld (vec3_t local, vec3_t world) {
-	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
-	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
-	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
-}
 
 /*
 =================
@@ -488,17 +467,12 @@ void R_SetupProjection( void ) {
 	tr.viewParms.projectionMatrix[15] = 0;
 }
 
-/*
-=================
-R_SetupFrustum
 
-Setup that culling frustum planes for the current view
-=================
-*/
-void R_SetupFrustum (void) {
-	int		i;
-	float	xs, xc;
-	float	ang;
+// set up the culling frustum planes for the current view
+
+static void R_SetupFrustum()
+{
+	float	ang, xs, xc;
 
 	ang = tr.viewParms.fovX / 180 * M_PI * 0.5f;
 	xs = sin( ang );
@@ -520,7 +494,7 @@ void R_SetupFrustum (void) {
 	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[3].normal );
 	VectorMA( tr.viewParms.frustum[3].normal, -xc, tr.viewParms.or.axis[2], tr.viewParms.frustum[3].normal );
 
-	for (i=0 ; i<4 ; i++) {
+	for (int i = 0; i < 4; ++i) {
 		tr.viewParms.frustum[i].type = PLANE_NON_AXIAL;
 		tr.viewParms.frustum[i].dist = DotProduct (tr.viewParms.or.origin, tr.viewParms.frustum[i].normal);
 		SetPlaneSignbits( &tr.viewParms.frustum[i] );

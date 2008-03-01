@@ -22,35 +22,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "tr_local.h"
 
 
+// returns true if the grid is completely culled away.
+// also sets the clipped hint bit in tess
 
-/*
-=================
-R_CullTriSurf
-
-Returns qtrue if the grid is completely culled away.
-Also sets the clipped hint bit in tess
-=================
-*/
-static qbool	R_CullTriSurf( srfTriangles_t *cv ) {
-	int 	boxCull;
-
-	boxCull = R_CullLocalBox( cv->bounds );
-
-	if ( boxCull == CULL_OUT ) {
-		return qtrue;
-	}
-	return qfalse;
+static qbool R_CullTriSurf( const srfTriangles_t* cv )
+{
+	return ( R_CullLocalBox( cv->bounds ) == CULL_OUT );
 }
 
-/*
-=================
-R_CullGrid
 
-Returns qtrue if the grid is completely culled away.
-Also sets the clipped hint bit in tess
-=================
-*/
-static qbool	R_CullGrid( srfGridMesh_t *cv ) {
+// returns true if the grid is completely culled away.
+// also sets the clipped hint bit in tess
+
+static qbool R_CullGrid( const srfGridMesh_t* cv )
+{
 	int 	boxCull;
 	int 	sphereCull;
 
@@ -64,7 +49,7 @@ static qbool	R_CullGrid( srfGridMesh_t *cv ) {
 		sphereCull = R_CullPointAndRadius( cv->localOrigin, cv->meshRadius );
 	}
 	boxCull = CULL_OUT;
-	
+
 	// check for trivial reject
 	if ( sphereCull == CULL_OUT )
 	{
@@ -78,7 +63,7 @@ static qbool	R_CullGrid( srfGridMesh_t *cv ) {
 
 		boxCull = R_CullLocalBox( cv->meshBounds );
 
-		if ( boxCull == CULL_OUT ) 
+		if ( boxCull == CULL_OUT )
 		{
 			tr.pc.c_box_cull_patch_out++;
 			return qtrue;
@@ -102,29 +87,23 @@ static qbool	R_CullGrid( srfGridMesh_t *cv ) {
 
 
 /*
-================
-R_CullSurface
-
 Tries to back face cull surfaces before they are lighted or
 added to the sorting list.
 
 This will also allow mirrors on both sides of a model without recursion.
-================
 */
-static qbool	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
-	srfSurfaceFace_t *sface;
-	float			d;
-
+static qbool R_CullSurface( const surfaceType_t* surface, const shader_t* shader )
+{
 	if ( r_nocull->integer ) {
 		return qfalse;
 	}
 
 	if ( *surface == SF_GRID ) {
-		return R_CullGrid( (srfGridMesh_t *)surface );
+		return R_CullGrid( (const srfGridMesh_t*)surface );
 	}
 
 	if ( *surface == SF_TRIANGLES ) {
-		return R_CullTriSurf( (srfTriangles_t *)surface );
+		return R_CullTriSurf( (const srfTriangles_t*)surface );
 	}
 
 	if ( *surface != SF_FACE ) {
@@ -140,8 +119,8 @@ static qbool	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 		return qfalse;
 	}
 
-	sface = ( srfSurfaceFace_t * ) surface;
-	d = DotProduct (tr.or.viewOrigin, sface->plane.normal);
+	const srfSurfaceFace_t* sface = (const srfSurfaceFace_t*)surface;
+	float d = DotProduct (tr.or.viewOrigin, sface->plane.normal);
 
 	// don't cull exactly on the plane, because there are levels of rounding
 	// through the BSP, ICD, and hardware that may cause pixel gaps if an

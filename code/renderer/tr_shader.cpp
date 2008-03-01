@@ -2224,7 +2224,6 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 	char		strippedName[MAX_QPATH];
 	char		fileName[MAX_QPATH];
 	int			i, hash;
-	image_t		*image;
 	shader_t	*sh;
 
 	if ( name[0] == 0 ) {
@@ -2300,7 +2299,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 	//
 	Q_strncpyz( fileName, name, sizeof( fileName ) );
 	COM_DefaultExtension( fileName, sizeof( fileName ), ".tga" );
-	image = R_FindImageFile( fileName, mipRawImage, mipRawImage, mipRawImage ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+	const image_t* image = R_FindImageFile( fileName, mipRawImage, mipRawImage, mipRawImage ? GL_REPEAT : GL_CLAMP_TO_EDGE );
 	if ( !image ) {
 		ri.Printf( PRINT_DEVELOPER, "Couldn't find image for shader %s\n", name );
 		shader.defaultShader = qtrue;
@@ -2348,8 +2347,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 		stages[0].bundle[0].image[0] = tr.lightmaps[shader.lightmapIndex];
 		stages[0].bundle[0].isLightmap = qtrue;
 		stages[0].active = qtrue;
-		stages[0].rgbGen = CGEN_IDENTITY;	// lightmaps are scaled on creation
-													// for identitylight
+		stages[0].rgbGen = CGEN_IDENTITY;	// lightmaps are scaled on creation for identitylight
 		stages[0].stateBits = GLS_DEFAULT;
 
 		stages[1].bundle[0].image[0] = image;
@@ -2366,7 +2364,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 // shaders registered from raw data should be "anonymous" and unsearchable
 // because they don't have the supercession concept of "real" shaders
 
-qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, image_t* image, qbool mip )
+qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, const image_t* image )
 {
 	if ((lightmapIndex < LIGHTMAP_2D) || (lightmapIndex >= tr.numLightmaps))
 		ri.Error( ERR_DROP, "RE_RegisterShaderFromImage: Invalid lightmap id %d for '%s'", lightmapIndex, name );
@@ -2446,8 +2444,7 @@ qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, image
 		stages[0].bundle[0].image[0] = tr.lightmaps[shader.lightmapIndex];
 		stages[0].bundle[0].isLightmap = qtrue;
 		stages[0].active = qtrue;
-		stages[0].rgbGen = CGEN_IDENTITY;	// lightmaps are scaled on creation
-													// for identitylight
+		stages[0].rgbGen = CGEN_IDENTITY;	// lightmaps are scaled on creation for identitylight
 		stages[0].stateBits = GLS_DEFAULT;
 
 		stages[1].bundle[0].image[0] = image;

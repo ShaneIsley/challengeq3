@@ -1437,7 +1437,7 @@ static void R_LoadImage( const char* name, byte** pic, int* w, int* h, GLenum* f
 
 // finds or loads the given image - returns NULL if it fails, not a default image
 
-image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode )
+const image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode )
 {
 	if (!name)
 		return NULL;
@@ -1471,24 +1471,6 @@ image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int
 	int width, height;
 	GLenum format;
 	R_LoadImage( name, &pic, &width, &height, &format );
-
-/* no, the quake fs is case-insensitive, which means this case can only trip for developer/impure
-which means either they should get their shit RIGHT, or we don't care
-	if ( pic == NULL ) {                                    // if we dont get a successful load
-	  char altname[MAX_QPATH];                              // copy the name
-    int len;                                              //  
-    strcpy( altname, name );                              //
-    len = strlen( altname );                              // 
-    altname[len-3] = toupper(altname[len-3]);             // and try upper case extension for unix systems
-    altname[len-2] = toupper(altname[len-2]);             //
-    altname[len-1] = toupper(altname[len-1]);             //
-		ri.Printf( PRINT_ALL, "trying %s...\n", altname );    // 
-	  R_LoadImage( altname, &pic, &width, &height );        //
-    if (pic == NULL) {                                    // if that fails
-      return NULL;                                        // bail
-    }
-	}
-*/
 
 	if (!pic)
 		return NULL;
@@ -1935,7 +1917,7 @@ void R_InitSkins()
 }
 
 
-skin_t* R_GetSkinByHandle( qhandle_t hSkin )
+const skin_t* R_GetSkinByHandle( qhandle_t hSkin )
 {
 	return ((hSkin > 0) && (hSkin < tr.numSkins) ? tr.skins[hSkin] : tr.skins[0]);
 }

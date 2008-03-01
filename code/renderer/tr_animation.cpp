@@ -320,7 +320,7 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 	mdrSurface_t	*surface;
 	mdrLOD_t		*lod;
 	shader_t		*shader;
-	skin_t		*skin;
+	const skin_t	*skin;
 	int				i, j;
 	int				lodnum = 0;
 	int				fogNum = 0;

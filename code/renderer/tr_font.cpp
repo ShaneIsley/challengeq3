@@ -136,7 +136,7 @@ static qbool R_UploadGlyphs( FT_Face& face, fontInfo_t* font, const char* sImage
 	}
 
 	image_t* image = R_CreateImage( sImage, img, w, font->height, GL_RGBA, qfalse, qfalse, GL_CLAMP_TO_EDGE );
-	font->shader = RE_RegisterShaderFromImage( sImage, LIGHTMAP_2D, image, qfalse );
+	font->shader = RE_RegisterShaderFromImage( sImage, LIGHTMAP_2D, image );
 
 	Z_Free( img );
 
