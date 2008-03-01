@@ -122,7 +122,6 @@ cvar_t   *in_joystickDebug = NULL;
 cvar_t   *joy_threshold    = NULL;
 
 cvar_t  *r_allowSoftwareGL;   // don't abort out if the pixelformat claims software
-cvar_t  *r_previousglDriver;
 cvar_t	*r_fullscreen;
 
 qboolean GLimp_sdl_init_video(void)
@@ -917,72 +916,14 @@ static qboolean GLW_LoadOpenGL( const char *name )
 */
 void GLimp_Init( void )
 {
-  qboolean attemptedlibGL = qfalse;
-  qboolean success = qfalse;
   char  buf[1024];
   cvar_t *lastValidRenderer = ri.Cvar_Get( "r_lastValidRenderer", "(uninitialized)", CVAR_ARCHIVE );
 
   r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
 
-  r_previousglDriver = ri.Cvar_Get( "r_previousglDriver", "", CVAR_ROM );
-
   InitSig();
 
   IN_Init();   // rcg08312005 moved into glimp.
-
-/*  // Hack here so that if the UI 
-  if ( *r_previousglDriver->string )
-  {
-    // The UI changed it on us, hack it back
-    // This means the renderer can't be changed on the fly
-    ri.Cvar_Set( "r_glDriver", r_previousglDriver->string );
-  }
-
-  //
-  // load and initialize the specific OpenGL driver
-  //
-  if ( !GLW_LoadOpenGL( r_glDriver->string ) )
-  {
-    if ( !Q_stricmp( r_glDriver->string, OPENGL_DRIVER_NAME ) )
-    {
-      attemptedlibGL = qtrue;
-    }
-
-    #if 0
-    // TTimo
-    // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=455
-    // old legacy load code, was confusing people who had a bad OpenGL setup
-    if ( !attempted3Dfx && !success )
-    {
-      attempted3Dfx = qtrue;
-      if ( GLW_LoadOpenGL( _3DFX_DRIVER_NAME ) )
-      {
-        ri.Cvar_Set( "r_glDriver", _3DFX_DRIVER_NAME );
-        r_glDriver->modified = qfalse;
-        success = qtrue;
-      }
-    }
-    #endif
-
-    // try ICD before trying 3Dfx standalone driver
-    if ( !attemptedlibGL && !success )
-    {
-      attemptedlibGL = qtrue;
-      if ( GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
-      {
-        ri.Cvar_Set( "r_glDriver", OPENGL_DRIVER_NAME );
-        r_glDriver->modified = qfalse;
-        success = qtrue;
-      }
-    }
-
-    if (!success)
-      ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
-
-  }
-
-  // Save it in case the UI stomps it
-  ri.Cvar_Set( "r_previousglDriver", r_glDriver->string ); */
 
   // load appropriate DLL and initialize subsystem
   if (!GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
