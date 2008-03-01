@@ -1,13 +1,6 @@
 #
 # Quake3 Unix Makefile
 #
-# Nov '98 by Zoid <zoid@idsoftware.com>
-#
-# Loki Hacking by Bernd Kreimeier
-#  and a little more by Ryan C. Gordon.
-#  and a little more by Rafael Barrero
-#  and a little more by the ioq3 cr3w
-#
 # GNU Make required
 #
 
@@ -27,8 +20,8 @@ ifeq ($(COMPILE_PLATFORM),mingw32)
 endif
 
 BUILD_SERVER     =
-# the client is boned ATM
 BUILD_CLIENT     =
+
 # this should probably be deleted/merged anyway
 BUILD_CLIENT_SMP = 0
 # the baseq3 vm is worthless

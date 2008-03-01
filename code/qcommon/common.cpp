@@ -144,10 +144,12 @@ void QDECL Com_Printf( const char *fmt, ... )
 		return;
 	}
 
+#ifndef DEDICATED
 	// echo to console if we're not a dedicated server
 	if ( com_dedicated && !com_dedicated->integer ) {
 		CL_ConsolePrint( msg );
 	}
+#endif
 
 	// echo to dedicated console and early console
 	Sys_Print( msg );
