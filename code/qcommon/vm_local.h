@@ -166,14 +166,35 @@ struct vm_s {
 };
 
 
+#define	VM_MAGIC		0x12721444
+#define	VM_MAGIC_VER2	0x12721445
+
+typedef struct {
+	int		vmMagic;
+
+	int		instructionCount;
+
+	int		codeOffset;
+	int		codeLength;
+
+	int		dataOffset;
+	int		dataLength;
+	int		litLength;			// ( dataLength - litLength ) should be byteswapped on load
+	int		bssLength;			// zero filled memory appended to datalength
+
+	//!!! below here is VM_MAGIC_VER2 !!!
+	int		jtrgLength;			// number of jump table targets
+} vmHeader_t;
+
+
 extern	vm_t	*currentVM;
 extern	int		vm_debugLevel;
 
-void VM_Compile( vm_t *vm, vmHeader_t *header );
+void VM_Compile( vm_t* vm, const vmHeader_t* header );
 int VM_CallCompiled( vm_t* vm, int* args );
 
 #if defined(NO_VM_COMPILED)
-void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header );
+void VM_PrepareInterpreter( vm_t* vm, const vmHeader_t* header );
 int VM_CallInterpreted( vm_t *vm, int *args );
 #endif
 
