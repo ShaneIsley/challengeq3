@@ -63,7 +63,6 @@ long myftol( float f );
 // see QSORT_SHADERNUM_SHIFT
 #define	MAX_SHADERS				16384
 
-#define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
 
 // can't be increased without changing bit packing for drawsurfs
@@ -404,31 +403,15 @@ typedef struct shader_s {
 	deformStage_t	deforms[MAX_SHADER_DEFORMS];
 
 	int			numUnfoggedPasses;
-	shaderStage_t	*stages[MAX_SHADER_STAGES];		
+	shaderStage_t	*stages[MAX_SHADER_STAGES];
 
 	void		(*optimalStageIteratorFunc)( void );
 
-  float clampTime;                                  // time this shader is clamped to
-  float timeOffset;                                 // current time offset for this shader
-
-  int numStates;                                    // if non-zero this is a state shader
-  struct shader_s *currentShader;                   // current state if this is a state shader
-  struct shader_s *parentShader;                    // current state if this is a state shader
-  int currentState;                                 // current state index for cycle purposes
-  long expireTime;                                  // time in milliseconds this expires
-
-  int shaderStates[MAX_STATES_PER_SHADER];          // index to valid shader states
+	float clampTime;				// time this shader is clamped to
+	float timeOffset;				// current time offset for this shader
 
 	struct	shader_s	*next;
 } shader_t;
-
-typedef struct shaderState_s {
-  char shaderName[MAX_QPATH];     // name of shader this state belongs to
-  char name[MAX_STATE_NAME];      // name of this state
-  char stateShader[MAX_QPATH];    // shader this name invokes
-  int cycleTime;                  // time this cycle lasts, <= 0 is forever
-  shader_t *shader;
-} shaderState_t;
 
 
 // trRefdef_t holds everything that comes in refdef_t,
