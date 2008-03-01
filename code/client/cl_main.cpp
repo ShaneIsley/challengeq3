@@ -2011,8 +2011,6 @@ static void CL_InitRef()
 	ri.FS_WriteFile = FS_WriteFile;
 	ri.FS_FreeFileList = FS_FreeFileList;
 	ri.FS_ListFiles = FS_ListFiles;
-	ri.FS_FileIsInPAK = FS_FileIsInPAK;
-	ri.FS_FileExists = FS_FileExists;
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 
@@ -2033,7 +2031,7 @@ static void CL_InitRef()
 	//Com_Printf( "-------------------------------\n");
 
 	if ( !ret ) {
-		Com_Error (ERR_FATAL, "Couldn't initialize refresh" );
+		Com_Error( ERR_FATAL, "Couldn't initialize refresh" );
 	}
 
 	re = *ret;
@@ -2909,8 +2907,6 @@ void CL_Init()
 
 	// register our variables
 	//
-	cl_motd = Cvar_Get ("cl_motd", "1", 0);
-
 	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
 
 	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
@@ -2946,6 +2942,7 @@ void CL_Init()
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
+	cl_motd = Cvar_Get( "cl_motd", "1", 0 );
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
 
 	Cvar_Get( "cl_maxPing", "800", CVAR_ARCHIVE );

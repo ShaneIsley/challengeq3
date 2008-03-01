@@ -860,7 +860,7 @@ static void RE_EndRegistration()
 }
 
 
-const refexport_t* GetRefAPI ( int apiVersion, refimport_t *rimp )
+const refexport_t* GetRefAPI ( int apiVersion, const refimport_t* rimp )
 {
 	static refexport_t re;
 
@@ -869,7 +869,7 @@ const refexport_t* GetRefAPI ( int apiVersion, refimport_t *rimp )
 	Com_Memset( &re, 0, sizeof( re ) );
 
 	if ( apiVersion != REF_API_VERSION ) {
-		ri.Printf(PRINT_ALL, "Mismatched REF_API_VERSION: expected %i, got %i\n", 
+		ri.Printf( PRINT_ALL, "Mismatched REF_API_VERSION: expected %i, got %i\n",
 			REF_API_VERSION, apiVersion );
 		return NULL;
 	}

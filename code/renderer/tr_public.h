@@ -70,8 +70,8 @@ typedef struct {
 	void	(*RenderScene)( const refdef_t *fd );
 
 	void	(*SetColor)( const float *rgba );	// NULL = 1,1,1,1
-	void	(*DrawStretchPic) ( float x, float y, float w, float h, 
-		float s1, float t1, float s2, float t2, qhandle_t hShader );	// 0 = white
+	void	(*DrawStretchPic) ( float x, float y, float w, float h,
+		float s1, float t1, float s2, float t2, qhandle_t hShader );
 
 	// Draw images for cinematic rendering, pass as 32 bit rgba
 	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
@@ -142,13 +142,11 @@ typedef struct {
 
 	// a -1 return means the file does not exist
 	// NULL can be passed for buf to just determine existance
-	int		(*FS_FileIsInPAK)( const char *name, int *pCheckSum );
 	int		(*FS_ReadFile)( const char *name, void **buf );
 	void	(*FS_FreeFile)( void *buf );
 	char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
 	void	(*FS_FreeFileList)( char **filelist );
 	void	(*FS_WriteFile)( const char *qpath, const void *buffer, int size );
-	qbool (*FS_FileExists)( const char *file );
 
 	// cinematic stuff
 	void	(*CIN_UploadCinematic)(int handle);
@@ -160,8 +158,7 @@ typedef struct {
 
 
 // this is the only function actually exported at the linker level
-// If the module can't init to a valid rendering state, NULL will be
-// returned.
-const refexport_t* GetRefAPI( int apiVersion, refimport_t *rimp );
+// if the module can't init to a valid rendering state, it will return NULL
+const refexport_t* GetRefAPI( int apiVersion, const refimport_t* rimp );
 
 #endif	// __TR_PUBLIC_H

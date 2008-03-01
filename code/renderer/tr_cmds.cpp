@@ -318,7 +318,6 @@ void RE_BeginFrame( stereoFrame_t stereoFrame )
 	//
 	if ( r_gamma->modified ) {
 		r_gamma->modified = qfalse;
-
 		R_SyncRenderThread();
 		R_SetColorMappings();
 	}
