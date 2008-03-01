@@ -25,16 +25,6 @@ backEndData_t	*backEndData[SMP_FRAMES];
 backEndState_t	backEnd;
 
 
-static float	s_flipMatrix[16] = {
-	// convert from our coordinate system (looking down X)
-	// to OpenGL's coordinate system (looking down -Z)
-	0, 0, -1, 0,
-	-1, 0, 0, 0,
-	0, 1, 0, 0,
-	0, 0, 0, 1
-};
-
-
 void GL_Bind( const image_t* image )
 {
 	int texnum;
@@ -507,15 +497,13 @@ void RB_BeginDrawingView (void) {
 }
 
 
-#define	MAC_EVENT_PUMP_MSEC		5
-
 /*
 ==================
 RB_RenderDrawSurfList
 ==================
 */
 void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	shader_t		*shader, *oldShader;
+	const shader_t	*shader, *oldShader;
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
@@ -781,10 +769,10 @@ static const void* RB_SetColor( const void* data )
 {
 	const setColorCommand_t* cmd = (const setColorCommand_t*)data;
 
-	backEnd.color2D[0] = cmd->color[0] * 255;
-	backEnd.color2D[1] = cmd->color[1] * 255;
-	backEnd.color2D[2] = cmd->color[2] * 255;
-	backEnd.color2D[3] = cmd->color[3] * 255;
+	backEnd.color2D[0] = (byte)(cmd->color[0] * 255);
+	backEnd.color2D[1] = (byte)(cmd->color[1] * 255);
+	backEnd.color2D[2] = (byte)(cmd->color[2] * 255);
+	backEnd.color2D[3] = (byte)(cmd->color[3] * 255);
 
 	return (const void*)(cmd + 1);
 }

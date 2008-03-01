@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GL_INDEX_TYPE GL_UNSIGNED_INT
 typedef unsigned int glIndex_t;
 
+extern const float s_flipMatrix[16];
+
 #pragma pack(push, 1)
 typedef struct {
 	unsigned char 	id_length, colormap_type, image_type;
@@ -542,7 +544,7 @@ typedef enum {
 
 typedef struct drawSurf_s {
 	unsigned			sort;			// bit combination for fast compares
-	surfaceType_t		*surface;		// any of surface*_t
+	const surfaceType_t* surface;		// any of surface*_t
 } drawSurf_t;
 
 #define	MAX_FACE_POINTS		64
@@ -639,7 +641,7 @@ typedef struct {
 } srfTriangles_t;
 
 
-extern	void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])(void *);
+extern	void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( const void* );
 
 /*
 ==============================================================================
@@ -1137,10 +1139,9 @@ void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces();
 
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
-					 int *fogNum, int *dlightMap );
+void R_DecomposeSort( unsigned sort, int *entityNum, const shader_t **shader, int *fogNum, int *dlightMap );
 
-void R_AddDrawSurf( surfaceType_t *surface, const shader_t* shader, int fogIndex, int dlightMap );
+void R_AddDrawSurf( const surfaceType_t* surface, const shader_t* shader, int fogIndex, int dlightMap );
 
 
 #define	CULL_IN		0		// completely unclipped

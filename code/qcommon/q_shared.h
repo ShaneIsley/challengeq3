@@ -513,11 +513,11 @@ void SetPlaneSignbits( struct cplane_s *out );
 #if !defined(__GNUC__)
 int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const struct cplane_s* p );
 #else
-extern "C" int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, struct cplane_s* p );
+extern "C" int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const struct cplane_s* p );
 #endif
 
-float	AngleMod(float a);
-float	LerpAngle (float from, float to, float frac);
+float	AngleMod( float a );
+float	LerpAngle( float from, float to, float frac );
 float	AngleSubtract( float a1, float a2 );
 void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 

@@ -23,11 +23,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_local.h"
 
-#include <string.h> // memcpy
 
-trGlobals_t		tr;
+trGlobals_t tr;
 
-static float	s_flipMatrix[16] = {
+refimport_t ri;
+
+const float s_flipMatrix[16] = {
 	// convert from our coordinate system (looking down X)
 	// to OpenGL's coordinate system (looking down -Z)
 	0, 0, -1, 0,
@@ -36,12 +37,6 @@ static float	s_flipMatrix[16] = {
 	0, 0, 0, 1
 };
 
-
-refimport_t	ri;
-
-// entities that will have procedurally generated surfaces will just
-// point at this for their sorting surface
-surfaceType_t	entitySurface = SF_ENTITY;
 
 /*
 =================
@@ -567,44 +562,43 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
 }
 
 
-/*
-=============
-R_PlaneForSurface
-=============
-*/
-void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
+static void R_PlaneForSurface( const surfaceType_t* surfType, cplane_t* plane )
+{
 	srfTriangles_t	*tri;
 	srfPoly_t		*poly;
 	drawVert_t		*v1, *v2, *v3;
 	vec4_t			plane4;
 
 	if (!surfType) {
-		Com_Memset (plane, 0, sizeof(*plane));
+		Com_Memset( plane, 0, sizeof(*plane) );
 		plane->normal[0] = 1;
 		return;
 	}
+
 	switch (*surfType) {
 	case SF_FACE:
-		*plane = ((srfSurfaceFace_t *)surfType)->plane;
+		*plane = ((const srfSurfaceFace_t*)surfType)->plane;
 		return;
+
 	case SF_TRIANGLES:
 		tri = (srfTriangles_t *)surfType;
 		v1 = tri->verts + tri->indexes[0];
 		v2 = tri->verts + tri->indexes[1];
 		v3 = tri->verts + tri->indexes[2];
 		PlaneFromPoints( plane4, v1->xyz, v2->xyz, v3->xyz );
-		VectorCopy( plane4, plane->normal ); 
+		VectorCopy( plane4, plane->normal );
 		plane->dist = plane4[3];
 		return;
 	case SF_POLY:
 		poly = (srfPoly_t *)surfType;
 		PlaneFromPoints( plane4, poly->verts[0].xyz, poly->verts[1].xyz, poly->verts[2].xyz );
-		VectorCopy( plane4, plane->normal ); 
+		VectorCopy( plane4, plane->normal );
 		plane->dist = plane4[3];
 		return;
+
 	default:
-		Com_Memset (plane, 0, sizeof(*plane));
-		plane->normal[0] = 1;		
+		Com_Memset( plane, 0, sizeof(*plane) );
+		plane->normal[0] = 1;
 		return;
 	}
 }
@@ -807,7 +801,7 @@ static qbool SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] )
 	float shortest = 100000000;
 	int entityNum;
 	int numTriangles;
-	shader_t *shader;
+	const shader_t *shader;
 	int		fogNum;
 	int dlighted;
 	vec4_t clip, eye;
@@ -1053,7 +1047,7 @@ static void R_RadixSort( drawSurf_t *source, int size )
 //==========================================================================================
 
 
-void R_AddDrawSurf( surfaceType_t *surface, const shader_t* shader, int fogIndex, int dlightMap )
+void R_AddDrawSurf( const surfaceType_t* surface, const shader_t* shader, int fogIndex, int dlightMap )
 {
 	// instead of checking for overflow, we just mask the index so it wraps around
 	int index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
@@ -1066,21 +1060,18 @@ void R_AddDrawSurf( surfaceType_t *surface, const shader_t* shader, int fogIndex
 }
 
 
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
-					 int *fogNum, int *dlightMap ) {
+void R_DecomposeSort( unsigned sort, int *entityNum, const shader_t **shader, int *fogNum, int *dlightMap )
+{
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = sort & 3;
 }
 
-/*
-=================
-R_SortDrawSurfs
-=================
-*/
-void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	shader_t		*shader;
+
+static void R_SortDrawSurfs( drawSurf_t* drawSurfs, int numDrawSurfs )
+{
+	const shader_t* shader;
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
@@ -1130,6 +1121,10 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	R_AddDrawSurfCmd( drawSurfs, numDrawSurfs );
 }
 
+
+// entities that will have procedurally generated surfaces will just
+// point at this for their sorting surface
+static const surfaceType_t entitySurface = SF_ENTITY;
 
 static void R_AddEntitySurfaces()
 {
