@@ -156,18 +156,6 @@ int R_CullLocalPointAndRadius( const vec3_t pt, float radius )
 
 
 /*
-=================
-R_WorldToLocal
-
-=================
-*/
-void R_WorldToLocal (vec3_t world, vec3_t local) {
-	local[0] = DotProduct(world, tr.or.axis[0]);
-	local[1] = DotProduct(world, tr.or.axis[1]);
-	local[2] = DotProduct(world, tr.or.axis[2]);
-}
-
-/*
 ==========================
 R_TransformModelToClip
 
@@ -303,23 +291,19 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	or->viewOrigin[2] = DotProduct( delta, or->axis[2] ) * axisLength;
 }
 
-/*
-=================
-R_RotateForViewer
 
-Sets up the modelview matrix for a given viewParm
-=================
-*/
-void R_RotateForViewer (void) 
+// sets up the modelview matrix for a given viewParm
+
+static void R_RotateForViewer()
 {
 	float	viewerMatrix[16];
 	vec3_t	origin;
 
-	Com_Memset (&tr.or, 0, sizeof(tr.or));
+	Com_Memset( &tr.or, 0, sizeof(tr.or) );
 	tr.or.axis[0][0] = 1;
 	tr.or.axis[1][1] = 1;
 	tr.or.axis[2][2] = 1;
-	VectorCopy (tr.viewParms.or.origin, tr.or.viewOrigin);
+	VectorCopy( tr.viewParms.or.origin, tr.or.viewOrigin );
 
 	// transform by the camera placement
 	VectorCopy( tr.viewParms.or.origin, origin );
@@ -349,17 +333,11 @@ void R_RotateForViewer (void)
 	myGlMultMatrix( viewerMatrix, s_flipMatrix, tr.or.modelMatrix );
 
 	tr.viewParms.world = tr.or;
-
 }
 
-/*
-** SetFarClip
-*/
-static void SetFarClip( void )
-{
-	float	farthestCornerDistance = 0;
-	int		i;
 
+static void SetFarClip()
+{
 	// if not rendering the world (icons, menus, etc)
 	// set a 2k far clip plane
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
@@ -367,62 +345,29 @@ static void SetFarClip( void )
 		return;
 	}
 
-	//
-	// set far clipping planes dynamically
-	//
-	farthestCornerDistance = 0;
-	for ( i = 0; i < 8; i++ )
+	// set far clipping plane dynamically
+
+	float farthestCornerDistance = 0;
+	for (int i = 0; i < 8; ++i)
 	{
 		vec3_t v;
-		vec3_t vecTo;
-		float distance;
+		v[0] = (i & 1) ? tr.viewParms.visBounds[0][0] : tr.viewParms.visBounds[1][0];
+		v[1] = (i & 2) ? tr.viewParms.visBounds[0][1] : tr.viewParms.visBounds[1][1];
+		v[2] = (i & 4) ? tr.viewParms.visBounds[0][2] : tr.viewParms.visBounds[1][2];
 
-		if ( i & 1 )
+		float d = DistanceSquared( v, tr.viewParms.or.origin );
+		if ( d > farthestCornerDistance )
 		{
-			v[0] = tr.viewParms.visBounds[0][0];
-		}
-		else
-		{
-			v[0] = tr.viewParms.visBounds[1][0];
-		}
-
-		if ( i & 2 )
-		{
-			v[1] = tr.viewParms.visBounds[0][1];
-		}
-		else
-		{
-			v[1] = tr.viewParms.visBounds[1][1];
-		}
-
-		if ( i & 4 )
-		{
-			v[2] = tr.viewParms.visBounds[0][2];
-		}
-		else
-		{
-			v[2] = tr.viewParms.visBounds[1][2];
-		}
-
-		VectorSubtract( v, tr.viewParms.or.origin, vecTo );
-
-		distance = vecTo[0] * vecTo[0] + vecTo[1] * vecTo[1] + vecTo[2] * vecTo[2];
-
-		if ( distance > farthestCornerDistance )
-		{
-			farthestCornerDistance = distance;
+			farthestCornerDistance = d;
 		}
 	}
+
 	tr.viewParms.zFar = sqrt( farthestCornerDistance );
 }
 
 
-/*
-===============
-R_SetupProjection
-===============
-*/
-void R_SetupProjection( void ) {
+static void R_SetupProjection()
+{
 	float	xmin, xmax, ymin, ymax;
 	float	width, height, depth;
 	float	zNear, zFar;
