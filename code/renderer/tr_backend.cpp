@@ -739,7 +739,7 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );	
+		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 	} else {
 		if (dirty) {
 			// otherwise, just subimage upload it so that drivers can tell we are going to be changing
@@ -864,10 +864,10 @@ static const void* RB_DrawBuffer( const void* data )
 
 
 /*
-Draw all the images to the screen, on top of whatever was there
-This is used to test for texture thrashing in 1999, but is useless now
+draw all the images to the screen, on top of whatever was there
+this was used to test for texture thrashing in 1999, but is useless now
 
-Also called by RE_EndRegistration
+also called by RE_EndRegistration to touch them for residency
 */
 void RB_ShowImages()
 {
@@ -895,7 +895,7 @@ void RB_ShowImages()
 		}
 
 		GL_Bind( image );
-		qglBegin (GL_QUADS);
+		qglBegin( GL_QUADS );
 		qglTexCoord2f( 0, 0 );
 		qglVertex2f( x, y );
 		qglTexCoord2f( 1, 0 );
@@ -913,15 +913,8 @@ void RB_ShowImages()
 }
 
 
-/*
-=============
-RB_SwapBuffers
-
-=============
-*/
-const void	*RB_SwapBuffers( const void *data ) {
-	const swapBuffersCommand_t	*cmd;
-
+static const void* RB_SwapBuffers( const void* data )
+{
 	// finish any 2D drawing if needed
 	if ( tess.numIndexes ) {
 		RB_EndSurface();
@@ -932,7 +925,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		RB_ShowImages();
 	}
 
-	cmd = (const swapBuffersCommand_t *)data;
+	const swapBuffersCommand_t* cmd = (const swapBuffersCommand_t*)data;
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
@@ -946,7 +939,6 @@ const void	*RB_SwapBuffers( const void *data ) {
 		backEnd.pc.c_overDraw += sum;
 	}
 
-
 	if ( !glState.finishCalled ) {
 		qglFinish();
 	}
@@ -957,8 +949,9 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	backEnd.projection2D = qfalse;
 
-	return (const void *)(cmd + 1);
+	return (const void*)(cmd + 1);
 }
+
 
 /*
 ====================
