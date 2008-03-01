@@ -518,12 +518,9 @@ qbool EmitMovEBXEDI(vm_t *vm, int andit) {
 	return qfalse;
 }
 
-/*
-=================
-VM_Compile
-=================
-*/
-void VM_Compile( vm_t *vm, vmHeader_t *header ) {
+
+void VM_Compile( vm_t* vm, const vmHeader_t* header )
+{
 	int		op;
 	int		maxLength;
 	int		v;

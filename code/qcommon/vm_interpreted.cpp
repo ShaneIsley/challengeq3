@@ -170,12 +170,8 @@ void VM_StackTrace( vm_t *vm, int programCounter, int programStack ) {
 }
 
 
-/*
-====================
-VM_PrepareInterpreter
-====================
-*/
-void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
+void VM_PrepareInterpreter( vm_t* vm, const vmHeader_t* header )
+{
 	int		op;
 	int		pc;
 	byte	*code;
