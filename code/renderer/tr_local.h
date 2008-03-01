@@ -262,26 +262,24 @@ typedef struct {
 
 
 typedef struct {
-	texMod_t		type;
+	texMod_t	type;
 
 	// used for TMOD_TURBULENT and TMOD_STRETCH
-	waveForm_t		wave;
+	waveForm_t	wave;
 
 	// used for TMOD_TRANSFORM
-	float			matrix[2][2];		// s' = s * m[0][0] + t * m[1][0] + trans[0]
-	float			translate[2];		// t' = s * m[0][1] + t * m[0][1] + trans[1]
+	float		matrix[2][2];	// s' = s * m[0][0] + t * m[1][0] + trans[0]
+	float		translate[2];	// t' = s * m[0][1] + t * m[0][1] + trans[1]
 
 	// used for TMOD_SCALE
-	float			scale[2];			// s *= scale[0]
-	                                    // t *= scale[1]
+	float		scale[2];		// s *= scale[0], t *= scale[1]
 
 	// used for TMOD_SCROLL
-	float			scroll[2];			// s' = s + scroll[0] * time
-										// t' = t + scroll[1] * time
+	float		scroll[2];		// s' = s + scroll[0] * time, t' = t + scroll[1] * time
 
 	// + = clockwise
 	// - = counterclockwise
-	float			rotateSpeed;
+	float		rotateSpeed;
 
 } texModInfo_t;
 
@@ -289,7 +287,7 @@ typedef struct {
 #define	MAX_IMAGE_ANIMATIONS	8
 
 typedef struct {
-	image_t			*image[MAX_IMAGE_ANIMATIONS];
+	const image_t*	image[MAX_IMAGE_ANIMATIONS];
 	int				numImageAnimations;
 	float			imageAnimationSpeed;
 
@@ -309,7 +307,7 @@ typedef struct {
 
 typedef struct {
 	qbool		active;
-	
+
 	textureBundle_t	bundle[NUM_TEXTURE_BUNDLES];
 
 	waveForm_t		rgbWave;
@@ -348,7 +346,7 @@ typedef enum {
 
 typedef struct {
 	float		cloudHeight;
-	image_t		*outerbox[6], *innerbox[6];
+	const image_t *outerbox[6], *innerbox[6];
 } skyParms_t;
 
 typedef struct {
@@ -388,7 +386,7 @@ typedef struct shader_s {
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
 
 	cullType_t	cullType;				// CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
-	qbool	polygonOffset;			// set for decals and other items that must be offset 
+	qbool	polygonOffset;			// set for decals and other items that must be offset
 	qbool	noMipMaps;				// for console fonts, 2D elements, etc.
 	qbool	noPicMip;				// for images that must always be full resolution
 
@@ -445,7 +443,6 @@ typedef struct {
 
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
-
 
 } trRefdef_t;
 
@@ -645,10 +642,10 @@ BRUSH MODELS
 
 typedef struct msurface_s {
 	int					viewCount;		// if == tr.viewCount, already added
-	struct shader_s		*shader;
+	const shader_t* shader;
 	int					fogIndex;
 
-	surfaceType_t		*data;			// any of srf*_t
+	const surfaceType_t		*data;			// any of srf*_t
 } msurface_t;
 
 
@@ -1130,11 +1127,10 @@ void R_AddDrawSurf( const surfaceType_t* surface, const shader_t* shader, int fo
 #define	CULL_IN		0		// completely unclipped
 #define	CULL_CLIP	1		// clipped by one or more planes
 #define	CULL_OUT	2		// completely outside the clipping planes
-void R_LocalNormalToWorld (vec3_t local, vec3_t world);
-void R_LocalPointToWorld (vec3_t local, vec3_t world);
-int R_CullLocalBox (vec3_t bounds[2]);
-int R_CullPointAndRadius( vec3_t origin, float radius );
-int R_CullLocalPointAndRadius( vec3_t origin, float radius );
+
+int R_CullLocalBox( const vec3_t bounds[2] );
+int R_CullPointAndRadius( const vec3_t origin, float radius );
+int R_CullLocalPointAndRadius( const vec3_t origin, float radius );
 
 void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, orientationr_t *or );
 
@@ -1203,7 +1199,7 @@ model_t* R_AllocModel();
 void	R_Init();
 qbool	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
-image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );
+const image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmip, int glWrapClampMode );
 image_t* R_CreateImage( const char* name, byte* pic, int width, int height, GLenum format,
 					qbool mipmap, qbool allowPicmip, int wrapClampMode );
 
@@ -1219,7 +1215,7 @@ void	R_InitImages();
 void	R_DeleteTextures();
 int		R_SumOfUsedImages();
 void	R_InitSkins();
-skin_t	*R_GetSkinByHandle( qhandle_t hSkin );
+const skin_t* R_GetSkinByHandle( qhandle_t hSkin );
 
 int R_ComputeLOD( trRefEntity_t *ent );
 
@@ -1230,11 +1226,10 @@ const void *RB_TakeVideoFrameCmd( const void *data );
 //
 qhandle_t RE_RegisterShader( const char* name );
 qhandle_t RE_RegisterShaderNoMip( const char* name );
-qhandle_t RE_RegisterShaderFromImage(const char *name, int lightmapIndex, image_t *image, qbool mipRawImage);
+qhandle_t RE_RegisterShaderFromImage( const char* name, int lightmapIndex, const image_t* image );
 
 shader_t	*R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage );
 const shader_t* R_GetShaderByHandle( qhandle_t hShader );
-shader_t	*R_GetShaderByState( int index, long *cycleTime );
 void		R_InitShaders( void );
 void		R_ShaderList_f( void );
 
