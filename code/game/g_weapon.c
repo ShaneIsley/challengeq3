@@ -113,31 +113,81 @@ static void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t 
 
 
 /*
+Round a vector to integers for more efficient network transmission
+but towards a given point rather than blindly truncating.
+This prevents it from truncating into a wall.
+
+	the id version of this is INSANELY wrong, because of sign problems
+	the classic test case is CPM3, shooting from lava to RG ledge
+	for that, the impact point ("v") is ( 817.360, -362.008, -64.125 )
+	and trBase ("to") is ( 838, -60, -292 )
+
+	the id code truncated the Z component of the result to 64, when it MUST become 65
+	otherwise the splash trace will be startsolid and thus pass up THROUGH the ledge
+	(because the normal of the "top" brush is also facing up, so is not tested for collision (convexity rule))
+
+is "if ((to[i] - v[i]) <= 0)" a good enough test to avoid the id bugs?
+
+shooting UP (note that the "to" in the arg list is actually "FROM", ie the point to snap TOwards, gg naming)
+-64 to -32.5: -31.5, <= 0, -32.5 -> -32-1 = -33 = right
+-64 to +32.5: -96.5, <= 0, +32.5 -> +32-1 = -31 = right, though just 32 would be fine
++16 to +32.5: -16.5, <= 0, +32.5 -> +32-1 = -31 = right, ditto "overcompensated"
+
+shooting DOWN
+-32 to -64.5: +32.5, > 0, -64.5 -> -64, right
++32 to -64.5: +96.5, > 0, -64.5 -> -64, right
++32 to +16.5: +15.5, > 0, +16.5 -> +16, FAIL: +16 is inside the brush, needs to be +17
+
+so
+
+if "to" is > "v" AND v is +ve, snap and ++
+if "to" is > "v" and v is NOT +ve, just snap
+if "to" is < "v" AND v is -ve, snap and --
+if "to" is < "v" and v is NOT -ve, just snap
+
+whew...  :)
+
+sanity check, CPM3 case:
+ "v" ( 817.360, -362.008, -64.125 )
+"to" ( 838,      -60,     -292    )
+to < v, v < 0, snap = -64, -- = 65, win
+
+sanity check, T4 case: same player positioning as CPM3, but +ve WORLD Z coordinates:
+ "v" ( 817.360, -362.008, 292.125 )
+"to" ( 838,      -60,      62     )
+to < v, v > 0, snap = 292, win
+
+*/
+
+void SnapVectorTowards( vec3_t v, const vec3_t to )
+{
+	int i;
+
+	for (i = 0; i < 3; i++) {
+		if (to[i] > v[i]) {
+			if (v[i] > 0) {
+				v[i] = (int)v[i] + 1;
+			} else {
+				v[i] = (int)v[i];
+			}
+		} else {
+			if (v[i] < 0) {
+				v[i] = (int)v[i] - 1;
+			} else {
+				v[i] = (int)v[i];
+			}
+		}
+	}
+}
+
+
+/*
 ======================================================================
 
 MACHINEGUN
 
 ======================================================================
 */
-
-
-/*
-Round a vector to integers for more efficient network transmission
-but towards a given point rather than blindly truncating.
-This prevents it from truncating into a wall.
-*/
-void SnapVectorTowards( vec3_t v, const vec3_t to )
-{
-	int i;
-
-	for (i = 0; i < 3; i++) {
-		if ((to[i] <= v[i]) || (v[i] < 0)) {
-			v[i] = (int)v[i];
-		} else {
-			v[i] = (int)v[i] + 1;
-		}
-	}
-}
 
 
 #ifdef MISSIONPACK

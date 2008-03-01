@@ -666,8 +666,8 @@ void BotInterbreeding(void) {
 	trap_BotLibVarSet("bot_reloadcharacters", "1");
 	//add a number of bots using the desired bot character
 	for (i = 0; i < bot_interbreedbots.integer; i++) {
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s 4 free %i %s%d\n",
-						bot_interbreedchar.string, i * 50, bot_interbreedchar.string, i) );
+		trap_SendConsoleCommand( va("addbot %s 4 free %i %s%d\n",
+				bot_interbreedchar.string, i * 50, bot_interbreedchar.string, i) );
 	}
 	//
 	trap_Cvar_Set("bot_interbreedchar", "");

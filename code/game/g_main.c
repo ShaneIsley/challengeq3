@@ -875,7 +875,7 @@ static void ExitLevel()
 	if ( g_gametype.integer == GT_TOURNAMENT  ) {
 		if ( !level.restarted ) {
 			RemoveTournamentLoser();
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_SendConsoleCommand( "map_restart 0\n" );
 			level.restarted = qtrue;
 			level.intermissiontime = 0;
 		}
@@ -887,9 +887,9 @@ static void ExitLevel()
 
 	if( !Q_stricmp( nextmap, "map_restart 0" ) && Q_stricmp( d1, "" ) ) {
 		trap_Cvar_Set( "nextmap", "vstr d2" );
-		trap_SendConsoleCommand( EXEC_APPEND, "vstr d1\n" );
+		trap_SendConsoleCommand( "vstr d1\n" );
 	} else {
-		trap_SendConsoleCommand( EXEC_APPEND, "vstr nextmap\n" );
+		trap_SendConsoleCommand( "vstr nextmap\n" );
 	}
 
 	level.intermissiontime = 0;
@@ -1267,7 +1267,7 @@ static void CheckTournament()
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_SendConsoleCommand( "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
 		}
@@ -1317,7 +1317,7 @@ static void CheckTournament()
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_SendConsoleCommand( "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
 		}
@@ -1329,7 +1329,7 @@ static void CheckVote()
 {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+		trap_SendConsoleCommand( va("%s\n", level.voteString ) );
 	}
 	if ( !level.voteTime ) {
 		return;
@@ -1443,7 +1443,7 @@ static void CheckTeamVote( int team )
 				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
 			}
 			else {
-				trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
+				trap_SendConsoleCommand( va("%s\n", level.teamVoteString[cs_offset] ) );
 			}
 		} else if ( level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset]/2 ) {
 			// same behavior as a timeout

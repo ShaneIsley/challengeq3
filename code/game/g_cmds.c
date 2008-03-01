@@ -1113,7 +1113,7 @@ static void Cmd_CallVote_f( gentity_t* ent )
 	// if there is still a vote to be executed
 	if ( level.voteExecuteTime ) {
 		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+		trap_SendConsoleCommand( va("%s\n", level.voteString ) );
 	}
 
 	// special case for g_gametype, check for bad values

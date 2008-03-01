@@ -379,14 +379,45 @@ static void G_MissileImpact( gentity_t* ent, trace_t* trace )
 	// change over to a normal entity right at the point of impact
 	ent->s.eType = ET_GENERAL;
 
+//G_Printf( "Impact at (%0.3f, %0.3f, %0.3f) \n",
+//		trace->endpos[0], trace->endpos[1], trace->endpos[2] );
+
+//G_Printf( "Prev posn (%0.3f, %0.3f, %0.3f) \n",
+//		ent->s.pos.trBase[0], ent->s.pos.trBase[1], ent->s.pos.trBase[2] );
+
 	SnapVectorTowards( trace->endpos, ent->s.pos.trBase );	// save net bandwidth
 
+/*
+G_Printf( "Impact backsnapped to (%0.3f, %0.3f, %0.3f) \n",
+		trace->endpos[0], trace->endpos[1], trace->endpos[2] );
+
+{
+trace_t tr;
+vec3_t start, end;
+VectorCopy( trace->endpos, start );
+VectorCopy( start, end );
+end[2] += 100;
+trap_Trace( &tr, start, vec3_origin, vec3_origin, end, ENTITYNUM_NONE, MASK_SOLID );
+G_Printf( "Vertical 100-unit trace result: \n"
+		"   endpos (%0.3f, %0.3f, %0.3f) \n"
+		"   fraction %0.3f \n"
+		"   allsolid %d   startsolid %d \n"
+		"   surfflags %d   contents %d   entity %d \n"
+		"   plane normal (%0.3f, %0.3f, %0.3f) dist %0.3f \n"
+		, tr.endpos[0], tr.endpos[1], tr.endpos[2]
+		, tr.fraction
+		, tr.allsolid, tr.startsolid
+		, tr.surfaceFlags, tr.contents, tr.entityNum
+		, tr.plane.normal[0], tr.plane.normal[1], tr.plane.normal[2], tr.plane.dist
+);
+
+}
+*/
 	G_SetOrigin( ent, trace->endpos );
 
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
-		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, 
-			other, ent->splashMethodOfDeath ) ) {
+		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, other, ent->splashMethodOfDeath ) ) {
 			if( !hitClient ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 			}

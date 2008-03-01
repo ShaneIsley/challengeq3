@@ -1101,7 +1101,7 @@ void ClientDisconnect( int clientNum )
 		ent->client->sess.sessionTeam == TEAM_FREE &&
 		level.intermissiontime ) {
 
-		trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+		trap_SendConsoleCommand( "map_restart 0\n" );
 		level.restarted = qtrue;
 		level.intermissiontime = 0;
 	}

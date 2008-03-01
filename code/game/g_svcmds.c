@@ -427,7 +427,7 @@ qboolean ConsoleCommand()
 	}
 
 	if (Q_stricmp (cmd, "listip") == 0) {
-		trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
+		trap_SendConsoleCommand( "g_banIPs\n" );
 		return qtrue;
 	}
 

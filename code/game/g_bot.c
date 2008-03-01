@@ -218,7 +218,7 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 		skin = model;
 	}
 
-	trap_SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
+	trap_SendConsoleCommand( va( "play sound/player/announce/%s.wav\n", skin ) );
 }
 
 
@@ -282,7 +282,7 @@ static void G_AddRandomBot( int team )
 				strncpy(netname, value, sizeof(netname)-1);
 				netname[sizeof(netname)-1] = '\0';
 				Q_CleanStr(netname);
-				trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
+				trap_SendConsoleCommand( va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
 				return;
 			}
 		}
@@ -312,7 +312,7 @@ int G_RemoveRandomBot( int team ) {
 		}
 		strcpy(netname, cl->pers.netname);
 		Q_CleanStr(netname);
-		trap_SendConsoleCommand( EXEC_INSERT, va("kick %s\n", netname) );
+		trap_SendConsoleCommand( va("kick %s\n", netname) );
 		return qtrue;
 	}
 	return qfalse;
@@ -828,7 +828,7 @@ static void G_SpawnBots( const char *botList, int baseDelay )
 		*bot = 0;
 
 		// we must add the bot this way, calling G_AddBot directly at this stage does "Bad Things"
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", botname, skill, delay) );
+		trap_SendConsoleCommand( va("addbot %s %f free %i\n", botname, skill, delay) );
 		delay += BOT_BEGIN_DELAY_INCREMENT;
 		bot = botname;
 	}
