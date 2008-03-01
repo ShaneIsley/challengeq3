@@ -222,7 +222,7 @@ void			trap_SetPbClStatus( int status );
 #if !defined(Q3_VM)
 void			trap_Cmd_ExecuteText( int ignored, const char *text );
 #endif
-#define			trap_SendConsoleCommand( x ) trap_Cmd_ExecuteText( 2, x );
+#define			trap_SendConsoleCommand( x ) trap_Cmd_ExecuteText( 2, x )
 
 
 typedef enum {

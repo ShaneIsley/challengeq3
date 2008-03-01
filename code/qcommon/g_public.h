@@ -596,7 +596,7 @@ int		trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *paren
 #if !defined(Q3_VM)
 void			shit_SendConsoleCommand( int ignored, const char *text );
 #endif
-#define			trap_SendConsoleCommand( x ) shit_SendConsoleCommand( 2, x );
+#define			trap_SendConsoleCommand( x ) shit_SendConsoleCommand( 2, x )
 
 
 ///////////////////////////////////////////////////////////////
