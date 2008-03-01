@@ -1041,11 +1041,12 @@ Goals:
 */
 
 
-#define	HUNK_MAGIC		0x89537892
-#define	HUNK_FREE_MAGIC	0x89537893
+typedef unsigned int hmagic;
+static const hmagic HUNK_MAGIC_INUSE = 0x89537892;
+static const hmagic HUNK_MAGIC_FREED = 0x89537893;
 
 typedef struct {
-	int		magic;
+	hmagic	magic;
 	int		size;
 } hunkHeader_t;
 
@@ -1564,7 +1565,7 @@ void* Hunk_AllocateTempMemory( int size )
 	hunkHeader_t* hdr = (hunkHeader_t*)buf;
 	buf = (void*)(hdr+1);
 
-	hdr->magic = HUNK_MAGIC;
+	hdr->magic = HUNK_MAGIC_INUSE;
 	hdr->size = size;
 
 	// don't bother clearing, because we are going to load a file over it
@@ -1584,11 +1585,11 @@ void Hunk_FreeTempMemory( void* buf )
 	}
 
 	hunkHeader_t* hdr = ( (hunkHeader_t *)buf ) - 1;
-	if ( hdr->magic != HUNK_MAGIC ) {
+	if ( hdr->magic != HUNK_MAGIC_INUSE ) {
 		Com_Error( ERR_FATAL, "Hunk_FreeTempMemory: bad magic" );
 	}
 
-	hdr->magic = HUNK_FREE_MAGIC;
+	hdr->magic = HUNK_MAGIC_FREED;
 
 	// this only works if the files are freed in stack order,
 	// otherwise the memory will stay around until Hunk_ClearTempMemory
