@@ -113,7 +113,7 @@ typedef enum {
 	CG_R_CLEARSCENE,
 	CG_R_ADDREFENTITYTOSCENE,
 	CG_R_ADDPOLYTOSCENE,
-	CG_R_ADDLIGHTTOSCENE,
+	CG_R_ADDDEFECTIVELIGHTTOSCENE,
 	CG_R_RENDERSCENE,
 	CG_R_SETCOLOR,
 	CG_R_DRAWSTRETCHPIC,
@@ -156,7 +156,7 @@ typedef enum {
 	CG_CM_TEMPCAPSULEMODEL,
 	CG_CM_CAPSULETRACE,
 	CG_CM_TRANSFORMEDCAPSULETRACE,
-	CG_R_ADDADDITIVELIGHTTOSCENE,
+	CG_R_ADDLIGHTTOSCENE,
 	CG_GET_ENTITY_TOKEN,
 	CG_R_ADDPOLYSTOSCENE,
 	CG_R_INPVS,
@@ -290,8 +290,8 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 // significant construction
 void		trap_R_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts );
 void		trap_R_AddPolysToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts, int numPolys );
+void		shit_R_AddMultiplicativeLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
-void		trap_R_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 void		trap_R_RenderScene( const refdef_t *fd );
 void		trap_R_SetColor( const float *rgba );	// NULL = 1,1,1,1

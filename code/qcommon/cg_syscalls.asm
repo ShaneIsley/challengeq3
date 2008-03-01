@@ -12,7 +12,7 @@ equ	trap_Argv							-9
 equ	trap_Args							-10
 equ	trap_FS_FOpenFile					-11
 equ	trap_FS_Read						-12
-equ	trap_FS_Write						-13 
+equ	trap_FS_Write						-13
 equ	trap_FS_FCloseFile					-14
 equ	trap_SendConsoleCommand				-15
 equ	trap_AddCommand						-16
@@ -43,7 +43,7 @@ equ	trap_R_RegisterShader				-40
 equ	trap_R_ClearScene					-41
 equ	trap_R_AddRefEntityToScene			-42
 equ	trap_R_AddPolyToScene				-43
-equ	trap_R_AddLightToScene				-44
+equ	shit_R_AddMultiplicativeLightToScene -44
 equ	trap_R_RenderScene					-45
 equ	trap_R_SetColor						-46
 equ	trap_R_DrawStretchPic				-47
@@ -85,7 +85,7 @@ equ shit_S_StopLoopingSound				-82
 equ trap_CM_TempCapsuleModel			-83
 equ trap_CM_CapsuleTrace				-84
 equ trap_CM_TransformedCapsuleTrace		-85
-equ trap_R_AddAdditiveLightToScene		-86
+equ trap_R_AddLightToScene				-86
 equ trap_GetEntityToken					-87
 equ trap_R_AddPolysToScene				-88
 equ trap_R_inPVS						-89
