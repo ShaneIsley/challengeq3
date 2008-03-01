@@ -1039,7 +1039,7 @@ Goals:
 */
 
 
-#define	HUNK_MAGIC	0x89537892
+#define	HUNK_MAGIC		0x89537892
 #define	HUNK_FREE_MAGIC	0x89537893
 
 typedef struct {
@@ -1054,6 +1054,17 @@ typedef struct {
 	int		tempHighwater;
 } hunkUsed_t;
 
+static	hunkUsed_t	hunk_low = {0}, hunk_high = {0};
+static	hunkUsed_t	*hunk_permanent = &hunk_low, *hunk_temp = &hunk_high;
+
+static	byte	*s_hunkData = NULL;
+static	int		s_hunkTotal = 0;
+
+static	int		s_zoneTotal = 0;
+static	int		s_smallZoneTotal = 0;
+
+#ifdef HUNK_DEBUG
+
 typedef struct hunkblock_s {
 	int size;
 	byte printed;
@@ -1063,16 +1074,9 @@ typedef struct hunkblock_s {
 	int line;
 } hunkblock_t;
 
-static	hunkblock_t *hunkblocks = NULL;
+static hunkblock_t* hunkblocks = NULL;
 
-static	hunkUsed_t	hunk_low = {0}, hunk_high = {0};
-static	hunkUsed_t	*hunk_permanent = &hunk_low, *hunk_temp = &hunk_high;
-
-static	byte	*s_hunkData = NULL;
-static	int		s_hunkTotal = 0;
-
-static	int		s_zoneTotal = 0;
-static	int		s_smallZoneTotal = 0;
+#endif
 
 
 static void Com_Meminfo_f( void )
@@ -1259,7 +1263,6 @@ static void Hunk_Log( void )
 	Com_sprintf(buf, sizeof(buf), "%d hunk blocks\r\n", numBlocks);
 	FS_Write(buf, strlen(buf), logfile);
 }
-
 
 void Hunk_SmallLog( void )
 {
