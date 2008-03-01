@@ -156,12 +156,14 @@ void			trap_Cvar_Create( const char *var_name, const char *var_value, int flags 
 void			trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize );
 int				trap_Argc( void );
 void			trap_Argv( int n, char *buffer, int bufferLength );
+
 int				trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void			trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void			trap_FS_Write( const void *buffer, int len, fileHandle_t f );
 void			trap_FS_FCloseFile( fileHandle_t f );
 int				trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
 int				trap_FS_Seek( fileHandle_t f, long offset, fsOrigin_t origin );
+
 qhandle_t		trap_R_RegisterModel( const char *name );
 qhandle_t		trap_R_RegisterSkin( const char *name );
 qhandle_t		trap_R_RegisterShaderNoMip( const char *name );
@@ -175,8 +177,12 @@ void			trap_R_SetColor( const float *rgba );
 void			trap_R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
 void			trap_UpdateScreen( void );
 int				trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName );
+
 void			trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );
+void			trap_S_StopBackgroundTrack( void );
+void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
+
 void			trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
 void			trap_Key_GetBindingBuf( int keynum, char *buf, int buflen );
 void			trap_Key_SetBinding( int keynum, const char *binding );
@@ -186,6 +192,7 @@ void			trap_Key_SetOverstrikeMode( qboolean state );
 void			trap_Key_ClearStates( void );
 int				trap_Key_GetCatcher( void );
 void			trap_Key_SetCatcher( int catcher );
+
 void			trap_GetClipboardData( char *buf, int bufsize );
 void			trap_GetClientState( uiClientState_t *state );
 void			trap_GetGlconfig( glconfig_t *glconfig );
