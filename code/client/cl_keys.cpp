@@ -985,7 +985,7 @@ void CL_KeyEvent( int key, qbool down, unsigned time )
 			{
 				Key_ClearStates();
 				Cvar_SetValue( "r_fullscreen", !Cvar_VariableIntegerValue( "r_fullscreen" ) );
-				Cbuf_ExecuteText( EXEC_APPEND, "vid_restart\n");
+				Cbuf_AddText( "vid_restart\n" );
 				return;
 			}
 		}
