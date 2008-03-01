@@ -1081,7 +1081,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 			if (   Q_stricmp( filename + l - 4, ".cfg" )
 				&& Q_stricmp( filename + l - 4, ".ttf" )
 				&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
-				fs_fakeChkSum = random();
+				fs_fakeChkSum = 0;
 			}
 
 			Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
