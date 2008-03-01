@@ -502,12 +502,8 @@ static void R_SetupFrustum()
 }
 
 
-/*
-=================
-R_MirrorPoint
-=================
-*/
-void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
+static void R_MirrorPoint( const vec3_t in, const orientation_t* surface, const orientation_t* camera, vec3_t out )
+{
 	int		i;
 	vec3_t	local;
 	vec3_t	transformed;
@@ -517,20 +513,22 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
 
 	VectorClear( transformed );
 	for ( i = 0 ; i < 3 ; i++ ) {
-		d = DotProduct(local, surface->axis[i]);
+		d = DotProduct( local, surface->axis[i] );
 		VectorMA( transformed, d, camera->axis[i], transformed );
 	}
 
 	VectorAdd( transformed, camera->origin, out );
 }
 
-void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
+
+static void R_MirrorVector( const vec3_t in, const orientation_t* surface, const orientation_t* camera, vec3_t out )
+{
 	int		i;
 	float	d;
 
 	VectorClear( out );
 	for ( i = 0 ; i < 3 ; i++ ) {
-		d = DotProduct(in, surface->axis[i]);
+		d = DotProduct( in, surface->axis[i] );
 		VectorMA( out, d, camera->axis[i], out );
 	}
 }
@@ -538,10 +536,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
 
 static void R_PlaneForSurface( const surfaceType_t* surfType, cplane_t* plane )
 {
-	srfTriangles_t	*tri;
-	srfPoly_t		*poly;
-	drawVert_t		*v1, *v2, *v3;
-	vec4_t			plane4;
+	vec4_t plane4;
 
 	if (!surfType) {
 		Com_Memset( plane, 0, sizeof(*plane) );
@@ -554,21 +549,22 @@ static void R_PlaneForSurface( const surfaceType_t* surfType, cplane_t* plane )
 		*plane = ((const srfSurfaceFace_t*)surfType)->plane;
 		return;
 
-	case SF_TRIANGLES:
-		tri = (srfTriangles_t *)surfType;
-		v1 = tri->verts + tri->indexes[0];
-		v2 = tri->verts + tri->indexes[1];
-		v3 = tri->verts + tri->indexes[2];
+	case SF_TRIANGLES: {
+		const srfTriangles_t* tri = (const srfTriangles_t*)surfType;
+		const drawVert_t* v1 = tri->verts + tri->indexes[0];
+		const drawVert_t* v2 = tri->verts + tri->indexes[1];
+		const drawVert_t* v3 = tri->verts + tri->indexes[2];
 		PlaneFromPoints( plane4, v1->xyz, v2->xyz, v3->xyz );
 		VectorCopy( plane4, plane->normal );
 		plane->dist = plane4[3];
-		return;
-	case SF_POLY:
-		poly = (srfPoly_t *)surfType;
+	} return;
+
+	case SF_POLY: {
+		const srfPoly_t* poly = (const srfPoly_t*)surfType;
 		PlaneFromPoints( plane4, poly->verts[0].xyz, poly->verts[1].xyz, poly->verts[2].xyz );
 		VectorCopy( plane4, plane->normal );
 		plane->dist = plane4[3];
-		return;
+	} return;
 
 	default:
 		Com_Memset( plane, 0, sizeof(*plane) );
@@ -907,7 +903,7 @@ qbool R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 		return qfalse;		// bad portal, no portalentity
 	}
 
-	R_MirrorPoint (oldParms.or.origin, &surface, &camera, newParms.or.origin );
+	R_MirrorPoint( oldParms.or.origin, &surface, &camera, newParms.or.origin );
 
 	VectorSubtract( vec3_origin, camera.axis[0], newParms.portalPlane.normal );
 	newParms.portalPlane.dist = DotProduct( camera.origin, newParms.portalPlane.normal );
