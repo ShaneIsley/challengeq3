@@ -374,40 +374,29 @@ void GL_State( unsigned long stateBits )
 }
 
 
+// a player has predicted a teleport, but hasn't arrived yet
 
-/*
-================
-RB_Hyperspace
-
-A player has predicted a teleport, but hasn't arrived yet
-================
-*/
-static void RB_Hyperspace( void ) {
-	float		c;
-
-	if ( !backEnd.isHyperspace ) {
-		// do initialization shit
-	}
-
-	c = ( backEnd.refdef.time & 255 ) / 255.0f;
+static void RB_Hyperspace()
+{
+	float c = 0.25 + 0.5 * sin( M_PI * (backEnd.refdef.time & 0x01FF) / 0x0200 );
 	qglClearColor( c, c, c, 1 );
 	qglClear( GL_COLOR_BUFFER_BIT );
-
-	backEnd.isHyperspace = qtrue;
 }
 
 
-static void SetViewportAndScissor( void ) {
+static void SetViewportAndScissor()
+{
 	qglMatrixMode(GL_PROJECTION);
 	qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
 	qglMatrixMode(GL_MODELVIEW);
 
 	// set the window clipping
-	qglViewport( backEnd.viewParms.viewportX, backEnd.viewParms.viewportY, 
+	qglViewport( backEnd.viewParms.viewportX, backEnd.viewParms.viewportY,
 		backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
-	qglScissor( backEnd.viewParms.viewportX, backEnd.viewParms.viewportY, 
+	qglScissor( backEnd.viewParms.viewportX, backEnd.viewParms.viewportY,
 		backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
 }
+
 
 /*
 =================
@@ -462,10 +451,6 @@ void RB_BeginDrawingView (void) {
 	{
 		RB_Hyperspace();
 		return;
-	}
-	else
-	{
-		backEnd.isHyperspace = qfalse;
 	}
 
 	glState.faceCulling = -1;		// force face culling to set next time

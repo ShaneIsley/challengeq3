@@ -861,7 +861,6 @@ typedef struct {
 	viewParms_t	viewParms;
 	orientationr_t	or;
 	backEndCounters_t	pc;
-	qbool	isHyperspace;
 	trRefEntity_t	*currentEntity;
 	qbool	skyRenderedThisView;	// flag for drawing sun
 
