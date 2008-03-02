@@ -22,18 +22,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_local.h"
 
-int			r_firstSceneDrawSurf;
 
-int			r_numdlights;
-int			r_firstSceneDlight;
+static int r_firstSceneDrawSurf;
 
-int			r_numentities;
-int			r_firstSceneEntity;
+static int r_numdlights;
+static int r_firstSceneDlight;
 
-int			r_numpolys;
-int			r_firstScenePoly;
+static int r_numentities;
+static int r_firstSceneEntity;
 
-int			r_numpolyverts;
+static int r_numpolys;
+static int r_firstScenePoly;
+
+static int r_numpolyverts;
 
 
 /*
@@ -92,9 +93,9 @@ void R_AddPolygonSurfaces()
 	tr.currentEntityNum = ENTITYNUM_WORLD;
 	tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
-	srfPoly_t* poly = tr.refdef.polys;
+	const srfPoly_t* poly = tr.refdef.polys;
 	for (int i = 0; i < tr.refdef.numPolys; ++i, ++poly) {
-		R_AddDrawSurf( (surfaceType_t*)poly, R_GetShaderByHandle( poly->hShader ), poly->fogIndex, qfalse );
+		R_AddDrawSurf( (const surfaceType_t*)poly, R_GetShaderByHandle( poly->hShader ), poly->fogIndex, qfalse );
 	}
 }
 
@@ -181,15 +182,8 @@ void RE_AddRefEntityToScene( const refEntity_t* ent )
 }
 
 
-/*
-=====================
-RE_AddDynamicLightToScene
-
-=====================
-*/
-void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, float g, float b, int additive ) {
-	dlight_t	*dl;
-
+static void R_AddDynamicLightToScene( const vec3_t org, float intensity, float r, float g, float b, int additive )
+{
 	if ( !tr.registered ) {
 		return;
 	}
@@ -200,8 +194,8 @@ void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, floa
 		return;
 	}
 
-	dl = &backEndData[tr.smpFrame]->dlights[r_numdlights++];
-	VectorCopy (org, dl->origin);
+	dlight_t* dl = &backEndData[tr.smpFrame]->dlights[r_numdlights++];
+	VectorCopy( org, dl->origin );
 	dl->radius = intensity;
 	dl->color[0] = r;
 	dl->color[1] = g;
@@ -209,40 +203,23 @@ void RE_AddDynamicLightToScene( const vec3_t org, float intensity, float r, floa
 	dl->additive = additive;
 }
 
-/*
-=====================
-RE_AddLightToScene
-
-=====================
-*/
-void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
-	RE_AddDynamicLightToScene( org, intensity, r, g, b, qfalse );
+void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b )
+{
+	R_AddDynamicLightToScene( org, intensity, r, g, b, qfalse );
 }
 
-/*
-=====================
-RE_AddAdditiveLightToScene
-
-=====================
-*/
-void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
-	RE_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
+void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b )
+{
+	R_AddDynamicLightToScene( org, intensity, r, g, b, qtrue );
 }
 
-/*
-@@@@@@@@@@@@@@@@@@@@@
-RE_RenderScene
 
-Draw a 3D view into a part of the window, then return
-to 2D drawing.
+// draw a 3D view into a part of the window, then return to 2D drawing
+// rendering a scene may require multiple views to be rendered to handle mirrors
 
-Rendering a scene may require multiple views to be rendered
-to handle mirrors,
-@@@@@@@@@@@@@@@@@@@@@
-*/
-void RE_RenderScene( const refdef_t *fd ) {
+void RE_RenderScene( const refdef_t* fd )
+{
 	viewParms_t		parms;
-	int				startTime;
 
 	if ( !tr.registered ) {
 		return;
@@ -253,7 +230,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 		return;
 	}
 
-	startTime = ri.Milliseconds();
+	int startTime = ri.Milliseconds();
 
 	if (!tr.world && !( fd->rdflags & RDF_NOWORLDMODEL ) ) {
 		ri.Error (ERR_DROP, "R_RenderScene: NULL worldmodel");
