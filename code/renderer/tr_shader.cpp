@@ -1111,7 +1111,7 @@ static void ParseSkyParms( const char** text )
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
-			shader.sky.outerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
+			shader.sky.outerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
 			if ( !shader.sky.outerbox[i] ) {
 				shader.sky.outerbox[i] = tr.defaultImage;
 			}
@@ -1140,7 +1140,7 @@ static void ParseSkyParms( const char** text )
 	if ( strcmp( token, "-" ) ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
-			shader.sky.innerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_REPEAT );
+			shader.sky.innerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_REPEAT );
 			if ( !shader.sky.innerbox[i] ) {
 				shader.sky.innerbox[i] = tr.defaultImage;
 			}
@@ -1328,7 +1328,7 @@ static qbool ParseShader( const char** text )
 
 			token = COM_ParseExt( text, qfalse );
 			a = atof( token );
-			VectorScale( tr.sunLight, a, tr.sunLight);
+			VectorScale( tr.sunLight, a, tr.sunLight );
 
 			token = COM_ParseExt( text, qfalse );
 			a = atof( token );
@@ -1620,7 +1620,6 @@ FIXME: I think modulated add + modulated add collapses incorrectly
 static qbool CollapseMultitexture( void ) {
 	int abits, bbits;
 	int i;
-	textureBundle_t tmpBundle;
 
 	if ( !qglActiveTextureARB ) {
 		return qfalse;
@@ -1693,9 +1692,11 @@ static qbool CollapseMultitexture( void ) {
 
 
 	// make sure that lightmaps are in bundle 1 for 3dfx
+	// (we still do this even tho 3dfx is long since dead
+	// because it keeps vlight collapses etc simple)
 	if ( stages[0].bundle[0].isLightmap )
 	{
-		tmpBundle = stages[0].bundle[0];
+		textureBundle_t tmpBundle = stages[0].bundle[0];
 		stages[0].bundle[0] = stages[1].bundle[0];
 		stages[0].bundle[1] = tmpBundle;
 	}
@@ -1829,7 +1830,6 @@ static void SortNewShader()
 static shader_t* GeneratePermanentShader()
 {
 	int			i, b;
-	int			hash;
 
 	if ( tr.numShaders == MAX_SHADERS ) {
 		ri.Printf( PRINT_WARNING, "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
@@ -1869,19 +1869,20 @@ static shader_t* GeneratePermanentShader()
 
 	SortNewShader();
 
-	hash = Q_FileHash(newShader->name, FILE_HASH_SIZE);
+	int hash = Q_FileHash(newShader->name, FILE_HASH_SIZE);
 	newShader->next = hashTable[hash];
 	hashTable[hash] = newShader;
 
 	return newShader;
 }
 
+
 /*
 =================
 VertexLightingCollapse
 
-If vertex lighting is enabled, only render a single
-pass, trying to guess which is the correct one to best aproximate
+If vertex lighting is enabled, only render a single pass,
+trying to guess which is the correct one to best approximate
 what it is supposed to look like.
 =================
 */
@@ -2295,7 +2296,7 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 	}
 
 	// if not defined in the in-memory shader descriptions,
-	// look for a single TGA, BMP, or PCX
+	// look for a raw texture (saves needing shaders for trivial opaque surfs)
 	//
 	Q_strncpyz( fileName, name, sizeof( fileName ) );
 	COM_DefaultExtension( fileName, sizeof( fileName ), ".tga" );
@@ -2721,7 +2722,7 @@ void R_InitShaders( void )
 {
 	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
 
-	Com_Memset(hashTable, 0, sizeof(hashTable));
+	Com_Memset( hashTable, 0, sizeof(hashTable) );
 
 	CreateInternalShaders();
 

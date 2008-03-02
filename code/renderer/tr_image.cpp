@@ -1423,15 +1423,6 @@ static void R_LoadImage( const char* name, byte** pic, int* w, int* h, GLenum* f
 	LoadJPG( altname, pic, w, h );
 
 	return;
-/*
-	}else if ( !Q_stricmp(name+len-4, ".pcx") ) {
-		LoadPCX32( name, pic, width, height );
-	} else if ( !Q_stricmp( name+len-4, ".bmp" ) ) {
-		LoadBMP( name, pic, width, height );
-	} else if ( !Q_stricmp( name+len-4, ".jpg" ) ) {
-		LoadJPG( name, pic, width, height );
-	}
-*/
 }
 
 
