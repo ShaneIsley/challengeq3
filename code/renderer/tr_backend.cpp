@@ -79,34 +79,6 @@ void GL_SelectTexture( int unit )
 
 
 /*
-** GL_BindMultitexture
-*/
-void GL_BindMultitexture( image_t *image0, GLuint env0, image_t *image1, GLuint env1 ) {
-	int		texnum0, texnum1;
-
-	texnum0 = image0->texnum;
-	texnum1 = image1->texnum;
-
-	if ( r_nobind->integer && tr.dlightImage ) {		// performance evaluation option
-		texnum0 = texnum1 = tr.dlightImage->texnum;
-	}
-
-	if ( glState.currenttextures[1] != texnum1 ) {
-		GL_SelectTexture( 1 );
-		image1->frameUsed = tr.frameCount;
-		glState.currenttextures[1] = texnum1;
-		qglBindTexture( GL_TEXTURE_2D, texnum1 );
-	}
-	if ( glState.currenttextures[0] != texnum0 ) {
-		GL_SelectTexture( 0 );
-		image0->frameUsed = tr.frameCount;
-		glState.currenttextures[0] = texnum0;
-		qglBindTexture( GL_TEXTURE_2D, texnum0 );
-	}
-}
-
-
-/*
 ** GL_Cull
 */
 void GL_Cull( int cullType ) {
@@ -116,11 +88,11 @@ void GL_Cull( int cullType ) {
 
 	glState.faceCulling = cullType;
 
-	if ( cullType == CT_TWO_SIDED ) 
+	if ( cullType == CT_TWO_SIDED )
 	{
 		qglDisable( GL_CULL_FACE );
-	} 
-	else 
+	}
+	else
 	{
 		qglEnable( GL_CULL_FACE );
 
@@ -160,7 +132,6 @@ void GL_TexEnv( int env )
 	}
 
 	glState.texEnv[glState.currenttmu] = env;
-
 
 	switch ( env )
 	{
@@ -398,15 +369,11 @@ static void SetViewportAndScissor()
 }
 
 
-/*
-=================
-RB_BeginDrawingView
+// any mirrored or portaled views have already been drawn
+// so prepare to actually render the visible surfaces for this view
 
-Any mirrored or portaled views have already been drawn, so prepare
-to actually render the visible surfaces for this view
-=================
-*/
-void RB_BeginDrawingView (void) {
+static void RB_BeginDrawingView()
+{
 	int clearBits = 0;
 
 	// sync with gl if needed
@@ -439,6 +406,7 @@ void RB_BeginDrawingView (void) {
 	if ( r_fastsky->integer && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
 	{
 		clearBits |= GL_COLOR_BUFFER_BIT;	// FIXME: only if sky shaders have been used
+		// KHB  backEnd.skyRenderedThisView seems like the answer, neh?  :P
 #ifdef _DEBUG
 		qglClearColor( 0.8f, 0.7f, 0.4f, 1.0f );	// FIXME: get color of sky
 #else
