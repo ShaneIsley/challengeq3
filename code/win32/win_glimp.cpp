@@ -751,11 +751,9 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 			if ( MessageBox( NULL,
 						"It is highly unlikely that a correct\n"
 						"windowed display can be initialized with\n"
-						"the current desktop display depth.  Select\n"
-						"'OK' to try anyway.  Press 'Cancel' if you\n"
-						"have a 3Dfx Voodoo, Voodoo-2, or Voodoo Rush\n"
-						"3D accelerator installed, or if you otherwise\n"
-						"wish to quit.",
+						"the current desktop display depth.\n"
+						"Select 'OK' to try anyway.\n"
+						"Press 'Cancel' if you wish to quit.",
 						"Low Desktop Color Depth",
 						MB_OKCANCEL | MB_ICONEXCLAMATION ) != IDOK )
 			{
@@ -913,7 +911,6 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 		glConfig.displayFrequency = dm.dmDisplayFrequency;
 	}
 
-	// NOTE: this is overridden later on standalone 3Dfx drivers
 	glConfig.isFullscreen = cdsFullscreen;
 
 	GLW_AttemptFSAA();
@@ -1284,7 +1281,6 @@ void GLimp_Init( void )
 */
 void GLimp_Shutdown( void )
 {
-//	const char *strings[] = { "soft", "hard" };
 	const char *success[] = { "failed", "success" };
 	int retVal;
 
@@ -1295,14 +1291,12 @@ void GLimp_Shutdown( void )
 
 	ri.Printf( PRINT_ALL, "Shutting down OpenGL subsystem\n" );
 
-	// restore gamma.  We do this first because 3Dfx's extension needs a valid OGL subsystem
 	WG_RestoreGamma();
 
 	// set current context to NULL
 	if ( qwglMakeCurrent )
 	{
 		retVal = qwglMakeCurrent( NULL, NULL ) != 0;
-
 		ri.Printf( PRINT_ALL, "...wglMakeCurrent( NULL, NULL ): %s\n", success[retVal] );
 	}
 
