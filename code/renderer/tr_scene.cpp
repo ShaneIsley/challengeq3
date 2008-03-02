@@ -256,23 +256,18 @@ void RE_RenderScene( const refdef_t* fd )
 	// copy the areamask data over and note if it has changed, which
 	// will force a reset of the visible leafs even if the view hasn't moved
 	tr.refdef.areamaskModified = qfalse;
-	if ( ! (tr.refdef.rdflags & RDF_NOWORLDMODEL) ) {
-		int		areaDiff;
-		int		i;
-
+	if ( !(tr.refdef.rdflags & RDF_NOWORLDMODEL) ) {
 		// compare the area bits
-		areaDiff = 0;
-		for (i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++) {
-			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((int *)fd->areamask)[i];
-			((int *)tr.refdef.areamask)[i] = ((int *)fd->areamask)[i];
+		int areaDiff = 0;
+		for (int i = 0; i < MAX_MAP_AREA_BYTES/4; ++i) {
+			areaDiff |= ((int*)tr.refdef.areamask)[i] ^ ((const int*)fd->areamask)[i];
+			((int*)tr.refdef.areamask)[i] = ((const int*)fd->areamask)[i];
 		}
-
 		if ( areaDiff ) {
 			// a door just opened or something
 			tr.refdef.areamaskModified = qtrue;
 		}
 	}
-
 
 	// derived info
 
