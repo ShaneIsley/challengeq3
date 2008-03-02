@@ -36,8 +36,7 @@ static qbool R_CullTriSurf( const srfTriangles_t* cv )
 
 static qbool R_CullGrid( const srfGridMesh_t* cv )
 {
-	int 	boxCull;
-	int 	sphereCull;
+	int sphereCull;
 
 	if ( r_nocurves->integer ) {
 		return qtrue;
@@ -48,7 +47,6 @@ static qbool R_CullGrid( const srfGridMesh_t* cv )
 	} else {
 		sphereCull = R_CullPointAndRadius( cv->localOrigin, cv->meshRadius );
 	}
-	boxCull = CULL_OUT;
 
 	// check for trivial reject
 	if ( sphereCull == CULL_OUT )
@@ -61,7 +59,7 @@ static qbool R_CullGrid( const srfGridMesh_t* cv )
 	{
 		tr.pc.c_sphere_cull_patch_clip++;
 
-		boxCull = R_CullLocalBox( cv->meshBounds );
+		int boxCull = R_CullLocalBox( cv->meshBounds );
 
 		if ( boxCull == CULL_OUT )
 		{
@@ -389,7 +387,7 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 
 		}
 
-		if ( node->contents != -1 ) {
+		if ( node->contents != CONTENTS_NODE ) {
 			break;
 		}
 
@@ -409,7 +407,7 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 				if ( dlightBits & ( 1 << i ) ) {
 					dl = &tr.refdef.dlights[i];
 					dist = DotProduct( dl->origin, node->plane->normal ) - node->plane->dist;
-					
+
 					if ( dist > -dl->radius ) {
 						newDlights[0] |= ( 1 << i );
 					}
@@ -478,7 +476,7 @@ static mnode_t* R_PointInLeaf( const vec3_t p )
 	}
 
 	mnode_t* node = tr.world->nodes;
-	while (node->contents == -1) {
+	while (node->contents == CONTENTS_NODE) {
 		const cplane_t* plane = node->plane;
 		float d = DotProduct (p,plane->normal) - plane->dist;
 		if (d > 0) {

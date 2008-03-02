@@ -479,8 +479,8 @@ typedef struct {
 	orientationr_t	or;
 	orientationr_t	world;
 	vec3_t		pvsOrigin;			// may be different than or.origin for portals
-	qbool	isPortal;			// qtrue if this view is through a portal
-	qbool	isMirror;			// the portal is a mirror, invert the face culling
+	qbool		isPortal;			// true if this view is through a portal
+	qbool		isMirror;			// the portal is a mirror, invert the face culling
 	int			frameSceneNum;		// copied from tr.frameSceneNum
 	int			frameCount;			// copied from tr.frameCount
 	cplane_t	portalPlane;		// clip anything behind this if mirroring
@@ -709,11 +709,9 @@ typedef struct {
 	int			lightGridBounds[3];
 	byte		*lightGridData;
 
-
 	int			numClusters;
 	int			clusterBytes;
 	const byte	*vis;			// may be passed in by CM_LoadMap to save space
-
 	byte		*novis;			// clusterBytes of 0xff
 
 	char		*entityString;
@@ -996,8 +994,6 @@ extern cvar_t	*r_ignore;				// used for debugging anything
 extern cvar_t	*r_verbose;				// used for verbose debug spew
 extern cvar_t	*r_ignoreFastPath;		// allows us to ignore our Tess fast paths
 
-extern cvar_t	*r_znear;				// near Z clip plane
-
 extern cvar_t	*r_stencilbits;			// number of desired stencil bits
 extern cvar_t	*r_depthbits;			// number of desired depth bits
 extern cvar_t	*r_colorbits;			// number of desired color bits, only relevant for fullscreen
@@ -1104,8 +1100,8 @@ extern	cvar_t	*r_printShaders;
 
 //====================================================================
 
+void  R_NoiseInit();
 float R_NoiseGet4f( float x, float y, float z, float t );
-void  R_NoiseInit( void );
 
 void R_SwapBuffers( int );
 
@@ -1128,7 +1124,7 @@ int R_CullLocalBox( const vec3_t bounds[2] );
 int R_CullPointAndRadius( const vec3_t origin, float radius );
 int R_CullLocalPointAndRadius( const vec3_t origin, float radius );
 
-void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, orientationr_t *or );
+void R_RotateForEntity( const trRefEntity_t* ent, const viewParms_t* viewParms, orientationr_t* or );
 
 /*
 ** GL wrapper/helper functions

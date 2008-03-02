@@ -202,13 +202,8 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 }
 
 
-/*
-==========================
-myGlMultMatrix
-
-==========================
-*/
-void myGlMultMatrix( const float *a, const float *b, float *out ) {
+static void myGlMultMatrix( const float *a, const float *b, float *out )
+{
 	int		i, j;
 
 	for ( i = 0 ; i < 4 ; i++ ) {
@@ -222,6 +217,7 @@ void myGlMultMatrix( const float *a, const float *b, float *out ) {
 	}
 }
 
+
 /*
 =================
 R_RotateForEntity
@@ -231,8 +227,8 @@ Does NOT produce any GL calls
 Called by both the front end and the back end
 =================
 */
-void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
-					   orientationr_t *or ) {
+void R_RotateForEntity( const trRefEntity_t* ent, const viewParms_t* viewParms, orientationr_t* or )
+{
 	float	glMatrix[16];
 	vec3_t	delta;
 	float	axisLength;
@@ -378,7 +374,7 @@ static void R_SetupProjection()
 	//
 	// set up projection matrix
 	//
-	zNear	= r_znear->value;
+	zNear	= 4.0f;
 	zFar	= tr.viewParms.zFar;
 
 	ymax = zNear * tan( tr.refdef.fov_y * M_PI / 360.0f );
