@@ -1361,7 +1361,6 @@ SKIES
 
 void R_InitSkyTexCoords( float cloudLayerHeight );
 void RB_DrawSun( void );
-void RB_ClipSkyPolygons( shaderCommands_t *shader );
 
 /*
 ============================================================

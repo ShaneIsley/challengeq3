@@ -36,25 +36,26 @@ POLYGON TO BOX SIDE PROJECTION
 ===================================================================================
 */
 
-static vec3_t sky_clip[6] = 
+static const vec3_t sky_clip[6] =
 {
 	{1,1,0},
 	{1,-1,0},
 	{0,-1,1},
 	{0,1,1},
 	{1,0,1},
-	{-1,0,1} 
+	{-1,0,1}
 };
 
 static float	sky_mins[2][6], sky_maxs[2][6];
 static float	sky_min, sky_max;
+
 
 /*
 ================
 AddSkyPolygon
 ================
 */
-static void AddSkyPolygon (int nump, vec3_t vecs) 
+static void AddSkyPolygon (int nump, vec3_t vecs)
 {
 	int		i,j;
 	vec3_t	v, av;
@@ -147,9 +148,9 @@ static void AddSkyPolygon (int nump, vec3_t vecs)
 ClipSkyPolygon
 ================
 */
-static void ClipSkyPolygon (int nump, vec3_t vecs, int stage) 
+static void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 {
-	float	*norm;
+	const float* norm;
 	float	*v;
 	qbool	front, back;
 	float	d, e;
@@ -238,43 +239,30 @@ static void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 	ClipSkyPolygon (newc[1], newv[1][0], stage+1);
 }
 
-/*
-==============
-ClearSkyBox
-==============
-*/
-static void ClearSkyBox (void) {
-	int		i;
 
-	for (i=0 ; i<6 ; i++) {
+static void ClearSkyBox()
+{
+	for (int i = 0; i < 6; ++i) {
 		sky_mins[0][i] = sky_mins[1][i] = 9999;
 		sky_maxs[0][i] = sky_maxs[1][i] = -9999;
 	}
 }
 
-/*
-================
-RB_ClipSkyPolygons
-================
-*/
-void RB_ClipSkyPolygons( shaderCommands_t *input )
+
+static void RB_ClipSkyPolygons( const shaderCommands_t* input )
 {
-	vec3_t		p[5];	// need one extra point for clipping
-	int			i, j;
+	vec3_t p[4];	// need one extra point for clipping
 
 	ClearSkyBox();
 
-	for ( i = 0; i < input->numIndexes; i += 3 )
-	{
-		for (j = 0 ; j < 3 ; j++) 
-		{
-			VectorSubtract( input->xyz[input->indexes[i+j]],
-							backEnd.viewParms.or.origin, 
-							p[j] );
-		}
+	for ( int i = 0; i < input->numIndexes; i += 3 ) {
+		VectorSubtract( input->xyz[input->indexes[i+0]], backEnd.viewParms.or.origin, p[0] );
+		VectorSubtract( input->xyz[input->indexes[i+1]], backEnd.viewParms.or.origin, p[1] );
+		VectorSubtract( input->xyz[input->indexes[i+2]], backEnd.viewParms.or.origin, p[2] );
 		ClipSkyPolygon( 3, p[0], 0 );
 	}
 }
+
 
 /*
 ===================================================================================
@@ -405,30 +393,7 @@ static void DrawSkyBox( const shader_t* shader )
 		{
 			continue;
 		}
-/*
-		sky_mins_subd[0] = sky_mins[0][i] * HALF_SKY_SUBDIVISIONS;
-		sky_mins_subd[1] = sky_mins[1][i] * HALF_SKY_SUBDIVISIONS;
-		sky_maxs_subd[0] = sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS;
-		sky_maxs_subd[1] = sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS;
 
-		if ( sky_mins_subd[0] < -HALF_SKY_SUBDIVISIONS )
-			sky_mins_subd[0] = -HALF_SKY_SUBDIVISIONS;
-		else if ( sky_mins_subd[0] > HALF_SKY_SUBDIVISIONS )
-			sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS;
-		if ( sky_mins_subd[1] < -HALF_SKY_SUBDIVISIONS )
-			sky_mins_subd[1] = -HALF_SKY_SUBDIVISIONS;
-		else if ( sky_mins_subd[1] > HALF_SKY_SUBDIVISIONS )
-			sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS;
-
-		if ( sky_maxs_subd[0] < -HALF_SKY_SUBDIVISIONS )
-			sky_maxs_subd[0] = -HALF_SKY_SUBDIVISIONS;
-		else if ( sky_maxs_subd[0] > HALF_SKY_SUBDIVISIONS )
-			sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS;
-		if ( sky_maxs_subd[1] < -HALF_SKY_SUBDIVISIONS )
-			sky_maxs_subd[1] = -HALF_SKY_SUBDIVISIONS;
-		else if ( sky_maxs_subd[1] > HALF_SKY_SUBDIVISIONS )
-			sky_maxs_subd[1] = HALF_SKY_SUBDIVISIONS;
-*/
 		sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[0][i] );
 		sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[1][i] );
 		sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs[0][i] );
@@ -480,7 +445,7 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qbool addIn
 	// only add indexes for one pass, otherwise it would draw multiple times for each pass
 	if ( addIndexes ) {
 		for ( t = 0; t < tHeight-1; t++ )
-		{	
+		{
 			for ( s = 0; s < sWidth-1; s++ )
 			{
 				tess.indexes[tess.numIndexes] = vertexStart + s + t * ( sWidth );
@@ -770,26 +735,17 @@ void RB_DrawSun( void ) {
 }
 
 
+// all of the visible sky triangles are in tess
+// other things could be stuck in here, like birds in the sky, etc
 
-
-/*
-================
-RB_StageIteratorSky
-
-All of the visible sky triangles are in tess
-
-Other things could be stuck in here, like birds in the sky, etc
-================
-*/
 void RB_StageIteratorSky()
 {
 	if ( r_fastsky->integer ) {
 		return;
 	}
 
-	// go through all the polygons and project them onto
-	// the sky box to see which blocks on each side need
-	// to be drawn
+	// project all the polygons onto the sky box
+	// to see which blocks on each side need to be drawn
 	RB_ClipSkyPolygons( &tess );
 
 	// r_showsky will let all the sky blocks be drawn in
@@ -804,13 +760,10 @@ void RB_StageIteratorSky()
 	// draw the outer skybox
 	if ( tess.shader->sky.outerbox[0] && tess.shader->sky.outerbox[0] != tr.defaultImage ) {
 		qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
-		
-		qglPushMatrix ();
+		qglPushMatrix();
 		GL_State( 0 );
 		qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
-
 		DrawSkyBox( tess.shader );
-
 		qglPopMatrix();
 	}
 
@@ -819,9 +772,6 @@ void RB_StageIteratorSky()
 	R_BuildCloudData( &tess );
 	if (tess.numVertexes)
 		RB_StageIteratorGeneric();
-
-	// draw the inner skybox
-	// or not...  :P
 
 	// back to normal depth range
 	qglDepthRange( 0.0, 1.0 );
