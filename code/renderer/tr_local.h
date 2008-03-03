@@ -37,7 +37,7 @@ extern const float s_flipMatrix[16];
 
 #pragma pack(push, 1)
 typedef struct {
-	unsigned char 	id_length, colormap_type, image_type;
+	unsigned char	id_length, colormap_type, image_type;
 	unsigned short	colormap_index, colormap_length;
 	unsigned char	colormap_size;
 	unsigned short	x_origin, y_origin, width, height;
@@ -580,7 +580,6 @@ typedef struct srfGridMesh_s {
 	float			*heightLodError;
 	drawVert_t		verts[1];		// variable sized
 } srfGridMesh_t;
-
 
 
 #define	VERTEXSIZE	8

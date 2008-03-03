@@ -876,18 +876,10 @@ void RB_SurfaceMesh(md3Surface_t *surface) {
 }
 
 
-/*
-==============
-RB_SurfaceFace
-==============
-*/
-void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
+static void RB_SurfaceFace( const srfSurfaceFace_t* surf )
+{
 	int			i;
-	unsigned	*indices, *tessIndexes;
-	float		*v;
-	float		*normal;
 	int			ndx;
-	int			Bob;
 	int			numPoints;
 	int			dlightBits;
 
@@ -896,30 +888,29 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	dlightBits = surf->dlightBits[backEnd.smpFrame];
 	tess.dlightBits |= dlightBits;
 
-	indices = ( unsigned * ) ( ( ( char  * ) surf ) + surf->ofsIndices );
+	const unsigned* indices = (const unsigned*)( ((const char*)surf) + surf->ofsIndices );
+	glIndex_t* tessIndexes = tess.indexes + tess.numIndexes;
 
-	Bob = tess.numVertexes;
-	tessIndexes = tess.indexes + tess.numIndexes;
-	for ( i = surf->numIndices-1 ; i >= 0  ; i-- ) {
-		tessIndexes[i] = indices[i] + Bob;
+	ndx = tess.numVertexes;
+	for (i = surf->numIndices-1; i >= 0; --i) {
+		tessIndexes[i] = indices[i] + ndx;
 	}
 
 	tess.numIndexes += surf->numIndices;
-
-	v = surf->points[0];
 
 	ndx = tess.numVertexes;
 
 	numPoints = surf->numPoints;
 
 	if ( tess.shader->needsNormal ) {
-		normal = surf->plane.normal;
+		const float* normal = surf->plane.normal;
 		for ( i = 0, ndx = tess.numVertexes; i < numPoints; i++, ndx++ ) {
 			VectorCopy( normal, tess.normal[ndx] );
 		}
 	}
 
-	for ( i = 0, v = surf->points[0], ndx = tess.numVertexes; i < numPoints; i++, v += VERTEXSIZE, ndx++ ) {
+	const float* v = surf->points[0];
+	for ( i = 0, ndx = tess.numVertexes; i < numPoints; i++, v += VERTEXSIZE, ndx++ ) {
 		VectorCopy( v, tess.xyz[ndx]);
 		tess.texCoords[ndx][0][0] = v[3];
 		tess.texCoords[ndx][0][1] = v[4];
@@ -928,7 +919,6 @@ void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 		* ( unsigned int * ) &tess.vertexColors[ndx] = * ( unsigned int * ) &v[7];
 		tess.vertexDlightBits[ndx] = dlightBits;
 	}
-
 
 	tess.numVertexes += surf->numPoints;
 }
