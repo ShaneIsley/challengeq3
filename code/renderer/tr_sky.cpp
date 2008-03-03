@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define HALF_SKY_SUBDIVISIONS	(SKY_SUBDIVISIONS/2)
 
 static float s_cloudTexCoords[6][SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1][2];
-static float s_cloudTexP[6][SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
 
 /*
 ===================================================================================
@@ -576,8 +575,6 @@ void R_InitSkyTexCoords( float heightCloud )
 								 SQR( skyVec[1] ) * SQR( heightCloud ) + 
 								 2 * SQR( skyVec[2] ) * radiusWorld * heightCloud +
 								 SQR( skyVec[2] ) * SQR( heightCloud ) ) );
-
-				s_cloudTexP[i][t][s] = p;
 
 				// compute intersection point based on p
 				VectorScale( skyVec, p, v );
