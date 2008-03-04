@@ -271,92 +271,14 @@ CLOUD VERTEX GENERATION
 ===================================================================================
 */
 
-/*
-** MakeSkyVec
-**
-** Parms: s, t range from -1 to 1
-*/
-static void MakeSkyVec( float s, float t, int axis, float outSt[2], vec3_t outXYZ )
-{
-	// 1 = s, 2 = t, 3 = 2048
-	static int	st_to_vec[6][3] =
-	{
-		{3,-1,2},
-		{-3,1,2},
 
-		{1,3,2},
-		{-1,-3,2},
-
-		{-2,-1,3},		// 0 degrees yaw, look straight up
-		{2,-1,-3}		// look straight down
-	};
-
-	vec3_t		b;
-	int			j, k;
-	float	boxSize;
-
-	boxSize = backEnd.viewParms.zFar / 1.75;		// div sqrt(3)
-	b[0] = s*boxSize;
-	b[1] = t*boxSize;
-	b[2] = boxSize;
-
-	for (j=0 ; j<3 ; j++)
-	{
-		k = st_to_vec[axis][j];
-		if (k < 0)
-		{
-			outXYZ[j] = -b[-k - 1];
-		}
-		else
-		{
-			outXYZ[j] = b[k - 1];
-		}
-	}
-
-/* KHB  this comment is untrue
-	it's logically incorrect EXCEPT for the case of GL_CLAMP rather than TO_EDGE
-	and if that IS the case you're screwed anyway, because the code is wrong
-	(as evidenced by idq3) because s == -1 => (-1+1)*0.5 == 0 so you still have seams
-*/
-	// avoid bilerp seam
-	s = (s+1)*0.5;
-	t = (t+1)*0.5;
-
-	if (s < sky_min)
-	{
-		s = sky_min;
-	}
-	else if (s > sky_max)
-	{
-		s = sky_max;
-	}
-
-	if (t < sky_min)
-	{
-		t = sky_min;
-	}
-	else if (t > sky_max)
-	{
-		t = sky_max;
-	}
-
-	t = 1.0 - t;
-
-	if ( outSt )
-	{
-		outSt[0] = s;
-		outSt[1] = t;
-	}
-}
+static vec3_t s_skyPoints[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
+static vec2_t s_skyTexCoords[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
 
 
-static vec3_t	s_skyPoints[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
-static float	s_skyTexCoords[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1][2];
+// s, t range from -1 to 1
 
-
-// parms: s, t range from -1 to 1
-
-static void MakeSkyPoint( float s, float t, int axis, vec3_t out )
+static void MakeSkyVec( float s, float t, int axis, vec2_t st, vec3_t xyz )
 {
 	// 1 = s, 2 = t, 3 = zfar
 	static const int st_to_vec[6][3] =
@@ -379,7 +301,13 @@ static void MakeSkyPoint( float s, float t, int axis, vec3_t out )
 
 	for (int i = 0; i < 3; ++i) {
 		int k = st_to_vec[axis][i];
-		out[i] = (k < 0) ? -b[-k - 1] : b[k - 1];
+		xyz[i] = (k < 0) ? -b[-k - 1] : b[k - 1];
+	}
+
+	// convert our -1:1 range (and inverted t) into GL TCs
+	if ( st ) {
+		st[0] = Com_Clamp( sky_min, sky_max, (s+1) * 0.5 );
+		st[1] = 1.0 - Com_Clamp( sky_min, sky_max, (t+1) * 0.5 );
 	}
 }
 
@@ -595,28 +523,21 @@ void R_InitSkyTexCoords( float heightCloud )
 		{
 			for ( s = 0; s <= SKY_SUBDIVISIONS; s++ )
 			{
-				/*
 				// compute vector from view origin to sky side integral point
-				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							i, 
-							NULL,
-							skyVec );
-				*/
-				MakeSkyPoint(
+				MakeSkyVec(
 						(float)(s - HALF_SKY_SUBDIVISIONS) / HALF_SKY_SUBDIVISIONS,
 						(float)(t - HALF_SKY_SUBDIVISIONS) / HALF_SKY_SUBDIVISIONS,
-						i, skyVec
+						i, NULL, skyVec
 				);
 
 				// compute parametric value 'p' that intersects with cloud layer
 				p = ( 1.0f / ( 2 * DotProduct( skyVec, skyVec ) ) ) *
-					( -2 * skyVec[2] * radiusWorld + 
-					   2 * sqrt( SQR( skyVec[2] ) * SQR( radiusWorld ) + 
-					             2 * SQR( skyVec[0] ) * radiusWorld * heightCloud +
-								 SQR( skyVec[0] ) * SQR( heightCloud ) + 
+					( -2 * skyVec[2] * radiusWorld +
+					   2 * sqrt( SQR( skyVec[2] ) * SQR( radiusWorld ) +
+								 2 * SQR( skyVec[0] ) * radiusWorld * heightCloud +
+								 SQR( skyVec[0] ) * SQR( heightCloud ) +
 								 2 * SQR( skyVec[1] ) * radiusWorld * heightCloud +
-								 SQR( skyVec[1] ) * SQR( heightCloud ) + 
+								 SQR( skyVec[1] ) * SQR( heightCloud ) +
 								 2 * SQR( skyVec[2] ) * radiusWorld * heightCloud +
 								 SQR( skyVec[2] ) * SQR( heightCloud ) ) );
 
