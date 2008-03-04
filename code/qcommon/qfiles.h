@@ -513,8 +513,6 @@ typedef struct {
 	byte		color[4];
 } drawVert_t;
 
-#define drawVert_t_cleared(x) drawVert_t (x) = {{0, 0, 0}, {0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 0, 0}}
-
 typedef enum {
 	MST_BAD,
 	MST_PLANAR,

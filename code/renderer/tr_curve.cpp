@@ -357,6 +357,8 @@ void R_FreeSurfaceGridMesh( srfGridMesh_t *grid ) {
 R_SubdividePatchToGrid
 =================
 */
+#define drawVert_t_cleared(x) drawVert_t (x) = {{0, 0, 0}, {0, 0}, {0, 0}, {0, 0, 0}, {0, 0, 0, 0}}
+
 srfGridMesh_t *R_SubdividePatchToGrid( int width, int height,
 								drawVert_t points[MAX_PATCH_SIZE*MAX_PATCH_SIZE] ) {
 	int			i, j, k, l;
