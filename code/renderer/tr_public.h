@@ -63,7 +63,7 @@ typedef struct {
 	// Nothing is drawn until R_RenderScene is called.
 	void	(*ClearScene)();
 	void	(*AddRefEntityToScene)( const refEntity_t *re );
-	void	(*AddPolyToScene)( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+	void	(*AddPolyToScene)( qhandle_t hShader, int numVerts, const polyVert_t *verts, int num );
 	qbool	(*LightForPoint)( const vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 	void	(*AddLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
 	void	(*AddAdditiveLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
@@ -71,7 +71,7 @@ typedef struct {
 
 	void	(*SetColor)( const float *rgba );	// NULL = 1,1,1,1
 	void	(*DrawStretchPic) ( float x, float y, float w, float h,
-		float s1, float t1, float s2, float t2, qhandle_t hShader );
+					float s1, float t1, float s2, float t2, qhandle_t hShader );
 
 	// Draw images for cinematic rendering, pass as 32 bit rgba
 	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
@@ -84,17 +84,14 @@ typedef struct {
 
 
 	int		(*MarkFragments)( int numPoints, const vec3_t *points, const vec3_t projection,
-				   int maxPoints, vec3_t pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
+					int maxPoints, vec3_t pointBuffer, int maxFragments, markFragment_t *fragmentBuffer );
 
-	int		(*LerpTag)( orientation_t *tag,  qhandle_t model, int startFrame, int endFrame, 
-					 float frac, const char *tagName );
+	int		(*LerpTag)( orientation_t *tag,  qhandle_t model, int startFrame, int endFrame,
+					float frac, const char *tagName );
 	void	(*ModelBounds)( qhandle_t model, vec3_t mins, vec3_t maxs );
 
-#ifdef __USEA3D
-	void    (*A3D_RenderGeometry) (void *pVoidA3D, void *pVoidGeom, void *pVoidMat, void *pVoidGeomStatus);
-#endif
 	qbool (*RegisterFont)( const char* fontName, int pointSize, fontInfo_t* font );
-	qbool (*GetEntityToken)( char *buffer, int size );
+	qbool (*GetEntityToken)( char* buffer, int size );
 	qbool (*inPVS)( const vec3_t p1, const vec3_t p2 );
 
 	void (*TakeVideoFrame)( int h, int w, byte* captureBuffer, byte *encodeBuffer, qbool motionJpeg );
@@ -134,8 +131,8 @@ typedef struct {
 	void	(*Cmd_AddCommand)( const char *name, void(*cmd)(void) );
 	void	(*Cmd_RemoveCommand)( const char *name );
 
-	int		(*Cmd_Argc) (void);
-	const char* (*Cmd_Argv) (int i);
+	int		(*Cmd_Argc)();
+	const char* (*Cmd_Argv)(int i);
 
 	// visualization for debugging collision detection
 	void	(*CM_DrawDebugSurface)( void (*drawPoly)(int color, int numPoints, const float* points) );
@@ -144,14 +141,14 @@ typedef struct {
 	// NULL can be passed for buf to just determine existance
 	int		(*FS_ReadFile)( const char *name, void **buf );
 	void	(*FS_FreeFile)( void *buf );
-	char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
+	char**	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
 	void	(*FS_FreeFileList)( char **filelist );
 	void	(*FS_WriteFile)( const char *qpath, const void *buffer, int size );
 
 	// cinematic stuff
 	void	(*CIN_UploadCinematic)(int handle);
-	int		(*CIN_PlayCinematic)( const char *arg0, int xpos, int ypos, int width, int height, int bits);
-	e_status (*CIN_RunCinematic) (int handle);
+	int		(*CIN_PlayCinematic)( const char *arg0, int xpos, int ypos, int width, int height, int bits );
+	e_status (*CIN_RunCinematic)(int handle);
 
 	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
 } refimport_t;
