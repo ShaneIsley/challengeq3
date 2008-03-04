@@ -382,10 +382,6 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qbool addIn
 {
 	int s, t;
 	int vertexStart = tess.numVertexes;
-	int tHeight, sWidth;
-
-	tHeight = maxs[1] - mins[1] + 1;
-	sWidth = maxs[0] - mins[0] + 1;
 
 	for ( t = mins[1]+HALF_SKY_SUBDIVISIONS; t <= maxs[1]+HALF_SKY_SUBDIVISIONS; t++ )
 	{
@@ -405,25 +401,29 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qbool addIn
 	}
 
 	// only add indexes for one pass, otherwise it would draw multiple times for each pass
-	if ( addIndexes ) {
-		for ( t = 0; t < tHeight-1; t++ )
-		{
-			for ( s = 0; s < sWidth-1; s++ )
-			{
-				tess.indexes[tess.numIndexes] = vertexStart + s + t * ( sWidth );
-				tess.numIndexes++;
-				tess.indexes[tess.numIndexes] = vertexStart + s + ( t + 1 ) * ( sWidth );
-				tess.numIndexes++;
-				tess.indexes[tess.numIndexes] = vertexStart + s + 1 + t * ( sWidth );
-				tess.numIndexes++;
+	if ( !addIndexes )
+		return;
 
-				tess.indexes[tess.numIndexes] = vertexStart + s + ( t + 1 ) * ( sWidth );
-				tess.numIndexes++;
-				tess.indexes[tess.numIndexes] = vertexStart + s + 1 + ( t + 1 ) * ( sWidth );
-				tess.numIndexes++;
-				tess.indexes[tess.numIndexes] = vertexStart + s + 1 + t * ( sWidth );
-				tess.numIndexes++;
-			}
+	int tHeight = maxs[1] - mins[1] + 1;
+	int sWidth = maxs[0] - mins[0] + 1;
+
+	for ( t = 0; t < tHeight-1; t++ )
+	{
+		for ( s = 0; s < sWidth-1; s++ )
+		{
+			tess.indexes[tess.numIndexes] = vertexStart + s + t * ( sWidth );
+			tess.numIndexes++;
+			tess.indexes[tess.numIndexes] = vertexStart + s + ( t + 1 ) * ( sWidth );
+			tess.numIndexes++;
+			tess.indexes[tess.numIndexes] = vertexStart + s + 1 + t * ( sWidth );
+			tess.numIndexes++;
+
+			tess.indexes[tess.numIndexes] = vertexStart + s + ( t + 1 ) * ( sWidth );
+			tess.numIndexes++;
+			tess.indexes[tess.numIndexes] = vertexStart + s + 1 + ( t + 1 ) * ( sWidth );
+			tess.numIndexes++;
+			tess.indexes[tess.numIndexes] = vertexStart + s + 1 + t * ( sWidth );
+			tess.numIndexes++;
 		}
 	}
 }
@@ -431,7 +431,7 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qbool addIn
 
 static void FillCloudBox( const shader_t* shader, int stage )
 {
-	// skybox surfs are ordered RBLFUD, so don't draw clouds on the last one
+	// skybox surfs are ordered RLBFUD, so don't draw clouds on the last one
 
 	for (int i = 0; i < 5; ++i)
 	{
@@ -439,7 +439,7 @@ static void FillCloudBox( const shader_t* shader, int stage )
 		int sky_mins_subd[2], sky_maxs_subd[2];
 
 		if ( ( sky_mins_st[i][0] >= sky_maxs_st[i][0] ) || ( sky_mins_st[i][1] >= sky_maxs_st[i][1] ) ) {
-			ri.Printf( PRINT_ALL, "clipped cloudside %i\n", i );
+			//ri.Printf( PRINT_ALL, "clipped cloudside %i\n", i );
 			continue;
 		}
 
