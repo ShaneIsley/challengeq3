@@ -1097,7 +1097,7 @@ static void ParseDeform( const char** text )
 
 static void ParseSkyParms( const char** text )
 {
-	static const char* suf[6] = {"rt", "bk", "lf", "ft", "up", "dn"};
+	static const char* suf[6] = { "rt", "lf", "bk", "ft", "up", "dn" };
 	const char* token;
 	char		pathname[MAX_QPATH];
 	int			i;
@@ -1109,7 +1109,7 @@ static void ParseSkyParms( const char** text )
 		return;
 	}
 	if ( strcmp( token, "-" ) ) {
-		for (i=0 ; i<6 ; i++) {
+		for (i = 0; i < 6; ++i) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 			shader.sky.outerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
 			if ( !shader.sky.outerbox[i] ) {
@@ -1138,7 +1138,7 @@ static void ParseSkyParms( const char** text )
 		return;
 	}
 	if ( strcmp( token, "-" ) ) {
-		for (i=0 ; i<6 ; i++) {
+		for (i = 0; i < 6; ++i) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 			shader.sky.innerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_REPEAT );
 			if ( !shader.sky.innerbox[i] ) {
