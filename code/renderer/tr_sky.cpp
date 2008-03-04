@@ -313,9 +313,15 @@ static void MakeSkyVec( float s, float t, int axis, float outSt[2], vec3_t outXY
 		}
 	}
 
+/* KHB  this comment is untrue
+	it's logically incorrect EXCEPT for the case of GL_CLAMP rather than TO_EDGE
+	and if that IS the case you're screwed anyway, because the code is wrong
+	(as evidenced by idq3) because s == -1 => (-1+1)*0.5 == 0 so you still have seams
+*/
 	// avoid bilerp seam
 	s = (s+1)*0.5;
 	t = (t+1)*0.5;
+
 	if (s < sky_min)
 	{
 		s = sky_min;
@@ -336,7 +342,6 @@ static void MakeSkyVec( float s, float t, int axis, float outSt[2], vec3_t outXY
 
 	t = 1.0 - t;
 
-
 	if ( outSt )
 	{
 		outSt[0] = s;
@@ -344,9 +349,51 @@ static void MakeSkyVec( float s, float t, int axis, float outSt[2], vec3_t outXY
 	}
 }
 
-static int	sky_texorder[6] = {0,2,1,3,4,5};
+
 static vec3_t	s_skyPoints[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1];
 static float	s_skyTexCoords[SKY_SUBDIVISIONS+1][SKY_SUBDIVISIONS+1][2];
+
+
+// parms: s, t range from -1 to 1
+
+static void MakeSkyPoint( float s, float t, int axis, vec3_t out )
+{
+	// 1 = s, 2 = t, 3 = zfar
+	static const int st_to_vec[6][3] =
+	{
+		{  3, -1,  2 },
+		{ -3,  1,  2 },
+
+		{  1,  3,  2 },
+		{ -1, -3,  2 },
+
+		{ -2, -1,  3 },		// 0 degrees yaw, look straight up
+		{  2, -1, -3 }		// look straight down
+	};
+
+	vec3_t b;
+	float boxSize = backEnd.viewParms.zFar / 1.75;		// div sqrt(3)
+	b[0] = boxSize * s;
+	b[1] = boxSize * t;
+	b[2] = boxSize;
+
+	for (int i = 0; i < 3; ++i) {
+		int k = st_to_vec[axis][i];
+		out[i] = (k < 0) ? -b[-k - 1] : b[k - 1];
+	}
+}
+
+
+static void CalcSkyBounds()
+{
+	for (int i = 0; i < 6; ++i) {
+		sky_mins[0][i] = floor( sky_mins[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_mins[1][i] = floor( sky_mins[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_maxs[0][i] =  ceil( sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_maxs[1][i] =  ceil( sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+	}
+}
+
 
 static void DrawSkySide( const image_t* image, const int mins[2], const int maxs[2] )
 {
@@ -371,8 +418,11 @@ static void DrawSkySide( const image_t* image, const int mins[2], const int maxs
 	}
 }
 
+
 static void DrawSkyBox( const shader_t* shader )
 {
+	static const int sky_texorder[6] = { 0,2,1,3,4,5 }; // RLBFUD rather than RBLFUD
+
 	sky_min = 0;
 	sky_max = 1;
 
@@ -382,14 +432,7 @@ static void DrawSkyBox( const shader_t* shader )
 	{
 		int sky_mins_subd[2], sky_maxs_subd[2];
 
-		sky_mins[0][i] = floor( sky_mins[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_mins[1][i] = floor( sky_mins[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[0][i] = ceil( sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[1][i] = ceil( sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-
-		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) ||
-			 ( sky_mins[1][i] >= sky_maxs[1][i] ) )
-		{
+		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) || ( sky_mins[1][i] >= sky_maxs[1][i] ) ) {
 			continue;
 		}
 
@@ -472,17 +515,11 @@ static void FillCloudBox( const shader_t* shader, int stage )
 
 	for (int i = 0; i < 5; ++i)
 	{
-		int sky_mins_subd[2], sky_maxs_subd[2];
 		int s, t;
+		int sky_mins_subd[2], sky_maxs_subd[2];
 
-		sky_mins[0][i] = floor( sky_mins[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_mins[1][i] = floor( sky_mins[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[0][i] = ceil( sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[1][i] = ceil( sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-
-		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) ||
-			 ( sky_mins[1][i] >= sky_maxs[1][i] ) )
-		{
+		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) || ( sky_mins[1][i] >= sky_maxs[1][i] ) ) {
+			ri.Printf( PRINT_ALL, "clipped cloudside %i\n", i );
 			continue;
 		}
 
@@ -558,12 +595,19 @@ void R_InitSkyTexCoords( float heightCloud )
 		{
 			for ( s = 0; s <= SKY_SUBDIVISIONS; s++ )
 			{
+				/*
 				// compute vector from view origin to sky side integral point
 				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							i, 
 							NULL,
 							skyVec );
+				*/
+				MakeSkyPoint(
+						(float)(s - HALF_SKY_SUBDIVISIONS) / HALF_SKY_SUBDIVISIONS,
+						(float)(t - HALF_SKY_SUBDIVISIONS) / HALF_SKY_SUBDIVISIONS,
+						i, skyVec
+				);
 
 				// compute parametric value 'p' that intersects with cloud layer
 				p = ( 1.0f / ( 2 * DotProduct( skyVec, skyVec ) ) ) *
@@ -698,6 +742,8 @@ void RB_StageIteratorSky()
 	// project all the polygons onto the sky box
 	// to see which blocks on each side need to be drawn
 	RB_ClipSkyPolygons( &tess );
+
+	CalcSkyBounds();
 
 	// r_showsky will let all the sky blocks be drawn in
 	// front of everything to allow developers to see how
