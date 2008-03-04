@@ -45,7 +45,7 @@ static const vec3_t sky_clip[6] =
 	{-1,0,1}
 };
 
-static float	sky_mins[2][6], sky_maxs[2][6];
+static vec2_t	sky_mins_st[6], sky_maxs_st[6];
 static float	sky_min, sky_max;
 
 
@@ -129,14 +129,14 @@ static void AddSkyPolygon (int nump, vec3_t vecs)
 		else
 			t = vecs[j-1] / dv;
 
-		if (s < sky_mins[0][axis])
-			sky_mins[0][axis] = s;
-		if (t < sky_mins[1][axis])
-			sky_mins[1][axis] = t;
-		if (s > sky_maxs[0][axis])
-			sky_maxs[0][axis] = s;
-		if (t > sky_maxs[1][axis])
-			sky_maxs[1][axis] = t;
+		if (sky_mins_st[axis][0] > s)
+			sky_mins_st[axis][0] = s;
+		if (sky_mins_st[axis][1] > t)
+			sky_mins_st[axis][1] = t;
+		if (sky_maxs_st[axis][0] < s)
+			sky_maxs_st[axis][0] = s;
+		if (sky_maxs_st[axis][1] < t)
+			sky_maxs_st[axis][1] = t;
 	}
 }
 
@@ -242,8 +242,8 @@ static void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 static void ClearSkyBox()
 {
 	for (int i = 0; i < 6; ++i) {
-		sky_mins[0][i] = sky_mins[1][i] = 9999;
-		sky_maxs[0][i] = sky_maxs[1][i] = -9999;
+		sky_mins_st[i][0] = sky_mins_st[i][1] = 9999;
+		sky_maxs_st[i][0] = sky_maxs_st[i][1] = -9999;
 	}
 }
 
@@ -315,10 +315,10 @@ static void MakeSkyVec( float s, float t, int axis, vec2_t st, vec3_t xyz )
 static void CalcSkyBounds()
 {
 	for (int i = 0; i < 6; ++i) {
-		sky_mins[0][i] = floor( sky_mins[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_mins[1][i] = floor( sky_mins[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[0][i] =  ceil( sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
-		sky_maxs[1][i] =  ceil( sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_mins_st[i][0] = floor( sky_mins_st[i][0] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_mins_st[i][1] = floor( sky_mins_st[i][1] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_maxs_st[i][0] =  ceil( sky_maxs_st[i][0] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
+		sky_maxs_st[i][1] =  ceil( sky_maxs_st[i][1] * HALF_SKY_SUBDIVISIONS ) / HALF_SKY_SUBDIVISIONS;
 	}
 }
 
@@ -360,14 +360,14 @@ static void DrawSkyBox( const shader_t* shader )
 	{
 		int sky_mins_subd[2], sky_maxs_subd[2];
 
-		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) || ( sky_mins[1][i] >= sky_maxs[1][i] ) ) {
+		if ( ( sky_mins_st[i][0] >= sky_maxs_st[i][0] ) || ( sky_mins_st[i][1] >= sky_maxs_st[i][1] ) ) {
 			continue;
 		}
 
-		sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[0][i] );
-		sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[1][i] );
-		sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs[0][i] );
-		sky_maxs_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs[1][i] );
+		sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins_st[i][0] );
+		sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins_st[i][1] );
+		sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs_st[i][0] );
+		sky_maxs_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs_st[i][1] );
 
 		//
 		// iterate through the subdivisions
@@ -446,15 +446,15 @@ static void FillCloudBox( const shader_t* shader, int stage )
 		int s, t;
 		int sky_mins_subd[2], sky_maxs_subd[2];
 
-		if ( ( sky_mins[0][i] >= sky_maxs[0][i] ) || ( sky_mins[1][i] >= sky_maxs[1][i] ) ) {
+		if ( ( sky_mins_st[i][0] >= sky_maxs_st[i][0] ) || ( sky_mins_st[i][1] >= sky_maxs_st[i][1] ) ) {
 			ri.Printf( PRINT_ALL, "clipped cloudside %i\n", i );
 			continue;
 		}
 
-		sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[0][i] );
-		sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins[1][i] );
-		sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs[0][i] );
-		sky_maxs_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs[1][i] );
+		sky_mins_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins_st[i][0] );
+		sky_mins_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_mins_st[i][1] );
+		sky_maxs_subd[0] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs_st[i][0] );
+		sky_maxs_subd[1] = HALF_SKY_SUBDIVISIONS * Com_Clamp( -1, 1, sky_maxs_st[i][1] );
 
 		//
 		// iterate through the subdivisions
@@ -463,9 +463,9 @@ static void FillCloudBox( const shader_t* shader, int stage )
 		{
 			for ( s = sky_mins_subd[0]+HALF_SKY_SUBDIVISIONS; s <= sky_maxs_subd[0]+HALF_SKY_SUBDIVISIONS; s++ )
 			{
-				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							i, 
+				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS,
+							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS,
+							i,
 							NULL,
 							s_skyPoints[t][s] );
 
@@ -503,7 +503,6 @@ static void R_BuildCloudData( shaderCommands_t* input )
 ** R_InitSkyTexCoords
 ** Called when a sky shader is parsed
 */
-#define SQR( a ) ((a)*(a))
 void R_InitSkyTexCoords( float heightCloud )
 {
 	int i, s, t;
@@ -533,13 +532,13 @@ void R_InitSkyTexCoords( float heightCloud )
 				// compute parametric value 'p' that intersects with cloud layer
 				p = ( 1.0f / ( 2 * DotProduct( skyVec, skyVec ) ) ) *
 					( -2 * skyVec[2] * radiusWorld +
-					   2 * sqrt( SQR( skyVec[2] ) * SQR( radiusWorld ) +
-								 2 * SQR( skyVec[0] ) * radiusWorld * heightCloud +
-								 SQR( skyVec[0] ) * SQR( heightCloud ) +
-								 2 * SQR( skyVec[1] ) * radiusWorld * heightCloud +
-								 SQR( skyVec[1] ) * SQR( heightCloud ) +
-								 2 * SQR( skyVec[2] ) * radiusWorld * heightCloud +
-								 SQR( skyVec[2] ) * SQR( heightCloud ) ) );
+					   2 * sqrt( Square( skyVec[2] ) * Square( radiusWorld ) +
+								 2 * Square( skyVec[0] ) * radiusWorld * heightCloud +
+								 Square( skyVec[0] ) * Square( heightCloud ) +
+								 2 * Square( skyVec[1] ) * radiusWorld * heightCloud +
+								 Square( skyVec[1] ) * Square( heightCloud ) +
+								 2 * Square( skyVec[2] ) * radiusWorld * heightCloud +
+								 Square( skyVec[2] ) * Square( heightCloud ) ) );
 
 				// compute intersection point based on p
 				VectorScale( skyVec, p, v );
