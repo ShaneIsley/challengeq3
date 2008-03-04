@@ -510,7 +510,6 @@ typedef enum {
 	SF_TRIANGLES,
 	SF_POLY,
 	SF_MD3,
-	SF_MD4,
 #ifdef RAVENMD4
 	SF_MDR,
 #endif
@@ -723,7 +722,6 @@ typedef enum {
 	MOD_BAD,
 	MOD_BRUSH,
 	MOD_MESH,
-	MOD_MD4,
 #ifdef RAVENMD4
 	MOD_MDR
 #endif
@@ -737,9 +735,10 @@ typedef struct model_s {
 	int			dataSize;			// just for listing purposes
 	bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
+#ifdef RAVENMD4
 	md4Header_t* md4;				// only if type == (MOD_MD4 | MOD_MDR)
-
-	int			 numLods;
+#endif
+	int			numLods;
 } model_t;
 
 
@@ -747,11 +746,9 @@ typedef struct model_s {
 
 void R_ModelInit();
 const model_t* R_GetModelByHandle( qhandle_t hModel );
-int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame, 
-					 float frac, const char *tagName );
-void		R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs );
-
-void		R_Modellist_f (void);
+int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame, float frac, const char *tagName );
+void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs );
+void R_Modellist_f( void );
 
 
 ///////////////////////////////////////////////////////////////
@@ -1436,9 +1433,6 @@ ANIMATED MODELS
 =============================================================
 */
 
-// void R_MakeAnimModel( model_t *model );      haven't seen this one really, so not needed I guess.
-void R_AddAnimSurfaces( trRefEntity_t *ent );
-void RB_SurfaceAnim( md4Surface_t *surfType );
 #ifdef RAVENMD4
 void R_MDRAddAnimSurfaces( trRefEntity_t *ent );
 void RB_MDRSurfaceAnim( md4Surface_t *surface );

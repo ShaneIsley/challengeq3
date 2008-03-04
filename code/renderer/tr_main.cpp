@@ -1079,9 +1079,6 @@ static void R_AddEntitySurfaces()
 				case MOD_MESH:
 					R_AddMD3Surfaces( ent );
 					break;
-				case MOD_MD4:
-					R_AddAnimSurfaces( ent );
-					break;
 #ifdef RAVENMD4
 				case MOD_MDR:
 					R_MDRAddAnimSurfaces( ent );

@@ -1204,7 +1204,6 @@ void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( const void* ) = {
 	(void(*)( const void* ))RB_SurfaceTriangles,	// SF_TRIANGLES
 	(void(*)( const void* ))RB_SurfacePolychain,	// SF_POLY
 	(void(*)( const void* ))RB_SurfaceMesh,			// SF_MD3
-	(void(*)( const void* ))RB_SurfaceAnim,			// SF_MD4
 #ifdef RAVENMD4
 	(void(*)( const void* ))RB_MDRSurfaceAnim,		// SF_MDR
 #endif

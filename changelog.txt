@@ -17,6 +17,8 @@ r_noportals is not a cheat var
 
 hyperspace is a bit less annoying
 
+purged the unused (never finished) idMD4 model code
+
 
 18 Feb 08 - 1.41
 
