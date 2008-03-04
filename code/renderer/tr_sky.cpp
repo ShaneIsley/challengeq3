@@ -35,18 +35,8 @@ POLYGON TO BOX SIDE PROJECTION
 ===================================================================================
 */
 
-static const vec3_t sky_clip[6] =
-{
-	{1,1,0},
-	{1,-1,0},
-	{0,-1,1},
-	{0,1,1},
-	{1,0,1},
-	{-1,0,1}
-};
 
-static vec2_t	sky_mins_st[6], sky_maxs_st[6];
-static float	sky_min, sky_max;
+static vec2_t sky_mins_st[6], sky_maxs_st[6];
 
 
 /*
@@ -142,11 +132,17 @@ static void AddSkyPolygon (int nump, vec3_t vecs)
 
 #define	ON_EPSILON		0.1f			// point on plane side epsilon
 #define	MAX_CLIP_VERTS	64
-/*
-================
-ClipSkyPolygon
-================
-*/
+
+static const vec3_t sky_clip[6] =
+{
+	{  1,  1,  0 }, // R
+	{  1, -1,  0 }, // L
+	{  0, -1,  1 }, // B
+	{  0,  1,  1 }, // F
+	{  1,  0,  1 }, // U
+	{ -1,  0,  1 }  // D
+};
+
 static void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 {
 	const float* norm;
@@ -306,8 +302,8 @@ static void MakeSkyVec( float s, float t, int axis, vec2_t st, vec3_t xyz )
 
 	// convert our -1:1 range (and inverted t) into GL TCs
 	if ( st ) {
-		st[0] = Com_Clamp( sky_min, sky_max, (s+1) * 0.5 );
-		st[1] = 1.0 - Com_Clamp( sky_min, sky_max, (t+1) * 0.5 );
+		st[0] = Com_Clamp( 0, 1, (s+1) * 0.5 );
+		st[1] = 1.0 - Com_Clamp( 0, 1, (t+1) * 0.5 );
 	}
 }
 
@@ -349,12 +345,7 @@ static void DrawSkySide( const image_t* image, const int mins[2], const int maxs
 
 static void DrawSkyBox( const shader_t* shader )
 {
-	static const int sky_texorder[6] = { 0,2,1,3,4,5 }; // RLBFUD rather than RBLFUD
-
-	sky_min = 0;
-	sky_max = 1;
-
-	Com_Memset( s_skyTexCoords, 0, sizeof( s_skyTexCoords ) );
+//	Com_Memset( s_skyTexCoords, 0, sizeof( s_skyTexCoords ) );
 
 	for (int i = 0; i < 6; ++i)
 	{
@@ -382,9 +373,10 @@ static void DrawSkyBox( const shader_t* shader )
 			}
 		}
 
-		DrawSkySide( shader->sky.outerbox[sky_texorder[i]], sky_mins_subd, sky_maxs_subd );
+		DrawSkySide( shader->sky.outerbox[i], sky_mins_subd, sky_maxs_subd );
 	}
 }
+
 
 static void FillCloudySkySide( const int mins[2], const int maxs[2], qbool addIndexes )
 {
@@ -483,9 +475,6 @@ static void FillCloudBox( const shader_t* shader, int stage )
 static void R_BuildCloudData( shaderCommands_t* input )
 {
 	assert( input->shader->isSky );
-
-	sky_min = 1.0 / 256.0f;		// FIXME: not correct?
-	sky_max = 255.0 / 256.0f;
 
 	// set up for drawing
 	tess.numIndexes = 0;
