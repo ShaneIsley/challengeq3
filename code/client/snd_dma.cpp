@@ -333,156 +333,22 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int *left_v
 }
 
 
-// =======================================================================
-// Start a sound effect
-// =======================================================================
-
 /*
-Validates the parms and queues the sound up
+validate the parms and queue the sound up
 if pos is NULL, the sound will be dynamically sourced from the entity
 
-in theory, entchannel 0 (CHAN_AUTO) will not override a playing sound unless it has to
-and other channels will automatically override
+in theory, entchannel 0 (CHAN_AUTO) will not override a playing sound
+unless it has to, and other channels will automatically override
 
-in reality, this code doesn't actually bother
+in reality, the code doesn't actually bother
 and EVERYTHING except CHAN_ANNOUNCER is treated as CHAN_AUTO
-*/
 
-/*
-static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle )
-{
-	channel_t	*ch;
-	sfx_t		*sfx;
-	int i, time;
-
-	if ( !s_soundStarted || s_soundMuted ) {
-		return;
-	}
-
-	if ( !origin && ( entityNum < 0 || entityNum > MAX_GENTITIES ) ) {
-		Com_Error( ERR_DROP, "S_StartSound: bad entitynum %i", entityNum );
-	}
-
-	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW, "S_StartSound: handle %i out of range\n", sfxHandle );
-		return;
-	}
-
-	sfx = &s_knownSfx[ sfxHandle ];
-
-	if (sfx->inMemory == qfalse) {
-		S_memoryLoad(sfx);
-	}
-
-	if ( s_show->integer == 1 ) {
-		Com_Printf( "%i : %s\n", s_paintedtime, sfx->soundName );
-	}
-
-	time = Com_Milliseconds();
-
-//	Com_Printf("playing %s\n", sfx->soundName);
-	// pick a channel to play on
-
-	int allowed = (entityNum == listener_number) ? 8 : 4;
-
-	int inplay = 0;
-	ch = s_channels;
-	for ( i = 0; i < MAX_CHANNELS ; i++, ch++ ) {
-		if (ch->entnum == entityNum && ch->thesfx == sfx) {
-			// the WORLD can very legitimately have multiple instances of the same sound at the same time
-			// and it's important that they DO play if possible even if simultaneous
-			// because a bullet hitting 2ft away and one hitting 50ft away are not the same thing
-			if ( (entityNum != ENTITYNUM_WORLD) && (time == ch->allocTime) ) {
-//				if (Cvar_VariableValue( "cg_showmiss" )) {
-//					Com_Printf("double sound start: %d %s\n", entityNum, sfx->soundName);
-//				}
-				return;
-			}
-			inplay++;
-		}
-	}
-
-	if (inplay > allowed) {
-		return;
-	}
-
-	sfx->lastTimeUsed = time;
-
-	ch = S_ChannelMalloc();
-	if (!ch) {
-		// realistically, this will only happen in timedemos,
-		// and on ubershitty maps (3W, CA, space) with massive PG spam etc
-		int oldest = sfx->lastTimeUsed;
-		int chosen = -1;
-
-		//Com_Printf("no channel for %s - ", sfx->soundName);
-
-		ch = s_channels;
-		for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
-			if (ch->entnum != listener_number && ch->entnum == entityNum && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
-				oldest = ch->allocTime;
-				chosen = i;
-				//Com_Printf("reusing same-entity channel\n");
-			}
-		}
-
-		if (chosen == -1) {
-			ch = s_channels;
-			for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
-				if (ch->entnum != listener_number && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
-					oldest = ch->allocTime;
-					chosen = i;
-					//Com_Printf("reusing diff-entity channel\n");
-				}
-			}
-		}
-
-		if (chosen == -1) {
-			ch = s_channels;
-			for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
-				if ( (ch->entnum == listener_number) && (ch->allocTime < oldest) ) {
-					oldest = ch->allocTime;
-					chosen = i;
-					//Com_Printf("reusing listener channel\n");
-				}
-			}
-		}
-
-		if (chosen == -1) {
-			Com_Printf("dropping sound\n");
-			return;
-		}
-
-		ch = &s_channels[chosen];
-		ch->allocTime = sfx->lastTimeUsed;
-	}
-
-	if (origin) {
-		VectorCopy (origin, ch->origin);
-		ch->fixed_origin = qtrue;
-	} else {
-		ch->fixed_origin = qfalse;
-	}
-
-	ch->master_vol = 127;
-	ch->entnum = entityNum;
-	ch->thesfx = sfx;
-	ch->startSample = START_SAMPLE_IMMEDIATE;
-	ch->entchannel = entchannel;
-	ch->leftvol = ch->master_vol;		// these will get calced at next spatialize
-	ch->rightvol = ch->master_vol;		// unless the game isn't running
-	ch->doppler = qfalse;
-}
-*/
-
-
-/*
-for a "correct" implementation that does actually honor channel numbers:
+for a "correct" implementation that did actually honor channel numbers:
 
 of the 7 per-entity channels:
 LOCAL is in fact NEVER used
 LOCAL_SOUND and ANNOUNCER are implicitly "this client only"
-the remaining 4 are common to all entities:
+the remaining 4 are common to all player entities:
 VOICE is used for pain, jump, death, and very little else
 BODY is used exclusively for footsteps and (incorrectly) for holdable item use
 ITEM is used exclusively for PU sounds (quad, suit, and regen)
@@ -490,13 +356,13 @@ WEAPON is used exclusively for firing sounds
 
 everything else is just thrown at CHAN_AUTO, whether it's "right" or not
 that includes things like water events, weapon changes, item pickups, and so on
-auto IS right for most of them, because e.g.
+and auto IS right for most of them, because e.g.
 you can pick up two items in (much) less time than the wavs take to play
 and it's critical that they DO both play (for us, at least - baseq3 is broken as fuck anyway)
 or you could "hide" an armor pickup with an ammobox pickup, etc (doom bfg style :P)
 
-so, realistically, a "correct" implementation is actually undesirable
-
+so in fact, a "correct" implementation is actually VERY UNdesirable
+not just because of the amount of correction the cgame would need, but conceptually too
 */
 
 static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle )
@@ -540,7 +406,7 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 
 	if ( entityNum != ENTITYNUM_WORLD ) {
 		ch = s_channels;
-		for ( i = 0; i < MAX_CHANNELS ; i++, ch++ ) {
+		for ( i = 0; i < MAX_CHANNELS; ++i, ++ch ) {
 			if ( (ch->entnum == entityNum) && (ch->allocTime == time) && (ch->thesfx == sfx) ) {
 				//Com_Printf("double sound start: %d %s\n", entityNum, sfx->soundName);
 				return;
@@ -567,7 +433,8 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 
 		if (!chOldest) {
 			// the entity itself has no reusable channels, so use the oldest "world" one
-			// which will typically be ambient noise shit, or something equally unimportant
+			// which will typically be ambient noise or something equally unimportant
+			// like the tail end of an mg impact or whatever from several frames ago
 			ch = s_channels;
 			for ( i = 0; i < MAX_CHANNELS; ++i, ++ch ) {
 				if ( ch->entnum == ENTITYNUM_WORLD ) {
@@ -580,7 +447,7 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 
 		if (!chOldest) {
 			// no channels of ANY kind free or even reusable?! something is VERY wrong
-			Com_Printf( "dropping sound %s for entity %d\n", sfx->soundName, entityNum );
+			//Com_Printf( "dropping sound %s for entity %d\n", sfx->soundName, entityNum );
 			return;
 		}
 

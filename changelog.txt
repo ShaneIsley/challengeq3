@@ -19,6 +19,8 @@ hyperspace is a bit less annoying
 
 purged the unused (never finished) idMD4 model code
 
+fixed some more dropped sound issues in snd_dma
+
 
 18 Feb 08 - 1.41
 
