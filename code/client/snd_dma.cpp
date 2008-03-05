@@ -348,6 +348,7 @@ in reality, this code doesn't actually bother
 and EVERYTHING except CHAN_ANNOUNCER is treated as CHAN_AUTO
 */
 
+/*
 static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle )
 {
 	channel_t	*ch;
@@ -407,7 +408,7 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 
 	sfx->lastTimeUsed = time;
 
-	ch = S_ChannelMalloc();	// entityNum, entchannel);
+	ch = S_ChannelMalloc();
 	if (!ch) {
 		// realistically, this will only happen in timedemos,
 		// and on ubershitty maps (3W, CA, space) with massive PG spam etc
@@ -458,6 +459,137 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 
 	if (origin) {
 		VectorCopy (origin, ch->origin);
+		ch->fixed_origin = qtrue;
+	} else {
+		ch->fixed_origin = qfalse;
+	}
+
+	ch->master_vol = 127;
+	ch->entnum = entityNum;
+	ch->thesfx = sfx;
+	ch->startSample = START_SAMPLE_IMMEDIATE;
+	ch->entchannel = entchannel;
+	ch->leftvol = ch->master_vol;		// these will get calced at next spatialize
+	ch->rightvol = ch->master_vol;		// unless the game isn't running
+	ch->doppler = qfalse;
+}
+*/
+
+
+/*
+for a "correct" implementation that does actually honor channel numbers:
+
+of the 7 per-entity channels:
+LOCAL is in fact NEVER used
+LOCAL_SOUND and ANNOUNCER are implicitly "this client only"
+the remaining 4 are common to all entities:
+VOICE is used for pain, jump, death, and very little else
+BODY is used exclusively for footsteps and (incorrectly) for holdable item use
+ITEM is used exclusively for PU sounds (quad, suit, and regen)
+WEAPON is used exclusively for firing sounds
+
+everything else is just thrown at CHAN_AUTO, whether it's "right" or not
+that includes things like water events, weapon changes, item pickups, and so on
+auto IS right for most of them, because e.g.
+you can pick up two items in (much) less time than the wavs take to play
+and it's critical that they DO both play (for us, at least - baseq3 is broken as fuck anyway)
+or you could "hide" an armor pickup with an ammobox pickup, etc (doom bfg style :P)
+
+so, realistically, a "correct" implementation is actually undesirable
+
+*/
+
+static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle )
+{
+	int i;
+	channel_t* ch;
+
+	if ( !s_soundStarted || s_soundMuted ) {
+		return;
+	}
+
+	if ( !origin && ( entityNum < 0 || entityNum > MAX_GENTITIES ) ) {
+		Com_Error( ERR_DROP, "S_StartSound: bad entitynum %i", entityNum );
+	}
+
+	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
+		Com_Printf( S_COLOR_YELLOW "S_StartSound: handle %i out of range\n", sfxHandle );
+		return;
+	}
+
+	sfx_t* sfx = &s_knownSfx[ sfxHandle ];
+
+	if (sfx->inMemory == qfalse) {
+		S_memoryLoad(sfx);
+	}
+
+	if ( s_show->integer == 1 ) {
+		Com_Printf( "%i : %s\n", s_paintedtime, sfx->soundName );
+	}
+
+	int time = Com_Milliseconds();
+	sfx->lastTimeUsed = time;
+
+//	Com_Printf("playing %s\n", sfx->soundName);
+
+	// a UNIQUE entity starting the same sound twice in a frame is either a bug,
+	// a timedemo, or a shitmap (eg q3ctf4) giving multiple items on spawn.
+	// even if you can create a case where it IS "valid", it's still pointless
+	// because you implicitly can't DISTINGUISH between the sounds:
+	// all that happens is the sound plays at double volume, which is just annoying
+
+	if ( entityNum != ENTITYNUM_WORLD ) {
+		ch = s_channels;
+		for ( i = 0; i < MAX_CHANNELS ; i++, ch++ ) {
+			if ( (ch->entnum == entityNum) && (ch->allocTime == time) && (ch->thesfx == sfx) ) {
+				//Com_Printf("double sound start: %d %s\n", entityNum, sfx->soundName);
+				return;
+			}
+		}
+	}
+
+	ch = S_ChannelMalloc();
+
+	if (!ch) {
+		// realistically, this will only happen in timedemos,
+		// and MAYBE on ubershitty maps (3W, CA, space) with massive PG spam etc
+		// so it's really not a priority or even an interesting case
+		channel_t* chOldest = NULL;
+
+		ch = s_channels;
+		for ( i = 0; i < MAX_CHANNELS; ++i, ++ch ) {
+			if ( (ch->entnum == entityNum) && (ch->entchannel != CHAN_ANNOUNCER) ) {
+				if ( !chOldest || (ch->allocTime < chOldest->allocTime) ) {
+					chOldest = ch;
+				}
+			}
+		}
+
+		if (!chOldest) {
+			// the entity itself has no reusable channels, so use the oldest "world" one
+			// which will typically be ambient noise shit, or something equally unimportant
+			ch = s_channels;
+			for ( i = 0; i < MAX_CHANNELS; ++i, ++ch ) {
+				if ( ch->entnum == ENTITYNUM_WORLD ) {
+					if ( !chOldest || (ch->allocTime < chOldest->allocTime) ) {
+						chOldest = ch;
+					}
+				}
+			}
+		}
+
+		if (!chOldest) {
+			// no channels of ANY kind free or even reusable?! something is VERY wrong
+			Com_Printf( "dropping sound %s for entity %d\n", sfx->soundName, entityNum );
+			return;
+		}
+
+		ch = chOldest;
+		ch->allocTime = time;
+	}
+
+	if (origin) {
+		VectorCopy( origin, ch->origin );
 		ch->fixed_origin = qtrue;
 	} else {
 		ch->fixed_origin = qfalse;
