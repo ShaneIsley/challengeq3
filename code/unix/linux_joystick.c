@@ -81,9 +81,9 @@ void IN_StartupJoystick( void )
   }
 
   for( i = 0; i < 4; i++ ) {
-    char filename[PATH_MAX];
+    char filename[MAX_OSPATH];
 
-    snprintf( filename, PATH_MAX, "/dev/js%d", i );
+    snprintf( filename, MAX_OSPATH, "/dev/js%d", i );
 
     joy_fd = open( filename, O_RDONLY | O_NONBLOCK );
 
