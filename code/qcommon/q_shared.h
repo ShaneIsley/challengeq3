@@ -549,7 +549,6 @@ int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... );
 void	COM_ParseWarning( char *format, ... );
 
-#define MAX_TOKENLENGTH		1024
 
 #ifndef TT_STRING
 //token types
@@ -566,7 +565,7 @@ typedef struct pc_token_s
 	int subtype;
 	int intvalue;
 	float floatvalue;
-	char string[MAX_TOKENLENGTH];
+	char string[MAX_TOKEN_CHARS];
 } pc_token_t;
 
 // data is an in/out parm, returns a parsed out token
@@ -787,7 +786,7 @@ typedef struct {
 
 // sound channels
 // channel 0 never willingly overrides
-// other channels will allways override a playing sound on that channel
+// other channels will always override a playing sound on that channel
 typedef enum {
 	CHAN_AUTO,
 	CHAN_LOCAL,		// hit sounds, menu sounds

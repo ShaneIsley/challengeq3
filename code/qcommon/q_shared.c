@@ -102,13 +102,17 @@ void COM_DefaultExtension (char *path, int maxSize, const char *extension ) {
 	Com_sprintf( path, maxSize, "%s%s", oldPath, extension );
 }
 
+
 /*
 ============================================================================
 
-					BYTE ORDER FUNCTIONS
+BYTE ORDER FUNCTIONS
+these don't belong in here and should never be used by a VM
 
 ============================================================================
 */
+
+#ifndef Q3_VM
 
 short   ShortSwap (short l)
 {
@@ -118,11 +122,6 @@ short   ShortSwap (short l)
 	b2 = (l>>8)&255;
 
 	return (b1<<8) + b2;
-}
-
-short	ShortNoSwap (short l)
-{
-	return l;
 }
 
 int    LongSwap (int l)
@@ -135,11 +134,6 @@ int    LongSwap (int l)
 	b4 = (l>>24)&255;
 
 	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
-}
-
-int	LongNoSwap (int l)
-{
-	return l;
 }
 
 qint64 Long64Swap (qint64 ll)
@@ -158,11 +152,6 @@ qint64 Long64Swap (qint64 ll)
 	return result;
 }
 
-qint64 Long64NoSwap (qint64 ll)
-{
-	return ll;
-}
-
 typedef union {
     float	f;
     unsigned int i;
@@ -177,10 +166,7 @@ float FloatSwap (const float *f) {
 	return out.f;
 }
 
-float FloatNoSwap (const float *f)
-{
-	return *f;
-}
+#endif
 
 
 /*
