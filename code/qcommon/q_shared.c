@@ -843,10 +843,6 @@ Info_RemoveKey
 ===================
 */
 void Info_RemoveKey( char *s, const char *key ) {
-	char	*start;
-	char	pkey[MAX_INFO_KEY];
-	char	value[MAX_INFO_VALUE];
-	char	*o;
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_RemoveKey: oversize infostring" );
@@ -858,7 +854,11 @@ void Info_RemoveKey( char *s, const char *key ) {
 
 	while (1)
 	{
-		start = s;
+		char *o;
+		char pkey[MAX_INFO_KEY];
+		char value[MAX_INFO_VALUE];
+		char *start = s;
+
 		if (*s == '\\')
 			s++;
 		o = pkey;
@@ -976,7 +976,6 @@ Changes or adds a key/value pair
 ==================
 */
 void Info_SetValueForKey( char *s, const char *key, const char *value ) {
-	char	newi[MAX_INFO_STRING];
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
@@ -1001,18 +1000,20 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 	}
 
 	Info_RemoveKey (s, key);
-	if (!value || !strlen(value))
+	if (!value || !strlen(value)){
 		return;
+	} else {
+		char	newi[MAX_INFO_STRING];
+		Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
 
-	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
+		if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
+		{
+			Com_Printf ("Info string length exceeded\n");
+			return;
+		}
 
-	if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
-	{
-		Com_Printf ("Info string length exceeded\n");
-		return;
+		strcat (s, newi);
 	}
-
-	strcat (s, newi);
 }
 
 /*

@@ -131,7 +131,6 @@ void S_CodecRegister(snd_codec_t *codec)
 
 byte* S_CodecLoad( const char* filename, snd_info_t* info )
 {
-	char fn[MAX_QPATH];
 
 	snd_codec_t* codec = S_FindCodecForFile(filename);
 	if (!codec)
@@ -140,6 +139,7 @@ byte* S_CodecLoad( const char* filename, snd_info_t* info )
 		return NULL;
 	}
 
+	char fn[MAX_QPATH];
 	strncpy(fn, filename, sizeof(fn));
 	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
 
@@ -153,16 +153,14 @@ S_CodecOpenStream
 */
 snd_stream_t *S_CodecOpenStream(const char *filename)
 {
-	snd_codec_t *codec;
-	char fn[MAX_QPATH];
-
-	codec = S_FindCodecForFile(filename);
+	snd_codec_t *codec = S_FindCodecForFile(filename);
 	if(!codec)
 	{
 		Com_Printf("Unknown extension for %s\n", filename);
 		return NULL;
 	}
 
+	char fn[MAX_QPATH];
 	strncpy(fn, filename, sizeof(fn));
 	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
 

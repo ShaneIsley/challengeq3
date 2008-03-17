@@ -128,14 +128,11 @@ DIRECTORY SCANNING
 
 static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, const char *filter, char **list, int *numfiles )
 {
-	char		search[MAX_OSPATH], newsubdirs[MAX_OSPATH];
-	char		filename[MAX_OSPATH];
-	int			findhandle;
-	struct _finddata_t findinfo;
-
 	if ( *numfiles >= MAX_FOUND_FILES - 1 ) {
 		return;
 	}
+
+	char		search[MAX_OSPATH];
 
 	if (strlen(subdirs)) {
 		Com_sprintf( search, sizeof(search), "%s\\%s\\*", basedir, subdirs );
@@ -144,11 +141,14 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, con
 		Com_sprintf( search, sizeof(search), "%s\\*", basedir );
 	}
 
-	findhandle = _findfirst (search, &findinfo);
+	struct _finddata_t findinfo;
+	int findhandle = _findfirst (search, &findinfo);
 	if (findhandle == -1) {
 		return;
 	}
 
+	char newsubdirs[MAX_OSPATH];
+	char filename[MAX_OSPATH];
 	do {
 		if (findinfo.attrib & _A_SUBDIR) {
 			if (Q_stricmp(findinfo.name, ".") && Q_stricmp(findinfo.name, "..")) {
@@ -177,7 +177,6 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, con
 
 char **Sys_ListFiles( const char *directory, const char *extension, const char *filter, int *numfiles, qbool wantsubs )
 {
-	char		search[MAX_OSPATH];
 	int			nfiles;
 	char		**listCopy;
 	char		*list[MAX_FOUND_FILES];
@@ -218,6 +217,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, const char *
 		flag = _A_SUBDIR;
 	}
 
+	char search[MAX_OSPATH];
 	Com_sprintf( search, sizeof(search), "%s\\*%s", directory, extension );
 
 	// search
@@ -700,8 +700,6 @@ void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptr
 
 sysEvent_t Sys_GetEvent()
 {
-	static byte sys_packetReceived[MAX_MSGLEN]; // static or it'll blow half the stack
-
 	// return if we have data
 	if ( eventHead > eventTail ) {
 		eventTail++;
@@ -734,6 +732,7 @@ sysEvent_t Sys_GetEvent()
 	// check for network packets
 	msg_t		netmsg;
 	netadr_t	adr;
+	static byte sys_packetReceived[MAX_MSGLEN]; // static or it'll blow half the stack
 	MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
 	if ( Sys_GetPacket( &adr, &netmsg ) ) {
 		// copy out to a seperate buffer for qeueing

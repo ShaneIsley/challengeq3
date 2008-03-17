@@ -415,14 +415,13 @@ static void Cvar_Toggle_f( void )
 
 static void Cvar_Set_f( void )
 {
-	char combined[MAX_STRING_TOKENS];
-
 	int c = Cmd_Argc();
 	if ( c < 3 ) {
 		Com_Printf ("usage: set <variable> <value>\n");
 		return;
 	}
 
+	char combined[MAX_STRING_TOKENS];
 	combined[0] = 0;
 	int l = 0;
 	for (int i = 2; i < c; i++) {

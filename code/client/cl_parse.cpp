@@ -495,7 +495,6 @@ static void CL_ParseGamestate( msg_t *msg )
 static void CL_ParseDownload( msg_t *msg )
 {
 	int		size;
-	unsigned char data[MAX_MSGLEN];
 	int block;
 
 	if (!*clc.downloadTempName) {
@@ -522,6 +521,7 @@ static void CL_ParseDownload( msg_t *msg )
 	}
 
 	size = MSG_ReadShort ( msg );
+	unsigned char data[MAX_MSGLEN];
 	if (size < 0 || size > sizeof(data))
 	{
 		Com_Error( ERR_DROP, "CL_ParseDownload: Invalid size %d for download chunk.", size );

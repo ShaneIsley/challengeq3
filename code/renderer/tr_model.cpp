@@ -70,14 +70,6 @@ asked for again.
 ====================
 */
 qhandle_t RE_RegisterModel( const char *name ) {
-	model_t		*mod;
-	unsigned	*buf;
-	int			lod;
-	int			ident;
-	qbool	loaded = qfalse;
-	qhandle_t	hModel;
-	int			numLoaded;
-	char		*fext, defex[] = "md3", filename[MAX_QPATH], namebuf[MAX_QPATH+20];
 
 	if ( !name || !name[0] ) {
 		ri.Printf( PRINT_ALL, "RE_RegisterModel: NULL name\n" );
@@ -89,6 +81,8 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		return 0;
 	}
 
+	model_t		*mod;
+	qhandle_t	hModel;
 	//
 	// search the currently loaded models
 	//
@@ -112,7 +106,6 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	// only set the name after the model has been successfully loaded
 	Q_strncpyz( mod->name, name, sizeof( mod->name ) );
 
-
 	// make sure the render thread is stopped
 	R_SyncRenderThread();
 
@@ -121,7 +114,12 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	//
 	// load the files
 	//
-	numLoaded = 0;
+	unsigned	*buf;
+	int			lod;
+	int			ident;
+	qbool	loaded = qfalse;
+	char		*fext, defex[] = "md3", filename[MAX_QPATH], namebuf[MAX_QPATH+20];
+	int			numLoaded = 0;
 
 	strcpy(filename, name);
 

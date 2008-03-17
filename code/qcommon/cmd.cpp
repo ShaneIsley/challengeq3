@@ -190,15 +190,15 @@ Cmd_Exec_f
 ===============
 */
 void Cmd_Exec_f( void ) {
-	char	*f;
-	int		len;
-	char	filename[MAX_QPATH];
 
 	if (Cmd_Argc () != 2) {
 		Com_Printf ("exec <filename> : execute a script file\n");
 		return;
 	}
 
+	char	*f;
+	int		len;
+	char	filename[MAX_QPATH];
 	Q_strncpyz( filename, Cmd_Argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" ); 
 	len = FS_ReadFile( filename, (void **)&f);

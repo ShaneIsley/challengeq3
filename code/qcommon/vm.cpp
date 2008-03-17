@@ -135,6 +135,11 @@ static int ParseHex( const char* text )
 
 static void VM_LoadSymbols( vm_t* vm )
 {
+	// don't load symbols if not developer
+	if ( !com_developer->integer ) {
+		return;
+	}
+
 	int		len;
 	char	*mapfile;
 	char	name[MAX_QPATH];
@@ -145,11 +150,6 @@ static void VM_LoadSymbols( vm_t* vm )
 	int		chars;
 	int		segment;
 	int		numInstructions;
-
-	// don't load symbols if not developer
-	if ( !com_developer->integer ) {
-		return;
-	}
 
 	COM_StripExtension(vm->name, name, sizeof(name));
 	Com_sprintf( symbols, sizeof( symbols ), "vm/%s.map", name );

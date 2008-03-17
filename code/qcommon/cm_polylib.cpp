@@ -640,21 +640,22 @@ Both w and *hull are on the same plane
 */
 #define	MAX_HULL_POINTS		128
 void	AddWindingToConvexHull( winding_t *w, winding_t **hull, vec3_t normal ) {
-	int			i, j, k;
-	float		*p, *copy;
-	vec3_t		dir;
-	float		d;
-	int			numHullPoints, numNew;
-	vec3_t		hullPoints[MAX_HULL_POINTS];
-	vec3_t		newHullPoints[MAX_HULL_POINTS];
-	vec3_t		hullDirs[MAX_HULL_POINTS];
-	qbool	hullSide[MAX_HULL_POINTS];
-	qbool	outside;
 
 	if ( !*hull ) {
 		*hull = CopyWinding( w );
 		return;
 	}
+
+	int		i, j, k;
+	float	*p, *copy;
+	vec3_t	dir;
+	float	d;
+	int		numHullPoints, numNew;
+	vec3_t	hullPoints[MAX_HULL_POINTS];
+	vec3_t	newHullPoints[MAX_HULL_POINTS];
+	vec3_t	hullDirs[MAX_HULL_POINTS];
+	qbool	hullSide[MAX_HULL_POINTS];
+	qbool	outside;
 
 	numHullPoints = (*hull)->numpoints;
 	Com_Memcpy( hullPoints, (*hull)->p, numHullPoints * sizeof(vec3_t) );

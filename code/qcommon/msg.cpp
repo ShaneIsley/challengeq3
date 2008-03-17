@@ -305,14 +305,14 @@ void MSG_WriteString( msg_t *sb, const char *s ) {
 		MSG_WriteData (sb, "", 1);
 	} else {
 		int		l,i;
-		char	string[MAX_STRING_CHARS];
-
 		l = strlen( s );
 		if ( l >= MAX_STRING_CHARS ) {
 			Com_Printf( "MSG_WriteString: MAX_STRING_CHARS" );
 			MSG_WriteData (sb, "", 1);
 			return;
 		}
+
+		char	string[MAX_STRING_CHARS];
 		Q_strncpyz( string, s, sizeof( string ) );
 
 		// get rid of 0xff chars, because old clients don't like them
@@ -331,14 +331,13 @@ void MSG_WriteBigString( msg_t *sb, const char *s ) {
 		MSG_WriteData (sb, "", 1);
 	} else {
 		int		l,i;
-		char	string[BIG_INFO_STRING];
-
 		l = strlen( s );
 		if ( l >= BIG_INFO_STRING ) {
 			Com_Printf( "MSG_WriteString: BIG_INFO_STRING" );
 			MSG_WriteData (sb, "", 1);
 			return;
 		}
+		char	string[BIG_INFO_STRING];
 		Q_strncpyz( string, s, sizeof( string ) );
 
 		// get rid of 0xff chars, because old clients don't like them

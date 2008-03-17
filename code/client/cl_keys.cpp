@@ -603,7 +603,6 @@ static void Console_Key( int key )
 
 static void Message_Key( int key )
 {
-	char buffer[MAX_STRING_CHARS];
 
 	if (key == K_ESCAPE) {
 		cls.keyCatchers &= ~KEYCATCH_MESSAGE;
@@ -614,6 +613,8 @@ static void Message_Key( int key )
 	if ( key == K_ENTER || key == K_KP_ENTER )
 	{
 		if ( chatField.buffer[0] && cls.state == CA_ACTIVE ) {
+			char buffer[MAX_STRING_CHARS];
+
 			if (chat_playerNum != -1 )
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
 			else if (chat_team)

@@ -2282,7 +2282,6 @@ static void FS_AddGameDirectory( const char *path, const char *dir )
 	char			*pakfile;
 	int				numfiles;
 	char			**pakfiles;
-	char			*sorted[MAX_PAKFILES];
 
 	// this fixes the case where fs_basepath is the same as fs_cdpath, which happens on full installs
 	// KHB  preserved despite removal of fs_cdpath, just in case base/home has the same problem on *nix
@@ -2314,6 +2313,8 @@ static void FS_AddGameDirectory( const char *path, const char *dir )
 	if ( numfiles > MAX_PAKFILES ) {
 		numfiles = MAX_PAKFILES;
 	}
+
+	char *sorted[MAX_PAKFILES];
 	for ( i = 0 ; i < numfiles ; i++ ) {
 		sorted[i] = pakfiles[i];
 	}

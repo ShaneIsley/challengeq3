@@ -155,8 +155,6 @@ A 0 length will still generate a packet.
 ================
 */
 void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
-	msg_t		send;
-	byte		send_buf[MAX_PACKETLEN];
 
 	if ( length > MAX_MSGLEN ) {
 		Com_Error( ERR_DROP, "Netchan_Transmit: length = %i", length );
@@ -174,6 +172,8 @@ void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
 		return;
 	}
 
+	msg_t		send;
+	byte		send_buf[MAX_PACKETLEN];
 	// write the packet header
 	MSG_InitOOB (&send, send_buf, sizeof(send_buf));
 

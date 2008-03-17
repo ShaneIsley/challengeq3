@@ -1099,8 +1099,6 @@ static void ParseSkyParms( const char** text )
 {
 	static const char* suf[6] = { "rt", "lf", "bk", "ft", "up", "dn" };
 	const char* token;
-	char		pathname[MAX_QPATH];
-	int			i;
 
 	// outerbox
 	token = COM_ParseExt( text, qfalse );
@@ -1108,6 +1106,9 @@ static void ParseSkyParms( const char** text )
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
+
+	char		pathname[MAX_QPATH];
+	int			i;
 	if ( strcmp( token, "-" ) ) {
 		for (i = 0; i < 6; ++i) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
@@ -2222,10 +2223,6 @@ most world construction surfaces.
 */
 shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 {
-	char		strippedName[MAX_QPATH];
-	char		fileName[MAX_QPATH];
-	int			i, hash;
-	shader_t	*sh;
 
 	if ( name[0] == 0 ) {
 		return tr.defaultShader;
@@ -2234,6 +2231,11 @@ shader_t* R_FindShader( const char *name, int lightmapIndex, qbool mipRawImage )
 	// use (fullbright) vertex lighting if the bsp file doesn't have lightmaps
 	if ( lightmapIndex >= 0 && lightmapIndex >= tr.numLightmaps )
 		lightmapIndex = LIGHTMAP_BY_VERTEX;
+
+	char		strippedName[MAX_QPATH];
+	char		fileName[MAX_QPATH];
+	int			i, hash;
+	shader_t	*sh;
 
 	COM_StripExtension(name, strippedName, sizeof(strippedName));
 
@@ -2591,9 +2593,7 @@ void R_ShaderList_f( void )
 
 static void ScanAndLoadShaderFiles()
 {
-	const int MAX_SHADER_FILES = 4096;
-	char* buffers[MAX_SHADER_FILES];
-	int len[MAX_SHADER_FILES];
+	static const int MAX_SHADER_FILES = 4096;
 
 	int i;
 	char* p;
@@ -2610,6 +2610,8 @@ static void ScanAndLoadShaderFiles()
 	if ( numShaders > MAX_SHADER_FILES )
 		ri.Error( ERR_DROP, "Shader file limit exceeded" );
 
+	int len[MAX_SHADER_FILES];
+	char* buffers[MAX_SHADER_FILES];
 	long sum = 0;
 	// load and parse shader files
 	for ( i = 0; i < numShaders; i++ )

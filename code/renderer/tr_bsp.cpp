@@ -1493,9 +1493,6 @@ static void R_LoadEntities( const lump_t* l )
 	strcpy( w->entityString, p );
 	w->entityParsePoint = w->entityString;
 
-	char keyname[MAX_TOKEN_CHARS];
-	char value[MAX_TOKEN_CHARS];
-
 	const char* token = COM_ParseExt( &p, qtrue );
 	if (!*token || *token != '{')
 		return;
@@ -1508,6 +1505,8 @@ static void R_LoadEntities( const lump_t* l )
 		if ( !*token || *token == '}' ) {
 			break;
 		}
+
+		char keyname[MAX_TOKEN_CHARS];
 		Q_strncpyz(keyname, token, sizeof(keyname));
 
 		// parse value
@@ -1516,6 +1515,8 @@ static void R_LoadEntities( const lump_t* l )
 		if ( !*token || *token == '}' ) {
 			break;
 		}
+
+		char value[MAX_TOKEN_CHARS];
 		Q_strncpyz(value, token, sizeof(value));
 
 		// check for a different grid size

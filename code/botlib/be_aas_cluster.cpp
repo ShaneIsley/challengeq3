@@ -792,6 +792,12 @@ int AAS_GetAdjacentAreasWithLessPresenceTypes_r(int *areanums, int numareas, int
 //===========================================================================
 int AAS_CheckAreaForPossiblePortals(int areanum)
 {
+
+	//if it isn't already a portal
+	if (aasworld.areasettings[areanum].contents & AREACONTENTS_CLUSTERPORTAL) return 0;
+	//it must be a grounded area
+	if (!(aasworld.areasettings[areanum].areaflags & AREA_GROUNDED)) return 0;
+	//
 	int i, j, k, fen, ben, frontedgenum, backedgenum, facenum;
 	int areanums[MAX_PORTALAREAS], numareas, otherareanum;
 	int numareafrontfaces[MAX_PORTALAREAS], numareabackfaces[MAX_PORTALAREAS];
@@ -803,11 +809,6 @@ int AAS_CheckAreaForPossiblePortals(int areanum)
 	aas_area_t *area;
 	aas_face_t *frontface, *backface, *face;
 
-	//if it isn't already a portal
-	if (aasworld.areasettings[areanum].contents & AREACONTENTS_CLUSTERPORTAL) return 0;
-	//it must be a grounded area
-	if (!(aasworld.areasettings[areanum].areaflags & AREA_GROUNDED)) return 0;
-	//
 	Com_Memset(numareafrontfaces, 0, sizeof(numareafrontfaces));
 	Com_Memset(numareabackfaces, 0, sizeof(numareabackfaces));
 	numareas = numfrontfaces = numbackfaces = 0;
