@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 typedef struct {
 	qbool	allowoverflow;	// if qfalse, do a Com_Error
 	qbool	overflowed;		// set to qtrue if the buffer size failed (with allowoverflow set)
-	qbool	oob;			// set to qtrue if the buffer size failed (with allowoverflow set)
+	qbool	oob;
 	byte	*data;
 	int		maxsize;
 	int		cursize;
@@ -54,51 +54,36 @@ void MSG_Bitstream( msg_t *buf );
 // sets data buffer as MSG_Init does prior to do the copy
 void MSG_Copy( msg_t* buf, byte* data, int length, const msg_t* src );
 
-struct usercmd_s;
-struct entityState_s;
-struct playerState_s;
-
 void MSG_WriteBits( msg_t *msg, int value, int bits );
 
-void MSG_WriteChar (msg_t *sb, int c);
 void MSG_WriteByte (msg_t *sb, int c);
 void MSG_WriteShort (msg_t *sb, int c);
 void MSG_WriteLong (msg_t *sb, int c);
-void MSG_WriteFloat (msg_t *sb, float f);
 void MSG_WriteString (msg_t *sb, const char *s);
 void MSG_WriteBigString (msg_t *sb, const char *s);
-void MSG_WriteAngle16 (msg_t *sb, float f);
 
 void	MSG_BeginReading (msg_t *sb);
 void	MSG_BeginReadingOOB(msg_t *sb);
 
 int		MSG_ReadBits( msg_t *msg, int bits );
 
-int		MSG_ReadChar (msg_t *sb);
 int		MSG_ReadByte (msg_t *sb);
 int		MSG_ReadShort (msg_t *sb);
 int		MSG_ReadLong (msg_t *sb);
-float	MSG_ReadFloat (msg_t *sb);
 char	*MSG_ReadString (msg_t *sb);
 char	*MSG_ReadBigString (msg_t *sb);
 char	*MSG_ReadStringLine (msg_t *sb);
-float	MSG_ReadAngle16 (msg_t *sb);
 void	MSG_ReadData (msg_t *sb, void *buffer, int size);
 
 
-void MSG_WriteDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
-void MSG_ReadDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
+void MSG_WriteDeltaUsercmdKey( msg_t* msg, int key, const usercmd_t* from, usercmd_t* to );
+void MSG_ReadDeltaUsercmdKey( msg_t* msg, int key, const usercmd_t* from, usercmd_t* to );
 
-void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
-void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
+void MSG_WriteDeltaEntity( msg_t* msg, const entityState_t* from, entityState_t* to, qbool force );
+void MSG_ReadDeltaEntity( msg_t* msg, const entityState_t* from, entityState_t* to, int number );
 
-void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to
-						   , qbool force );
-void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to, 
-						 int number );
-
-void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
-void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
+void MSG_WriteDeltaPlayerstate( msg_t* msg, const playerState_t* from, playerState_t* to );
+void MSG_ReadDeltaPlayerstate( msg_t* msg, const playerState_t* from, playerState_t* to );
 
 
 // void MSG_ReportChangeVectors_f( void );
@@ -1020,11 +1005,9 @@ void	Huff_offsetTransmit (huff_t *huff, int ch, byte *fout, int *offset);
 void	Huff_putBit( int bit, byte *fout, int *offset);
 int		Huff_getBit( byte *fout, int *offset);
 
-extern huffman_t clientHuffTables;
-
-#define	SV_ENCODE_START		4
-#define SV_DECODE_START		12
-#define	CL_ENCODE_START		12
-#define CL_DECODE_START		4
+#define SV_ENCODE_START		4
+#define CL_ENCODE_START		12
+#define SV_DECODE_START		CL_ENCODE_START
+#define CL_DECODE_START		SV_ENCODE_START
 
 #endif // _QCOMMON_H_
