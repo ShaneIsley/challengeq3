@@ -494,9 +494,6 @@ static void CL_ParseGamestate( msg_t *msg )
 
 static void CL_ParseDownload( msg_t *msg )
 {
-	int		size;
-	int block;
-
 	if (!*clc.downloadTempName) {
 		Com_Printf("Server sending download, but no download was requested\n");
 		CL_AddReliableCommand( "stopdl" );
@@ -504,13 +501,12 @@ static void CL_ParseDownload( msg_t *msg )
 	}
 
 	// read the data
-	block = MSG_ReadShort( msg );
+	int block = MSG_ReadShort( msg );
 
 	if ( !block )
 	{
 		// block zero is special, contains file size
 		clc.downloadSize = MSG_ReadLong( msg );
-
 		Cvar_SetValue( "cl_downloadSize", clc.downloadSize );
 
 		if (clc.downloadSize < 0)
@@ -520,7 +516,7 @@ static void CL_ParseDownload( msg_t *msg )
 		}
 	}
 
-	size = MSG_ReadShort ( msg );
+	int size = MSG_ReadShort( msg );
 	unsigned char data[MAX_MSGLEN];
 	if (size < 0 || size > sizeof(data))
 	{
