@@ -546,46 +546,6 @@ float	AngleMod(float a) {
 }
 
 
-/*
-=================
-AngleNormalize360
-
-returns angle normalized to the range [0 <= angle < 360]
-=================
-*/
-float AngleNormalize360 ( float angle ) {
-	return (360.0 / 65536) * ((int)(angle * (65536 / 360.0)) & 65535);
-}
-
-
-/*
-=================
-AngleNormalize180
-
-returns angle normalized to the range [-180 < angle <= 180]
-=================
-*/
-float AngleNormalize180 ( float angle ) {
-	angle = AngleNormalize360( angle );
-	if ( angle > 180.0 ) {
-		angle -= 360.0;
-	}
-	return angle;
-}
-
-
-/*
-=================
-AngleDelta
-
-returns the normalized delta from angle1 to angle2
-=================
-*/
-float AngleDelta ( float angle1, float angle2 ) {
-	return AngleNormalize180( angle1 - angle2 );
-}
-
-
 //============================================================
 
 

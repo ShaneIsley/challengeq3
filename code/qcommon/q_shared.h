@@ -339,7 +339,7 @@ int ColorIndex( char ccode );
 #define MAKERGB( v, r, g, b ) { v[0]=r;v[1]=g;v[2]=b; }
 #define MAKERGBA( v, r, g, b, a ) { v[0]=r;v[1]=g;v[2]=b;v[3]=a; }
 
-#define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
+#define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0f )
 #define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
 
 
@@ -516,10 +516,6 @@ float	AngleMod( float a );
 float	LerpAngle( float from, float to, float frac );
 float	AngleSubtract( float a1, float a2 );
 void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
-
-float AngleNormalize360 ( float angle );
-float AngleNormalize180 ( float angle );
-float AngleDelta ( float angle1, float angle2 );
 
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
