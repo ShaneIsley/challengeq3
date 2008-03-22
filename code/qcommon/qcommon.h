@@ -392,6 +392,22 @@ modules of the program.
 
 */
 
+// nothing outside the Cvar_*() functions should modify these fields!
+typedef struct cvar_s {
+	char		*name;
+	char		*string;
+	char		*resetString;		// cvar_restart will reset to this value
+	char		*latchedString;		// for CVAR_LATCH vars
+	int			flags;
+	qboolean	modified;			// set each time the cvar is changed
+	int			modificationCount;	// incremented each time the cvar is changed
+	float		value;				// atof( string )
+	int			integer;			// atoi( string )
+	struct cvar_s *next;
+	struct cvar_s *hashNext;
+} cvar_t;
+
+
 cvar_t *Cvar_Get( const char *var_name, const char *value, int flags );
 // creates the variable if it doesn't exist, or returns the existing one
 // if it exists, the value will not be changed, but flags will be ORed in
