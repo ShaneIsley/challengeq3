@@ -264,11 +264,9 @@ static int asmCallPtr = (int)doAsmCall;
 int VM_CallCompiled( vm_t* vm, int* args )
 {
 	int		stack[1024];
-	int		programCounter;
 	int		programStack;
 	int		stackOnEntry;
 	byte	*image;
-	void	*opStack;
 	int		*oldInstructionPointers;
 
 	oldInstructionPointers = instructionPointers;
@@ -276,19 +274,14 @@ int VM_CallCompiled( vm_t* vm, int* args )
 	currentVM = vm;
 	instructionPointers = vm->instructionPointers;
 
-	// interpret the code
-	vm->currentlyInterpreting = qtrue;
-
 	callMask = vm->dataMask;
 
 	// we might be called recursively, so this might not be the very top
 	programStack = vm->programStack;
 	stackOnEntry = programStack;
 
-	// set up the stack frame 
+	// set up the stack frame
 	image = vm->dataBase;
-
-	programCounter = 0;
 
 	programStack -= 48;
 
@@ -306,7 +299,7 @@ int VM_CallCompiled( vm_t* vm, int* args )
 	*(int *)&image[ programStack ] = -1;	// will terminate the loop on return
 
 	// off we go into generated code...
-	opStack = &stack;
+	void* opStack = &stack;
 
 #ifdef _MSC_VER
 	void* codeBase = vm->codeBase; // dunno WHY vc needs this deref'd by hand, but it does

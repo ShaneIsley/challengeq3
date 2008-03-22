@@ -111,9 +111,6 @@ typedef enum {
 } opcode_t;
 
 
-
-typedef int	vmptr_t;
-
 typedef struct vmSymbol_s {
 	struct vmSymbol_s	*next;
 	int		symValue;
@@ -139,9 +136,6 @@ struct vm_s {
 	intptr_t	(QDECL *entryPoint)( int callNum, ... );
 	void (*destroy)(vm_t* self);
 
-	// for interpreted modules
-	qbool	currentlyInterpreting;
-
 	qbool	compiled;
 	byte		*codeBase;
 	int			codeLength;
@@ -152,14 +146,15 @@ struct vm_s {
 	byte		*dataBase;
 	int			dataMask;
 
-	int			stackBottom;		// if programStack < stackBottom, error
-
 	int			numSymbols;
-	struct vmSymbol_s	*symbols;
+	vmSymbol_t	*symbols;
 
+	int			stackBottom;		// if programStack < stackBottom, error
+#if defined(NO_VM_COMPILED)
 	int			callLevel;			// for debug indenting
 	int			breakFunction;		// increment breakCount on function entry to this
 	int			breakCount;
+#endif
 
 	byte		*jumpTableTargets;
 	int			numJumpTableTargets;
