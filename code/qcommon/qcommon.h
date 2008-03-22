@@ -520,7 +520,6 @@ int		FS_GetModList(  char *listbuf, int bufsize );
 fileHandle_t	FS_FOpenFileWrite( const char *qpath );
 // will properly create any needed paths and deal with seperater character issues
 
-int		FS_filelength( fileHandle_t f );
 fileHandle_t FS_SV_FOpenFileWrite( const char *filename );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp );
 void	FS_SV_Rename( const char *from, const char *to );
@@ -568,7 +567,7 @@ int		FS_FTell( fileHandle_t f );
 
 void	FS_Flush( fileHandle_t f );
 
-void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
+void	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
 // like fprintf
 
 int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
@@ -588,8 +587,8 @@ const char *FS_LoadedPakPureChecksums( void );
 const char *FS_ReferencedPakNames( void );
 const char *FS_ReferencedPakChecksums( void );
 const char *FS_ReferencedPakPureChecksums( void );
-// Returns a space separated string containing the checksums of all loaded 
-// AND referenced pk3 files. Servers with sv_pure set will get this string 
+// Returns a space separated string containing the checksums of all loaded
+// AND referenced pk3 files. Servers with sv_pure set will get this string
 // back from clients for pure validation 
 
 void FS_ClearPakReferences( int flags );
@@ -613,6 +612,8 @@ void FS_HomeRemove( const char *homePath );
 
 void	FS_FilenameCompletion( const char *dir, const char *ext,
 		qbool stripExt, void(*callback)(const char *s) );
+
+
 /*
 ==============================================================
 
