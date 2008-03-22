@@ -533,21 +533,23 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 float Com_Clamp( float min, float max, float value );
 
+void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
+
 const char* COM_SkipPath( const char* pathname );
 void	COM_StripExtension(const char *in, char *out, int destsize);
 void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
-void	COM_BeginParseSession( const char *name );
-int		COM_GetCurrentParseLine( void );
 const char* COM_Parse( const char** data_p );
 const char* COM_ParseExt( const char** data_p, qbool allowLineBreak );
 int		COM_Compress( char *data_p );
-void	COM_ParseError( char *format, ... );
-void	COM_ParseWarning( char *format, ... );
 
+void SkipBracedSection( const char** data );
+void SkipRestOfLine( const char** data );
+
+
+// botlib crap hacked into the engine for no good reason
 
 #ifndef TT_STRING
-//token types
 #define TT_STRING					1			// string
 #define TT_LITERAL					2			// literal
 #define TT_NUMBER					3			// number
@@ -564,14 +566,6 @@ typedef struct pc_token_s
 	char string[MAX_TOKEN_CHARS];
 } pc_token_t;
 
-// data is an in/out parm, returns a parsed out token
-
-void COM_MatchToken( const char** data, const char* match );
-
-void SkipBracedSection( const char** data );
-void SkipRestOfLine( const char** data );
-
-void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 // mode parm for FS_FOpenFile
 typedef enum {
@@ -610,22 +604,6 @@ void	Q_strcat( char *dest, int size, const char *src );
 int Q_PrintStrlen( const char *string );
 // removes color sequences from string
 char *Q_CleanStr( char *string );
-
-//=============================================
-
-// 64-bit integers for global rankings interface
-// implemented as a struct for qvm compatibility
-typedef struct
-{
-	byte	b0;
-	byte	b1;
-	byte	b2;
-	byte	b3;
-	byte	b4;
-	byte	b5;
-	byte	b6;
-	byte	b7;
-} qint64;
 
 //=============================================
 

@@ -136,22 +136,6 @@ int    LongSwap (int l)
 	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
 }
 
-qint64 Long64Swap (qint64 ll)
-{
-	qint64	result;
-
-	result.b0 = ll.b7;
-	result.b1 = ll.b6;
-	result.b2 = ll.b5;
-	result.b3 = ll.b4;
-	result.b4 = ll.b3;
-	result.b5 = ll.b2;
-	result.b6 = ll.b1;
-	result.b7 = ll.b0;
-
-	return result;
-}
-
 typedef union {
     float	f;
     unsigned int i;
@@ -178,61 +162,14 @@ PARSING
 */
 
 static	char	com_token[MAX_TOKEN_CHARS];
-static	char	com_parsename[MAX_TOKEN_CHARS];
-static	int		com_lines;
 
-void COM_BeginParseSession( const char *name )
-{
-	com_lines = 0;
-	Com_sprintf(com_parsename, sizeof(com_parsename), "%s", name);
-}
-
-int COM_GetCurrentParseLine( void )
-{
-	return com_lines;
-}
 
 const char* COM_Parse( const char** data_p )
 {
 	return COM_ParseExt( data_p, qtrue );
 }
 
-void COM_ParseError( char *format, ... )
-{
-	va_list argptr;
-	static char string[4096];
 
-	va_start (argptr, format);
-	vsprintf (string, format, argptr);
-	va_end (argptr);
-
-	Com_Printf("ERROR: %s, line %d: %s\n", com_parsename, com_lines, string);
-}
-
-void COM_ParseWarning( char *format, ... )
-{
-	va_list argptr;
-	static char string[4096];
-
-	va_start (argptr, format);
-	vsprintf (string, format, argptr);
-	va_end (argptr);
-
-	Com_Printf("WARNING: %s, line %d: %s\n", com_parsename, com_lines, string);
-}
-
-/*
-==============
-COM_Parse
-
-Parse a token out of a string
-Will never return NULL, just empty strings
-
-If "allowLineBreaks" is qtrue then an empty
-string will be returned if the next token is
-a newline.
-==============
-*/
 static const char* SkipWhitespace( const char* data, qbool* hasNewLines )
 {
 	int c;
@@ -242,7 +179,6 @@ static const char* SkipWhitespace( const char* data, qbool* hasNewLines )
 			return NULL;
 		}
 		if( c == '\n' ) {
-			com_lines++;
 			*hasNewLines = qtrue;
 		}
 		data++;
@@ -308,6 +244,9 @@ int COM_Compress( char* p )
 	return out - p;
 }
 
+
+// parse a token out of a string - will never return NULL, just empty strings
+// if "allowLineBreaks" is true then an empty string will be returned if the next token is a newline
 
 const char* COM_ParseExt( const char** data_p, qbool allowLineBreaks )
 {
@@ -399,9 +338,7 @@ const char* COM_ParseExt( const char** data_p, qbool allowLineBreaks )
 		}
 		data++;
 		c = *data;
-		if ( c == '\n' )
-			com_lines++;
-	} while (c>32);
+	} while (c > 32);
 
 	com_token[len] = 0;
 
@@ -410,37 +347,10 @@ const char* COM_ParseExt( const char** data_p, qbool allowLineBreaks )
 }
 
 
-void COM_MatchToken( const char** data, const char* match )
-{
-	const char* token = COM_Parse( data );
-	if ( strcmp( token, match ) ) {
-		Com_Error( ERR_DROP, "MatchToken: %s != %s", token, match );
-	}
-}
-
-
-// returns the index in g_color_table[] corresponding to the colour code; white on failure
-int ColorIndex( char ccode )
-{
-	if ( ccode >= '0' && ccode <= '9' ) {
-		return (ccode - '0');
-	} else if ( ccode >= 'a' && ccode <= 'y' ) {
-		return ((ccode - 'a') + 10);
-	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
-		return ((ccode - 'A') + 10);
-	}
-
-	return 7;
-}
-
 /*
-=================
-SkipBracedSection
-
 The next token should be an open brace.
 Skips until a matching close brace is found.
 Internal brace depths are properly skipped.
-=================
 */
 void SkipBracedSection( const char** data )
 {
@@ -463,17 +373,28 @@ void SkipBracedSection( const char** data )
 
 void SkipRestOfLine( const char** data )
 {
+	int c;
 	const char* p = *data;
 
-	int c;
-	while ( (c = *p++) != 0 ) {
-		if ( c == '\n' ) {
-			com_lines++;
-			break;
-		}
-	}
+	while ( (c = *p++) && (c != '\n') )
+		;
 
 	*data = p;
+}
+
+
+// returns the index in g_color_table[] corresponding to the colour code; white on failure
+int ColorIndex( char ccode )
+{
+	if ( ccode >= '0' && ccode <= '9' ) {
+		return (ccode - '0');
+	} else if ( ccode >= 'a' && ccode <= 'y' ) {
+		return ((ccode - 'a') + 10);
+	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
+		return ((ccode - 'A') + 10);
+	}
+
+	return 7;
 }
 
 
@@ -843,6 +764,10 @@ Info_RemoveKey
 ===================
 */
 void Info_RemoveKey( char *s, const char *key ) {
+	char	*start;
+	char	pkey[MAX_INFO_KEY];
+	char	value[MAX_INFO_VALUE];
+	char	*o;
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_RemoveKey: oversize infostring" );
@@ -854,11 +779,7 @@ void Info_RemoveKey( char *s, const char *key ) {
 
 	while (1)
 	{
-		char *o;
-		char pkey[MAX_INFO_KEY];
-		char value[MAX_INFO_VALUE];
-		char *start = s;
-
+		start = s;
 		if (*s == '\\')
 			s++;
 		o = pkey;
@@ -948,8 +869,6 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 }
 
 
-
-
 /*
 ==================
 Info_Validate
@@ -976,6 +895,7 @@ Changes or adds a key/value pair
 ==================
 */
 void Info_SetValueForKey( char *s, const char *key, const char *value ) {
+	char	newi[MAX_INFO_STRING];
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
 		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
@@ -1000,20 +920,18 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 	}
 
 	Info_RemoveKey (s, key);
-	if (!value || !strlen(value)){
+	if (!value || !strlen(value))
 		return;
-	} else {
-		char	newi[MAX_INFO_STRING];
-		Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
 
-		if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
-		{
-			Com_Printf ("Info string length exceeded\n");
-			return;
-		}
+	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
 
-		strcat (s, newi);
+	if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
+	{
+		Com_Printf ("Info string length exceeded\n");
+		return;
 	}
+
+	strcat (s, newi);
 }
 
 /*
