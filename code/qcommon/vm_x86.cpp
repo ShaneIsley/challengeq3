@@ -322,7 +322,7 @@ int VM_CallCompiled( vm_t* vm, int* args )
 		"	movl %%edi,%1	\n" \
 		"	popal			\n" \
 		: "=m" (programStack), "=m" (opStack) \
-		: "m" (vm->codeBase), "m" (programStack), "m" (opStack) \
+		: "m" (vm->codeBase) \
 		: "si", "di" \
 	);
 #endif
