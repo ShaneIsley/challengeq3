@@ -199,6 +199,7 @@ SV_LinkEntity
 #define MAX_TOTAL_ENT_LEAFS		128
 void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	worldSector_t	*node;
+	int			leafs[MAX_TOTAL_ENT_LEAFS];
 	int			cluster;
 	int			num_leafs;
 	int			i, j, k;
@@ -280,7 +281,6 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	ent->areanum2 = -1;
 
 	//get all leafs, including solids
-	int	 leafs[MAX_TOTAL_ENT_LEAFS];
 	num_leafs = CM_BoxLeafnums( gEnt->r.absmin, gEnt->r.absmax,
 		leafs, MAX_TOTAL_ENT_LEAFS, &lastLeaf );
 

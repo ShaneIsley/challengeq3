@@ -788,20 +788,18 @@ Fill up msg with data
 */
 void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 {
-
-	if (!*cl->downloadName)
-		return;	// Nothing being downloaded
-
 	int curindex;
 	int rate;
 	int blockspersnap;
 	int idPack = 0, missionPack = 0, unreferenced = 1;
+	char errorMessage[1024];
+	char pakbuf[MAX_QPATH], *pakptr;
 	int numRefPaks;
 
-	if (!cl->download) {
-		char errorMessage[1024];
-		char pakbuf[MAX_QPATH], *pakptr;
+	if (!*cl->downloadName)
+		return;	// Nothing being downloaded
 
+	if (!cl->download) {
 		// Chop off filename extension.
 		Com_sprintf(pakbuf, sizeof(pakbuf), "%s", cl->downloadName);
 		pakptr = Q_strrchr(pakbuf, '.');
@@ -1335,6 +1333,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qbool delta ) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;
+	usercmd_t	cmds[MAX_PACKET_USERCMDS];
 	usercmd_t	*cmd, *oldcmd;
 
 	if ( delta ) {
@@ -1364,7 +1363,6 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qbool delta ) {
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
-	usercmd_t	cmds[MAX_PACKET_USERCMDS];
 	for ( i = 0 ; i < cmdCount ; i++ ) {
 		cmd = &cmds[i];
 		MSG_ReadDeltaUsercmdKey( msg, key, oldcmd, cmd );

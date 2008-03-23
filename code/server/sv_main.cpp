@@ -314,11 +314,6 @@ the simple info query.
 ================
 */
 void SVC_Status( netadr_t from ) {
-
-	// ignore if we are in single player
-	if (Cvar_VariableValue("sv_singlePlayer"))
-		return;
-
 	char	player[1024];
 	char	status[MAX_MSGLEN];
 	int		i;
@@ -327,6 +322,10 @@ void SVC_Status( netadr_t from ) {
 	int		statusLength;
 	int		playerLength;
 	char	infostring[MAX_INFO_STRING];
+
+	// ignore if we are in single player
+	if (Cvar_VariableValue("sv_singlePlayer"))
+		return;
 
 	strcpy( infostring, Cvar_InfoString( CVAR_SERVERINFO ) );
 
@@ -361,6 +360,9 @@ void SVC_Status( netadr_t from ) {
 
 static void SVC_Info( const netadr_t& from )
 {
+	int		i, count;
+	char	infostring[MAX_INFO_STRING];
+
 	// ignore if we are in single player
 	if (Cvar_VariableValue("sv_singlePlayer"))
 		return;
@@ -371,9 +373,6 @@ static void SVC_Info( const netadr_t& from )
 	// A maximum challenge length of 128 should be more than plenty.
 	if(strlen(Cmd_Argv(1)) > 128)
 		return;
-
-	int		i, count;
-	char	infostring[MAX_INFO_STRING];
 
 	// don't count privateclients
 	count = 0;
@@ -435,8 +434,11 @@ Redirect all printfs
 void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	qbool	valid;
 	unsigned int time;
+	char		remaining[1024];
 	// TTimo - scaled down to accumulate, but not overflow anything network wise, print wise etc.
 	// (OOB messages are the bottleneck here)
+#define SV_OUTPUTBUF_LENGTH (1024 - 16)
+	char		sv_outputbuf[SV_OUTPUTBUF_LENGTH];
 	static unsigned int lasttime = 0;
 
 	// TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=534
@@ -455,8 +457,6 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 		Com_Printf ("Rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
 	}
 
-	#define SV_OUTPUTBUF_LENGTH (1024 - 16)
-	char sv_outputbuf[SV_OUTPUTBUF_LENGTH];
 	// start redirecting all print outputs to the packet
 	svs.redirectAddress = from;
 	Com_BeginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
@@ -466,7 +466,6 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	} else if ( !valid ) {
 		Com_Printf ("Bad rconpassword.\n");
 	} else {
-		char remaining[1024];
 		remaining[0] = 0;
 		
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
