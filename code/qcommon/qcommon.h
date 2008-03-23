@@ -916,18 +916,6 @@ void* QDECL Sys_LoadDll( const char* name,
 		intptr_t (QDECL **entryPoint)(int, ...), intptr_t (QDECL *systemcalls)(intptr_t, ...) );
 void Sys_UnloadDll( void* dllHandle );
 
-void	Sys_UnloadGame( void );
-void	*Sys_GetGameAPI( void *parms );
-
-void	Sys_UnloadCGame( void );
-void	*Sys_GetCGameAPI( void );
-
-void	Sys_UnloadUI( void );
-void	*Sys_GetUIAPI( void );
-
-void	Sys_UnloadBotLib( void );
-void	*Sys_GetBotLibAPI( void *parms );
-
 void	QDECL Sys_Error( const char *error, ...);
 char	*Sys_GetClipboardData( void );	// note that this isn't journaled...
 
