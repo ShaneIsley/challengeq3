@@ -181,13 +181,6 @@ typedef int		clipHandle_t;
 	#define ALIGN(x)
 #endif
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
-
-#define	MAX_QINT			0x7fffffff
-#define	MIN_QINT			(-MAX_QINT-1)
-
 
 // angle indexes
 #define	PITCH				0		// up / down
