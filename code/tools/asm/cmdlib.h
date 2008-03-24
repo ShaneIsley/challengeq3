@@ -52,12 +52,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #endif
 
-#ifndef __BYTEBOOL__
-#define __BYTEBOOL__
-typedef enum { qfalse, qtrue } qboolean;
-typedef unsigned char byte;
-#endif
-
 #define	MAX_OS_PATH		1024
 #define MEM_BLOCKSIZE 4096
 
@@ -73,22 +67,11 @@ char *strupr (char *in);
 char *strlower (char *in);
 int Q_strncasecmp( const char *s1, const char *s2, int n );
 int Q_stricmp( const char *s1, const char *s2 );
-void Q_getwd( char *out );
 
 int Q_filelength (FILE *f);
 int	FileTime( const char *path );
 
 void	Q_mkdir( const char *path );
-
-extern	char		qdir[1024];
-extern	char		gamedir[1024];
-extern  char		writedir[1024];
-void SetQdirFromPath( const char *path );
-char *ExpandArg( const char *path );	// from cmd line
-char *ExpandPath( const char *path );	// from scripts
-char *ExpandGamePath (const char *path);
-char *ExpandPathAndArchive( const char *path );
-
 
 double I_FloatTime( void );
 
@@ -116,14 +99,6 @@ void 	ExtractFileBase( const char *path, char *dest );
 void	ExtractFileExtension( const char *path, char *dest );
 
 int 	ParseNum (const char *str);
-
-short	BigShort (short l);
-short	LittleShort (short l);
-int		BigLong (int l);
-int		LittleLong (int l);
-float	BigFloat (float l);
-float	LittleFloat (float l);
-
 
 char *ASM_Parse (char *data);
 

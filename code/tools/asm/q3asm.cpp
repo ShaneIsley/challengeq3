@@ -20,10 +20,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include "cmdlib.h"
-#define _QCOMMON_H_
-typedef struct vm_s vm_t;
 #include "../../qcommon/vm_local.h"
+
+extern "C" {
+#include "cmdlib.h"
+};
 
 /* 19079 total symbols in FI, 2002 Jan 23 */
 #define DEFAULT_HASHTABLE_SIZE 2048
@@ -165,16 +166,14 @@ void
 hashtable_init (hashtable_t *H, int buckets)
 {
   H->buckets = buckets;
-  H->table = calloc(H->buckets, sizeof(*(H->table)));
+  H->table = (hashchain_t**)calloc(H->buckets, sizeof(*(H->table)));
   return;
 }
 
 hashtable_t *
 hashtable_new (int buckets)
 {
-  hashtable_t *H;
-
-  H = malloc(sizeof(hashtable_t));
+  hashtable_t *H = (hashtable_t*)malloc(sizeof(hashtable_t));
   hashtable_init(H, buckets);
   return H;
 }
@@ -191,14 +190,14 @@ hashtable_add (hashtable_t *H, int hashvalue, void *datum)
   if (*hb == 0)
     {
       /* Empty bucket.  Create new one. */
-      *hb = calloc(1, sizeof(**hb));
+      *hb = (hashchain_t*)calloc(1, sizeof(**hb));
       hc = *hb;
     }
   else
     {
       /* Get hc to point to last node in chain. */
       for (hc = *hb; hc && hc->next; hc = hc->next);
-      hc->next = calloc(1, sizeof(*hc));
+      hc->next = (hashchain_t*)calloc(1, sizeof(*hc));
       hc = hc->next;
     }
   hc->data = datum;
@@ -311,7 +310,7 @@ sort_symbols ()
 
 //crumb("sort_symbols: Constructing symlist array\n");
   for (elems = 0, s = symbols; s; s = s->next, elems++) /* nop */ ;
-  symlist = malloc(elems * sizeof(symbol_t*));
+  symlist = (symbol_t**)malloc(elems * sizeof(symbol_t*));
   for (i = 0, s = symbols; s; s = s->next, i++)
     {
       symlist[i] = s;
@@ -398,7 +397,7 @@ unsigned int HashString (const char *key)
     acc = (acc << 2) | (acc >> 30);
     acc &= 0xffffffffU;
     }
-    return abs(acc);
+    return abs((long)acc);
 }
 
 
@@ -478,7 +477,7 @@ void DefineSymbol( char *sym, int value ) {
 		return;
 	}
 
-	s = malloc( sizeof( *s ) );
+	s = (symbol_t*)malloc( sizeof( *s ) );
 	s->next = NULL;
 	s->name = copystring( sym );
 	s->hash = hash;

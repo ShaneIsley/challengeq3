@@ -21,9 +21,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // cmdlib.c
 
+#include "../../qcommon/q_shared.h"
 #include "cmdlib.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
+/*
 
 #ifdef WIN32
 #include <direct.h>
@@ -35,6 +38,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #define	BASEDIRNAME	"quake"		// assumed to have a 2 or 3 following
+*/
+
 #define PATHSEPERATOR   '/'
 
 // set these before calling CheckParm
@@ -169,12 +174,6 @@ void qprintf( const char *format, ... ) {
 
 }
 
-#ifdef WIN32
-HWND hwndOut = NULL;
-qboolean lookedForServer = qfalse;
-UINT wm_BroadcastCommand = -1;
-#endif
-
 void _printf( const char *format, ... ) {
 	va_list argptr;
 	char text[4096];
@@ -184,154 +183,6 @@ void _printf( const char *format, ... ) {
 	va_end (argptr);
 
 	printf(text);
-}
-
-
-/*
-
-qdir will hold the path up to the quake directory, including the slash
-
-  f:\quake\
-  /raid/quake/
-
-gamedir will hold qdir + the game directory (id1, id2, etc)
-
-  */
-
-char		qdir[1024];
-char		gamedir[1024];
-char		writedir[1024];
-
-void SetQdirFromPath( const char *path )
-{
-	char	temp[1024];
-	const char	*c;
-  const char *sep;
-	int		len, count;
-
-	if (!(path[0] == '/' || path[0] == '\\' || path[1] == ':'))
-	{	// path is partial
-		Q_getwd (temp);
-		strcat (temp, path);
-		path = temp;
-	}
-
-	// search for "quake2" in path
-
-	len = strlen(BASEDIRNAME);
-	for (c=path+strlen(path)-1 ; c != path ; c--)
-	{
-		int i;
-
-		if (!Q_strncasecmp (c, BASEDIRNAME, len))
-		{
-      //
-			//strncpy (qdir, path, c+len+2-path);
-      // the +2 assumes a 2 or 3 following quake which is not the
-      // case with a retail install
-      // so we need to add up how much to the next separator
-      sep = c + len;
-      count = 1;
-      while (*sep && *sep != '/' && *sep != '\\')
-      {
-        sep++;
-        count++;
-      }
-			strncpy (qdir, path, c+len+count-path);
-			qprintf ("qdir: %s\n", qdir);
-			for ( i = 0; i < strlen( qdir ); i++ )
-			{
-				if ( qdir[i] == '\\' ) 
-					qdir[i] = '/';
-			}
-
-			c += len+count;
-			while (*c)
-			{
-				if (*c == '/' || *c == '\\')
-				{
-					strncpy (gamedir, path, c+1-path);
-
-					for ( i = 0; i < strlen( gamedir ); i++ )
-					{
-						if ( gamedir[i] == '\\' ) 
-							gamedir[i] = '/';
-					}
-
-					qprintf ("gamedir: %s\n", gamedir);
-
-					if ( !writedir[0] )
-						strcpy( writedir, gamedir );
-					else if ( writedir[strlen( writedir )-1] != '/' )
-					{
-						writedir[strlen( writedir )] = '/';
-						writedir[strlen( writedir )+1] = 0;
-					}
-
-					return;
-				}
-				c++;
-			}
-			Error ("No gamedir in %s", path);
-			return;
-		}
-	}
-	Error ("SetQdirFromPath: no '%s' in %s", BASEDIRNAME, path);
-}
-
-char *ExpandArg (const char *path)
-{
-	static char full[1024];
-
-	if (path[0] != '/' && path[0] != '\\' && path[1] != ':')
-	{
-		Q_getwd (full);
-		strcat (full, path);
-	}
-	else
-		strcpy (full, path);
-	return full;
-}
-
-char *ExpandPath (const char *path)
-{
-	static char full[1024];
-	if (!*qdir)
-		Error ("ExpandPath called without qdir set");
-	if (path[0] == '/' || path[0] == '\\' || path[1] == ':') {
-		strcpy( full, path );
-		return full;
-	}
-	sprintf (full, "%s%s", qdir, path);
-	return full;
-}
-
-char *ExpandGamePath (const char *path)
-{
-	static char full[1024];
-	if (!*qdir)
-		Error ("ExpandGamePath called without qdir set");
-	if (path[0] == '/' || path[0] == '\\' || path[1] == ':') {
-		strcpy( full, path );
-		return full;
-	}
-	sprintf (full, "%s%s", gamedir, path);
-	return full;
-}
-
-char *ExpandPathAndArchive (const char *path)
-{
-	char	*expanded;
-	char	archivename[1024];
-
-	expanded = ExpandPath (path);
-
-	if (archive)
-	{
-		sprintf (archivename, "%s/%s", archivedir, path);
-		QCopyFile (expanded, archivename);
-	}
-	return expanded;
 }
 
 
@@ -374,27 +225,6 @@ double I_FloatTime (void)
 	return (tp.tv_sec - secbase) + tp.tv_usec/1000000.0;
 #endif
 }
-
-void Q_getwd (char *out)
-{
-	int i = 0;
-
-#ifdef WIN32
-   _getcwd (out, 256);
-   strcat (out, "\\");
-#else
-   getcwd (out, 256);
-   strcat (out, "/");
-#endif
-
-   while ( out[i] != 0 )
-   {
-	   if ( out[i] == '\\' )
-		   out[i] = '/';
-	   i++;
-   }
-}
-
 
 void Q_mkdir (const char *path)
 {
@@ -948,132 +778,6 @@ int ParseNum (const char *str)
 		return ParseHex (str+2);
 	return atol (str);
 }
-
-
-
-/*
-============================================================================
-
-					BYTE ORDER FUNCTIONS
-
-============================================================================
-*/
-
-#ifdef _SGI_SOURCE
-#define	__BIG_ENDIAN__
-#endif
-
-#ifdef __BIG_ENDIAN__
-
-short   LittleShort (short l)
-{
-	byte    b1,b2;
-
-	b1 = l&255;
-	b2 = (l>>8)&255;
-
-	return (b1<<8) + b2;
-}
-
-short   BigShort (short l)
-{
-	return l;
-}
-
-
-int    LittleLong (int l)
-{
-	byte    b1,b2,b3,b4;
-
-	b1 = l&255;
-	b2 = (l>>8)&255;
-	b3 = (l>>16)&255;
-	b4 = (l>>24)&255;
-
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
-}
-
-int    BigLong (int l)
-{
-	return l;
-}
-
-
-float	LittleFloat (float l)
-{
-	union {byte b[4]; float f;} in, out;
-	
-	in.f = l;
-	out.b[0] = in.b[3];
-	out.b[1] = in.b[2];
-	out.b[2] = in.b[1];
-	out.b[3] = in.b[0];
-	
-	return out.f;
-}
-
-float	BigFloat (float l)
-{
-	return l;
-}
-
-
-#else
-
-
-short   BigShort (short l)
-{
-	byte    b1,b2;
-
-	b1 = l&255;
-	b2 = (l>>8)&255;
-
-	return (b1<<8) + b2;
-}
-
-short   LittleShort (short l)
-{
-	return l;
-}
-
-
-int    BigLong (int l)
-{
-	byte    b1,b2,b3,b4;
-
-	b1 = l&255;
-	b2 = (l>>8)&255;
-	b3 = (l>>16)&255;
-	b4 = (l>>24)&255;
-
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
-}
-
-int    LittleLong (int l)
-{
-	return l;
-}
-
-float	BigFloat (float l)
-{
-	union {byte b[4]; float f;} in, out;
-	
-	in.f = l;
-	out.b[0] = in.b[3];
-	out.b[1] = in.b[2];
-	out.b[2] = in.b[1];
-	out.b[3] = in.b[0];
-	
-	return out.f;
-}
-
-float	LittleFloat (float l)
-{
-	return l;
-}
-
-
-#endif
 
 
 //=======================================================
