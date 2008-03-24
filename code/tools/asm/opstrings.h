@@ -19,6 +19,7 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
+
 { "BREAK", OP_BREAK },
 
 { "CNSTF4", OP_CONST },
@@ -172,4 +173,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 { "LOADP4", OP_UNDEF },
 { "LOADU4", OP_UNDEF },
 
+{ NULL, OP_UNDEF }
 
