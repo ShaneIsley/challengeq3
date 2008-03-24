@@ -49,15 +49,6 @@ extern "C" {
 };
 
 
-struct SourceOp {
-	const char* name;
-	int opcode;
-};
-
-static const SourceOp aSourceOps[] = {
-	#include "opstrings.h"
-};
-
 typedef stdext::hash_map< const char*, int, VanillaStringCmp > OpTable;
 OpTable aOpTable;
 
@@ -942,6 +933,15 @@ Empirical frequency statistics from FI 2001.01.23:
 
 static void InitTables()
 {
+	struct SourceOp {
+		const char* name;
+		int opcode;
+	};
+
+	static const SourceOp aSourceOps[] = {
+		#include "opstrings.h"
+	};
+
 	for (int i = 0; aSourceOps[i].name; ++i) {
 		aOpTable[ aSourceOps[i].name ] = aSourceOps[i].opcode;
 	}
@@ -1133,40 +1133,32 @@ void ParseOptionFile( const char *filename ) {
 	}
 }
 
-/*
-==============
-main
-==============
-*/
-int main( int argc, char **argv ) {
-	int			i;
-	double		start, end;
 
+int main( int argc, char **argv )
+{
 	if ( argc < 2 ) {
-		Error("Usage: %s [OPTION]... [FILES]...\n\
-Assemble LCC bytecode assembly to Q3VM bytecode.\n\
-\n\
-    -o OUTPUT      Write assembled output to file OUTPUT.qvm\n\
-    -f LISTFILE    Read options and list of files to assemble from LISTFILE\n\
-    -v             Verbose compilation report\n\
-", argv[0]);
+		Error( "Usage: %s [OPTION]... [FILES]...\n"
+				"Assemble LCC bytecode assembly to Q3VM bytecode.\n\n"
+				"-o OUTPUT     Write assembled output to file OUTPUT.qvm\n"
+				"-f LISTFILE   Read options and list of files to assemble from LISTFILE\n"
+				"-v            Verbose compilation report\n"
+				, argv[0] );
 	}
-
-	start = I_FloatTime ();
 
 	// default filename is "q3asm"
 	strcpy( outputFilename, "q3asm" );
-	numAsmFiles = 0;	
+	numAsmFiles = 0;
 
-	for ( i = 1 ; i < argc ; i++ ) {
+	int i;
+	for (i = 1; i < argc; ++i) {
 		if ( argv[i][0] != '-' ) {
 			break;
 		}
+
 		if ( !strcmp( argv[i], "-o" ) ) {
 			if ( i == argc - 1 ) {
 				Error( "-o must preceed a filename" );
 			}
-/* Timbo of Tremulous pointed out -o not working; stock ID q3asm folded in the change. Yay. */
 			strcpy( outputFilename, argv[ i+1 ] );
 			i++;
 			continue;
@@ -1181,12 +1173,9 @@ Assemble LCC bytecode assembly to Q3VM bytecode.\n\
 			continue;
 		}
 
+		// by default (no -v option), q3asm remains silent except for critical errors
+		// verbosity turns on all messages, error or not
 		if( !strcmp( argv[ i ], "-v" ) ) {
-/* Verbosity option added by Timbo, 2002.09.14.
-By default (no -v option), q3asm remains silent except for critical errors.
-Verbosity turns on all messages, error or not.
-Motivation: not wanting to scrollback for pages to find asm error.
-*/
 			options.verbose = qtrue;
 			continue;
 		}
@@ -1200,18 +1189,13 @@ Motivation: not wanting to scrollback for pages to find asm error.
 	}
 
 	// the rest of the command line args are asm files
-	for ( ; i < argc ; i++ ) {
+	for (; i < argc; ++i) {
 		asmFileNames[ numAsmFiles ] = copystring( argv[ i ] );
 		numAsmFiles++;
 	}
 
-	options.verbose = qtrue;
-
 	InitTables();
 	Assemble();
-
-	end = I_FloatTime ();
-	report ("%5.0f seconds elapsed\n", end-start);
 
 	return errorCount;
 }
