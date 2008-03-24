@@ -25,6 +25,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __CMDLIB__
 
 #ifdef _MSC_VER
+#pragma warning( disable : 4996 )
+
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
 #pragma warning(disable : 4051)     // ALPHA
@@ -123,7 +125,7 @@ float	BigFloat (float l);
 float	LittleFloat (float l);
 
 
-char *COM_Parse (char *data);
+char *ASM_Parse (char *data);
 
 extern	char		com_token[1024];
 extern	qboolean	com_eof;

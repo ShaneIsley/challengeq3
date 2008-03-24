@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "cmdlib.h"
-#include "mathlib.h"
-#include "../../qcommon/qfiles.h"
+#define _QCOMMON_H_
+typedef struct vm_s vm_t;
+#include "../../qcommon/vm_local.h"
 
 /* 19079 total symbols in FI, 2002 Jan 23 */
 #define DEFAULT_HASHTABLE_SIZE 2048
@@ -31,92 +32,6 @@ char	outputFilename[MAX_OS_PATH];
 
 // the zero page size is just used for detecting run time faults
 #define	ZERO_PAGE_SIZE	0		// 256
-
-typedef enum {
-	OP_UNDEF, 
-
-	OP_IGNORE, 
-
-	OP_BREAK, 
-
-	OP_ENTER,
-	OP_LEAVE,
-	OP_CALL,
-	OP_PUSH,
-	OP_POP,
-
-	OP_CONST,
-	OP_LOCAL,
-
-	OP_JUMP,
-
-	//-------------------
-
-	OP_EQ,
-	OP_NE,
-
-	OP_LTI,
-	OP_LEI,
-	OP_GTI,
-	OP_GEI,
-
-	OP_LTU,
-	OP_LEU,
-	OP_GTU,
-	OP_GEU,
-
-	OP_EQF,
-	OP_NEF,
-
-	OP_LTF,
-	OP_LEF,
-	OP_GTF,
-	OP_GEF,
-
-	//-------------------
-
-	OP_LOAD1,
-	OP_LOAD2,
-	OP_LOAD4,
-	OP_STORE1,
-	OP_STORE2,
-	OP_STORE4,				// *(stack[top-1]) = stack[yop
-	OP_ARG,
-	OP_BLOCK_COPY,
-
-	//-------------------
-
-	OP_SEX8,
-	OP_SEX16,
-
-	OP_NEGI,
-	OP_ADD,
-	OP_SUB,
-	OP_DIVI,
-	OP_DIVU,
-	OP_MODI,
-	OP_MODU,
-	OP_MULI,
-	OP_MULU,
-
-	OP_BAND,
-	OP_BOR,
-	OP_BXOR,
-	OP_BCOM,
-
-	OP_LSH,
-	OP_RSHI,
-	OP_RSHU,
-
-	OP_NEGF,
-	OP_ADDF,
-	OP_SUBF,
-	OP_DIVF,
-	OP_MULF,
-
-	OP_CVIF,
-	OP_CVFI
-} opcode_t;
 
 typedef struct {
 	int		imageBytes;		// after decompression
@@ -175,7 +90,6 @@ int		errorCount;
 typedef struct options_s {
 	qboolean verbose;
 	qboolean writeMapFile;
-	qboolean vanillaQ3Compatibility;
 } options_t;
 
 options_t options = { 0 };
@@ -1370,24 +1284,18 @@ void WriteVmFile( void ) {
 	report( "lit  segment: %7i\n", segment[LITSEG].imageUsed );
 	report( "bss  segment: %7i\n", segment[BSSSEG].imageUsed );
 	report( "instruction count: %i\n", instructionCount );
-  
+
 	if ( errorCount != 0 ) {
 		report( "Not writing a file due to errors\n" );
 		return;
 	}
 
-	if( !options.vanillaQ3Compatibility ) {
-		header.vmMagic = VM_MAGIC_VER2;
-		headerSize = sizeof( header );
-	} else {
-		header.vmMagic = VM_MAGIC;
-
-		// Don't write the VM_MAGIC_VER2 bits when maintaining 1.32b compatibility.
-		// (I know this isn't strictly correct due to padding, but then platforms
-		// that pad wouldn't be able to write a correct header anyway).  Note: if
-		// vmHeader_t changes, this needs to be adjusted too.
-		headerSize = sizeof( header ) - sizeof( header.jtrgLength );
-	}
+	header.vmMagic = VM_MAGIC;
+	// Don't write the VM_MAGIC_VER2 bits when maintaining 1.32b compatibility.
+	// (I know this isn't strictly correct due to padding, but then platforms
+	// that pad wouldn't be able to write a correct header anyway).  Note: if
+	// vmHeader_t changes, this needs to be adjusted too.
+	headerSize = sizeof( header ) - sizeof( header.jtrgLength );
 
 	header.instructionCount = instructionCount;
 	header.codeOffset = headerSize;
@@ -1406,11 +1314,6 @@ void WriteVmFile( void ) {
 	SafeWrite( f, &segment[CODESEG].image, segment[CODESEG].imageUsed );
 	SafeWrite( f, &segment[DATASEG].image, segment[DATASEG].imageUsed );
 	SafeWrite( f, &segment[LITSEG].image, segment[LITSEG].imageUsed );
-
-	if( !options.vanillaQ3Compatibility ) {
-		SafeWrite( f, &segment[JTRGSEG].image, segment[JTRGSEG].imageUsed );
-	}
-
 	fclose( f );
 }
 
@@ -1499,10 +1402,10 @@ void ParseOptionFile( const char *filename ) {
 
 	text_p = text;
 
-	while( ( text_p = COM_Parse( text_p ) ) != 0 ) {
+	while( ( text_p = ASM_Parse( text_p ) ) != 0 ) {
 		if ( !strcmp( com_token, "-o" ) ) {
 			// allow output override in option file
-			text_p = COM_Parse( text_p );
+			text_p = ASM_Parse( text_p );
 			if ( text_p ) {
 				strcpy( outputFilename, com_token );
 			}
@@ -1533,7 +1436,6 @@ Assemble LCC bytecode assembly to Q3VM bytecode.\n\
     -f LISTFILE    Read options and list of files to assemble from LISTFILE\n\
     -b BUCKETS     Set symbol hash table to BUCKETS buckets\n\
     -v             Verbose compilation report\n\
-    -vq3           Produce a qvm file compatible with Q3 1.32b\n\
 ", argv[0]);
 	}
 
@@ -1587,11 +1489,6 @@ Motivation: not wanting to scrollback for pages to find asm error.
 
 		if( !strcmp( argv[ i ], "-m" ) ) {
 			options.writeMapFile = qtrue;
-			continue;
-		}
-
-		if( !strcmp( argv[ i ], "-vq3" ) ) {
-			options.vanillaQ3Compatibility = qtrue;
 			continue;
 		}
 

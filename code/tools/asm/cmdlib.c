@@ -177,29 +177,13 @@ UINT wm_BroadcastCommand = -1;
 
 void _printf( const char *format, ... ) {
 	va_list argptr;
-  char text[4096];
-#ifdef WIN32
-  ATOM a;
-#endif
+	char text[4096];
+
 	va_start (argptr,format);
 	vsprintf (text, format, argptr);
 	va_end (argptr);
 
-  printf(text);
-
-#ifdef WIN32
-  if (!lookedForServer) {
-    lookedForServer = qtrue;
-    hwndOut = FindWindow(NULL, "Q3Map Process Server");
-    if (hwndOut) {
-      wm_BroadcastCommand = RegisterWindowMessage( "Q3MPS_BroadcastCommand" );
-    }
-  }
-  if (hwndOut) {
-    a = GlobalAddAtom(text);
-    PostMessage(hwndOut, wm_BroadcastCommand, 0, (LPARAM)a);
-  }
-#endif
+	printf(text);
 }
 
 
@@ -451,7 +435,7 @@ COM_Parse
 Parse a token out of a string
 ==============
 */
-char *COM_Parse (char *data)
+char *ASM_Parse (char *data)
 {
 	int		c;
 	int		len;
