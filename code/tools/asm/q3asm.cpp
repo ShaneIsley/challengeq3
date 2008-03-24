@@ -20,14 +20,47 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+#include <hash_map>
+
+struct VanillaStringCmp
+{
+	// parameters for hash table
+	enum { bucket_size = 4, min_buckets = 8 };
+
+	size_t operator()( const char* s ) const // X31 hash
+	{
+		size_t h = 0;
+		const unsigned char* p = (const unsigned char*)s;
+		while (*p)
+			h = (h << 5) - h + (*p++);
+		return h;
+	}
+
+	bool operator()( const char* lhs, const char* rhs) const
+	{
+		return (strcmp(lhs, rhs) < 0);
+	}
+};
+
 #include "../../qcommon/vm_local.h"
 
 extern "C" {
 #include "cmdlib.h"
 };
 
-/* 19079 total symbols in FI, 2002 Jan 23 */
-#define DEFAULT_HASHTABLE_SIZE 2048
+
+struct SourceOp {
+	const char* name;
+	int opcode;
+};
+
+static const SourceOp aSourceOps[] = {
+	#include "opstrings.h"
+};
+
+typedef stdext::hash_map< const char*, int, VanillaStringCmp > OpTable;
+OpTable aOpTable;
+
 
 char	outputFilename[MAX_OS_PATH];
 
@@ -58,27 +91,14 @@ typedef struct {
 	int		segmentBase;		// only valid on second pass
 } segment_t;
 
-typedef struct symbol_s {
-	struct	symbol_s	*next;
-	int		hash;
-	segment_t	*segment;
-	char	*name;
-	int		value;
+typedef struct {
+	const segment_t* segment;
+	int value;
 } symbol_t;
 
-typedef struct hashchain_s {
-  void *data;
-  struct hashchain_s *next;
-} hashchain_t;
+typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
+SymTable aSymTable;
 
-typedef struct hashtable_s {
-  int buckets;
-  hashchain_t **table;
-} hashtable_t;
-
-int symtablelen = DEFAULT_HASHTABLE_SIZE;
-hashtable_t *symtable;
-hashtable_t *optable;
 
 segment_t	segment[NUM_SEGMENTS];
 segment_t	*currentSegment;
@@ -93,7 +113,7 @@ typedef struct options_s {
 	qboolean writeMapFile;
 } options_t;
 
-options_t options = { 0 };
+static options_t options;
 
 symbol_t	*symbols;
 symbol_t	*lastSymbol = 0;  /* Most recent symbol defined. */
@@ -108,7 +128,6 @@ int		currentFileIndex;
 char	*currentFileName;
 int		currentFileLine;
 
-//int		stackSize = 16384;
 int		stackSize = 0x10000;
 
 // we need to convert arg and ret instructions to
@@ -124,20 +143,6 @@ int		lineParseOffset;
 char	token[MAX_LINE_LENGTH];
 
 int		instructionCount;
-
-typedef struct {
-	char	*name;
-	int		opcode;
-} sourceOps_t;
-
-sourceOps_t		sourceOps[] = {
-#include "opstrings.h"
-};
-
-#define	NUM_SOURCE_OPS ( sizeof( sourceOps ) / sizeof( sourceOps[0] ) )
-
-int		opcodesHash[ NUM_SOURCE_OPS ];
-
 
 
 int
@@ -158,178 +163,6 @@ report (const char *fmt, ...)
   retval = vreport(fmt, va);
   va_end(va);
   return retval;
-}
-
-/* The chain-and-bucket hash table.  -PH */
-
-void
-hashtable_init (hashtable_t *H, int buckets)
-{
-  H->buckets = buckets;
-  H->table = (hashchain_t**)calloc(H->buckets, sizeof(*(H->table)));
-  return;
-}
-
-hashtable_t *
-hashtable_new (int buckets)
-{
-  hashtable_t *H = (hashtable_t*)malloc(sizeof(hashtable_t));
-  hashtable_init(H, buckets);
-  return H;
-}
-
-/* No destroy/destructor.  No need. */
-
-void
-hashtable_add (hashtable_t *H, int hashvalue, void *datum)
-{
-  hashchain_t *hc, **hb;
-
-  hashvalue = (abs(hashvalue) % H->buckets);
-  hb = &(H->table[hashvalue]);
-  if (*hb == 0)
-    {
-      /* Empty bucket.  Create new one. */
-      *hb = (hashchain_t*)calloc(1, sizeof(**hb));
-      hc = *hb;
-    }
-  else
-    {
-      /* Get hc to point to last node in chain. */
-      for (hc = *hb; hc && hc->next; hc = hc->next);
-      hc->next = (hashchain_t*)calloc(1, sizeof(*hc));
-      hc = hc->next;
-    }
-  hc->data = datum;
-  hc->next = 0;
-  return;
-}
-
-hashchain_t *
-hashtable_get (hashtable_t *H, int hashvalue)
-{
-  hashvalue = (abs(hashvalue) % H->buckets);
-  return (H->table[hashvalue]);
-}
-
-void
-hashtable_stats (hashtable_t *H)
-{
-  int len, empties, longest, nodes;
-  int i;
-  float meanlen;
-  hashchain_t *hc;
-
-  report("Stats for hashtable %08X", H);
-  empties = 0;
-  longest = 0;
-  nodes = 0;
-  for (i = 0; i < H->buckets; i++)
-    {
-      if (H->table[i] == 0)
-        { empties++; continue; }
-      for (hc = H->table[i], len = 0; hc; hc = hc->next, len++);
-      if (len > longest) { longest = len; }
-      nodes += len;
-    }
-  meanlen = (float)(nodes) / (H->buckets - empties);
-#if 0
-/* Long stats display */
-  report(" Total buckets: %d\n", H->buckets);
-  report(" Total stored nodes: %d\n", nodes);
-  report(" Longest chain: %d\n", longest);
-  report(" Empty chains: %d\n", empties);
-  report(" Mean non-empty chain length: %f\n", meanlen);
-#else //0
-/* Short stats display */
-  report(", %d buckets, %d nodes", H->buckets, nodes);
-  report("\n");
-  report(" Longest chain: %d, empty chains: %d, mean non-empty: %f", longest, empties, meanlen);
-#endif //0
-  report("\n");
-}
-
-
-/* Kludge. */
-/* Check if symbol already exists. */
-/* Returns 0 if symbol does NOT already exist, non-zero otherwise. */
-int
-hashtable_symbol_exists (hashtable_t *H, int hash, char *sym)
-{
-  hashchain_t *hc;
-  symbol_t *s;
-
-  hash = (abs(hash) % H->buckets);
-  hc = H->table[hash];
-  if (hc == 0)
-    {
-      /* Empty chain means this symbol has not yet been defined. */
-      return 0;
-    }
-  for (; hc; hc = hc->next)
-    {
-      s = (symbol_t*)hc->data;
-//      if ((hash == s->hash) && (strcmp(sym, s->name) == 0))
-/* We _already_ know the hash is the same.  That's why we're probing! */
-      if (strcmp(sym, s->name) == 0)
-        {
-          /* Symbol collisions -- symbol already exists. */
-          return 1;
-        }
-    }
-  return 0;  /* Can't find collision. */
-}
-
-
-
-
-/* Comparator function for quicksorting. */
-int
-symlist_cmp (const void *e1, const void *e2)
-{
-  const symbol_t *a, *b;
-
-  a = *(const symbol_t **)e1;
-  b = *(const symbol_t **)e2;
-//crumb("Symbol comparison (1) %d  to  (2) %d\n", a->value, b->value);
-  return ( a->value - b->value);
-}
-
-/*
-  Sort the symbols list by using QuickSort (qsort()).
-  This may take a LOT of memory (a few megabytes?), but memory is cheap these days.
-  However, qsort(3) already exists, and I'm really lazy.
- -PH
-*/
-void
-sort_symbols ()
-{
-  int i, elems;
-  symbol_t *s;
-  symbol_t **symlist;
-
-//crumb("sort_symbols: Constructing symlist array\n");
-  for (elems = 0, s = symbols; s; s = s->next, elems++) /* nop */ ;
-  symlist = (symbol_t**)malloc(elems * sizeof(symbol_t*));
-  for (i = 0, s = symbols; s; s = s->next, i++)
-    {
-      symlist[i] = s;
-    }
-//crumbf("sort_symbols: Quick-sorting %d symbols\n", elems);
-  qsort(symlist, elems, sizeof(symbol_t*), symlist_cmp);
-//crumbf("sort_symbols: Reconstructing symbols list\n");
-  s = symbols = symlist[0];
-  for (i = 1; i < elems; i++)
-    {
-      s->next = symlist[i];
-      s = s->next;
-    }
-  lastSymbol = s;
-  s->next = 0;
-//crumbf("sort_symbols: verifying..."); fflush(stdout);
-  for (i = 0, s = symbols; s; s = s->next, i++) /*nop*/ ;
-//crumbf(" %d elements\n", i);
-  free(symlist);  /* d'oh.  no gc. */
 }
 
 
@@ -367,37 +200,6 @@ int atoiNoCap (const char *s)
     retval.u = (unsigned int)l;
   }
   return retval.i;  /* <- union hackage.  I feel dirty with this.  -PH */
-}
-
-
-
-/*
-=============
-HashString
-=============
-*/
-/* Default hash function of Kazlib 1.19, slightly modified. */
-unsigned int HashString (const char *key)
-{
-    static unsigned long randbox[] = {
-    0x49848f1bU, 0xe6255dbaU, 0x36da5bdcU, 0x47bf94e9U,
-    0x8cbcce22U, 0x559fc06aU, 0xd268f536U, 0xe10af79aU,
-    0xc1af4d69U, 0x1d2917b5U, 0xec4c304dU, 0x9ee5016cU,
-    0x69232f74U, 0xfead7bb3U, 0xe9089ab6U, 0xf012f6aeU,
-    };
-
-    const char *str = key;
-    unsigned int acc = 0;
-
-    while (*str) {
-    acc ^= randbox[(*str + acc) & 0xf];
-    acc = (acc << 1) | (acc >> 31);
-    acc &= 0xffffffffU;
-    acc ^= randbox[((*str++ >> 4) + acc) & 0xf];
-    acc = (acc << 2) | (acc >> 30);
-    acc &= 0xffffffffU;
-    }
-    return abs((long)acc);
 }
 
 
@@ -447,105 +249,61 @@ void EmitInt( segment_t *seg, int v ) {
 	seg->imageUsed += 4;
 }
 
-/*
-============
-DefineSymbol
 
-Symbols can only be defined on pass 0
-============
-*/
-void DefineSymbol( char *sym, int value ) {
-	/* Hand optimization by PhaethonH */
-	symbol_t	*s;
-	char		expanded[MAX_LINE_LENGTH];
-	int			hash;
+static void DefineSymbol( const char* symbol, int value )
+{
+	// symbols can only be defined on pass 0
+	if ( passNumber == 1 )
+		return;
 
-	if ( passNumber == 1 ) {
+	// add the file prefix to local symbols to guarantee uniqueness
+	// !!! note that this doesn't fucking work, and everything is a global
+	char expanded[MAX_LINE_LENGTH];
+	if ( symbol[0] == '$' ) {
+		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
+		symbol = expanded;
+	}
+
+	SymTable::const_iterator it = aSymTable.find( symbol );
+
+	if (it != aSymTable.end()) {
+		CodeError( "Multiple definitions for %s\n", symbol );
 		return;
 	}
 
-	// add the file prefix to local symbols to guarantee unique
-	if ( sym[0] == '$' ) {
-		sprintf( expanded, "%s_%i", sym, currentFileIndex );
-		sym = expanded;
-	}
-
-	hash = HashString( sym );
-
-	if (hashtable_symbol_exists(symtable, hash, sym)) {
-		CodeError( "Multiple definitions for %s\n", sym );
-		return;
-	}
-
-	s = (symbol_t*)malloc( sizeof( *s ) );
-	s->next = NULL;
-	s->name = copystring( sym );
-	s->hash = hash;
-	s->value = value;
+	const char* name = copystring( symbol );
+	symbol_t* s = new symbol_t;
 	s->segment = currentSegment;
+	s->value = value;
+	aSymTable[ name ] = s;
 
-	hashtable_add(symtable, hash, s);
-
-/*
-  Hash table lookup already speeds up symbol lookup enormously.
-  We postpone sorting until end of pass 0.
-  Since we're not doing the insertion sort, lastSymbol should always
-   wind up pointing to the end of list.
-  This allows constant time for adding to the list.
- -PH
-*/
-	if (symbols == 0) {
-		lastSymbol = symbols = s;
-	} else {
-		lastSymbol->next = s;
-		lastSymbol = s;
-	}
+	lastSymbol = s;
 }
 
 
-/*
-============
-LookupSymbol
+static int LookupSymbol( const char* symbol )
+{
+	// symbols can only be evaluated on pass 1
+	if ( passNumber == 0 )
+		return 0;
 
-Symbols can only be evaluated on pass 1
-============
-*/
-int LookupSymbol( char *sym ) {
-	symbol_t	*s;
-	char		expanded[MAX_LINE_LENGTH];
-	int			hash;
-	hashchain_t *hc;
+	// add the file prefix to local symbols to guarantee uniqueness
+	// !!! note that this doesn't fucking work, and everything is a global
+	char expanded[MAX_LINE_LENGTH];
+	if ( symbol[0] == '$' ) {
+		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
+		symbol = expanded;
+	}
 
-	if ( passNumber == 0 ) {
+	SymTable::const_iterator it = aSymTable.find( symbol );
+
+	if (it == aSymTable.end()) {
+		CodeError( "Symbol %s undefined\n", symbol );
 		return 0;
 	}
 
-	// add the file prefix to local symbols to guarantee unique
-	if ( sym[0] == '$' ) {
-		sprintf( expanded, "%s_%i", sym, currentFileIndex );
-		sym = expanded;
-	}
-
-	hash = HashString( sym );
-
-/*
-  Hand optimization by PhaethonH
-
-  Using a hash table with chain/bucket for lookups alone sped up q3asm by almost 3x for me.
- -PH
-*/
-	for (hc = hashtable_get(symtable, hash); hc; hc = hc->next) {
-		s = (symbol_t*)hc->data;  /* ugly typecasting, but it's fast! */
-		if ( (hash == s->hash) && !strcmp(sym, s->name) ) {
-			return s->segment->segmentBase + s->value;
-		}
-	}
-
-	CodeError( "error: symbol %s undefined\n", sym );
-	passNumber = 0;
-	DefineSymbol( sym, 0 );	// so more errors aren't printed
-	passNumber = 1;
-	return 0;
+	const symbol_t* s = (*it).second;
+	return (s->segment->segmentBase + s->value);
 }
 
 
@@ -1070,89 +828,62 @@ STAT("LABEL");
 }
 
 
-
-/*
-==============
-AssembleLine
-
-==============
-*/
-void AssembleLine( void ) {
-	hashchain_t *hc;
-	sourceOps_t *op;
-	int		i;
-	int		hash;
-
+static void AssembleLine()
+{
 	Parse();
-	if ( !token[0] ) {
+	if ( !token[0] )
+		return;
+
+	OpTable::const_iterator it = aOpTable.find( token );
+
+	if (it != aOpTable.end()) {
+		int opcode = (*it).second;
+
+		if ( opcode == OP_UNDEF ) {
+			CodeError( "Undefined opcode: %s\n", token );
+		}
+
+		if ( opcode == OP_IGNORE ) {
+			return;		// we ignore most conversions
+		}
+
+		// sign extensions need to check next parm
+		if ( opcode == OP_SEX8 ) {
+			Parse();
+			if ( token[0] == '1' ) {
+				opcode = OP_SEX8;
+			} else if ( token[0] == '2' ) {
+				opcode = OP_SEX16;
+			} else {
+				CodeError( "Bad sign extension: %s\n", token );
+				return;
+			}
+		}
+
+		// check for expression
+		Parse();
+
+		if ( token[0] && opcode != OP_CVIF && opcode != OP_CVFI ) {
+			// code like this can generate non-dword block copies:
+			// auto char buf[2] = " ";
+			// we are just going to round up.  This might conceivably
+			// be incorrect if other initialized chars follow.
+			int expression = ParseExpression();
+			if ( opcode == OP_BLOCK_COPY ) {
+				expression = ( expression + 3 ) & ~3;
+			}
+			EmitByte( &segment[CODESEG], opcode );
+			EmitInt( &segment[CODESEG], expression );
+		} else {
+			EmitByte( &segment[CODESEG], opcode );
+		}
+
+		instructionCount++;
 		return;
 	}
 
-	hash = HashString( token );
+/* These should be sorted in sequence of statistical frequency, most frequent first.  -PH
 
-/*
-  Opcode search using hash table.
-  Since the opcodes stays mostly fixed, this may benefit even more from a tree.
-  Always with the tree :)
- -PH
-*/
-	for (hc = hashtable_get(optable, hash); hc; hc = hc->next) {
-		op = (sourceOps_t*)(hc->data);
-		i = op - sourceOps;
-		if ((hash == opcodesHash[i]) && (!strcmp(token, op->name))) {
-			int		opcode;
-			int		expression;
-
-			if ( op->opcode == OP_UNDEF ) {
-				CodeError( "Undefined opcode: %s\n", token );
-			}
-			if ( op->opcode == OP_IGNORE ) {
-				return;		// we ignore most conversions
-			}
-
-			// sign extensions need to check next parm
-			opcode = op->opcode;
-			if ( opcode == OP_SEX8 ) {
-				Parse();
-				if ( token[0] == '1' ) {
-					opcode = OP_SEX8;
-				} else if ( token[0] == '2' ) {
-					opcode = OP_SEX16;
-				} else {
-					CodeError( "Bad sign extension: %s\n", token );
-					return;
-				}
-			}
-
-			// check for expression
-			Parse();
-			if ( token[0] && op->opcode != OP_CVIF
-					&& op->opcode != OP_CVFI ) {
-				expression = ParseExpression();
-
-				// code like this can generate non-dword block copies:
-				// auto char buf[2] = " ";
-				// we are just going to round up.  This might conceivably
-				// be incorrect if other initialized chars follow.
-				if ( opcode == OP_BLOCK_COPY ) {
-					expression = ( expression + 3 ) & ~3;
-				}
-
-				EmitByte( &segment[CODESEG], opcode );
-				EmitInt( &segment[CODESEG], expression );
-			} else {
-				EmitByte( &segment[CODESEG], opcode );
-			}
-
-			instructionCount++;
-			return;
-		}
-	}
-
-/* This falls through if an assembly opcode is not found.  -PH */
-
-/* The following should be sorted in sequence of statistical frequency, most frequent first.  -PH */
-/*
 Empirical frequency statistics from FI 2001.01.23:
  109892	STAT ADDRL
   72188	STAT BYTE
@@ -1177,7 +908,6 @@ Empirical frequency statistics from FI 2001.01.23:
     100	STAT BSS
      68	STAT DATA
 
- -PH
 */
 
 #undef ASM
@@ -1209,30 +939,18 @@ Empirical frequency statistics from FI 2001.01.23:
 	CodeError( "Unknown token: %s\n", token );
 }
 
-/*
-==============
-InitTables
-==============
-*/
-void InitTables( void ) {
-	int i;
 
-	symtable = hashtable_new(symtablelen);
-	optable = hashtable_new(100);  /* There's hardly 100 opcodes anyway. */
-
-	for ( i = 0 ; i < NUM_SOURCE_OPS ; i++ ) {
-		opcodesHash[i] = HashString( sourceOps[i].name );
-		hashtable_add(optable, opcodesHash[i], sourceOps + i);
+static void InitTables()
+{
+	for (int i = 0; aSourceOps[i].name; ++i) {
+		aOpTable[ aSourceOps[i].name ] = aSourceOps[i].opcode;
 	}
 }
 
 
+static void WriteMapFile()
+{
 /*
-==============
-WriteMapFile
-==============
-*/
-void WriteMapFile( void ) {
 	FILE		*f;
 	symbol_t	*s;
 	char		imageName[MAX_OS_PATH];
@@ -1257,7 +975,9 @@ void WriteMapFile( void ) {
 		}
 	}
 	fclose( f );
+*/
 }
+
 
 /*
 ===============
@@ -1358,12 +1078,9 @@ void Assemble( void ) {
 			}
 		}
 
-		// align all segment
+		// align all the segments
 		for ( i = 0 ; i < NUM_SEGMENTS ; i++ ) {
 			segment[i].imageUsed = (segment[i].imageUsed + 3) & ~3;
-		}
-		if (passNumber == 0) {
-			sort_symbols();
 		}
 	}
 
@@ -1425,15 +1142,12 @@ int main( int argc, char **argv ) {
 	int			i;
 	double		start, end;
 
-//	_chdir( "/quake3/jccode/cgame/lccout" );	// hack for vc profiler
-
 	if ( argc < 2 ) {
 		Error("Usage: %s [OPTION]... [FILES]...\n\
 Assemble LCC bytecode assembly to Q3VM bytecode.\n\
 \n\
     -o OUTPUT      Write assembled output to file OUTPUT.qvm\n\
     -f LISTFILE    Read options and list of files to assemble from LISTFILE\n\
-    -b BUCKETS     Set symbol hash table to BUCKETS buckets\n\
     -v             Verbose compilation report\n\
 ", argv[0]);
 	}
@@ -1467,15 +1181,6 @@ Assemble LCC bytecode assembly to Q3VM bytecode.\n\
 			continue;
 		}
 
-		if (!strcmp(argv[i], "-b")) {
-			if (i == argc - 1) {
-				Error("-b requires an argument");
-			}
-			i++;
-			symtablelen = atoiNoCap(argv[i]);
-			continue;
-		}
-
 		if( !strcmp( argv[ i ], "-v" ) ) {
 /* Verbosity option added by Timbo, 2002.09.14.
 By default (no -v option), q3asm remains silent except for critical errors.
@@ -1500,21 +1205,10 @@ Motivation: not wanting to scrollback for pages to find asm error.
 		numAsmFiles++;
 	}
 
+	options.verbose = qtrue;
+
 	InitTables();
 	Assemble();
-
-	{
-		symbol_t *s;
-
-		for ( i = 0, s = symbols ; s ; s = s->next, i++ ) /* nop */ ;
-
-		if (options.verbose)
-		{
-			report("%d symbols defined\n", i);
-			hashtable_stats(symtable);
-			hashtable_stats(optable);
-		}
-	}
 
 	end = I_FloatTime ();
 	report ("%5.0f seconds elapsed\n", end-start);
