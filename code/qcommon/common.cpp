@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // common.c -- misc functions used in client and server
 
+#include <limits>
+#include <list>
+
 #include "q_shared.h"
 #include "qcommon.h"
 #include <setjmp.h>
@@ -1634,10 +1637,86 @@ journaled file
 
 // FIXME TTimo blunt upping from 256 to 1024
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=5
-#define MAX_PUSHED_EVENTS	1024
-static sysEvent_t com_pushedEvents[MAX_PUSHED_EVENTS];
-static int com_pushedEventsHead;
-static int com_pushedEventsTail;
+//#define MAX_PUSHED_EVENTS	1024
+//static sysEvent_t com_pushedEvents[MAX_PUSHED_EVENTS];
+//static int com_pushedEventsHead;
+//static int com_pushedEventsTail;
+
+template <class T>
+class q3allocator {
+public:
+	typedef size_t    size_type;
+	typedef ptrdiff_t difference_type;
+	typedef T*        pointer;
+	typedef const T*  const_pointer;
+	typedef T&        reference;
+	typedef const T&  const_reference;
+	typedef T         value_type;
+
+	template <class U>
+	struct rebind {
+		typedef q3allocator<U> other;
+	};
+
+	pointer address (reference value) const {
+		return &value;
+	}
+	const_pointer address (const_reference value) const {
+		return &value;
+	}
+
+	q3allocator() throw() {
+	}
+
+	q3allocator(const q3allocator&) throw() {
+	}
+
+	template <class U> q3allocator (const q3allocator<U>&) throw() {
+	}
+
+	~q3allocator() throw() {
+	}
+
+	size_type max_size () const throw() {
+		return std::numeric_limits<size_t>::max() / sizeof(T);
+	}
+
+	pointer allocate (size_type num, const_pointer hint = 0) {
+		return (pointer)(S_Malloc(num*sizeof(T)));
+	}
+
+	void construct (pointer p, const T& value) {
+		new((void*)p)T(value);
+	}
+
+	void destroy (pointer p) {
+		p->~T();
+	}
+
+	void deallocate (pointer p, size_type num) {
+		Z_Free((void*)p);
+	}
+};
+
+typedef std::list<sysEvent_t, q3allocator<sysEvent_t> > comEvenets_t;
+static comEvenets_t& Com_PushedEvenets()
+{
+	static qbool called = qfalse;
+	static comEvenets_t* _instance = NULL;
+
+	if (!called)
+	{
+		called = qtrue;
+		{
+			static comEvenets_t _stack;
+			_instance = &_stack;
+		}
+	}
+
+	return *_instance;
+}
+
+
 
 static void Com_InitJournaling()
 {
@@ -1708,6 +1787,8 @@ static sysEvent_t Com_GetRealEvent()
 
 static void Com_PushEvent( const sysEvent_t& event )
 {
+	Com_PushedEvenets().push_back( event );
+	/*
 	static qbool printedWarning = qfalse;
 
 	sysEvent_t& ev = com_pushedEvents[ com_pushedEventsHead & (MAX_PUSHED_EVENTS-1) ];
@@ -1730,15 +1811,24 @@ static void Com_PushEvent( const sysEvent_t& event )
 
 	ev = event;
 	com_pushedEventsHead++;
+	*/
 }
 
 
 static sysEvent_t Com_GetEvent()
 {
+	if( !Com_PushedEvenets().empty() ){
+		sysEvent_t tmp( Com_PushedEvenets().front() );
+		Com_PushedEvenets().pop_front();
+		return tmp;
+	}
+
+	/*
 	if ( com_pushedEventsHead > com_pushedEventsTail ) {
 		com_pushedEventsTail++;
 		return com_pushedEvents[ (com_pushedEventsTail-1) & (MAX_PUSHED_EVENTS-1) ];
 	}
+	*/
 	return Com_GetRealEvent();
 }
 
@@ -2056,9 +2146,11 @@ void Com_Init( char *commandLine )
 		Sys_Error ("Error during initialization");
 	}
 
+	/*
 	memset( com_pushedEvents, 0, sizeof(com_pushedEvents) );
 	com_pushedEventsHead = 0;
 	com_pushedEventsTail = 0;
+	*/
 
 	Com_InitSmallZoneMemory();
 	Cvar_Init();
