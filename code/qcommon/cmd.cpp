@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // cmd.c -- Quake script command processing module
 
+#include <vector>
 #include "q_shared.h"
 #include "qcommon.h"
 
@@ -611,3 +612,26 @@ void Cmd_Init()
 	Cmd_AddCommand( "wait", Cmd_Wait_f );
 }
 
+const char* Cmd_ArgsFromSafe( int arg )
+{
+	static std::vector<char> cmd_args( NULL, MAX_GAMESTATE_CHARS );
+
+	if (arg < 0)
+		Com_Error( ERR_FATAL, "Cmd_ArgsFrom: arg < 0" );
+
+	cmd_args.clear();
+
+	for (int i = arg; i < cmd_argc; ++i) {
+		if (!cmd_argv[i] || !cmd_argv[i][0])
+			continue;
+
+		for (int c=0; cmd_argv[i][c]; ++c)
+			cmd_args.push_back( cmd_argv[i][c] );
+
+		if (i != cmd_argc-1) {
+			cmd_args.push_back( ' ' );
+		}
+	}
+	cmd_args.push_back(0);
+	return &cmd_args[0];
+}
