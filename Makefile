@@ -22,6 +22,9 @@ endif
 BUILD_SERVER     =
 BUILD_CLIENT     =
 
+# needs stl, cbf to fight with gcc
+BUILD_TOOLS = 0
+
 # this should probably be deleted/merged anyway
 BUILD_CLIENT_SMP = 0
 # the baseq3 vm is worthless
@@ -691,6 +694,10 @@ ifneq ($(BUILD_CLIENT),0)
   TARGETS += $(B)/ChallengeQuake3.$(ARCH)$(BINEXT)
 endif
 
+ifneq ($(BUILD_TOOLS),0)
+  TARGETS += tools
+endif
+
 ifneq ($(BUILD_GAME_SO),0)
   TARGETS += \
     $(B)/baseq3/cgame$(ARCH).$(SHLIBEXT) \
@@ -752,11 +759,11 @@ debug: build_debug
 release: build_release
 
 build_debug: B=$(BD)
-build_debug: makedirs tools
+build_debug: makedirs
 	$(MAKE)  targets B=$(BD) CFLAGS="$(CFLAGS) $(DEBUG_CFLAGS) $(DEPEND_CFLAGS)"
 
 build_release: B=$(BR)
-build_release: makedirs tools
+build_release: makedirs
 	$(MAKE)  targets B=$(BR) CFLAGS="$(CFLAGS) $(RELEASE_CFLAGS) $(DEPEND_CFLAGS)"
 
 #Build both debug and release builds
@@ -789,13 +796,15 @@ makedirs:
 Q3LCC=$(TOOLSDIR)/q3lcc$(BINEXT)
 Q3ASM=$(TOOLSDIR)/q3asm$(BINEXT)
 
-ifeq ($(CROSS_COMPILING),1)
-tools:
-	echo QVM tools not built when cross-compiling
-else
-tools:
-	$(MAKE) -C $(TOOLSDIR)/lcc install
-	$(MAKE) -C $(TOOLSDIR)/asm install
+ifneq ($(BUILD_TOOLS),0)
+  ifeq ($(CROSS_COMPILING),1)
+  tools:
+    echo QVM tools not built when cross-compiling
+  else
+  tools:
+    $(MAKE) -C $(TOOLSDIR)/lcc install
+    $(MAKE) -C $(TOOLSDIR)/asm install
+  endif
 endif
 
 DO_Q3LCC=$(Q3LCC) -o $@ $<
