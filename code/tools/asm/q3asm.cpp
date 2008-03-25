@@ -110,7 +110,7 @@ SymTable aSymLocal[MAX_ASM_FILES];
 
 // we need to convert arg and ret instructions to
 // stores to the local stack frame, so we need to track the
-// characteristics of the current functions stack frame
+// characteristics of the current function's stack frame
 int		currentLocals;			// bytes of locals needed by this function
 int		currentArgs;			// bytes of largest argument list called from this function
 int		currentArgOffset;		// byte offset in currentArgs to store next arg, reset each call
@@ -133,31 +133,17 @@ int		instructionCount;
 #endif
 
 /*
- Problem:
-	BYTE values are specified as signed decimal string.  A properly functional
-	atoip() will cap large signed values at 0x7FFFFFFF.  Negative word values are
-	often specified as very large decimal values by lcc.  Therefore, values that
-	should be between 0x7FFFFFFF and 0xFFFFFFFF come out as 0x7FFFFFFF when using
-	atoi().  Bad.
+	BYTE values are specified as signed decimal strings
+	A properly functional atoi() will cap large signed values at 0x7FFFFFFF
+	Negative word values are often specified by LCC as very large decimal values
+	so values that should be between 0x7FFFFFFF and 0xFFFFFFFF come out as 0x7FFFFFFF
 
- This function is one big evil hack to work around this problem.
+	This function is a trivial (tho clever) hack to work around this problem
 */
-int atoiNoCap (const char *s)
+static int atoiNoCap( const char* s )
 {
-  INT64 l;
-  union {
-    unsigned int u;
-    signed int i;
-  } retval;
-
-  l = atoi64(s);
-  /* Now smash to signed 32 bits accordingly. */
-  if (l < 0) {
-    retval.i = (int)l;
-  } else {
-    retval.u = (unsigned int)l;
-  }
-  return retval.i;  /* <- union hackage.  I feel dirty with this.  -PH */
+	INT64 n = atoi64(s);
+	return (n < 0) ? (int)n : (unsigned)n;
 }
 
 
@@ -248,14 +234,6 @@ static void DefineSymbol( const char* symbol, int value )
 	// symbols can only be defined on pass 0
 	if ( passNumber == 1 )
 		return;
-/*
-	// add the file prefix to local symbols to guarantee uniqueness
-	char expanded[MAX_LINE_LENGTH];
-	if ( symbol[0] == '$' ) {
-		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
-		symbol = expanded;
-	}
-*/
 
 	const char* name = copystring( symbol );
 	symbol_t* s = new symbol_t;
@@ -283,14 +261,6 @@ static int LookupSymbol( const char* symbol )
 	// symbols can only be evaluated on pass 1
 	if ( passNumber == 0 )
 		return 0;
-/*
-	// add the file prefix to local symbols to guarantee uniqueness
-	char expanded[MAX_LINE_LENGTH];
-	if ( symbol[0] == '$' ) {
-		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
-		symbol = expanded;
-	}
-*/
 
 	SymTable::const_iterator it;
 
@@ -433,8 +403,7 @@ int	ParseExpression(void) {
 	memcpy( sym, token, i );
 	sym[i] = 0;
 
-	switch (*sym) {  /* Resolve depending on first character. */
-/* Optimizing compilers can convert cases into "calculated jumps".  I think these are faster.  -PH */
+	switch (*sym) {  // resolve depending on first character
 		case '-':
 		case '0': case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7': case '8': case '9':
@@ -777,7 +746,7 @@ ASM(BYTE)
 	return qfalse;
 }
 
-// code labels are emited as instruction counts, not byte offsets,
+// code labels are emitted as instruction counts, not byte offsets,
 // because the physical size of the code will change with
 // different run time compilers and we want to minimize the
 // size of the required translation table
