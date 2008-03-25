@@ -82,7 +82,8 @@ struct symbol_t {
 };
 
 typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
-SymTable aSymTable;
+SymTable aSymGlobal;
+SymTable aSymImported;
 
 static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment
 
@@ -103,6 +104,8 @@ char	*asmFileNames[MAX_ASM_FILES];
 static int currentFileIndex;
 static const char* currentFileName;
 static int currentFileLine;
+
+SymTable aSymLocal[MAX_ASM_FILES];
 
 
 // we need to convert arg and ret instructions to
@@ -207,31 +210,69 @@ static void EmitInt( segment_t* seg, int v )
 }
 
 
-static void DefineSymbol( const char* symbol, int value )
+static void ExportSymbol( const char* symbol )
 {
 	// symbols can only be defined on pass 0
 	if ( passNumber == 1 )
 		return;
 
+	SymTable::const_iterator it = aSymGlobal.find( symbol );
+	if (it != aSymGlobal.end())
+		return;
+
+	const char* name = copystring( symbol );
+	symbol_t* s = new symbol_t;
+	s->value = 0;
+	aSymGlobal[ name ] = s;
+}
+
+
+static void ImportSymbol( const char* symbol )
+{
+	// symbols can only be defined on pass 0
+	if ( passNumber == 1 )
+		return;
+
+	SymTable::const_iterator it = aSymImported.find( symbol );
+	if (it != aSymImported.end())
+		return;
+
+	const char* name = copystring( symbol );
+	symbol_t* s = new symbol_t;
+	aSymImported[ name ] = s;
+}
+
+
+static void DefineSymbol( const char* symbol, int value )
+{
+	// symbols can only be defined on pass 0
+	if ( passNumber == 1 )
+		return;
+/*
 	// add the file prefix to local symbols to guarantee uniqueness
 	char expanded[MAX_LINE_LENGTH];
 	if ( symbol[0] == '$' ) {
 		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
 		symbol = expanded;
 	}
-
-	SymTable::const_iterator it = aSymTable.find( symbol );
-
-	if (it != aSymTable.end()) {
-		CodeError( "Multiple definitions for %s\n", symbol );
-		return;
-	}
+*/
 
 	const char* name = copystring( symbol );
 	symbol_t* s = new symbol_t;
 	s->segment = currentSegment;
 	s->value = value;
-	aSymTable[ name ] = s;
+
+	SymTable::iterator it;
+
+	it = aSymGlobal.find( symbol );
+	if (it != aSymGlobal.end()) {
+		// we've encountered an "export blah" for this "proc blah"
+		// so update the global's placeholder with the real data too
+		delete (*it).second;
+		(*it).second = s;
+	}
+
+	aSymLocal[currentFileIndex][ name ] = s;
 
 	lastSymbol = s;
 }
@@ -242,18 +283,34 @@ static int LookupSymbol( const char* symbol )
 	// symbols can only be evaluated on pass 1
 	if ( passNumber == 0 )
 		return 0;
-
+/*
 	// add the file prefix to local symbols to guarantee uniqueness
 	char expanded[MAX_LINE_LENGTH];
 	if ( symbol[0] == '$' ) {
 		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
 		symbol = expanded;
 	}
+*/
 
-	SymTable::const_iterator it = aSymTable.find( symbol );
+	SymTable::const_iterator it;
 
-	if (it == aSymTable.end()) {
+	it = aSymLocal[currentFileIndex].find( symbol );
+	if (it != aSymLocal[currentFileIndex].end()) {
+		const symbol_t* s = (*it).second;
+		return (s->segment->segmentBase + s->value);
+	}
+
+	it = aSymImported.find( symbol );
+	if (it == aSymImported.end()) {
+		// no explicit prototype == incorrect code
+		// whether the symbol is "reachable" or not
 		CodeError( "Symbol %s undefined\n", symbol );
+		return 0;
+	}
+
+	it = aSymGlobal.find( symbol );
+	if (it == aSymGlobal.end()) {
+		CodeError( "External symbol %s undefined\n", symbol );
 		return 0;
 	}
 
@@ -530,8 +587,8 @@ ASM(ADDRL)
 ASM(PROC)
 {
 	if ( !strcmp( token, "proc" ) ) {
-		Parse();					// function name
-		DefineSymbol( token, instructionCount ); // segment[CODESEG].imageUsed );
+		Parse();	// function name
+		DefineSymbol( token, instructionCount );
 
 		currentLocals = ParseValue();	// locals
 		currentLocals = ( currentLocals + 3 ) & ~3;
@@ -589,6 +646,8 @@ ASM(ADDRESS)
 ASM(EXPORT)
 {
 	if ( !strcmp( token, "export" ) ) {
+		Parse();	// function name
+		ExportSymbol( token );
 		return qtrue;
 	}
 	return qfalse;
@@ -597,6 +656,8 @@ ASM(EXPORT)
 ASM(IMPORT)
 {
 	if ( !strcmp( token, "import" ) ) {
+		Parse();	// function name
+		ImportSymbol( token );
 		return qtrue;
 	}
 	return qfalse;
@@ -656,11 +717,12 @@ ASM(FILE)
 
 ASM(EQU)
 {
-	char	name[1024];
+	char name[1024];
 	if ( !strcmp( token, "equ" ) ) {
 		Parse();
 		strcpy( name, token );
 		Parse();
+		ExportSymbol( name );
 		DefineSymbol( name, atoiNoCap(token) );
 		return qtrue;
 	}
@@ -863,6 +925,12 @@ static void InitTables()
 }
 
 
+static void ShowTable( const SymTable& table, const char* name )
+{
+	report( "%s: %d symbols\n", name, table.size() );
+}
+
+
 static void WriteMapFile()
 {
 /*
@@ -980,6 +1048,7 @@ static void Assemble()
 				p = ExtractLine( p );
 				AssembleLine();
 			}
+			//ShowTable( aSymLocal[i], "Locals" );
 		}
 
 		// align all the segments
@@ -1103,6 +1172,8 @@ int main( int argc, char **argv )
 	InitTables();
 	Assemble();
 
+	ShowTable( aSymImported, "Imported" );
+	ShowTable( aSymGlobal, "Globals" );
 	report( "%s compiled in %.3fs\n", outputFilename, Q_FloatTime() - tStart );
 
 	return errorCount;
