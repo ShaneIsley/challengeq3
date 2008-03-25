@@ -50,7 +50,7 @@ extern "C" {
 
 
 typedef stdext::hash_map< const char*, int, VanillaStringCmp > OpTable;
-OpTable aOpTable;
+static OpTable aOpTable;
 
 
 static char outputFilename[MAX_OSPATH];
@@ -83,8 +83,8 @@ struct symbol_t {
 };
 
 typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
-SymTable aSymGlobal;
-SymTable aSymImported;
+static SymTable aSymGlobal;
+static SymTable aSymImported;
 
 static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment
 
@@ -106,7 +106,7 @@ static int currentFileIndex;
 static const char* currentFileName;
 static int currentFileLine;
 
-SymTable aSymLocal[MAX_ASM_FILES];
+static SymTable aSymLocal[MAX_ASM_FILES];
 
 
 // we need to convert arg and ret instructions to
@@ -302,156 +302,129 @@ static int LookupSymbol( const char* symbol )
 }
 
 
-/*
-==============
-ExtractLine
+///////////////////////////////////////////////////////////////
 
+// this stuff should probably be replaced with COM_Parse, but...
+
+
+/*
 Extracts the next line from the given text block.
 If a full line isn't parsed, returns NULL
 Otherwise returns the updated parse pointer
-===============
 */
-char *ExtractLine( char *data ) {
-/* Goal:
-	 Given a string `data', extract one text line into buffer `lineBuffer' that
-	 is no longer than MAX_LINE_LENGTH characters long.  Return value is
-	 remainder of `data' that isn't part of `lineBuffer'.
- -PH
-*/
-	/* Hand-optimized by PhaethonH */
-	char 	*p, *q;
-
-	currentFileLine++;
+static const char* ExtractLine( const char* data )
+{
+	++currentFileLine;
 
 	lineParseOffset = 0;
 	token[0] = 0;
-	*lineBuffer = 0;
 
-	p = q = data;
-	if (!*q) {
+	if ( data[0] == 0 ) {
+		lineBuffer[0] = 0;
 		return NULL;
 	}
 
-	for ( ; !((*p == 0) || (*p == '\n')); p++)  /* nop */ ;
-
-	if ((p - q) >= MAX_LINE_LENGTH) {
+	int i;
+	for ( i = 0 ; i < MAX_LINE_LENGTH ; i++ ) {
+		if ( data[i] == 0 || data[i] == '\n' ) {
+			break;
+		}
+	}
+	if ( i == MAX_LINE_LENGTH ) {
 		CodeError( "MAX_LINE_LENGTH" );
 		return data;
 	}
 
-	memcpy( lineBuffer, data, (p - data) );
-	lineBuffer[(p - data)] = 0;
-	p += (*p == '\n') ? 1 : 0;  /* Skip over final newline. */
-	return p;
+	memcpy( lineBuffer, data, i );
+	lineBuffer[i] = 0;
+	data += i;
+
+	if ( data[0] == '\n' ) {
+		return ++data;
+	}
+
+	return data;
 }
 
 
-/*
-==============
-Parse
+// parse a token out of lineBuffer
 
-Parse a token out of linebuffer
-==============
-*/
-qboolean Parse( void ) {
-	/* Hand-optimized by PhaethonH */
-	const char 	*p, *q;
-
-	/* Because lineParseOffset is only updated just before exit, this makes this code version somewhat harder to debug under a symbolic debugger. */
-
-	*token = 0;  /* Clear token. */
+static qboolean GetToken()
+{
+	token[0] = 0;
 
 	// skip whitespace
-	for (p = lineBuffer + lineParseOffset; *p && (*p <= ' '); p++) /* nop */ ;
+	while ( lineBuffer[ lineParseOffset ] <= ' ' ) {
+		if ( lineBuffer[ lineParseOffset ] == 0 ) {
+			return qfalse;
+		}
+		++lineParseOffset;
+	}
 
 	// skip ; comments
-	/* die on end-of-string */
-	if ((*p == ';') || (*p == 0)) {
-		lineParseOffset = p - lineBuffer;
+	int c = lineBuffer[ lineParseOffset ];
+	if ( c == ';' ) {
 		return qfalse;
 	}
 
-	q = p;  /* Mark the start of token. */
-	/* Find separator first. */
-	for ( ; *p > 32; p++) /* nop */ ;  /* XXX: unsafe assumptions. */
-	/* *p now sits on separator.  Mangle other values accordingly. */
-	strncpy(token, q, p - q);
-	token[p - q] = 0;
-
-	lineParseOffset = p - lineBuffer;
+	// parse a regular word
+	int len = 0;
+	do {
+		token[len++] = c;
+		c = lineBuffer[ ++lineParseOffset ];
+	} while (c > ' ');
+	token[len] = 0;
 
 	return qtrue;
 }
 
 
-/*
-==============
-ParseValue
-==============
-*/
-int	ParseValue( void ) {
-	Parse();
+static int ParseValue()
+{
+	GetToken();
 	return atoiNoCap( token );
 }
 
 
-/*
-==============
-ParseExpression
-==============
-*/
-int	ParseExpression(void) {
-	/* Hand optimization, PhaethonH */
-	int		i, j;
-	char	sym[MAX_LINE_LENGTH];
-	int		v;
+static int ParseExpression()
+{
+	// skip any leading minus
+	int i = (token[0] == '-') ? 1 : 0;
 
-	/* Skip over a leading minus. */
-	for ( i = ((token[0] == '-') ? 1 : 0) ; i < MAX_LINE_LENGTH ; i++ ) {
+	for ( ; i < MAX_LINE_LENGTH ; i++ ) {
 		if ( token[i] == '+' || token[i] == '-' || token[i] == 0 ) {
 			break;
 		}
 	}
 
-	memcpy( sym, token, i );
-	sym[i] = 0;
+	char s[MAX_LINE_LENGTH];
+	memcpy( s, token, i );
+	s[i] = 0;
 
-	switch (*sym) {  // resolve depending on first character
-		case '-':
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
-			v = atoiNoCap(sym);
-			break;
-		default:
-			v = LookupSymbol(sym);
-			break;
+	int v;
+	if ( isdigit(s[0]) || (s[0] == '-') ) {
+		v = atoiNoCap( s );
+	} else {
+		v = LookupSymbol( s );
 	}
 
 	// parse add / subtract offsets
-	while ( token[i] != 0 ) {
+	int j;
+	while ( token[i] ) {
 		for ( j = i + 1 ; j < MAX_LINE_LENGTH ; j++ ) {
 			if ( token[j] == '+' || token[j] == '-' || token[j] == 0 ) {
 				break;
 			}
 		}
-
-		memcpy( sym, token+i+1, j-i-1 );
-		sym[j-i-1] = 0;
-
-		switch (token[i]) {
-			case '+':
-				v += atoiNoCap(sym);
-				break;
-			case '-':
-				v -= atoiNoCap(sym);
-				break;
-		}
-
+		v += atoi( &token[i] );
 		i = j;
 	}
 
 	return v;
 }
+
+
+///////////////////////////////////////////////////////////////
 
 
 /*
@@ -481,10 +454,6 @@ static void HackToSegment( segmentName_t seg )
 
 
 #define ASM(O) static qboolean TryAssemble##O()
-
-// these clauses were moved out from AssembleLine() to allow easy reordering
-// an optimizing compiler should reconstruct them back into inline code  -PH
-
 
 // call instructions reset currentArgOffset
 ASM(CALL)
@@ -543,7 +512,7 @@ ASM(ADDRF)
 {
 	if ( !strncmp( token, "ADDRF", 5 ) ) {
 		instructionCount++;
-		Parse();
+		GetToken();
 		int v = ParseExpression() + 16 + currentArgs + currentLocals;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
@@ -557,7 +526,7 @@ ASM(ADDRL)
 {
 	if ( !strncmp( token, "ADDRL", 5 ) ) {
 		instructionCount++;
-		Parse();
+		GetToken();
 		int v = ParseExpression() + 8 + currentArgs;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
@@ -569,7 +538,7 @@ ASM(ADDRL)
 ASM(PROC)
 {
 	if ( !strcmp( token, "proc" ) ) {
-		Parse();	// function name
+		GetToken();	// function name
 		DefineSymbol( token, instructionCount );
 
 		currentLocals = ParseValue();	// locals
@@ -593,7 +562,7 @@ ASM(ENDPROC)
 {
 	int		v, v2;
 	if ( !strcmp( token, "endproc" ) ) {
-		Parse();				// skip the function name
+		GetToken();				// skip the function name
 		v = ParseValue();		// locals
 		v2 = ParseValue();		// arg marshalling
 
@@ -613,7 +582,7 @@ ASM(ENDPROC)
 ASM(ADDRESS)
 {
 	if ( !strcmp( token, "address" ) ) {
-		Parse();
+		GetToken();
 		int v = ParseExpression();
 		// addresses are 32 bits wide, and therefore go into data segment
 		HackToSegment( DATASEG );
@@ -628,7 +597,7 @@ ASM(ADDRESS)
 ASM(EXPORT)
 {
 	if ( !strcmp( token, "export" ) ) {
-		Parse();	// function name
+		GetToken();	// function name
 		ExportSymbol( token );
 		return qtrue;
 	}
@@ -638,7 +607,7 @@ ASM(EXPORT)
 ASM(IMPORT)
 {
 	if ( !strcmp( token, "import" ) ) {
-		Parse();	// function name
+		GetToken();	// function name
 		ImportSymbol( token );
 		return qtrue;
 	}
@@ -701,9 +670,9 @@ ASM(EQU)
 {
 	char name[1024];
 	if ( !strcmp( token, "equ" ) ) {
-		Parse();
+		GetToken();
 		strcpy( name, token );
-		Parse();
+		GetToken();
 		ExportSymbol( name );
 		DefineSymbol( name, atoiNoCap(token) );
 		return qtrue;
@@ -751,7 +720,7 @@ ASM(BYTE)
 
 		// emit little endien
 		for ( i = 0 ; i < v ; i++ ) {
-			EmitByte( currentSegment, (v2 & 0xFF) ); /* paranoid ANDing  -PH */
+			EmitByte( currentSegment, (v2 & 0xFF) ); // paranoid ANDing
 			v2 >>= 8;
 		}
 		return qtrue;
@@ -766,7 +735,7 @@ ASM(BYTE)
 ASM(LABEL)
 {
 	if ( !strncmp( token, "LABEL", 5 ) ) {
-		Parse();
+		GetToken();
 		if ( currentSegment == &segment[CODESEG] ) {
 			DefineSymbol( token, instructionCount );
 		} else {
@@ -777,10 +746,12 @@ ASM(LABEL)
 	return qfalse;
 }
 
+#undef ASM
+
 
 static void AssembleLine()
 {
-	Parse();
+	GetToken();
 	if ( !token[0] )
 		return;
 
@@ -799,7 +770,7 @@ static void AssembleLine()
 
 		// sign extensions need to check next parm
 		if ( opcode == OP_SEX8 ) {
-			Parse();
+			GetToken();
 			if ( token[0] == '1' ) {
 				opcode = OP_SEX8;
 			} else if ( token[0] == '2' ) {
@@ -811,7 +782,7 @@ static void AssembleLine()
 		}
 
 		// check for expression
-		Parse();
+		GetToken();
 
 		EmitByte( &segment[CODESEG], opcode );
 		if ( token[0] && opcode != OP_CVIF && opcode != OP_CVFI ) {
@@ -830,41 +801,14 @@ static void AssembleLine()
 		return;
 	}
 
-/* These should be sorted in sequence of statistical frequency, most frequent first.  -PH
+// these should ideally be sorted by descending statistical frequency
+// tho the difference is ms-trivial, so don't obsess over it
+//#define ASM(O) if (TryAssemble##O()) { printf("STAT "#O"\n"); return; }
 
-Empirical frequency statistics from FI 2001.01.23:
- 109892	STAT ADDRL
-  72188	STAT BYTE
-  51150	STAT LINE
-  50906	STAT ARG
-  43704	STAT IMPORT
-  34902	STAT LABEL
-  32066	STAT ADDRF
-  23704	STAT CALL
-   7720	STAT POP
-   7256	STAT RET
-   5198	STAT ALIGN
-   3292	STAT EXPORT
-   2878	STAT PROC
-   2878	STAT ENDPROC
-   2812	STAT ADDRESS
-    738	STAT SKIP
-    374	STAT EQU
-    280	STAT CODE
-    176	STAT LIT
-    102	STAT FILE
-    100	STAT BSS
-     68	STAT DATA
-*/
+#define ASM(O) if (TryAssemble##O()) { return; }
 
-//#define STAT(L) _printf("STAT " L "\n");
-#define STAT(L)
-
-#undef ASM
-#define ASM(O) if (TryAssemble##O()) { STAT(#O); return; }
-
-	ASM(ADDRL)
 	ASM(BYTE)
+	ASM(ADDRL)
 	ASM(LINE)
 	ASM(ARG)
 	ASM(IMPORT)
@@ -885,6 +829,8 @@ Empirical frequency statistics from FI 2001.01.23:
 	ASM(FILE)
 	ASM(BSS)
 	ASM(DATA)
+
+#undef ASM
 
 	CodeError( "Unknown token: %s\n", token );
 }
@@ -1021,7 +967,7 @@ static void Assemble()
 			currentFileLine = 0;
 			report( "pass %i: %s\n", passNumber, currentFileName );
 			fflush( NULL );
-			char* p = asmFiles[i];
+			const char* p = asmFiles[i];
 			while ( p ) {
 				p = ExtractLine( p );
 				AssembleLine();
