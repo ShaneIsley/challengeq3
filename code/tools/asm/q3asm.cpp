@@ -24,8 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 struct VanillaStringCmp
 {
-	// parameters for hash table
-	enum { bucket_size = 4, min_buckets = 8 };
+	enum { bucket_size = 4, min_buckets = 8 }; // parameters for VC hash table
 
 	size_t operator()( const char* s ) const // X31 hash
 	{
@@ -85,10 +84,7 @@ typedef struct {
 typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
 SymTable aSymTable;
 
-static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment cack
-
-
-int		passNumber;
+static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment
 
 
 typedef struct options_s {
@@ -104,11 +100,10 @@ int		numAsmFiles;
 char	*asmFiles[MAX_ASM_FILES];
 char	*asmFileNames[MAX_ASM_FILES];
 
-int		currentFileIndex;
-char	*currentFileName;
-int		currentFileLine;
+static int currentFileIndex;
+static const char* currentFileName;
+static int currentFileLine;
 
-int		stackSize = 0x10000;
 
 // we need to convert arg and ret instructions to
 // stores to the local stack frame, so we need to track the
@@ -122,6 +117,7 @@ char	lineBuffer[MAX_LINE_LENGTH];
 int		lineParseOffset;
 char	token[MAX_LINE_LENGTH];
 
+int		passNumber;
 int		instructionCount;
 
 
@@ -506,12 +502,10 @@ ASM(POP)
 // address of a parameter is converted to OP_LOCAL
 ASM(ADDRF)
 {
-	int		v;
 	if ( !strncmp( token, "ADDRF", 5 ) ) {
 		instructionCount++;
 		Parse();
-		v = ParseExpression();
-		v = 16 + currentArgs + currentLocals + v;
+		int v = ParseExpression() + 16 + currentArgs + currentLocals;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
 		return qtrue;
@@ -522,12 +516,10 @@ ASM(ADDRF)
 // address of a local is converted to OP_LOCAL
 ASM(ADDRL)
 {
-	int		v;
 	if ( !strncmp( token, "ADDRL", 5 ) ) {
 		instructionCount++;
 		Parse();
-		v = ParseExpression();
-		v = 8 + currentArgs + v;
+		int v = ParseExpression() + 8 + currentArgs;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
 		return qtrue;
@@ -537,11 +529,8 @@ ASM(ADDRL)
 
 ASM(PROC)
 {
-	char	name[1024];
 	if ( !strcmp( token, "proc" ) ) {
 		Parse();					// function name
-		strcpy( name, token );
-
 		DefineSymbol( token, instructionCount ); // segment[CODESEG].imageUsed );
 
 		currentLocals = ParseValue();	// locals
@@ -550,7 +539,7 @@ ASM(PROC)
 		currentArgs = ( currentArgs + 3 ) & ~3;
 
 		if ( 8 + currentLocals + currentArgs >= 32767 ) {
-			CodeError( "Locals > 32k in %s\n", name );
+			CodeError( "Locals > 32k in %s\n", token );
 		}
 
 		instructionCount++;
@@ -726,10 +715,10 @@ ASM(BYTE)
 	return qfalse;
 }
 
-	// code labels are emited as instruction counts, not byte offsets,
-	// because the physical size of the code will change with
-	// different run time compilers and we want to minimize the
-	// size of the required translation table
+// code labels are emited as instruction counts, not byte offsets,
+// because the physical size of the code will change with
+// different run time compilers and we want to minimize the
+// size of the required translation table
 ASM(LABEL)
 {
 	if ( !strncmp( token, "LABEL", 5 ) ) {
@@ -955,19 +944,15 @@ static void WriteVmFile()
 	fclose( f );
 }
 
-/*
-===============
-Assemble
-===============
-*/
-void Assemble( void ) {
-	int		i;
-	char	filename[MAX_OSPATH];
-	char		*ptr;
+
+static void Assemble()
+{
+	int i;
 
 	report( "outputFilename: %s\n", outputFilename );
 
 	for ( i = 0 ; i < numAsmFiles ; i++ ) {
+		char filename[MAX_OSPATH];
 		strcpy( filename, asmFileNames[ i ] );
 		DefaultExtension( filename, ".asm" );
 		LoadFile( filename, (void **)&asmFiles[i] );
@@ -990,9 +975,9 @@ void Assemble( void ) {
 			currentFileLine = 0;
 			report("pass %i: %s\n", passNumber, currentFileName );
 			fflush( NULL );
-			ptr = asmFiles[i];
-			while ( ptr ) {
-				ptr = ExtractLine( ptr );
+			char* p = asmFiles[i];
+			while ( p ) {
+				p = ExtractLine( p );
 				AssembleLine();
 			}
 		}
@@ -1004,15 +989,15 @@ void Assemble( void ) {
 	}
 
 	// reserve the stack in bss
+	const int stackSize = 0x10000;
 	DefineSymbol( "_stackStart", segment[BSSSEG].imageUsed );
 	segment[BSSSEG].imageUsed += stackSize;
 	DefineSymbol( "_stackEnd", segment[BSSSEG].imageUsed );
 
-	// write the image
 	WriteVmFile();
 
-	// write the map file even if there were errors
-	if ( options.writeMapFile ) {
+	// only write the map file if there were no errors
+	if ( options.writeMapFile && !errorCount ) {
 		WriteMapFile();
 	}
 }
