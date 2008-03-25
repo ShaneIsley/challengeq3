@@ -22,13 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // q_math.c -- stateless support routines that are included in each code module
 
-// Some of the vector functions are static inline in q_shared.h. q3asm
-// doesn't understand static functions though, so we only want them in
-// one file. That's what this is about.
-#ifdef Q3_VM
-#define __Q3_VM_MATH
-#endif
-
 #include "q_shared.h"
 
 
@@ -959,6 +952,66 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs ) {
 		maxs[2] = v[2];
 	}
 }
+
+
+// KHB  although our version of q3asm CAN handle "static inline" correctly (I RULE :P)
+// there's no actual value to it, because *LCC* can't, so multiple copies just bloat the vm
+
+#if defined( Q3_VM )
+
+qboolean VectorCompare( const vec3_t v1, const vec3_t v2 )
+{
+	return (v1[0] == v2[0] && v1[1] == v2[1] && v1[2] == v2[2]);
+}
+
+vec_t VectorLength( const vec3_t v )
+{
+	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+
+vec_t VectorLengthSquared( const vec3_t v )
+{
+	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+
+vec_t Distance( const vec3_t p1, const vec3_t p2 )
+{
+	vec3_t	v;
+	VectorSubtract (p2, p1, v);
+	return VectorLength( v );
+}
+
+vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 )
+{
+	vec3_t	v;
+	VectorSubtract (p2, p1, v);
+	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+}
+
+void VectorNormalizeFast( vec3_t v )
+{
+	float ilength = Q_rsqrt( DotProduct( v, v ) );
+	v[0] *= ilength;
+	v[1] *= ilength;
+	v[2] *= ilength;
+}
+
+void VectorInverse( vec3_t v )
+{
+	v[0] = -v[0];
+	v[1] = -v[1];
+	v[2] = -v[2];
+}
+
+void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross )
+{
+	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
+	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
+	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
+}
+
+#endif // defined( Q3_VM )
+
 
 vec_t VectorNormalize( vec3_t v ) {
 	// NOTE: TTimo - Apple G4 altivec source uses double?

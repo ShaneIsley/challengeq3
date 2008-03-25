@@ -397,7 +397,7 @@ void ClearBounds( vec3_t mins, vec3_t maxs );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 
 
-#if !defined( Q3_VM ) || defined( __Q3_VM_MATH )
+#if !defined( Q3_VM )
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4514)		// unreferenced inline
