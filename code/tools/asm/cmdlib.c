@@ -19,95 +19,19 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-// cmdlib.c
 
 #include "../../qcommon/q_shared.h"
 #include "cmdlib.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
-/*
 
-#ifdef WIN32
-#include <direct.h>
-#include <windows.h>
-#elif defined(NeXT)
-#include <libc.h>
-#else
-#include <unistd.h>
-#endif
-
-#define	BASEDIRNAME	"quake"		// assumed to have a 2 or 3 following
-*/
 
 #define PATHSEPERATOR   '/'
-
-// set these before calling CheckParm
-int myargc;
-char **myargv;
 
 char		com_token[1024];
 qboolean	com_eof;
 
-qboolean		archive;
-char			archivedir[1024];
-
-
-/*
-===================
-ExpandWildcards
-
-Mimic unix command line expansion
-===================
-*/
-#define	MAX_EX_ARGC	1024
-int		ex_argc;
-char	*ex_argv[MAX_EX_ARGC];
-#ifdef _WIN32
-#include "io.h"
-void ExpandWildcards( int *argc, char ***argv )
-{
-	struct _finddata_t fileinfo;
-	int		handle;
-	int		i;
-	char	filename[1024];
-	char	filebase[1024];
-	char	*path;
-
-	ex_argc = 0;
-	for (i=0 ; i<*argc ; i++)
-	{
-		path = (*argv)[i];
-		if ( path[0] == '-'
-			|| ( !strstr(path, "*") && !strstr(path, "?") ) )
-		{
-			ex_argv[ex_argc++] = path;
-			continue;
-		}
-
-		handle = _findfirst (path, &fileinfo);
-		if (handle == -1)
-			return;
-
-		ExtractFilePath (path, filebase);
-
-		do
-		{
-			sprintf (filename, "%s%s", filebase, fileinfo.name);
-			ex_argv[ex_argc++] = copystring (filename);
-		} while (_findnext( handle, &fileinfo ) != -1);
-
-		_findclose (handle);
-	}
-
-	*argc = ex_argc;
-	*argv = ex_argv;
-}
-#else
-void ExpandWildcards (int *argc, char ***argv)
-{
-}
-#endif
 
 #ifdef WIN_ERROR
 #include <windows.h>
@@ -195,36 +119,12 @@ char *copystring(const char *s)
 }
 
 
-
-/*
-================
-I_FloatTime
-================
-*/
-double I_FloatTime (void)
+float Q_FloatTime()
 {
-	time_t	t;
-	
-	time (&t);
-	
-	return t;
-#if 0
-// more precise, less portable
-	struct timeval tp;
-	struct timezone tzp;
-	static int		secbase;
-
-	gettimeofday(&tp, &tzp);
-	
-	if (!secbase)
-	{
-		secbase = tp.tv_sec;
-		return tp.tv_usec/1000000.0;
-	}
-	
-	return (tp.tv_sec - secbase) + tp.tv_usec/1000000.0;
-#endif
+	clock_t t = clock();
+	return ((float)t / CLOCKS_PER_SEC);
 }
+
 
 void Q_mkdir (const char *path)
 {
@@ -339,63 +239,6 @@ skipwhite:
 }
 
 
-int Q_strncasecmp (const char *s1, const char *s2, int n)
-{
-	int		c1, c2;
-	
-	do
-	{
-		c1 = *s1++;
-		c2 = *s2++;
-
-		if (!n--)
-			return 0;		// strings are equal until end point
-		
-		if (c1 != c2)
-		{
-			if (c1 >= 'a' && c1 <= 'z')
-				c1 -= ('a' - 'A');
-			if (c2 >= 'a' && c2 <= 'z')
-				c2 -= ('a' - 'A');
-			if (c1 != c2)
-				return -1;		// strings not equal
-		}
-	} while (c1);
-	
-	return 0;		// strings are equal
-}
-
-int Q_stricmp (const char *s1, const char *s2)
-{
-	return Q_strncasecmp (s1, s2, 99999);
-}
-
-
-char *strupr (char *start)
-{
-	char	*in;
-	in = start;
-	while (*in)
-	{
-		*in = toupper(*in);
-		in++;
-	}
-	return start;
-}
-
-char *strlower (char *start)
-{
-	char	*in;
-	in = start;
-	while (*in)
-	{
-		*in = tolower(*in); 
-		in++;
-	}
-	return start;
-}
-
-
 /*
 =============================================================================
 
@@ -403,29 +246,6 @@ char *strlower (char *start)
 
 =============================================================================
 */
-
-
-/*
-=================
-CheckParm
-
-Checks for the given parameter in the program's command line arguments
-Returns the argument number (1 to argc-1) or 0 if not present
-=================
-*/
-int CheckParm (const char *check)
-{
-	int             i;
-
-	for (i = 1;i<myargc;i++)
-	{
-		if ( !Q_stricmp(check, myargv[i]) )
-			return i;
-	}
-
-	return 0;
-}
-
 
 
 /*
@@ -446,14 +266,10 @@ int Q_filelength (FILE *f)
 	return end;
 }
 
-#ifdef MAX_PATH
-#undef MAX_PATH
-#endif
-#define MAX_PATH 4096
 static FILE* myfopen(const char* filename, const char* mode)
 {
 	char* p;
-	char fn[MAX_PATH];
+	char fn[MAX_OSPATH];
 
 	fn[0] = '\0';
 	strncat(fn, filename, sizeof(fn)-1);
@@ -534,37 +350,6 @@ int    LoadFile( const char *filename, void **bufferptr )
 	length = Q_filelength (f);
 	buffer = malloc (length+1);
 	((char *)buffer)[length] = 0;
-	SafeRead (f, buffer, length);
-	fclose (f);
-
-	*bufferptr = buffer;
-	return length;
-}
-
-
-/*
-==============
-LoadFileBlock
--
-rounds up memory allocation to 4K boundry
--
-==============
-*/
-int    LoadFileBlock( const char *filename, void **bufferptr )
-{
-	FILE	*f;
-	int    length, nBlock, nAllocSize;
-	void    *buffer;
-
-	f = SafeOpenRead (filename);
-	length = Q_filelength (f);
-  nAllocSize = length;
-  nBlock = nAllocSize % MEM_BLOCKSIZE;
-  if ( nBlock > 0) {
-    nAllocSize += MEM_BLOCKSIZE - nBlock;
-  }
-	buffer = malloc (nAllocSize+1);
-  memset(buffer, 0, nAllocSize+1);
 	SafeRead (f, buffer, length);
 	fclose (f);
 
@@ -677,69 +462,6 @@ void    StripExtension (char *path)
 
 
 /*
-====================
-Extract file parts
-====================
-*/
-// FIXME: should include the slash, otherwise
-// backing to an empty path will be wrong when appending a slash
-void ExtractFilePath (const char *path, char *dest)
-{
-	const char    *src;
-
-	src = path + strlen(path) - 1;
-
-//
-// back up until a \ or the start
-//
-	while (src != path && *(src-1) != '\\' && *(src-1) != '/')
-		src--;
-
-	memcpy (dest, path, src-path);
-	dest[src-path] = 0;
-}
-
-void ExtractFileBase (const char *path, char *dest)
-{
-	const char    *src;
-
-	src = path + strlen(path) - 1;
-
-//
-// back up until a \ or the start
-//
-	while (src != path && *(src-1) != PATHSEPERATOR)
-		src--;
-
-	while (*src && *src != '.')
-	{
-		*dest++ = *src++;
-	}
-	*dest = 0;
-}
-
-void ExtractFileExtension (const char *path, char *dest)
-{
-	const char    *src;
-
-	src = path + strlen(path) - 1;
-
-//
-// back up until a . or the start
-//
-	while (src != path && *(src-1) != '.')
-		src--;
-	if (src == path)
-	{
-		*dest = 0;	// no extension
-		return;
-	}
-
-	strcpy (dest,src);
-}
-
-
-/*
 ==============
 ParseNum / ParseHex
 ==============
@@ -786,13 +508,13 @@ int ParseNum (const char *str)
 // FIXME: byte swap?
 
 // this is a 16 bit, non-reflected CRC using the polynomial 0x1021
-// and the initial and final xor values shown below...  in other words, the
-// CCITT standard CRC used by XMODEM
+// and the initial and final xor values shown below...
+// in other words, the CCITT standard CRC used by XMODEM
 
 #define CRC_INIT_VALUE	0xffff
 #define CRC_XOR_VALUE	0x0000
 
-static unsigned short crctable[256] =
+static const unsigned short crctable[256] =
 {
 	0x0000,	0x1021,	0x2042,	0x3063,	0x4084,	0x50a5,	0x60c6,	0x70e7,
 	0x8108,	0x9129,	0xa14a,	0xb16b,	0xc18c,	0xd1ad,	0xe1ce,	0xf1ef,
@@ -842,6 +564,7 @@ unsigned short CRC_Value(unsigned short crcvalue)
 {
 	return crcvalue ^ CRC_XOR_VALUE;
 }
+
 //=============================================================================
 
 /*

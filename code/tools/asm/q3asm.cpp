@@ -42,6 +42,7 @@ struct VanillaStringCmp
 	}
 };
 
+
 #include "../../qcommon/vm_local.h"
 
 extern "C" {
@@ -53,17 +54,7 @@ typedef stdext::hash_map< const char*, int, VanillaStringCmp > OpTable;
 OpTable aOpTable;
 
 
-char	outputFilename[MAX_OS_PATH];
-
-// the zero page size is just used for detecting run time faults
-#define	ZERO_PAGE_SIZE	0		// 256
-
-typedef struct {
-	int		imageBytes;		// after decompression
-	int		entryPoint;
-	int		stackBase;
-	int		stackSize;
-} executableHeader_t;
+static char outputFilename[MAX_OSPATH];
 
 typedef enum {
 	CODESEG,
@@ -74,13 +65,17 @@ typedef enum {
 	NUM_SEGMENTS
 } segmentName_t;
 
-#define	MAX_IMAGE	0x400000
+#define MAX_SEGSIZE 0x400000
 
 typedef struct {
-	byte	image[MAX_IMAGE];
+	byte	image[MAX_SEGSIZE];
 	int		imageUsed;
 	int		segmentBase;		// only valid on second pass
 } segment_t;
+
+static segment_t segment[NUM_SEGMENTS];
+static segment_t* currentSegment;
+
 
 typedef struct {
 	const segment_t* segment;
@@ -90,14 +85,11 @@ typedef struct {
 typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
 SymTable aSymTable;
 
+static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment cack
 
-segment_t	segment[NUM_SEGMENTS];
-segment_t	*currentSegment;
 
 int		passNumber;
 
-int		numSymbols;
-int		errorCount;
 
 typedef struct options_s {
 	qboolean verbose;
@@ -105,9 +97,6 @@ typedef struct options_s {
 } options_t;
 
 static options_t options;
-
-symbol_t	*symbols;
-symbol_t	*lastSymbol = 0;  /* Most recent symbol defined. */
 
 
 #define	MAX_ASM_FILES	256
@@ -134,27 +123,6 @@ int		lineParseOffset;
 char	token[MAX_LINE_LENGTH];
 
 int		instructionCount;
-
-
-int
-vreport (const char* fmt, va_list vp)
-{
-  if (options.verbose != qtrue)
-      return 0;
-  return vprintf(fmt, vp);
-}
-
-int
-report (const char *fmt, ...)
-{
-  va_list va;
-  int retval;
-
-  va_start(va, fmt);
-  retval = vreport(fmt, va);
-  va_end(va);
-  return retval;
-}
 
 
 #ifdef _MSC_VER
@@ -194,28 +162,36 @@ int atoiNoCap (const char *s)
 }
 
 
-/*
-============
-CodeError
-============
-*/
-void CodeError( char *fmt, ... ) {
-	va_list		argptr;
+static void report( const char* fmt, ... )
+{
+	if (!options.verbose)
+		return;
 
+	va_list va;
+	va_start( va, fmt );
+	vprintf( fmt, va );
+	va_end(va);
+}
+
+
+static int errorCount;
+
+static void CodeError( const char* fmt, ... )
+{
 	errorCount++;
+	printf( "%s:%i : ", currentFileName, currentFileLine );
 
-	report( "%s:%i ", currentFileName, currentFileLine );
-
-	va_start( argptr,fmt );
-	vprintf( fmt,argptr );
-	va_end( argptr );
+	va_list va;
+	va_start( va, fmt );
+	vprintf( fmt, va );
+	va_end(va);
 }
 
 
 static void EmitByte( segment_t* seg, int v )
 {
-	if ( seg->imageUsed >= MAX_IMAGE ) {
-		Error( "MAX_IMAGE" );
+	if ( seg->imageUsed >= MAX_SEGSIZE ) {
+		Error( "MAX_SEGSIZE" );
 	}
 	seg->image[ seg->imageUsed ] = v;
 	seg->imageUsed++;
@@ -224,8 +200,8 @@ static void EmitByte( segment_t* seg, int v )
 
 static void EmitInt( segment_t* seg, int v )
 {
-	if ( seg->imageUsed >= MAX_IMAGE - 4 ) {
-		Error( "MAX_IMAGE" );
+	if ( seg->imageUsed >= MAX_SEGSIZE - 4 ) {
+		Error( "MAX_SEGSIZE" );
 	}
 	seg->image[ seg->imageUsed ] = v & 255;
 	seg->image[ seg->imageUsed + 1 ] = ( v >> 8 ) & 255;
@@ -444,9 +420,6 @@ int	ParseExpression(void) {
 
 
 /*
-==============
-HackToSegment
-
 BIG HACK: I want to put all 32 bit values in the data
 segment so they can be byte swapped, and all char data in the lit
 segment, but switch jump tables are emited in the lit segment and
@@ -457,9 +430,9 @@ label that was just defined
 
 Note that the lit segment is read-write in the VM, so strings
 aren't read only as in some architectures.
-==============
 */
-void HackToSegment( segmentName_t seg ) {
+static void HackToSegment( segmentName_t seg )
+{
 	if ( currentSegment == &segment[seg] ) {
 		return;
 	}
@@ -472,118 +445,100 @@ void HackToSegment( segmentName_t seg ) {
 }
 
 
+#define ASM(O) static qboolean TryAssemble##O()
+
+// these clauses were moved out from AssembleLine() to allow easy reordering
+// an optimizing compiler should reconstruct them back into inline code  -PH
 
 
-
-
-
-//#define STAT(L) report("STAT " L "\n");
-#define STAT(L)
-#define ASM(O) int TryAssemble##O ()
-
-
-/*
-  These clauses were moved out from AssembleLine() to allow reordering of if's.
-  An optimizing compiler should reconstruct these back into inline code.
- -PH
-*/
-
-	// call instructions reset currentArgOffset
+// call instructions reset currentArgOffset
 ASM(CALL)
 {
 	if ( !strncmp( token, "CALL", 4 ) ) {
-STAT("CALL");
 		EmitByte( &segment[CODESEG], OP_CALL );
 		instructionCount++;
 		currentArgOffset = 0;
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
-	// arg is converted to a reversed store
+// arg is converted to a reversed store
 ASM(ARG)
 {
 	if ( !strncmp( token, "ARG", 3 ) ) {
-STAT("ARG");
 		EmitByte( &segment[CODESEG], OP_ARG );
 		instructionCount++;
 		if ( 8 + currentArgOffset >= 256 ) {
 			CodeError( "currentArgOffset >= 256" );
-			return 1;
+			return qtrue;
 		}
 		EmitByte( &segment[CODESEG], 8 + currentArgOffset );
 		currentArgOffset += 4;
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
-	// ret just leaves something on the op stack
+// ret just leaves something on the op stack
 ASM(RET)
 {
 	if ( !strncmp( token, "RET", 3 ) ) {
-STAT("RET");
 		EmitByte( &segment[CODESEG], OP_LEAVE );
 		instructionCount++;
 		EmitInt( &segment[CODESEG], 8 + currentLocals + currentArgs );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
-	// pop is needed to discard the return value of 
-	// a function
+// pop is needed to discard the return value of a function
 ASM(POP)
 {
 	if ( !strncmp( token, "pop", 3 ) ) {
-STAT("POP");
 		EmitByte( &segment[CODESEG], OP_POP );
 		instructionCount++;
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
-	// address of a parameter is converted to OP_LOCAL
+// address of a parameter is converted to OP_LOCAL
 ASM(ADDRF)
 {
 	int		v;
 	if ( !strncmp( token, "ADDRF", 5 ) ) {
-STAT("ADDRF");
 		instructionCount++;
 		Parse();
 		v = ParseExpression();
 		v = 16 + currentArgs + currentLocals + v;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
-	// address of a local is converted to OP_LOCAL
+// address of a local is converted to OP_LOCAL
 ASM(ADDRL)
 {
 	int		v;
 	if ( !strncmp( token, "ADDRL", 5 ) ) {
-STAT("ADDRL");
 		instructionCount++;
 		Parse();
 		v = ParseExpression();
 		v = 8 + currentArgs + v;
 		EmitByte( &segment[CODESEG], OP_LOCAL );
 		EmitInt( &segment[CODESEG], v );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(PROC)
 {
 	char	name[1024];
 	if ( !strcmp( token, "proc" ) ) {
-STAT("PROC");
 		Parse();					// function name
 		strcpy( name, token );
 
@@ -601,17 +556,15 @@ STAT("PROC");
 		instructionCount++;
 		EmitByte( &segment[CODESEG], OP_ENTER );
 		EmitInt( &segment[CODESEG], 8 + currentLocals + currentArgs );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
-
 
 ASM(ENDPROC)
 {
 	int		v, v2;
 	if ( !strcmp( token, "endproc" ) ) {
-STAT("ENDPROC");
 		Parse();				// skip the function name
 		v = ParseValue();		// locals
 		v2 = ParseValue();		// arg marshalling
@@ -624,160 +577,142 @@ STAT("ENDPROC");
 		EmitByte( &segment[CODESEG], OP_LEAVE );
 		EmitInt( &segment[CODESEG], 8 + currentLocals + currentArgs );
 
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
-
 
 ASM(ADDRESS)
 {
-	int		v;
 	if ( !strcmp( token, "address" ) ) {
-STAT("ADDRESS");
 		Parse();
-		v = ParseExpression();
-
-/* Addresses are 32 bits wide, and therefore go into data segment. */
+		int v = ParseExpression();
+		// addresses are 32 bits wide, and therefore go into data segment
 		HackToSegment( DATASEG );
 		EmitInt( currentSegment, v );
-		if( passNumber == 1 && token[ 0 ] == '$' ) // crude test for labels
+		if ( passNumber == 1 && token[ 0 ] == '$' ) // crude test for labels
 			EmitInt( &segment[ JTRGSEG ], v );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(EXPORT)
 {
 	if ( !strcmp( token, "export" ) ) {
-STAT("EXPORT");
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(IMPORT)
 {
 	if ( !strcmp( token, "import" ) ) {
-STAT("IMPORT");
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(CODE)
 {
 	if ( !strcmp( token, "code" ) ) {
-STAT("CODE");
 		currentSegment = &segment[CODESEG];
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(BSS)
 {
 	if ( !strcmp( token, "bss" ) ) {
-STAT("BSS");
 		currentSegment = &segment[BSSSEG];
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(DATA)
 {
 	if ( !strcmp( token, "data" ) ) {
-STAT("DATA");
 		currentSegment = &segment[DATASEG];
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(LIT)
 {
 	if ( !strcmp( token, "lit" ) ) {
-STAT("LIT");
 		currentSegment = &segment[LITSEG];
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(LINE)
 {
 	if ( !strcmp( token, "line" ) ) {
-STAT("LINE");
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(FILE)
 {
 	if ( !strcmp( token, "file" ) ) {
-STAT("FILE");
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(EQU)
 {
 	char	name[1024];
 	if ( !strcmp( token, "equ" ) ) {
-STAT("EQU");
 		Parse();
 		strcpy( name, token );
 		Parse();
 		DefineSymbol( name, atoiNoCap(token) );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(ALIGN)
 {
-	int		v;
 	if ( !strcmp( token, "align" ) ) {
-STAT("ALIGN");
-		v = ParseValue();
+		int v = ParseValue();
 		currentSegment->imageUsed = (currentSegment->imageUsed + v - 1 ) & ~( v - 1 );
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(SKIP)
 {
-	int		v;
 	if ( !strcmp( token, "skip" ) ) {
-STAT("SKIP");
-		v = ParseValue();
+		int v = ParseValue();
 		currentSegment->imageUsed += v;
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 ASM(BYTE)
 {
 	int		i, v, v2;
 	if ( !strcmp( token, "byte" ) ) {
-STAT("BYTE");
 		v = ParseValue();
 		v2 = ParseValue();
 
 		if ( v == 1 ) {
-/* Character (1-byte) values go into lit(eral) segment. */
+			// character (1-byte) values go into lit(eral) segment
 			HackToSegment( LITSEG );
 		} else if ( v == 4 ) {
-/* 32-bit (4-byte) values go into data segment. */
+			// 32-bit (4-byte) values go into data segment
 			HackToSegment( DATASEG );
 		} else if ( v == 2 ) {
-/* and 16-bit (2-byte) values will cause q3asm to barf. */
+			// and 16-bit (2-byte) values will cause q3asm to barf
 			CodeError( "16 bit initialized data not supported" );
 		}
 
@@ -786,9 +721,9 @@ STAT("BYTE");
 			EmitByte( currentSegment, (v2 & 0xFF) ); /* paranoid ANDing  -PH */
 			v2 >>= 8;
 		}
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 	// code labels are emited as instruction counts, not byte offsets,
@@ -798,16 +733,15 @@ STAT("BYTE");
 ASM(LABEL)
 {
 	if ( !strncmp( token, "LABEL", 5 ) ) {
-STAT("LABEL");
 		Parse();
 		if ( currentSegment == &segment[CODESEG] ) {
 			DefineSymbol( token, instructionCount );
 		} else {
 			DefineSymbol( token, currentSegment->imageUsed );
 		}
-		return 1;
+		return qtrue;
 	}
-	return 0;
+	return qfalse;
 }
 
 
@@ -888,11 +822,13 @@ Empirical frequency statistics from FI 2001.01.23:
     102	STAT FILE
     100	STAT BSS
      68	STAT DATA
-
 */
 
+//#define STAT(L) _printf("STAT " L "\n");
+#define STAT(L)
+
 #undef ASM
-#define ASM(O) if (TryAssemble##O ()) return;
+#define ASM(O) if (TryAssemble##O()) { STAT(#O); return; }
 
 	ASM(ADDRL)
 	ASM(BYTE)
@@ -973,7 +909,7 @@ static void WriteVmFile()
 {
 	report( "%i total errors\n", errorCount );
 
-	char imageName[MAX_OS_PATH];
+	char imageName[MAX_OSPATH];
 	strcpy( imageName, outputFilename );
 	StripExtension( imageName );
 	strcat( imageName, ".qvm" );
@@ -1026,7 +962,7 @@ Assemble
 */
 void Assemble( void ) {
 	int		i;
-	char	filename[MAX_OS_PATH];
+	char	filename[MAX_OSPATH];
 	char		*ptr;
 
 	report( "outputFilename: %s\n", outputFilename );
@@ -1076,7 +1012,7 @@ void Assemble( void ) {
 	WriteVmFile();
 
 	// write the map file even if there were errors
-	if( options.writeMapFile ) {
+	if ( options.writeMapFile ) {
 		WriteMapFile();
 	}
 }
@@ -1089,7 +1025,7 @@ ParseOptionFile
 =============
 */
 void ParseOptionFile( const char *filename ) {
-	char		expanded[MAX_OS_PATH];
+	char		expanded[MAX_OSPATH];
 	char		*text, *text_p;
 
 	strcpy( expanded, filename );
@@ -1128,6 +1064,8 @@ int main( int argc, char **argv )
 				, argv[0] );
 	}
 
+	float tStart = Q_FloatTime();
+
 	// default filename is "q3asm"
 	strcpy( outputFilename, "q3asm" );
 	numAsmFiles = 0;
@@ -1158,12 +1096,12 @@ int main( int argc, char **argv )
 
 		// by default (no -v option), q3asm remains silent except for critical errors
 		// verbosity turns on all messages, error or not
-		if( !strcmp( argv[ i ], "-v" ) ) {
+		if ( !strcmp( argv[ i ], "-v" ) ) {
 			options.verbose = qtrue;
 			continue;
 		}
 
-		if( !strcmp( argv[ i ], "-m" ) ) {
+		if ( !strcmp( argv[ i ], "-m" ) ) {
 			options.writeMapFile = qtrue;
 			continue;
 		}
@@ -1179,6 +1117,8 @@ int main( int argc, char **argv )
 
 	InitTables();
 	Assemble();
+
+	report( "%s compiled in %.3fs\n", outputFilename, Q_FloatTime() - tStart );
 
 	return errorCount;
 }
