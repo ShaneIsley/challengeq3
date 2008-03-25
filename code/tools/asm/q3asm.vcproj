@@ -74,6 +74,7 @@
 				OutputFile="$(OutDir)\q3asm.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateManifest="false"
 				ProgramDatabaseFile="$(IntDir)\q3asm.pdb"
 				SubSystem="1"
 				TargetMachine="1"
