@@ -1035,6 +1035,11 @@ static void Assemble()
 		}
 	}
 
+	SymTable::const_iterator it = aSymGlobal.find( "vmMain" );
+	if ( (it == aSymGlobal.end()) || ((*it).second->segment != &segment[CODESEG]) || (*it).second->value ) {
+		CodeError( "vmMain missing or not the first symbol in the QVM\n" );
+	}
+
 	// reserve the stack in bss
 	const int stackSize = 0x10000;
 	DefineSymbol( "_stackStart", segment[BSSSEG].imageUsed );
