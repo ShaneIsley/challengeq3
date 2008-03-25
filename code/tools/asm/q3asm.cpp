@@ -35,7 +35,7 @@ struct VanillaStringCmp
 		return h;
 	}
 
-	bool operator()( const char* lhs, const char* rhs) const
+	bool operator()( const char* lhs, const char* rhs ) const
 	{
 		return (strcmp(lhs, rhs) < 0);
 	}
@@ -66,20 +66,20 @@ typedef enum {
 
 #define MAX_SEGSIZE 0x400000
 
-typedef struct {
+struct segment_t {
 	byte	image[MAX_SEGSIZE];
 	int		imageUsed;
 	int		segmentBase;		// only valid on second pass
-} segment_t;
+};
 
 static segment_t segment[NUM_SEGMENTS];
 static segment_t* currentSegment;
 
 
-typedef struct {
+struct symbol_t {
 	const segment_t* segment;
 	int value;
-} symbol_t;
+};
 
 typedef stdext::hash_map< const char*, symbol_t*, VanillaStringCmp > SymTable;
 SymTable aSymTable;
@@ -87,10 +87,10 @@ SymTable aSymTable;
 static symbol_t* lastSymbol; // symbol most recently defined, used by HackToSegment
 
 
-typedef struct options_s {
+struct options_t {
 	qboolean verbose;
 	qboolean writeMapFile;
-} options_t;
+};
 
 static options_t options;
 
