@@ -53,10 +53,8 @@ int		TryLoadFile( const char *filename, void **bufferptr );
 void	SaveFile( const char *filename, const void *buffer, int count );
 qboolean	FileExists( const char *filename );
 
-void	DefaultExtension( char *path, const char *extension );
 void	DefaultPath( char *path, const char *basepath );
 void	StripFilename( char *path );
-void	StripExtension( char *path );
 
 int ParseNum( const char* s );
 

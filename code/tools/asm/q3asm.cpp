@@ -67,6 +67,7 @@ typedef enum {
 #define MAX_SEGSIZE 0x400000
 
 struct segment_t {
+	const char* name;
 	byte	image[MAX_SEGSIZE];
 	int		imageUsed;
 	int		segmentBase;		// only valid on second pass
@@ -903,6 +904,12 @@ static void InitTables()
 	for (int i = 0; aSourceOps[i].name; ++i) {
 		aOpTable[ aSourceOps[i].name ] = aSourceOps[i].opcode;
 	}
+
+	segment[CODESEG].name = "CS";
+	segment[DATASEG].name = "DS";
+	segment[LITSEG].name = "LS";
+	segment[BSSSEG].name = "BS";
+	segment[JTRGSEG].name = "JT";
 }
 
 
@@ -914,32 +921,25 @@ static void ShowTable( const SymTable& table, const char* name )
 
 static void WriteMapFile()
 {
-/*
-	FILE		*f;
-	symbol_t	*s;
-	char		imageName[MAX_OS_PATH];
-	int			seg;
-
-	strcpy( imageName, outputFilename );
-	StripExtension( imageName );
+	char imageName[MAX_OSPATH];
+	COM_StripExtension( outputFilename, imageName, sizeof(imageName) );
 	strcat( imageName, ".map" );
 
 	report( "Writing %s...\n", imageName );
 
-	f = SafeOpenWrite( imageName );
-	for ( seg = CODESEG ; seg <= BSSSEG ; seg++ ) {
-		for ( s = symbols ; s ; s = s->next ) {
-			if ( s->name[0] == '$' ) {
-				continue;	// skip locals
+	FILE* f = SafeOpenWrite( imageName );
+	for (int seg = CODESEG; seg <= BSSSEG; ++seg) {
+		fprintf( f, "%s:\n", segment[seg].name );
+		for (SymTable::const_iterator it = aSymGlobal.begin(); it != aSymGlobal.end(); ++it) {
+			const symbol_t* s = (*it).second;
+			if ( &segment[seg] == s->segment ) {
+				if ( s->value >= 0 ) { // ignore systraps
+					fprintf( f, "%8X %s\n", s->value, (*it).first );
+				}
 			}
-			if ( &segment[seg] != s->segment ) {
-				continue;
-			}
-			fprintf( f, "%i %8x %s\n", seg, s->value, s->name );
 		}
 	}
 	fclose( f );
-*/
 }
 
 
@@ -948,16 +948,13 @@ static void WriteVmFile()
 	report( "%i total errors\n", errorCount );
 
 	char imageName[MAX_OSPATH];
-	strcpy( imageName, outputFilename );
-	StripExtension( imageName );
+	COM_StripExtension( outputFilename, imageName, sizeof(imageName) );
 	strcat( imageName, ".qvm" );
 
 	remove( imageName );
 
-	report( "code segment: %7i\n", segment[CODESEG].imageUsed );
-	report( "data segment: %7i\n", segment[DATASEG].imageUsed );
-	report( "lit  segment: %7i\n", segment[LITSEG].imageUsed );
-	report( "bss  segment: %7i\n", segment[BSSSEG].imageUsed );
+	for (int seg = 0; seg < NUM_SEGMENTS; ++seg)
+		report( "%s: %7i\n", segment[seg].name, segment[seg].imageUsed );
 	report( "instruction count: %i\n", instructionCount );
 
 	if ( errorCount != 0 ) {
@@ -1003,7 +1000,7 @@ static void Assemble()
 	for ( i = 0 ; i < numAsmFiles ; i++ ) {
 		char filename[MAX_OSPATH];
 		strcpy( filename, asmFileNames[ i ] );
-		DefaultExtension( filename, ".asm" );
+		COM_DefaultExtension( filename, sizeof(filename), ".asm" );
 		LoadFile( filename, (void **)&asmFiles[i] );
 	}
 
@@ -1142,6 +1139,11 @@ int main( int argc, char **argv )
 		asmFileNames[ numAsmFiles ] = copystring( argv[ i ] );
 		numAsmFiles++;
 	}
+
+#if defined(_DEBUG)
+	options.writeMapFile = qtrue;
+	options.verbose = qtrue;
+#endif
 
 	InitTables();
 	Assemble();

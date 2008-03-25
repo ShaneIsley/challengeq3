@@ -322,27 +322,6 @@ void    SaveFile (const char *filename, const void *buffer, int count)
 }
 
 
-
-void DefaultExtension (char *path, const char *extension)
-{
-	char    *src;
-//
-// if path doesnt have a .EXT, append extension
-// (extension should include the .)
-//
-	src = path + strlen(path) - 1;
-
-	while (*src != '/' && *src != '\\' && src != path)
-	{
-		if (*src == '.')
-			return;                 // it has an extension
-		src--;
-	}
-
-	strcat (path, extension);
-}
-
-
 void DefaultPath (char *path, const char *basepath)
 {
 	char    temp[128];
@@ -363,21 +342,6 @@ void    StripFilename (char *path)
 	while (length > 0 && path[length] != PATHSEPERATOR)
 		length--;
 	path[length] = 0;
-}
-
-void    StripExtension (char *path)
-{
-	int             length;
-
-	length = strlen(path)-1;
-	while (length > 0 && path[length] != '.')
-	{
-		length--;
-		if (path[length] == '/')
-			return;		// no extension
-	}
-	if (length)
-		path[length] = 0;
 }
 
 
