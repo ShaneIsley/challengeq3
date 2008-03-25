@@ -321,8 +321,6 @@ void CL_SystemInfoChanged()
 {
 	const char		*systemInfo;
 	const char		*s, *t;
-	char			key[BIG_INFO_KEY];
-	char			value[BIG_INFO_VALUE];
 	qbool		gameSet;
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
@@ -355,7 +353,9 @@ void CL_SystemInfoChanged()
 	// scan through all the variables in the systeminfo and locally set cvars to match
 	s = systemInfo;
 	while ( s ) {
-		int cvar_flags;
+		int  cvar_flags;
+		char key[BIG_INFO_KEY];
+		char value[BIG_INFO_VALUE];
 
 		Info_NextPair( &s, key, value );
 		if ( !key[0] ) {

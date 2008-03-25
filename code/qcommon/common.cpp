@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // common.c -- misc functions used in client and server
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <limits>
 #include <list>
 
@@ -32,7 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <netinet/in.h>
 #include <sys/stat.h> // umask
 #endif
-
 
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
@@ -174,7 +174,10 @@ void QDECL Com_Printf( const char *fmt, ... )
 		logfile = FS_FOpenFileWrite( "qconsole.log" );
 		if (logfile)
 		{
-			Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
+			if (newtime)
+			if (const char* newtime_str = asctime( newtime ))
+				Com_Printf( "logfile opened on %s\n", newtime_str );
+
 			if ( com_logfile->integer > 1 )
 			{
 				// force it to not buffer so we get valid
@@ -610,8 +613,7 @@ int Com_RealTime( qtime_t* qtime )
 	if (!qtime)
 		return t;
 
-	const struct tm* tms = localtime(&t);
-	if (tms) {
+	if (const struct tm* tms = localtime(&t)) {
 		qtime->tm_sec = tms->tm_sec;
 		qtime->tm_min = tms->tm_min;
 		qtime->tm_hour = tms->tm_hour;
@@ -1004,9 +1006,16 @@ char* CopyString( const char *in )
 			return ((char *)&numberstring[in[0]-'0']) + sizeof(memblock_t);
 		}
 	}
-	char* out = (char*)S_Malloc(strlen(in)+1);
-	strcpy(out, in);
-	return out;
+	
+	size_t l = strlen(in);
+	if (char* out = (char*)S_Malloc(l+1))
+	{
+		strncpy( out, in, l );
+		out[l] = 0;
+		return out;
+	}
+
+	return NULL;
 }
 
 /*
@@ -1696,7 +1705,18 @@ public:
 	void deallocate (pointer p, size_type num) {
 		Z_Free((void*)p);
 	}
+
 };
+
+template<class T1, class T2>
+qbool operator==( const q3allocator<T1>&, const q3allocator<T2>& ) {
+	return true;
+}
+
+template<class T1, class T2>
+qbool operator!=( const q3allocator<T1>&, const q3allocator<T2>& ) {
+	return false;
+}
 
 typedef std::list<sysEvent_t, q3allocator<sysEvent_t> > comEvenets_t;
 static comEvenets_t& Com_PushedEvenets()
@@ -1745,10 +1765,9 @@ static void Com_InitJournaling()
 }
 
 
-static sysEvent_t Com_GetRealEvent()
+static void Com_GetRealEvent( sysEvent_t& ev )
 {
 	int			r;
-	sysEvent_t	ev;
 
 	// get an event from either the system or the journal file
 	if ( com_journal->integer == 2 ) {
@@ -1764,6 +1783,9 @@ static sysEvent_t Com_GetRealEvent()
 			}
 		}
 	} else {
+		ev.evType = SE_NONE;
+		ev.evTime = Sys_Milliseconds();
+
 		ev = Sys_GetEvent();
 
 		// write the journal value out if needed
@@ -1781,55 +1803,23 @@ static sysEvent_t Com_GetRealEvent()
 		}
 	}
 
-	return ev;
 }
 
 
 static void Com_PushEvent( const sysEvent_t& event )
 {
 	Com_PushedEvenets().push_back( event );
-	/*
-	static qbool printedWarning = qfalse;
-
-	sysEvent_t& ev = com_pushedEvents[ com_pushedEventsHead & (MAX_PUSHED_EVENTS-1) ];
-
-	if ( com_pushedEventsHead - com_pushedEventsTail >= MAX_PUSHED_EVENTS ) {
-
-		// don't print the warning constantly, or it can give time for more...
-		if ( !printedWarning ) {
-			printedWarning = qtrue;
-			Com_Printf( "WARNING: Com_PushEvent overflow\n" );
-		}
-
-		if ( ev.evPtr ) {
-			Z_Free( ev.evPtr );
-		}
-		com_pushedEventsTail++;
-	} else {
-		printedWarning = qfalse;
-	}
-
-	ev = event;
-	com_pushedEventsHead++;
-	*/
 }
 
 
-static sysEvent_t Com_GetEvent()
+static void Com_GetEvent( sysEvent_t& event )
 {
 	if( !Com_PushedEvenets().empty() ){
-		sysEvent_t tmp( Com_PushedEvenets().front() );
+		event = Com_PushedEvenets().front();
 		Com_PushedEvenets().pop_front();
-		return tmp;
+	} else {
+		Com_GetRealEvent( event );
 	}
-
-	/*
-	if ( com_pushedEventsHead > com_pushedEventsTail ) {
-		com_pushedEventsTail++;
-		return com_pushedEvents[ (com_pushedEventsTail-1) & (MAX_PUSHED_EVENTS-1) ];
-	}
-	*/
-	return Com_GetRealEvent();
 }
 
 
@@ -1859,7 +1849,7 @@ int Com_EventLoop()
 
 	while ( 1 ) {
 		NET_FlushPacketQueue();
-		ev = Com_GetEvent();
+		Com_GetEvent( ev );
 
 		// if no more events are available
 		if ( ev.evType == SE_NONE ) {
@@ -1950,7 +1940,7 @@ int Com_Milliseconds()
 
 	// get events and push them until we get a null event with the current time
 	do {
-		ev = Com_GetRealEvent();
+		Com_GetRealEvent( ev );
 		if ( ev.evType != SE_NONE ) {
 			Com_PushEvent( ev );
 		}
