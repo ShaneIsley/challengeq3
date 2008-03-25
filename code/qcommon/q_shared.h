@@ -529,8 +529,8 @@ float Com_Clamp( float min, float max, float value );
 void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
 
 const char* COM_SkipPath( const char* pathname );
-void	COM_StripExtension(const char *in, char *out, int destsize);
-void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
+void COM_StripExtension( const char* in, char* out, int destsize );
+void COM_DefaultExtension( char* path, int maxSize, const char* ext );
 
 const char* COM_Parse( const char** data_p );
 const char* COM_ParseExt( const char** data_p, qbool allowLineBreak );
