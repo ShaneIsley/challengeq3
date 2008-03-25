@@ -33,83 +33,6 @@ char		com_token[1024];
 qboolean	com_eof;
 
 
-#ifdef WIN_ERROR
-#include <windows.h>
-/*
-=================
-Error
-
-For abnormal program terminations in windowed apps
-=================
-*/
-void Error( const char *error, ... )
-{
-	va_list argptr;
-	char	text[1024];
-	char	text2[1024];
-	int		err;
-
-	err = GetLastError ();
-
-	va_start (argptr,error);
-	vsprintf (text, error,argptr);
-	va_end (argptr);
-
-	sprintf (text2, "%s\nGetLastError() = %i", text, err);
-    MessageBox(NULL, text2, "Error", 0 /* MB_OK */ );
-
-	exit (1);
-}
-
-#else
-/*
-=================
-Error
-
-For abnormal program terminations in console apps
-=================
-*/
-void Error( const char *error, ...)
-{
-	va_list argptr;
-
-	_printf ("\n************ ERROR ************\n");
-
-	va_start (argptr,error);
-	vprintf (error,argptr);
-	va_end (argptr);
-	_printf ("\r\n");
-
-	exit (1);
-}
-#endif
-
-// only printf if in verbose mode
-qboolean verbose = qfalse;
-void qprintf( const char *format, ... ) {
-	va_list argptr;
-
-	if (!verbose)
-		return;
-
-	va_start (argptr,format);
-	vprintf (format,argptr);
-	va_end (argptr);
-
-}
-
-void _printf( const char *format, ... ) {
-	va_list argptr;
-	char text[4096];
-
-	va_start (argptr,format);
-	vsprintf (text, format, argptr);
-	va_end (argptr);
-
-	printf(text);
-}
-
-
 char *copystring(const char *s)
 {
 	char	*b;
@@ -126,7 +49,7 @@ float Q_FloatTime()
 }
 
 
-void Q_mkdir (const char *path)
+void Q_mkdir( const char* path )
 {
 #ifdef WIN32
 	if (_mkdir (path) != -1)
@@ -136,8 +59,9 @@ void Q_mkdir (const char *path)
 		return;
 #endif
 	if (errno != EEXIST)
-		Error ("mkdir %s: %s",path, strerror(errno));
+		Com_Error( ERR_FATAL, "mkdir %s: %s",path, strerror(errno) );
 }
+
 
 /*
 ============
@@ -280,42 +204,38 @@ static FILE* myfopen(const char* filename, const char* mode)
 }
 
 
-FILE *SafeOpenWrite (const char *filename)
+FILE* SafeOpenRead( const char* filename )
 {
-	FILE	*f;
-
-	f = myfopen(filename, "wb");
+	FILE* f = myfopen( filename, "rb" );
 
 	if (!f)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+		Com_Error( ERR_FATAL, "Error opening %s: %s", filename, strerror(errno) );
 
 	return f;
 }
 
-FILE *SafeOpenRead (const char *filename)
+FILE* SafeOpenWrite( const char* filename )
 {
-	FILE	*f;
-
-	f = myfopen(filename, "rb");
+	FILE* f = myfopen( filename, "wb" );
 
 	if (!f)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+		Com_Error( ERR_FATAL, "Error opening %s: %s", filename, strerror(errno) );
 
 	return f;
 }
 
 
-void SafeRead (FILE *f, void *buffer, int count)
+void SafeRead( FILE* f, void* buffer, int count )
 {
-	if ( fread (buffer, 1, count, f) != (size_t)count)
-		Error ("File read failure");
+	if ( fread(buffer, 1, count, f) != (size_t)count )
+		Com_Error( ERR_FATAL, "File read failure" );
 }
 
 
-void SafeWrite (FILE *f, const void *buffer, int count)
+void SafeWrite( FILE* f, const void* buffer, int count )
 {
-	if (fwrite (buffer, 1, count, f) != (size_t)count)
-		Error ("File write failure");
+	if ( fwrite(buffer, 1, count, f) != (size_t)count )
+		Com_Error( ERR_FATAL, "File write failure" );
 }
 
 
@@ -461,44 +381,36 @@ void    StripExtension (char *path)
 }
 
 
-/*
-==============
-ParseNum / ParseHex
-==============
-*/
-int ParseHex (const char *hex)
+static int ParseHex( const char* hex )
 {
-	const char    *str;
-	int    num;
+	int num = 0;
+	const char* s = hex;
 
-	num = 0;
-	str = hex;
-
-	while (*str)
+	while (*s)
 	{
 		num <<= 4;
-		if (*str >= '0' && *str <= '9')
-			num += *str-'0';
-		else if (*str >= 'a' && *str <= 'f')
-			num += 10 + *str-'a';
-		else if (*str >= 'A' && *str <= 'F')
-			num += 10 + *str-'A';
+		if (*s >= '0' && *s <= '9')
+			num += *s-'0';
+		else if (*s >= 'a' && *s <= 'f')
+			num += 10 + *s-'a';
+		else if (*s >= 'A' && *s <= 'F')
+			num += 10 + *s-'A';
 		else
-			Error ("Bad hex number: %s",hex);
-		str++;
+			Com_Error( ERR_FATAL, "Bad hex number: %s", hex );
+		s++;
 	}
 
 	return num;
 }
 
 
-int ParseNum (const char *str)
+int ParseNum( const char* s )
 {
-	if (str[0] == '$')
-		return ParseHex (str+1);
-	if (str[0] == '0' && str[1] == 'x')
-		return ParseHex (str+2);
-	return atol (str);
+	if (s[0] == '$')
+		return ParseHex( s+1 );
+	if (s[0] == '0' && s[1] == 'x')
+		return ParseHex( s+2 );
+	return atoi( s );
 }
 
 

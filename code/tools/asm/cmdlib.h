@@ -36,19 +36,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdarg.h>
 
 
+float Q_FloatTime();
+
 int Q_filelength (FILE *f);
 int	FileTime( const char *path );
 
-void	Q_mkdir( const char *path );
+void Q_mkdir( const char* path );
 
-float Q_FloatTime();
-
-void	Error( const char *error, ... );
-
-FILE	*SafeOpenWrite( const char *filename );
-FILE	*SafeOpenRead( const char *filename );
-void	SafeRead (FILE *f, void *buffer, int count);
-void	SafeWrite (FILE *f, const void *buffer, int count);
+FILE* SafeOpenRead( const char* filename );
+FILE* SafeOpenWrite( const char* filename );
+void SafeWrite( FILE* f, const void* buffer, int count );
+void SafeRead( FILE* f, const void* buffer, int count );
 
 int		LoadFile( const char *filename, void **bufferptr );
 int		TryLoadFile( const char *filename, void **bufferptr );
@@ -60,7 +58,7 @@ void	DefaultPath( char *path, const char *basepath );
 void	StripFilename( char *path );
 void	StripExtension( char *path );
 
-int 	ParseNum (const char *str);
+int ParseNum( const char* s );
 
 char *ASM_Parse (char *data);
 
@@ -76,11 +74,6 @@ unsigned short CRC_Value(unsigned short crcvalue);
 
 void	CreatePath( const char *path );
 void	QCopyFile( const char *from, const char *to );
-
-
-extern	qboolean verbose;
-void qprintf( const char *format, ... );
-void _printf( const char *format, ... );
 
 
 #endif

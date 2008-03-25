@@ -233,6 +233,10 @@
 				RelativePath=".\q3asm.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\qcommon\q_shared.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

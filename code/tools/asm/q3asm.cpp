@@ -124,6 +124,18 @@ int		passNumber;
 int		instructionCount;
 
 
+void QDECL Com_Error( int level, const char* error, ... )
+{
+	va_list va;
+	va_start( va, error );
+	vprintf( error, va );
+	va_end( va );
+	exit( level );
+}
+
+void QDECL Com_Printf( const char* fmt, ... ) {}
+
+
 #ifdef _MSC_VER
 #define INT64 __int64
 #define atoi64 _atoi64
@@ -169,14 +181,14 @@ static void CodeError( const char* fmt, ... )
 	va_list va;
 	va_start( va, fmt );
 	vprintf( fmt, va );
-	va_end(va);
+	va_end( va );
 }
 
 
 static void EmitByte( segment_t* seg, int v )
 {
 	if ( seg->imageUsed >= MAX_SEGSIZE ) {
-		Error( "MAX_SEGSIZE" );
+		Com_Error( ERR_FATAL, "MAX_SEGSIZE" );
 	}
 	seg->image[ seg->imageUsed ] = v;
 	seg->imageUsed++;
@@ -186,7 +198,7 @@ static void EmitByte( segment_t* seg, int v )
 static void EmitInt( segment_t* seg, int v )
 {
 	if ( seg->imageUsed >= MAX_SEGSIZE - 4 ) {
-		Error( "MAX_SEGSIZE" );
+		Com_Error( ERR_FATAL, "MAX_SEGSIZE" );
 	}
 	seg->image[ seg->imageUsed ] = v & 255;
 	seg->image[ seg->imageUsed + 1 ] = ( v >> 8 ) & 255;
@@ -1010,7 +1022,7 @@ static void Assemble()
 			currentFileIndex = i;
 			currentFileName = asmFileNames[ i ];
 			currentFileLine = 0;
-			report("pass %i: %s\n", passNumber, currentFileName );
+			report( "pass %i: %s\n", passNumber, currentFileName );
 			fflush( NULL );
 			char* p = asmFiles[i];
 			while ( p ) {
@@ -1041,24 +1053,19 @@ static void Assemble()
 }
 
 
-/*
-=============
-ParseOptionFile
-
-=============
-*/
-void ParseOptionFile( const char *filename ) {
-	char		expanded[MAX_OSPATH];
-	char		*text, *text_p;
-
+static void ParseOptionFile( const char* filename )
+{
+	char expanded[MAX_OSPATH];
 	strcpy( expanded, filename );
-	DefaultExtension( expanded, ".q3asm" );
+	COM_DefaultExtension( expanded, sizeof(expanded), ".q3asm" );
+
+	char* text;
 	LoadFile( expanded, (void **)&text );
 	if ( !text ) {
 		return;
 	}
 
-	text_p = text;
+	char* text_p = text;
 
 	while( ( text_p = ASM_Parse( text_p ) ) != 0 ) {
 		if ( !strcmp( com_token, "-o" ) ) {
@@ -1079,7 +1086,7 @@ void ParseOptionFile( const char *filename ) {
 int main( int argc, char **argv )
 {
 	if ( argc < 2 ) {
-		Error( "Usage: %s [OPTION]... [FILES]...\n"
+		Com_Error( ERR_FATAL, "Usage: %s [OPTION]... [FILES]...\n"
 				"Assemble LCC bytecode assembly to Q3VM bytecode.\n\n"
 				"-o OUTPUT     Write assembled output to file OUTPUT.qvm\n"
 				"-f LISTFILE   Read options and list of files to assemble from LISTFILE\n"
@@ -1101,19 +1108,17 @@ int main( int argc, char **argv )
 
 		if ( !strcmp( argv[i], "-o" ) ) {
 			if ( i == argc - 1 ) {
-				Error( "-o must preceed a filename" );
+				Com_Error( ERR_FATAL, "-o requires a filename" );
 			}
-			strcpy( outputFilename, argv[ i+1 ] );
-			i++;
+			strcpy( outputFilename, argv[++i] );
 			continue;
 		}
 
 		if ( !strcmp( argv[i], "-f" ) ) {
 			if ( i == argc - 1 ) {
-				Error( "-f must preceed a filename" );
+				Com_Error( ERR_FATAL, "-f requires a filename" );
 			}
-			ParseOptionFile( argv[ i+1 ] );
-			i++;
+			ParseOptionFile( argv[++i] );
 			continue;
 		}
 
@@ -1129,7 +1134,7 @@ int main( int argc, char **argv )
 			continue;
 		}
 
-		Error( "Unknown option: %s", argv[i] );
+		Com_Error( ERR_FATAL, "Unknown option: %s", argv[i] );
 	}
 
 	// the rest of the command line args are asm files
