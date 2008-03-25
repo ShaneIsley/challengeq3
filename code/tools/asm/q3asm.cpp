@@ -211,12 +211,9 @@ void CodeError( char *fmt, ... ) {
 	va_end( argptr );
 }
 
-/*
-============
-EmitByte
-============
-*/
-void EmitByte( segment_t *seg, int v ) {
+
+static void EmitByte( segment_t* seg, int v )
+{
 	if ( seg->imageUsed >= MAX_IMAGE ) {
 		Error( "MAX_IMAGE" );
 	}
@@ -224,13 +221,10 @@ void EmitByte( segment_t *seg, int v ) {
 	seg->imageUsed++;
 }
 
-/*
-============
-EmitInt
-============
-*/
-void EmitInt( segment_t *seg, int v ) {
-	if ( seg->imageUsed >= MAX_IMAGE - 4) {
+
+static void EmitInt( segment_t* seg, int v )
+{
+	if ( seg->imageUsed >= MAX_IMAGE - 4 ) {
 		Error( "MAX_IMAGE" );
 	}
 	seg->image[ seg->imageUsed ] = v & 255;
@@ -248,7 +242,6 @@ static void DefineSymbol( const char* symbol, int value )
 		return;
 
 	// add the file prefix to local symbols to guarantee uniqueness
-	// !!! note that this doesn't fucking work, and everything is a global
 	char expanded[MAX_LINE_LENGTH];
 	if ( symbol[0] == '$' ) {
 		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
@@ -279,7 +272,6 @@ static int LookupSymbol( const char* symbol )
 		return 0;
 
 	// add the file prefix to local symbols to guarantee uniqueness
-	// !!! note that this doesn't fucking work, and everything is a global
 	char expanded[MAX_LINE_LENGTH];
 	if ( symbol[0] == '$' ) {
 		sprintf( expanded, "%s_%i", symbol, currentFileIndex );
@@ -854,19 +846,17 @@ static void AssembleLine()
 		// check for expression
 		Parse();
 
+		EmitByte( &segment[CODESEG], opcode );
 		if ( token[0] && opcode != OP_CVIF && opcode != OP_CVFI ) {
+			int expression = ParseExpression();
 			// code like this can generate non-dword block copies:
 			// auto char buf[2] = " ";
 			// we are just going to round up.  This might conceivably
 			// be incorrect if other initialized chars follow.
-			int expression = ParseExpression();
 			if ( opcode == OP_BLOCK_COPY ) {
 				expression = ( expression + 3 ) & ~3;
 			}
-			EmitByte( &segment[CODESEG], opcode );
 			EmitInt( &segment[CODESEG], expression );
-		} else {
-			EmitByte( &segment[CODESEG], opcode );
 		}
 
 		instructionCount++;
@@ -979,19 +969,11 @@ static void WriteMapFile()
 }
 
 
-/*
-===============
-WriteVmFile
-===============
-*/
-void WriteVmFile( void ) {
-	char	imageName[MAX_OS_PATH];
-	vmHeader_t	header;
-	FILE	*f;
-	int		headerSize;
-
+static void WriteVmFile()
+{
 	report( "%i total errors\n", errorCount );
 
+	char imageName[MAX_OS_PATH];
 	strcpy( imageName, outputFilename );
 	StripExtension( imageName );
 	strcat( imageName, ".qvm" );
@@ -1009,12 +991,13 @@ void WriteVmFile( void ) {
 		return;
 	}
 
+	vmHeader_t header;
 	header.vmMagic = VM_MAGIC;
 	// Don't write the VM_MAGIC_VER2 bits when maintaining 1.32b compatibility.
 	// (I know this isn't strictly correct due to padding, but then platforms
-	// that pad wouldn't be able to write a correct header anyway).  Note: if
-	// vmHeader_t changes, this needs to be adjusted too.
-	headerSize = sizeof( header ) - sizeof( header.jtrgLength );
+	// that pad wouldn't be able to write a correct header anyway).
+	// Note: if vmHeader_t changes, this needs to be adjusted too.
+	int headerSize = sizeof( header ) - sizeof( header.jtrgLength );
 
 	header.instructionCount = instructionCount;
 	header.codeOffset = headerSize;
@@ -1028,7 +1011,7 @@ void WriteVmFile( void ) {
 	report( "Writing to %s\n", imageName );
 
 	CreatePath( imageName );
-	f = SafeOpenWrite( imageName );
+	FILE* f = SafeOpenWrite( imageName );
 	SafeWrite( f, &header, headerSize );
 	SafeWrite( f, &segment[CODESEG].image, segment[CODESEG].imageUsed );
 	SafeWrite( f, &segment[DATASEG].image, segment[DATASEG].imageUsed );
