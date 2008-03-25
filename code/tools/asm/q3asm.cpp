@@ -116,11 +116,6 @@ int		currentLocals;			// bytes of locals needed by this function
 int		currentArgs;			// bytes of largest argument list called from this function
 int		currentArgOffset;		// byte offset in currentArgs to store next arg, reset each call
 
-#define	MAX_LINE_LENGTH	1024
-char	lineBuffer[MAX_LINE_LENGTH];
-int		lineParseOffset;
-char	token[MAX_LINE_LENGTH];
-
 int		passNumber;
 int		instructionCount;
 
@@ -305,6 +300,12 @@ static int LookupSymbol( const char* symbol )
 ///////////////////////////////////////////////////////////////
 
 // this stuff should probably be replaced with COM_Parse, but...
+
+
+#define MAX_LINE_LENGTH 1024
+static char lineBuffer[MAX_LINE_LENGTH];
+static int lineParseOffset;
+static char token[MAX_LINE_LENGTH];
 
 
 /*
@@ -702,26 +703,25 @@ ASM(SKIP)
 
 ASM(BYTE)
 {
-	int		i, v, v2;
 	if ( !strcmp( token, "byte" ) ) {
-		v = ParseValue();
-		v2 = ParseValue();
+		int c = ParseValue();
+		int v = ParseValue();
 
-		if ( v == 1 ) {
+		if ( c == 1 ) {
 			// character (1-byte) values go into lit(eral) segment
 			HackToSegment( LITSEG );
-		} else if ( v == 4 ) {
+		} else if ( c == 4 ) {
 			// 32-bit (4-byte) values go into data segment
 			HackToSegment( DATASEG );
-		} else if ( v == 2 ) {
-			// and 16-bit (2-byte) values will cause q3asm to barf
-			CodeError( "16 bit initialized data not supported" );
+		} else {
+			CodeError( "%i-byte initialized data not supported", c );
+			return qtrue;
 		}
 
 		// emit little endien
-		for ( i = 0 ; i < v ; i++ ) {
-			EmitByte( currentSegment, (v2 & 0xFF) ); // paranoid ANDing
-			v2 >>= 8;
+		while (c--) {
+			EmitByte( currentSegment, (v & 0xFF) ); // paranoid ANDing
+			v >>= 8;
 		}
 		return qtrue;
 	}
