@@ -1172,9 +1172,9 @@ int main( int argc, char **argv )
 	InitTables();
 	Assemble();
 
+	report( "%s compiled in %.3fs\n", outputFilename, Q_FloatTime() - tStart );
 	ShowTable( aSymImported, "Imported" );
 	ShowTable( aSymGlobal, "Globals" );
-	report( "%s compiled in %.3fs\n", outputFilename, Q_FloatTime() - tStart );
 
 	return errorCount;
 }
