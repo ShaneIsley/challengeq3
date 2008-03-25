@@ -1784,8 +1784,6 @@ static void Com_GetRealEvent( sysEvent_t& ev )
 		}
 	} else {
 		ev.evType = SE_NONE;
-		ev.evTime = Sys_Milliseconds();
-
 		ev = Sys_GetEvent();
 
 		// write the journal value out if needed
@@ -1865,7 +1863,7 @@ int Com_EventLoop()
 				}
 			}
 
-			return ev.evTime;
+			return Sys_Milliseconds();
 		}
 
 
@@ -1946,7 +1944,7 @@ int Com_Milliseconds()
 		}
 	} while ( ev.evType != SE_NONE );
 
-	return ev.evTime;
+	return Sys_Milliseconds();
 }
 
 
