@@ -1709,13 +1709,13 @@ public:
 };
 
 template<class T1, class T2>
-qbool operator==( const q3allocator<T1>&, const q3allocator<T2>& ) {
-	return true;
+int operator==( const q3allocator<T1>&, const q3allocator<T2>& ) {
+	return 1;
 }
 
 template<class T1, class T2>
-qbool operator!=( const q3allocator<T1>&, const q3allocator<T2>& ) {
-	return false;
+int operator!=( const q3allocator<T1>&, const q3allocator<T2>& ) {
+	return 0;
 }
 
 typedef std::list<sysEvent_t, q3allocator<sysEvent_t> > comEvenets_t;
