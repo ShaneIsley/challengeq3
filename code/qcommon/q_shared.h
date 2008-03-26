@@ -524,9 +524,11 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 //=============================================
 
-float Com_Clamp( float min, float max, float value );
-
+void QDECL Com_Error( int level, const char* error, ... );
+void QDECL Com_Printf( const char* msg, ... );
 void QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
+
+float Com_Clamp( float min, float max, float value );
 
 const char* COM_SkipPath( const char* pathname );
 void COM_StripExtension( const char* in, char* out, int destsize );
@@ -614,10 +616,6 @@ void Info_SetValueForKey( char *s, const char *key, const char *value );
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
 qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
-
-// this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... );
-void	QDECL Com_Printf( const char *msg, ... );
 
 
 /*
