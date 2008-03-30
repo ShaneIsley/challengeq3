@@ -2853,18 +2853,17 @@ const char *FS_ReferencedPakPureChecksums( void ) {
 FS_ReferencedPakNames
 
 Returns a space separated string containing the names of all referenced pk3 files.
-The server will send this to the clients so they can check which files should be auto-downloaded. 
+The server will send this to the clients so they can check which files should be auto-downloaded.
 =====================
 */
-const char *FS_ReferencedPakNames( void ) {
-	static char	info[BIG_INFO_STRING];
-	searchpath_t	*search;
-
+const char *FS_ReferencedPakNames( void )
+{
+	static char info[BIG_INFO_STRING];
 	info[0] = 0;
 
 	// we want to return ALL pk3's from the fs_game path
-	// and referenced one's from baseq3
-	for ( search = fs_searchpaths ; search ; search = search->next ) {
+	// and referenced ones from baseq3
+	for ( const searchpath_t* search = fs_searchpaths; search; search = search->next ) {
 		// is the element a pak file?
 		if ( search->pack ) {
 			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, BASEGAME, strlen(BASEGAME))) {
