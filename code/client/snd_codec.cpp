@@ -24,41 +24,30 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 #include "snd_codec.h"
 
-static snd_codec_t *codecs;
+static const snd_codec_t* codecs;
 
-/*
-=================
-S_FileExtension
-=================
-*/
-static char *S_FileExtension(const char *fni)
+
+static const char* S_FileExtension( const char* filename )
 {
-	// we should search from the ending to the last '/'
+	const char* fn = filename + strlen(filename) - 1;
 
-	char *fn = (char *) fni + strlen(fni) - 1;
-	char *eptr = NULL;
-
-	while(*fn != '/' && fn != fni)
+	while (*fn != '/' && fn != filename)
 	{
-		if(*fn == '.')
-			eptr = fn;
-		fn--;
+		if (*fn == '.')
+			return fn;
+		--fn;
 	}
 
-	return eptr;
+	return NULL;
 }
 
-/*
-=================
-S_FindCodecForFile
 
-Select an appropriate codec for a file based on its extension
-=================
-*/
-static snd_codec_t *S_FindCodecForFile(const char *filename)
+// select an appropriate codec for a file based on its extension
+
+static const snd_codec_t* S_FindCodecForFile( const char* filename )
 {
-	char *ext = S_FileExtension(filename);
-	snd_codec_t *codec = codecs;
+	const snd_codec_t *codec = codecs;
+	const char* ext = S_FileExtension( filename );
 
 	if(!ext)
 	{
@@ -66,13 +55,13 @@ static snd_codec_t *S_FindCodecForFile(const char *filename)
 		while(codec)
 		{
 			char fn[MAX_QPATH];
-			
+
 			// there is no extension so we do not need to subtract 4 chars
 			Q_strncpyz(fn, filename, MAX_QPATH);
 			COM_DefaultExtension(fn, MAX_QPATH, codec->ext);
 
 			// Check it exists
-			if(FS_ReadFile(fn, NULL) != -1)
+			if (FS_ReadFile(fn, NULL) != -1)
 				return codec;
 
 			// Nope. Next!
@@ -93,11 +82,7 @@ static snd_codec_t *S_FindCodecForFile(const char *filename)
 	return NULL;
 }
 
-/*
-=================
-S_CodecInit
-=================
-*/
+
 void S_CodecInit()
 {
 	codecs = NULL;
@@ -107,22 +92,14 @@ void S_CodecInit()
 #endif
 }
 
-/*
-=================
-S_CodecShutdown
-=================
-*/
+
 void S_CodecShutdown()
 {
 	codecs = NULL;
 }
 
-/*
-=================
-S_CodecRegister
-=================
-*/
-void S_CodecRegister(snd_codec_t *codec)
+
+void S_CodecRegister( snd_codec_t* codec )
 {
 	codec->next = codecs;
 	codecs = codec;
@@ -131,11 +108,10 @@ void S_CodecRegister(snd_codec_t *codec)
 
 byte* S_CodecLoad( const char* filename, snd_info_t* info )
 {
-
-	snd_codec_t* codec = S_FindCodecForFile(filename);
+	const snd_codec_t* codec = S_FindCodecForFile( filename );
 	if (!codec)
 	{
-		Com_Printf("Unknown extension for %s\n", filename);
+		Com_Printf( "Unknown extension for %s\n", filename );
 		return NULL;
 	}
 
@@ -146,17 +122,13 @@ byte* S_CodecLoad( const char* filename, snd_info_t* info )
 	return (byte*)codec->load(fn, info);
 }
 
-/*
-=================
-S_CodecOpenStream
-=================
-*/
-snd_stream_t *S_CodecOpenStream(const char *filename)
+
+snd_stream_t* S_CodecOpenStream( const char* filename )
 {
-	snd_codec_t *codec = S_FindCodecForFile(filename);
-	if(!codec)
+	const snd_codec_t* codec = S_FindCodecForFile( filename );
+	if (!codec)
 	{
-		Com_Printf("Unknown extension for %s\n", filename);
+		Com_Printf( "Unknown extension for %s\n", filename );
 		return NULL;
 	}
 
@@ -177,48 +149,34 @@ int S_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 	return stream->codec->read(stream, bytes, buffer);
 }
 
-//=======================================================================
-// Util functions (used by codecs)
 
-/*
-=================
-S_CodecUtilOpen
-=================
-*/
-snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
+snd_stream_t* S_CodecUtilOpen( const char* filename, const snd_codec_t* codec )
 {
-	fileHandle_t hnd;
-	int length;
+	fileHandle_t fh;
+	int length = FS_FOpenFileRead( filename, &fh, qtrue );
 
-	// Try to open the file
-	length = FS_FOpenFileRead(filename, &hnd, qtrue);
-	if(!hnd)
+	if (!fh)
 	{
-		Com_Printf("Can't read sound file %s\n", filename);
+		Com_Printf( "Can't read sound file %s\n", filename );
 		return NULL;
 	}
 
 	snd_stream_t* stream = Z_New<snd_stream_t>();
-	if(!stream)
+	if (!stream)
 	{
-		FS_FCloseFile(hnd);
+		FS_FCloseFile( fh );
 		return NULL;
 	}
 
-	// Copy over, return
 	stream->codec = codec;
-	stream->file = hnd;
+	stream->file = fh;
 	stream->length = length;
 	return stream;
 }
 
-/*
-=================
-S_CodecUtilClose
-=================
-*/
-void S_CodecUtilClose(snd_stream_t *stream)
+
+void S_CodecUtilClose( snd_stream_t* stream )
 {
-	FS_FCloseFile(stream->file);
-	Z_Free(stream);
+	FS_FCloseFile( stream->file );
+	Z_Free( stream );
 }

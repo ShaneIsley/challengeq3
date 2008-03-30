@@ -162,7 +162,7 @@ extern cvar_t *s_musicVolume;
 extern cvar_t *s_doppler;
 extern const cvar_t* s_testsound;
 
-qbool S_LoadSound( sfx_t *sfx );
+qbool S_LoadSound( sfx_t* sfx );
 
 void		SND_free(sndBuffer *v);
 sndBuffer*	SND_malloc();

@@ -20,27 +20,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-/*****************************************************************************
- * name:		snd_mem.c
- *
- * desc:		sound caching
- *
- * $Archive: /MissionPack/code/client/snd_mem.c $
- *
- *****************************************************************************/
-
 #include "snd_local.h"
 #include "snd_codec.h"
 
+
 #define DEF_COMSOUNDMEGS "8"
-
-/*
-===============================================================================
-
-memory management
-
-===============================================================================
-*/
 
 static sndBuffer* sndbuffers = NULL;
 static sndBuffer* freelist = NULL;
@@ -141,40 +125,29 @@ static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data )
 }
 
 
-/*
-==============
-S_LoadSound
-
-The filename may be different than sfx->name in the case
-of a forced fallback of a player specific sound
-==============
-*/
-qbool S_LoadSound( sfx_t *sfx )
+qbool S_LoadSound( sfx_t* sfx )
 {
-	byte	*data;
-	snd_info_t	info;
-
 	// player specific sounds are never directly loaded
-	if ( sfx->soundName[0] == '*') {
+	if (sfx->soundName[0] == '*') {
 		return qfalse;
 	}
 
-	// load it in
-	data = S_CodecLoad(sfx->soundName, &info);
-	if(!data)
+	snd_info_t info;
+	byte* data = S_CodecLoad( sfx->soundName, &info );
+	if (!data)
 		return qfalse;
 
 	if ( info.width == 1 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is a 8 bit wav file\n", sfx->soundName);
+		Com_DPrintf( S_COLOR_YELLOW "WARNING: %s is a 8 bit wav file\n", sfx->soundName );
 	}
 
 	if ( info.rate != 22050 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->soundName);
+		Com_DPrintf( S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->soundName );
 	}
 
-	short* samples = (short*)Hunk_AllocateTempMemory(info.samples * sizeof(short) * 2);
+	short* samples = (short*)Hunk_AllocateTempMemory( info.samples * sizeof(short) * 2 );
 
-	sfx->lastTimeUsed = Com_Milliseconds()+1;
+	sfx->lastTimeUsed = Com_Milliseconds();
 
 	sfx->soundLength = info.samples;
 	sfx->soundData = NULL;
