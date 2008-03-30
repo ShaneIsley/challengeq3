@@ -312,28 +312,24 @@ static void CL_ParseSnapshot( msg_t *msg )
 
 int cl_connectedToPureServer;
 
-/*
-The systeminfo configstring has been changed, so parse
-new information out of it.  This will happen at every
-gamestate, and possibly during gameplay.
-*/
+// the systeminfo configstring has been changed, so parse the new info out of it
+// this will happen at every gamestate, and possibly during gameplay
+
 void CL_SystemInfoChanged()
 {
-	const char		*systemInfo;
-	const char		*s, *t;
-	qbool		gameSet;
-
-	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
-	// NOTE TTimo:
-	// when the serverId changes, any further messages we send to the server will use this new serverId
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
-	// in some cases, outdated cp commands might get sent with this new serverId
-	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
+	const char *s, *t;
 
 	// don't set any vars when playing a demo
 	if ( clc.demoplaying ) {
 		return;
 	}
+
+	const char* systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
+
+	// when the serverId changes, any further messages we send to the server will use this new serverId
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
+	// in some cases, outdated cp commands might get sent with this new serverId
+	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
 
 	s = Info_ValueForKey( systemInfo, "sv_cheats" );
 	if ( atoi(s) == 0 ) {
@@ -349,14 +345,11 @@ void CL_SystemInfoChanged()
 	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
 	FS_PureServerSetReferencedPaks( s, t );
 
-	gameSet = qfalse;
+	qbool gameSet = qfalse;
 	// scan through all the variables in the systeminfo and locally set cvars to match
 	s = systemInfo;
 	while ( s ) {
-		int  cvar_flags;
-		char key[BIG_INFO_KEY];
-		char value[BIG_INFO_VALUE];
-
+		char key[BIG_INFO_KEY], value[BIG_INFO_VALUE];
 		Info_NextPair( &s, key, value );
 		if ( !key[0] ) {
 			break;
@@ -365,7 +358,7 @@ void CL_SystemInfoChanged()
 		// ehw!
 		if (!Q_stricmp(key, "fs_game"))
 		{
-			if(FS_CheckDirTraversal(value))
+			if (FS_CheckDirTraversal(value))
 			{
 				Com_Printf("WARNING: Server sent invalid fs_game value %s\n", value);
 				continue;
@@ -373,14 +366,13 @@ void CL_SystemInfoChanged()
 			gameSet = qtrue;
 		}
 
-		if((cvar_flags = Cvar_Flags(key)) == CVAR_NONEXISTENT)
-			Cvar_Get(key, value, CVAR_SERVER_CREATED | CVAR_ROM);
-		else
-		{
-			// If this cvar may not be modified by a server discard the value.
-			if(!(cvar_flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED)))
-				continue;
-			Cvar_Set(key, value);
+		// servers are only allowed to modify specific sets of cvars
+		int flags = Cvar_Flags(key);
+		if (flags == CVAR_NONEXISTENT) {
+			Cvar_Get( key, value, CVAR_SERVER_CREATED | CVAR_ROM );
+		}
+		else if (flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED)) {
+			Cvar_Set( key, value );
 		}
 	}
 
@@ -388,6 +380,7 @@ void CL_SystemInfoChanged()
 	if ( !gameSet && *Cvar_VariableString("fs_game") ) {
 		Cvar_Set( "fs_game", "" );
 	}
+
 	cl_connectedToPureServer = Cvar_VariableValue( "sv_pure" );
 }
 
