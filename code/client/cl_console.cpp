@@ -528,7 +528,7 @@ static void Con_DrawSolidConsole( float frac )
 	MAKERGBA( color, 0.33f, 0.33f, 0.33f, 1.0 );
 	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
 
-	i = sizeof( Q3_VERSION ) - 1;
+	i = sizeof(Q3_VERSION)/sizeof(char) - 1;
 	x = cls.glconfig.vidWidth;
 	while (--i >= 0) {
 		x -= SMALLCHAR_WIDTH;
