@@ -1075,13 +1075,13 @@ typedef enum {
 #if defined(__cplusplus)
 };
 
-template <size_t size> int Q_stricmpn( const char (&lhs)[size], const char *rhs ) { return Q_stricmpn( lhs, rhs, size ); }
-template <size_t size> int Q_stricmpn( const char *lhs, const char (&rhs)[size] ) { return Q_stricmpn( lhs, rhs, size ); }
+template <size_t size> int Q_stricmpn( const char (&lhs)[size], const char *rhs ) { return Q_stricmpn( lhs, rhs, size-1 ); }
+template <size_t size> int Q_stricmpn( const char *lhs, const char (&rhs)[size] ) { return Q_stricmpn( lhs, rhs, size-1 ); }
 //ambiguous call
 //template <size_t size1, size_t size2> int Q_stricmpn( const char (&lhs)[size1], const char (&rhs)[size2] ) { return Q_stricmpn( lhs, rhs, min(size1,size2) ); }
 
-template <size_t size> int Q_strncmp( const char (&lhs)[size], const char *rhs ) { return Q_strncmp( lhs, rhs, size ); }
-template <size_t size> int Q_strncmp( const char *lhs, const char (&rhs)[size] ) { return Q_strncmp( lhs, rhs, size ); }
+template <size_t size> int Q_strncmp( const char (&lhs)[size], const char *rhs ) { return Q_strncmp( lhs, rhs, size-1 ); }
+template <size_t size> int Q_strncmp( const char *lhs, const char (&rhs)[size] ) { return Q_strncmp( lhs, rhs, size-1 ); }
 //ambiguous call
 //template <size_t size1, size_t size2> int Q_strncmp( const char (&lhs)[size1], const char (&rhs)[size2] ) { return Q_strncmp( lhs, rhs, max(size1,size2) ); }
 
