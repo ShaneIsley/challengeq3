@@ -607,7 +607,7 @@ void QDECL NET_OutOfBandData( netsrc_t sock, const netadr_t& adr, const byte* da
 
 qbool NET_StringToAdr( const char* s, netadr_t* a )
 {
-	if (!strcmp(s, "localhost")) {
+	if (!Q_stricmpn(s, "localhost")) {
 		Com_Memset( a, 0, sizeof(*a) );
 		a->type = NA_LOOPBACK;
 		return qtrue;

@@ -1441,7 +1441,7 @@ const image_t* R_FindImageFile( const char* name, qbool mipmap, qbool allowPicmi
 	for (image=hashTable[hash]; image; image=image->next) {
 		if ( !strcmp( name, image->imgName ) ) {
 			// the white image can be used with any set of parms, but other mismatches are errors
-			if ( strcmp( name, "*white" ) ) {
+			if ( Q_strncmp( name, "*white" ) ) {
 				if ( image->mipmap != mipmap ) {
 					ri.Printf( PRINT_DEVELOPER, "WARNING: reused image %s with mixed mipmap parm\n", name );
 				}
@@ -1846,7 +1846,7 @@ qhandle_t RE_RegisterSkin( const char* name )
 	// KHB why? we're not uploading anything...   R_SyncRenderThread();
 
 	// if not a .skin file, load as a single shader
-	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
+	if ( Q_strncmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
 		skin->surfaces[0] = RI_New<skinSurface_t>();
 		skin->surfaces[0]->shader = R_FindShader( name, LIGHTMAP_NONE, qtrue );

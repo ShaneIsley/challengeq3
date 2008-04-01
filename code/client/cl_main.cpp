@@ -894,7 +894,7 @@ void CL_Disconnect_f( void )
 
 static void CL_Reconnect_f()
 {
-	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
+	if ( !cls.servername[0] || !Q_stricmpn<10>( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
@@ -917,7 +917,7 @@ static void CL_Connect_f()
 
 	const char* server = Cmd_Argv(1);
 
-	if ( com_sv_running->integer && !strcmp( server, "localhost" ) ) {
+	if ( com_sv_running->integer && !Q_stricmpn( server, "localhost" ) ) {
 		// if running a local server, kill it
 		SV_Shutdown( "Server quit" );
 	}
@@ -1334,7 +1334,7 @@ static void CL_MotdPacket( const netadr_t& from )
 	const char* info = Cmd_Argv(1);
 
 	s = Info_ValueForKey( info, "challenge" );
-	if ( strcmp( s, cls.updateChallenge ) )
+	if ( Q_strncmp( s, cls.updateChallenge ) )
 		return;
 
 	s = Info_ValueForKey( info, "motd" );

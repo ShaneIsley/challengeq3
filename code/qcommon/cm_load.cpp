@@ -447,7 +447,7 @@ void CM_LoadMap( const char* name, qbool clientload, int* checksum )
 	Com_DPrintf( "CM_LoadMap( %s, %i )\n", name, clientload );
 
 	static unsigned last_checksum;
-	if ( !strcmp( cm.name, name ) && clientload ) {
+	if ( clientload && !Q_strncmp( cm.name, name ) ) {
 		*checksum = last_checksum;
 		return;
 	}

@@ -384,7 +384,7 @@ void AAS_ParseBSPEntities(void)
 
 	while(PS_ReadToken(script, &token))
 	{
-		if (strcmp(token.string, "{"))
+		if (Q_stricmpn<2>(token.string, "{"))
 		{
 			ScriptError(script, "invalid %s\n", token.string);
 			AAS_FreeBSPEntities();
@@ -401,7 +401,7 @@ void AAS_ParseBSPEntities(void)
 		ent->epairs = NULL;
 		while(PS_ReadToken(script, &token))
 		{
-			if (!strcmp(token.string, "}")) break;
+			if (!Q_stricmpn<2>(token.string, "}")) break;
 			epair = (bsp_epair_t *) GetClearedHunkMemory(sizeof(bsp_epair_t));
 			epair->next = ent->epairs;
 			ent->epairs = epair;

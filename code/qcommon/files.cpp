@@ -2320,13 +2320,14 @@ static void FS_AddGameDirectory( const char *path, const char *dir )
 	}
 
 	qsort( sorted, numfiles, sizeof(char*), paksort );
+	fs_packFiles = 0;
 
 	for ( i = 0 ; i < numfiles ; i++ ) {
 		pakfile = FS_BuildOSPath( path, dir, sorted[i] );
 		if ( ( pak = FS_LoadZipFile( pakfile, sorted[i] ) ) == 0 )
 			continue;
 		// store the game name for downloading
-		strcpy(pak->pakGamename, dir);
+		Q_strncpyz( pak->pakGamename, dir, sizeof(pak->pakGamename) );
 
 		search = Z_New<searchpath_t>();
 		search->pack = pak;
