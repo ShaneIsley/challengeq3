@@ -591,7 +591,6 @@ char	*Q_strlwr( char *s1 );
 char	*Q_strupr( char *s1 );
 char	*Q_strrchr( const char* string, int c );
 
-
 // buffer size safe library replacements
 void	Q_strncpyz( char *dest, const char *src, int destsize );
 void	Q_strcat( char *dest, int size, const char *src );
@@ -1074,13 +1073,6 @@ typedef enum {
 
 #if defined(__cplusplus)
 };
-
-//template <size_t size> int Q_stricmpn( const char (&lhs)[size], const char *rhs ) { return Q_stricmpn( lhs, rhs, size-1 ); }
-template <size_t size> int Q_stricmpn( const char *lhs, const char (&rhs)[size] ) { return Q_stricmpn( lhs, rhs, size-1 ); }
-
-template <size_t size> int Q_strncmp( const char (&lhs)[size], const char *rhs ) { return Q_strncmp( lhs, rhs, size-1 ); }
-template <size_t size> int Q_strncmp( const char *lhs, const char (&rhs)[size] ) { return Q_strncmp( lhs, rhs, size-1 ); }
-
 #endif
 
 #endif	// __Q_SHARED_H

@@ -413,7 +413,7 @@ static void Cvar_Toggle_f( void )
 // Allows setting and defining of arbitrary cvars from console
 // even if they weren't declared in C code
 
-static void Cvar_Set_f()
+static void Cvar_Set_f( void )
 {
 	int c = Cmd_Argc();
 	if ( c < 3 ) {
@@ -425,8 +425,8 @@ static void Cvar_Set_f()
 	combined[0] = 0;
 	int l = 0;
 	for (int i = 2; i < c; i++) {
-		int len = strlen ( Cmd_Argv( i ) ) + 1;
-		if ( (l + len) >= (MAX_STRING_TOKENS - 2) ) {
+		int len = strlen ( Cmd_Argv( i ) + 1 );
+		if ( l + len >= MAX_STRING_TOKENS - 2 ) {
 			break;
 		}
 		strcat( combined, Cmd_Argv( i ) );

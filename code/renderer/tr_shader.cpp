@@ -44,7 +44,7 @@ static qbool ParseVector( const char** text, int count, float *v )
 
 	// FIXME: spaces are currently required after parens, should change parseext...
 	const char* token = COM_ParseExt( text, qfalse );
-	if ( Q_strncmp( token, "(" ) ) {
+	if ( strcmp( token, "(" ) ) {
 		ri.Printf( PRINT_WARNING, "WARNING: missing parenthesis in shader '%s'\n", shader.name );
 		return qfalse;
 	}
@@ -59,7 +59,7 @@ static qbool ParseVector( const char** text, int count, float *v )
 	}
 
 	token = COM_ParseExt( text, qfalse );
-	if ( Q_strncmp( token, ")" ) ) {
+	if ( strcmp( token, ")" ) ) {
 		ri.Printf( PRINT_WARNING, "WARNING: missing parenthesis in shader '%s'\n", shader.name );
 		return qfalse;
 	}
@@ -1108,7 +1108,7 @@ static void ParseSkyParms( const char** text )
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
-	if ( Q_strncmp( token, "-" ) ) {
+	if ( strcmp( token, "-" ) ) {
 		for (i = 0; i < 6; ++i) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 			shader.sky.outerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
@@ -1137,7 +1137,7 @@ static void ParseSkyParms( const char** text )
 		ri.Printf( PRINT_WARNING, "WARNING: 'skyParms' missing parameter in shader '%s'\n", shader.name );
 		return;
 	}
-	if ( Q_strncmp( token, "-" ) ) {
+	if ( strcmp( token, "-" ) ) {
 		for (i = 0; i < 6; ++i) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga", token, suf[i] );
 			shader.sky.innerbox[i] = R_FindImageFile( pathname, qtrue, qtrue, GL_REPEAT );

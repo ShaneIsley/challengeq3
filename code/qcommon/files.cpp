@@ -2033,7 +2033,7 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 			continue;
 		}
 		// we drop "baseq3" "." and ".."
-		if (Q_stricmp(name, BASEGAME) && Q_stricmpn(name, ".")) {
+		if (Q_stricmp(name, BASEGAME) && Q_stricmpn(name, ".", 1)) {
 			// now we need to find some .pk3 files to validate the mod
 			// NOTE TTimo: (actually I'm not sure why .. what if it's a mod under developement with no .pk3?)
 			// we didn't keep the information when we merged the directory names, as to what OS Path it was found under
@@ -2057,9 +2057,9 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 				nLen = strlen(name) + 1;
 				// nLen is the length of the mod path
 				// we need to see if there is a description available
-				//descPath[0] = '\0';
-				Q_strncpyz( descPath, name, MAX_OSPATH );
-				Q_strcat( descPath, MAX_OSPATH, "/description.txt" );
+				descPath[0] = '\0';
+				strcpy(descPath, name);
+				strcat(descPath, "/description.txt");
 				nDescLen = FS_SV_FOpenFileRead( descPath, &descHandle );
 				if ( nDescLen > 0 && descHandle) {
 					FILE *file;
@@ -2071,7 +2071,7 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 					}
 					FS_FCloseFile(descHandle);
 				} else {
-					Q_strncpyz(descPath, name, MAX_OSPATH);
+					strcpy(descPath, name);
 				}
 				nDescLen = strlen(descPath) + 1;
 
@@ -2320,14 +2320,13 @@ static void FS_AddGameDirectory( const char *path, const char *dir )
 	}
 
 	qsort( sorted, numfiles, sizeof(char*), paksort );
-	fs_packFiles = 0;
 
 	for ( i = 0 ; i < numfiles ; i++ ) {
 		pakfile = FS_BuildOSPath( path, dir, sorted[i] );
 		if ( ( pak = FS_LoadZipFile( pakfile, sorted[i] ) ) == 0 )
 			continue;
 		// store the game name for downloading
-		Q_strncpyz( pak->pakGamename, dir, sizeof(pak->pakGamename) );
+		strcpy(pak->pakGamename, dir);
 
 		search = Z_New<searchpath_t>();
 		search->pack = pak;
@@ -2789,7 +2788,7 @@ const char *FS_ReferencedPakChecksums( void ) {
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		// is the element a pak file?
 		if ( search->pack ) {
-			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, BASEGAME)) {
+			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, BASEGAME, strlen(BASEGAME))) {
 				Q_strcat( info, sizeof( info ), va("%i ", search->pack->checksum ) );
 			}
 		}
@@ -2867,7 +2866,7 @@ const char *FS_ReferencedPakNames( void )
 	for ( const searchpath_t* search = fs_searchpaths; search; search = search->next ) {
 		// is the element a pak file?
 		if ( search->pack ) {
-			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, BASEGAME)) {
+			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, BASEGAME, strlen(BASEGAME))) {
 				if (*info)
 					Q_strcat(info, sizeof( info ), " " );
 				Q_strcat( info, sizeof( info ), search->pack->pakGamename );

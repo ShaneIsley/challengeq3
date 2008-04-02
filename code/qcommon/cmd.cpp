@@ -297,11 +297,10 @@ const char* Cmd_ArgsFrom( int arg )
 	return &cmd_args[0];
 }
 
-extern const char* Cmd_ArgsFromSafe(int arg);
 
 const char* Cmd_Args()
 {
-	return Cmd_ArgsFromSafe(1);
+	return Cmd_ArgsFrom(1);
 }
 
 

@@ -266,7 +266,7 @@ rescan:
 	int argc = Cmd_Argc();
 	const char* cmd = Cmd_Argv(0);
 
-	if ( !Q_stricmpn( cmd, "disconnect" ) ) {
+	if ( !strcmp( cmd, "disconnect" ) ) {
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=552
 		// allow server to indicate why they were disconnected
 		if ( argc >= 2 )
@@ -275,12 +275,12 @@ rescan:
 			Com_Error (ERR_SERVERDISCONNECT,"Server disconnected\n");
 	}
 
-	if ( !Q_stricmpn( cmd, "bcs0" ) ) {
+	if ( !strcmp( cmd, "bcs0" ) ) {
 		Com_sprintf( bigConfigString, BIG_INFO_STRING, "cs %s \"%s", Cmd_Argv(1), Cmd_Argv(2) );
 		return qfalse;
 	}
 
-	if ( !Q_stricmpn( cmd, "bcs1" ) ) {
+	if ( !strcmp( cmd, "bcs1" ) ) {
 		s = Cmd_Argv(2);
 		if( strlen(bigConfigString) + strlen(s) >= BIG_INFO_STRING ) {
 			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
@@ -289,7 +289,7 @@ rescan:
 		return qfalse;
 	}
 
-	if ( !Q_stricmpn( cmd, "bcs2" ) ) {
+	if ( !strcmp( cmd, "bcs2" ) ) {
 		s = Cmd_Argv(2);
 		if( strlen(bigConfigString) + strlen(s) + 1 >= BIG_INFO_STRING ) {
 			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
@@ -300,14 +300,14 @@ rescan:
 		goto rescan;
 	}
 
-	if ( !Q_stricmpn( cmd, "cs" ) ) {
+	if ( !strcmp( cmd, "cs" ) ) {
 		CL_ConfigstringModified();
 		// reparse the string, because CL_ConfigstringModified may have done another Cmd_TokenizeString()
 		Cmd_TokenizeString( s );
 		return qtrue;
 	}
 
-	if ( !Q_stricmpn( cmd, "map_restart" ) ) {
+	if ( !strcmp( cmd, "map_restart" ) ) {
 		// clear notify lines and outgoing commands before passing
 		// the restart to the cgame
 		Con_ClearNotify();
