@@ -425,7 +425,7 @@ static void Cvar_Set_f( void )
 	combined[0] = 0;
 	int l = 0;
 	for (int i = 2; i < c; i++) {
-		int len = strlen ( Cmd_Argv( i ) + 1 );
+		int len = strlen ( Cmd_Argv( i ) ) + 1;
 		if ( l + len >= MAX_STRING_TOKENS - 2 ) {
 			break;
 		}
