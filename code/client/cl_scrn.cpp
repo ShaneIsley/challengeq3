@@ -368,7 +368,9 @@ void SCR_UpdateScreen()
 		return;				// not initialized yet
 	}
 
-	if ( ++recursive > 1 ) {
+	// there are several cases where this IS called twice in one frame
+	// easiest example is: conn to a server, kill the server
+	if ( ++recursive > 2 ) {
 		Com_Error( ERR_FATAL, "SCR_UpdateScreen: recursively called" );
 	}
 
