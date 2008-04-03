@@ -134,7 +134,7 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, con
 
 	char		search[MAX_OSPATH];
 
-	if (strlen(subdirs)) {
+	if (subdirs[0]) {
 		Com_sprintf( search, sizeof(search), "%s\\%s\\*", basedir, subdirs );
 	}
 	else {
@@ -152,7 +152,7 @@ static void Sys_ListFilteredFiles( const char *basedir, const char *subdirs, con
 	do {
 		if (findinfo.attrib & _A_SUBDIR) {
 			if (Q_stricmp(findinfo.name, ".") && Q_stricmp(findinfo.name, "..")) {
-				if (strlen(subdirs)) {
+				if (subdirs[0]) {
 					Com_sprintf( newsubdirs, sizeof(newsubdirs), "%s\\%s", subdirs, findinfo.name);
 				}
 				else {

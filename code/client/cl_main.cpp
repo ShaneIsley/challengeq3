@@ -894,7 +894,7 @@ void CL_Disconnect_f( void )
 
 static void CL_Reconnect_f()
 {
-	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
+	if ( !cls.servername[0] || !strcmp( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
@@ -992,7 +992,7 @@ static void CL_Rcon_f( void )
 	if ( cls.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress;
 	} else {
-		if (!strlen(rconAddress->string)) {
+		if (!rconAddress->string[0]) {
 			Com_Printf ("You must either be connected,\n"
 						"or set the 'rconAddress' cvar\n"
 						"to issue rcon commands\n");
@@ -2286,8 +2286,8 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 
 	char	info[MAX_INFO_STRING];
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
-	if (strlen(info)) {
-		if (info[strlen(info)-1] != '\n') {
+	if (size_t len = strlen(info)) {
+		if (info[len-1] != '\n') {
 			strncat(info, "\n", sizeof(info));
 		}
 		Com_Printf( "%s: %s", NET_AdrToString( from ), info );

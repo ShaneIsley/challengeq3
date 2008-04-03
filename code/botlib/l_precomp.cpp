@@ -1012,7 +1012,7 @@ int PC_Directive_include(source_t *source)
 		{
 			SourceWarning(source, "#include missing trailing >");
 		} //end if
-		if (!strlen(path))
+		if (!path[0])
 		{
 			SourceError(source, "#include without file name between < >");
 			return qfalse;

@@ -60,7 +60,7 @@ static void SV_UserinfoChanged( client_t *cl )
 
 	// snaps command
 	val = Info_ValueForKey (cl->userinfo, "snaps");
-	if (strlen(val)) {
+	if (val[0]) {
 		i = atoi(val);
 		if ( i < 1 ) {
 			i = 1;

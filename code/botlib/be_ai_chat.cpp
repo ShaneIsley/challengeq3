@@ -682,7 +682,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 							return NULL;
 						} //end if
 						StripDoubleQuotes(token.string);
-						if (strlen(token.string) <= 0)
+						if (!token.string[0])
 						{
 							SourceError(source, "empty string", token.string);
 							FreeSource(source);
@@ -1214,7 +1214,7 @@ bot_matchpiece_t *BotLoadMatchPieces(source_t *source, char *endtoken)
 				matchstring = (bot_matchstring_t *) GetClearedHunkMemory(sizeof(bot_matchstring_t) + strlen(token.string) + 1);
 				matchstring->string = (char *) matchstring + sizeof(bot_matchstring_t);
 				strcpy(matchstring->string, token.string);
-				if (!strlen(token.string)) emptystring = qtrue;
+				if (!token.string[0]) emptystring = qtrue;
 				matchstring->next = NULL;
 				if (lastmatchstring) lastmatchstring->next = matchstring;
 				else matchpiece->firststring = matchstring;
@@ -1383,7 +1383,7 @@ int StringsMatch(bot_matchpiece_t *pieces, bot_match_t *match)
 			newstrptr = NULL;
 			for (ms = mp->firststring; ms; ms = ms->next)
 			{
-				if (!strlen(ms->string))
+				if (!ms->string[0])
 				{
 					newstrptr = strptr;
 					break;
@@ -1420,7 +1420,7 @@ int StringsMatch(bot_matchpiece_t *pieces, bot_match_t *match)
 		} //end else if
 	} //end for
 	//if a match was found
-	if (!mp && (lastvariable >= 0 || !strlen(strptr)))
+	if (!mp && (lastvariable >= 0 || !strptr[0]))
 	{
 		//if the last piece was a variable string
 		if (lastvariable >= 0)
@@ -1446,10 +1446,10 @@ int BotFindMatch(char *str, bot_match_t *match, unsigned long int context)
 
 	strncpy(match->string, str, MAX_MESSAGE_SIZE);
 	//remove any trailing enters
-	while(strlen(match->string) &&
-			match->string[strlen(match->string)-1] == '\n')
+	for(size_t len=strlen(match->string); len && match->string[len-1] == '\n'; len=strlen(match->string) )
+	//while(strlen(match->string) &&	match->string[strlen(match->string)-1] == '\n')
 	{
-		match->string[strlen(match->string)-1] = '\0';
+		match->string[len-1] = '\0';
 	} //end while
 	//compare the string with all the match strings
 	for (ms = matchtemplates; ms; ms = ms->next)
@@ -1908,7 +1908,7 @@ bot_replychat_t *BotLoadReplyChat(char *filename)
 						return NULL;
 					} //end if
 					StripDoubleQuotes(token.string);
-					if (strlen(namebuffer)) strcat(namebuffer, "\\");
+					if (namebuffer[0]) strcat(namebuffer, "\\");
 					strcat(namebuffer, token.string);
 				} while(PC_CheckTokenString(source, ","));
 				if (!PC_ExpectTokenString(source, ">"))
@@ -2528,49 +2528,49 @@ void BotInitialChat(int chatstate, char *type, int mcontext, char *var0, char *v
 		strcat(match.string, var0);
 		match.variables[0].offset = index;
 		match.variables[0].length = strlen(var0);
-		index += strlen(var0);
+		index += match.variables[0].length;
 	}
 	if( var1 ) {
 		strcat(match.string, var1);
 		match.variables[1].offset = index;
 		match.variables[1].length = strlen(var1);
-		index += strlen(var1);
+		index += match.variables[1].length;
 	}
 	if( var2 ) {
 		strcat(match.string, var2);
 		match.variables[2].offset = index;
 		match.variables[2].length = strlen(var2);
-		index += strlen(var2);
+		index += match.variables[2].length;
 	}
 	if( var3 ) {
 		strcat(match.string, var3);
 		match.variables[3].offset = index;
 		match.variables[3].length = strlen(var3);
-		index += strlen(var3);
+		index += match.variables[3].length;
 	}
 	if( var4 ) {
 		strcat(match.string, var4);
 		match.variables[4].offset = index;
 		match.variables[4].length = strlen(var4);
-		index += strlen(var4);
+		index += match.variables[4].length;
 	}
 	if( var5 ) {
 		strcat(match.string, var5);
 		match.variables[5].offset = index;
 		match.variables[5].length = strlen(var5);
-		index += strlen(var5);
+		index += match.variables[5].length;
 	}
 	if( var6 ) {
 		strcat(match.string, var6);
 		match.variables[6].offset = index;
 		match.variables[6].length = strlen(var6);
-		index += strlen(var6);
+		index += match.variables[6].length;
 	}
 	if( var7 ) {
 		strcat(match.string, var7);
 		match.variables[7].offset = index;
 		match.variables[7].length = strlen(var7);
-		index += strlen(var7);
+		index += match.variables[7].length;
 	}
  	//
 	BotConstructChatMessage(cs, message, mcontext, &match, 0, qfalse);
@@ -2711,49 +2711,49 @@ int BotReplyChat(int chatstate, char *message, int mcontext, int vcontext, char 
 			strcat(bestmatch.string, var0);
 			bestmatch.variables[0].offset = index;
 			bestmatch.variables[0].length = strlen(var0);
-			index += strlen(var0);
+			index += bestmatch.variables[0].length;
 		}
 		if( var1 ) {
 			strcat(bestmatch.string, var1);
 			bestmatch.variables[1].offset = index;
 			bestmatch.variables[1].length = strlen(var1);
-			index += strlen(var1);
+			index += bestmatch.variables[1].length;
 		}
 		if( var2 ) {
 			strcat(bestmatch.string, var2);
 			bestmatch.variables[2].offset = index;
 			bestmatch.variables[2].length = strlen(var2);
-			index += strlen(var2);
+			index += bestmatch.variables[2].length;
 		}
 		if( var3 ) {
 			strcat(bestmatch.string, var3);
 			bestmatch.variables[3].offset = index;
 			bestmatch.variables[3].length = strlen(var3);
-			index += strlen(var3);
+			index += bestmatch.variables[3].length;
 		}
 		if( var4 ) {
 			strcat(bestmatch.string, var4);
 			bestmatch.variables[4].offset = index;
 			bestmatch.variables[4].length = strlen(var4);
-			index += strlen(var4);
+			index += bestmatch.variables[4].length;
 		}
 		if( var5 ) {
 			strcat(bestmatch.string, var5);
 			bestmatch.variables[5].offset = index;
 			bestmatch.variables[5].length = strlen(var5);
-			index += strlen(var5);
+			index += bestmatch.variables[5].length;
 		}
 		if( var6 ) {
 			strcat(bestmatch.string, var6);
 			bestmatch.variables[6].offset = index;
 			bestmatch.variables[6].length = strlen(var6);
-			index += strlen(var6);
+			index += bestmatch.variables[6].length;
 		}
 		if( var7 ) {
 			strcat(bestmatch.string, var7);
 			bestmatch.variables[7].offset = index;
 			bestmatch.variables[7].length = strlen(var7);
-			index += strlen(var7);
+			index += bestmatch.variables[7].length;
 		}
 		if (LibVarGetValue("bot_testrchat"))
 		{
@@ -2800,7 +2800,7 @@ void BotEnterChat(int chatstate, int clientto, int sendto)
 	cs = BotChatStateFromHandle(chatstate);
 	if (!cs) return;
 
-	if (strlen(cs->chatmessage))
+	if (cs->chatmessage[0])
 	{
 		BotRemoveTildes(cs->chatmessage);
 		if (LibVarGetValue("bot_testichat")) {

@@ -2820,10 +2820,10 @@ const char *FS_ReferencedPakPureChecksums( void ) {
 		if (nFlags & FS_GENERAL_REF) {
 			// add a delimter between must haves and general refs
 			//Q_strcat(info, sizeof(info), "@ ");
-			info[strlen(info)+1] = '\0';
-			info[strlen(info)+2] = '\0';
-			info[strlen(info)] = '@';
-			info[strlen(info)] = ' ';
+			char* ptr = info + strlen(info);
+			*ptr++ = '@';
+			*ptr++ = ' ';
+			*ptr++ = '\0';
 		}
 		for ( search = fs_searchpaths ; search ; search = search->next ) {
 			// is the element a pak file and has it been referenced based on flag?

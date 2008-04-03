@@ -495,7 +495,7 @@ void SV_SpawnServer( const char* mapname )
 		// load pk3s also loaded at the server
 		p = FS_LoadedPakChecksums();
 		Cvar_Set( "sv_paks", p );
-		if (strlen(p) == 0) {
+		if (!p[0]) {
 			Com_Printf( "WARNING: sv_pure set but no PK3 files loaded\n" );
 		}
 		p = FS_LoadedPakNames();

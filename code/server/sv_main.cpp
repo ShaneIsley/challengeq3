@@ -448,7 +448,7 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	}
 	lasttime = time;
 
-	if ( !strlen( sv_rconPassword->string ) ||
+	if ( !sv_rconPassword->string[0] ||
 		strcmp (Cmd_Argv(1), sv_rconPassword->string) ) {
 		valid = qfalse;
 		Com_Printf ("Bad rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
@@ -461,7 +461,7 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	svs.redirectAddress = from;
 	Com_BeginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
-	if ( !strlen( sv_rconPassword->string ) ) {
+	if ( !sv_rconPassword->string[0] ) {
 		Com_Printf ("No rconpassword set on the server.\n");
 	} else if ( !valid ) {
 		Com_Printf ("Bad rconpassword.\n");

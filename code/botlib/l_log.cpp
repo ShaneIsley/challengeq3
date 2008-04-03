@@ -58,8 +58,10 @@ static logfile_t logfile;
 //===========================================================================
 void Log_Open(char *filename)
 {
-	if (!LibVarValue("log", "0")) return;
-	if (!filename || !strlen(filename))
+	if (!LibVarValue("log", "0")) 
+		return;
+
+	if (!filename || !filename[0])
 	{
 		botimport.Print(PRT_MESSAGE, "openlog <filename>\n");
 		return;

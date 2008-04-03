@@ -512,7 +512,7 @@ int Com_Filter( const char* filter, const char* name )
 				filter++;
 			}
 			buf[i] = '\0';
-			if (strlen(buf)) {
+			if (buf[0]) {
 				ptr = Com_StringContains(name, buf);
 				if (!ptr) return qfalse;
 				name = ptr + strlen(buf);
