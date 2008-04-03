@@ -2797,38 +2797,29 @@ const char *FS_ReferencedPakChecksums( void ) {
 	return info;
 }
 
+
 /*
-=====================
-FS_ReferencedPakPureChecksums
-
-Returns a space separated string containing the pure checksums of all referenced pk3 files.
-Servers with sv_pure set will get this string back from clients for pure validation 
-
-The string has a specific order, "cgame ui @ ref1 ref2 ref3 ..."
-=====================
+returns a space-separated string containing the pure checksums of all referenced pk3 files
+servers with sv_pure set will get this string back from clients for pure validation
+the string has a specific order, "cgame ui @ ref1 ref2 ref3 ..."
 */
-const char *FS_ReferencedPakPureChecksums( void ) {
-	static char	info[BIG_INFO_STRING];
-	searchpath_t	*search;
-	int nFlags, numPaks, checksum;
-
+const char* FS_ReferencedPakPureChecksums()
+{
+	static char info[BIG_INFO_STRING];
 	info[0] = 0;
 
-	checksum = fs_checksumFeed;
-	numPaks = 0;
-	for (nFlags = FS_CGAME_REF; nFlags; nFlags = nFlags >> 1) {
+	int numPaks = 0;
+	int checksum = fs_checksumFeed;
+
+	for (int nFlags = FS_CGAME_REF; nFlags; nFlags = nFlags >> 1) {
 		if (nFlags & FS_GENERAL_REF) {
 			// add a delimter between must haves and general refs
-			//Q_strcat(info, sizeof(info), "@ ");
-			char* ptr = info + strlen(info);
-			*ptr++ = '@';
-			*ptr++ = ' ';
-			*ptr++ = '\0';
+			Q_strcat(info, sizeof(info), "@ ");
 		}
-		for ( search = fs_searchpaths ; search ; search = search->next ) {
+		for ( const searchpath_t* search = fs_searchpaths; search; search = search->next ) {
 			// is the element a pak file and has it been referenced based on flag?
 			if ( search->pack && (search->pack->referenced & nFlags)) {
-				Q_strcat( info, sizeof( info ), va("%i ", search->pack->pure_checksum ) );
+				Q_strcat( info, sizeof( info ), va("%i ", search->pack->pure_checksum) );
 				if (nFlags & (FS_CGAME_REF | FS_UI_REF)) {
 					break;
 				}
@@ -2841,6 +2832,7 @@ const char *FS_ReferencedPakPureChecksums( void ) {
 			Q_strcat( info, sizeof( info ), va("%i ", fs_fakeChkSum ) );
 		}
 	}
+
 	// last checksum is the encoded number of referenced pk3s
 	checksum ^= numPaks;
 	Q_strcat( info, sizeof( info ), va("%i ", checksum ) );
@@ -2848,15 +2840,12 @@ const char *FS_ReferencedPakPureChecksums( void ) {
 	return info;
 }
 
-/*
-=====================
-FS_ReferencedPakNames
 
-Returns a space separated string containing the names of all referenced pk3 files.
-The server will send this to the clients so they can check which files should be auto-downloaded.
-=====================
+/*
+returns a space separated string containing the names of all referenced pk3 files
+the server will send this to the clients so they can check which files should be auto-downloaded
 */
-const char *FS_ReferencedPakNames( void )
+const char* FS_ReferencedPakNames()
 {
 	static char info[BIG_INFO_STRING];
 	info[0] = 0;
@@ -2878,6 +2867,7 @@ const char *FS_ReferencedPakNames( void )
 
 	return info;
 }
+
 
 /*
 =====================
