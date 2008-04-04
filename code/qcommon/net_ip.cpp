@@ -62,7 +62,7 @@ static WSADATA	winsockdata;
 #endif
 
 typedef int SOCKET;
-const SOCKET INVALID_SOCKET = -1;
+static const SOCKET INVALID_SOCKET = -1;
 #define SOCKET_ERROR		-1
 #define closesocket			close
 #define ioctlsocket			ioctl
@@ -96,7 +96,7 @@ static const char* NET_ErrorString()
 {
 #ifdef _WIN32
 	//FIXME: replace with FormatMessage?
-	switch( socketError ) {
+	switch ( socketError ) {
 		case WSAEINTR: return "WSAEINTR";
 		case WSAEBADF: return "WSAEBADF";
 		case WSAEACCES: return "WSAEACCES";
@@ -439,7 +439,7 @@ static SOCKET NET_IPSocket( const char* net_interface, int port )
 }
 
 
-void NET_OpenSocks( int port )
+static void NET_OpenSocks( int port )
 {
 	const int SOCKS_VERSION = 5;
 	struct sockaddr_in	address;
