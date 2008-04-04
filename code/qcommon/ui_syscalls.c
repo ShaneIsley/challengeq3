@@ -189,8 +189,8 @@ void trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( UI_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
-sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
-	return syscall( UI_S_REGISTERSOUND, sample, compressed );
+sfxHandle_t	shit_S_RegisterSound( const char *sample, qboolean ignored ) {
+	return syscall( UI_S_REGISTERSOUND, sample, qfalse );
 }
 
 void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {

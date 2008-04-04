@@ -31,7 +31,7 @@ equ	trap_R_DrawStretchPic					-28
 equ	trap_UpdateScreen						-29
 equ	trap_CM_LerpTag							-30
 equ	trap_CM_LoadModel						-31
-equ	trap_S_RegisterSound					-32
+equ	shit_S_RegisterSound					-32
 equ	trap_S_StartLocalSound					-33
 equ	trap_Key_KeynumToStringBuf				-34
 equ	trap_Key_GetBindingBuf					-35
