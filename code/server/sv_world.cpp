@@ -368,18 +368,10 @@ typedef struct {
 } areaParms_t;
 
 
-static void SV_AreaEntities_r( const worldSector_t *node, areaParms_t *ap )
+static void SV_AreaEntities_r( const worldSector_t* node, areaParms_t* ap )
 {
-	svEntity_t	*check, *next;
-	sharedEntity_t *gcheck;
-	int			count;
-
-	count = 0;
-
-	for ( check = node->entities  ; check ; check = next ) {
-		next = check->nextEntityInWorldSector;
-
-		gcheck = SV_GEntityForSvEntity( check );
+	for (const svEntity_t* check = node->entities; check; check = check->nextEntityInWorldSector ) {
+		const sharedEntity_t* gcheck = SV_GEntityForSvEntity( check );
 
 		if ( gcheck->r.absmin[0] > ap->maxs[0]
 		|| gcheck->r.absmin[1] > ap->maxs[1]
@@ -405,20 +397,17 @@ static void SV_AreaEntities_r( const worldSector_t *node, areaParms_t *ap )
 
 	// recurse down both sides
 	if ( ap->maxs[node->axis] > node->dist ) {
-		SV_AreaEntities_r ( node->children[0], ap );
+		SV_AreaEntities_r( node->children[0], ap );
 	}
 	if ( ap->mins[node->axis] < node->dist ) {
-		SV_AreaEntities_r ( node->children[1], ap );
+		SV_AreaEntities_r( node->children[1], ap );
 	}
 }
 
-/*
-================
-SV_AreaEntities
-================
-*/
-int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount ) {
-	areaParms_t		ap;
+
+int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount )
+{
+	areaParms_t ap;
 
 	ap.mins = mins;
 	ap.maxs = maxs;
@@ -430,7 +419,6 @@ int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int 
 
 	return ap.count;
 }
-
 
 
 //===========================================================================
@@ -541,7 +529,6 @@ static void SV_ClipMoveToEntities( moveclip_t *clip )
 		origin = touch->r.currentOrigin;
 		angles = touch->r.currentAngles;
 
-
 		if ( !touch->r.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}
@@ -631,41 +618,28 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 }
 
 
-
-/*
-=============
-SV_PointContents
-=============
-*/
-int SV_PointContents( const vec3_t p, int passEntityNum ) {
-	int			touch[MAX_GENTITIES];
-	sharedEntity_t *hit;
-	int			i, num;
-	int			contents, c2;
-	clipHandle_t	clipHandle;
-	const float		*angles;
-
+int SV_PointContents( const vec3_t p, int passEntityNum )
+{
 	// get base contents from world
-	contents = CM_PointContents( p, 0 );
+	int contents = CM_PointContents( p, 0 );
 
-	// or in contents from all the other entities
-	num = SV_AreaEntities( p, p, touch, MAX_GENTITIES );
+	// OR in contents from all the other entities
+	int touch[MAX_GENTITIES];
+	int num = SV_AreaEntities( p, p, touch, MAX_GENTITIES );
 
-	for ( i=0 ; i<num ; i++ ) {
+	for (int i = 0; i < num; ++i) {
 		if ( touch[i] == passEntityNum ) {
 			continue;
 		}
-		hit = SV_GentityNum( touch[i] );
+
+		const sharedEntity_t* hit = SV_GentityNum( touch[i] );
 		// might intersect, so do an exact clip
-		clipHandle = SV_ClipHandleForEntity( hit );
-		angles = hit->s.angles;
-		if ( !hit->r.bmodel ) {
-			angles = vec3_origin;	// boxes don't rotate
-		}
-
-		c2 = CM_TransformedPointContents (p, clipHandle, hit->s.origin, hit->s.angles);
-
-		contents |= c2;
+		clipHandle_t clipHandle = SV_ClipHandleForEntity( hit );
+		// KHB !!!  the original id code tried to distinguish between bmodels and AABBs here
+		// (bmodels rotate, bboxes don't (ie are always axis-aligned)) but was broken
+		// am preserving the bugs because i don't have the time to qa a corrected version
+		// but this is just hopelessly wrong, so it's a good thing we don't use this case  :P
+		contents |= CM_TransformedPointContents( p, clipHandle, hit->s.origin, hit->s.angles );
 	}
 
 	return contents;
