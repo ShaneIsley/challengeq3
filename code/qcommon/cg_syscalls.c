@@ -208,8 +208,8 @@ void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], in
 	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater );
 }
 
-sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
-	return syscall( CG_S_REGISTERSOUND, sample, compressed );
+sfxHandle_t	shit_S_RegisterSound( const char* sample, qboolean ignored ) {
+	return syscall( CG_S_REGISTERSOUND, sample, qfalse );
 }
 
 void	trap_S_StartBackgroundTrack( const char *intro, const char *loop ) {

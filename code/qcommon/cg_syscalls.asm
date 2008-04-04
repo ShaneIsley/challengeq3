@@ -34,7 +34,7 @@ equ	trap_S_ClearLoopingSounds			-31
 equ	trap_S_AddLoopingSound				-32
 equ	trap_S_UpdateEntityPosition			-33
 equ	trap_S_Respatialize					-34
-equ	trap_S_RegisterSound				-35
+equ	shit_S_RegisterSound				-35
 equ	trap_S_StartBackgroundTrack			-36
 equ	trap_R_LoadWorldMap					-37
 equ	trap_R_RegisterModel				-38

@@ -267,9 +267,13 @@ void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 // respatialize recalculates the volumes of sound as they should be heard by the
 // given entityNum and position
 void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater );
-sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );		// returns buzz if not found
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
-void	trap_S_StopBackgroundTrack( void );
+void		trap_S_StopBackgroundTrack( void );
+
+#if !defined(Q3_VM)
+sfxHandle_t	shit_S_RegisterSound( const char* sample, qboolean ignored );
+#endif
+#define		trap_S_RegisterSound( x ) shit_S_RegisterSound( x, qfalse )
 
 
 void		trap_R_LoadWorldMap( const char *mapname );
