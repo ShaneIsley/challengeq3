@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "tr_local.h"
 
-volatile renderCommandList_t	*renderCommandList;
-
 volatile qbool	renderThreadActive;
 
 
@@ -244,7 +242,7 @@ void RE_SetColor( const float* rgba )
 }
 
 
-void RE_StretchPic ( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader )
+void RE_StretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader )
 {
 	R_CMD( stretchPicCommand_t, RC_STRETCH_PIC );
 

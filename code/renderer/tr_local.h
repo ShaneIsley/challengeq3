@@ -1598,8 +1598,6 @@ extern	int		max_polyverts;
 
 extern	backEndData_t	*backEndData[SMP_FRAMES];	// the second one may not be allocated
 
-extern	volatile renderCommandList_t	*renderCommandList;
-
 extern	volatile qbool	renderThreadActive;
 
 
