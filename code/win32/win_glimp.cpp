@@ -43,8 +43,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "win_local.h"
 
 
-#define OPENGL_DRIVER_NAME "opengl32"
-
 typedef enum {
 	RSERR_OK,
 
@@ -767,9 +765,8 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 	if ( cdsFullscreen )
 	{
 		memset( &dm, 0, sizeof( dm ) );
-		
 		dm.dmSize = sizeof( dm );
-		
+
 		dm.dmPelsWidth  = glConfig.vidWidth;
 		dm.dmPelsHeight = glConfig.vidHeight;
 		dm.dmFields     = DM_PELSWIDTH | DM_PELSHEIGHT;
@@ -779,7 +776,7 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 			dm.dmDisplayFrequency = r_displayRefresh->integer;
 			dm.dmFields |= DM_DISPLAYFREQUENCY;
 		}
-		
+
 		// try to change color depth if possible
 		if ( colorbits != 0 )
 		{
@@ -812,7 +809,7 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 		else
 		{
 			ri.Printf( PRINT_DEVELOPER, "...calling CDS: " );
-			
+
 			// try setting the exact mode requested, because some drivers don't report
 			// the low res modes in EnumDisplaySettings, but still work
 			if ( ( cdsRet = ChangeDisplaySettings( &dm, CDS_FULLSCREEN ) ) == DISP_CHANGE_SUCCESSFUL )
@@ -841,7 +838,7 @@ static rserr_t GLW_SetMode( int mode, int colorbits, qbool cdsFullscreen )
 				PrintCDSError( cdsRet );
 
 				ri.Printf( PRINT_ALL, "...trying next higher resolution:" );
-				
+
 				// we could do a better matching job here...
 				for ( modeNum = 0 ; ; modeNum++ ) {
 					if ( !EnumDisplaySettings( NULL, modeNum, &devmode ) ) {
@@ -1084,47 +1081,30 @@ static qbool GLW_CheckOSVersion()
 	return (qbool)GetVersionEx( &vinfo );
 }
 
-/*
-** GLW_LoadOpenGL
-**
-** GLimp_win.c internal function that attempts to load and use 
-** a specific OpenGL DLL.
-*/
-static qbool GLW_LoadOpenGL( const char *drivername )
+
+static qbool GLW_LoadOpenGL()
 {
-	char buffer[1024];
-	qbool cdsFullscreen;
-
-	Q_strncpyz( buffer, drivername, sizeof(buffer) );
-	Q_strlwr(buffer);
-
-	// only real drivers are acceptable
-	if (!strstr( buffer, "opengl32" ))
-		return qfalse;
-
+	// only real GL implementations are acceptable
+	const char* OPENGL_DRIVER_NAME = "opengl32";
 	glConfig.driverType = GLDRV_ICD;
 	glConfig.hardwareType = GLHW_GENERIC;
 
 	//
 	// load the driver and bind our function pointers to it
 	//
-	if ( QGL_Init( buffer ) )
+	if ( QGL_Init( OPENGL_DRIVER_NAME ) )
 	{
-		cdsFullscreen = (qbool)r_fullscreen->integer;
+		qbool cdsFullscreen = (qbool)r_fullscreen->integer;
 
 		// create the window and set up the context
 		if ( !GLW_StartDriverAndSetMode( r_mode->integer, r_colorbits->integer, cdsFullscreen ) )
 		{
-			// if we're on a 24/32-bit desktop and we're going fullscreen on an ICD,
-			// try it again but with a 16-bit desktop
-			if ( glConfig.driverType == GLDRV_ICD )
+			// fallback mode is 640x480x16 fullscreen
+			if ( r_colorbits->integer != 16 || !cdsFullscreen || r_mode->integer != 3 )
 			{
-				if ( r_colorbits->integer != 16 || !cdsFullscreen || r_mode->integer != 3 )
+				if ( !GLW_StartDriverAndSetMode( 3, 16, qtrue ) )
 				{
-					if ( !GLW_StartDriverAndSetMode( 3, 16, qtrue ) )
-					{
-						goto fail;
-					}
+					goto fail;
 				}
 			}
 			else
@@ -1173,43 +1153,10 @@ void GLimp_EndFrame (void)
 
 
 /*
-static void GLW_StartOpenGL()
-{
-	qbool attemptedOpenGL32 = qfalse;
-
-	//
-	// load and initialize the specific OpenGL driver
-	//
-	if ( !GLW_LoadOpenGL( r_glDriver->string ) )
-	{
-		if ( !Q_stricmp( r_glDriver->string, OPENGL_DRIVER_NAME ) )
-		{
-			attemptedOpenGL32 = qtrue;
-		}
-
-		if ( !attemptedOpenGL32 )
-		{
-			attemptedOpenGL32 = qtrue;
-			if ( GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
-			{
-				ri.Cvar_Set( "r_glDriver", OPENGL_DRIVER_NAME );
-				r_glDriver->modified = qfalse;
-			}
-			else
-			{
-				ri.Error( ERR_FATAL, "GLW_StartOpenGL() - could not load OpenGL subsystem\n" );
-			}
-		}
-	}
-}
-*/
-
-
-/*
 ** GLimp_Init
 **
-** This is the platform specific OpenGL initialization function.  It
-** is responsible for loading OpenGL, initializing it, setting
+** This is the platform specific OpenGL initialization function.
+** It is responsible for loading OpenGL, initializing it, setting
 ** extensions, creating a window of the appropriate size, doing
 ** fullscreen manipulations, etc.  Its overall responsibility is
 ** to make sure that a functional OpenGL subsystem is operating
@@ -1219,7 +1166,6 @@ void GLimp_Init( void )
 {
 	char	buf[1024];
 	cvar_t *lastValidRenderer = ri.Cvar_Get( "r_lastValidRenderer", "(uninitialized)", CVAR_ARCHIVE );
-	cvar_t	*cv;
 
 	ri.Printf( PRINT_DEVELOPER, "Initializing OpenGL subsystem\n" );
 
@@ -1232,11 +1178,11 @@ void GLimp_Init( void )
 	}
 
 	// save off hInstance for the subsystems
-	cv = ri.Cvar_Get( "win_hinstance", "", 0 );
+	const cvar_t* cv = ri.Cvar_Get( "win_hinstance", "", 0 );
 	sscanf( cv->string, "%i", (int *)&g_wv.hInstance );
 
 	// load appropriate DLL and initialize subsystem
-	if (!GLW_LoadOpenGL( OPENGL_DRIVER_NAME ) )
+	if (!GLW_LoadOpenGL())
 		ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
 
 	// get our config strings
@@ -1261,7 +1207,7 @@ void GLimp_Init( void )
 		ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
 		ri.Cvar_Set( "r_picmip", "1" );
 	}
-	
+
 	//
 	// this is where hardware specific workarounds that should be
 	// detected/initialized every startup should go.
@@ -1367,24 +1313,19 @@ SMP acceleration
 ===========================================================
 */
 
-HANDLE	renderCommandsEvent;
-HANDLE	renderCompletedEvent;
-HANDLE	renderActiveEvent;
+static HANDLE renderCommandsEvent;
+static HANDLE renderCompletedEvent;
+static HANDLE renderActiveEvent;
 
-void (*glimpRenderThread)( void );
+static void (*glimpRenderThread)( void );
 
-void GLimp_RenderThreadWrapper( void ) {
+static void GLimp_RenderThreadWrapper()
+{
 	glimpRenderThread();
-
 	// unbind the context before we die
 	qwglMakeCurrent( glw_state.hDC, NULL );
 }
 
-/*
-=======================
-GLimp_SpawnRenderThread
-=======================
-*/
 qbool GLimp_SpawnRenderThread( void (*function)( void ) )
 {
 	renderCommandsEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
@@ -1402,12 +1343,9 @@ qbool GLimp_SpawnRenderThread( void (*function)( void ) )
 	   0,			//   DWORD fdwCreate,
 	   &renderThreadId );
 
-	if ( !renderThreadHandle ) {
-		return qfalse;
-	}
-
-	return qtrue;
+	return (renderThreadHandle != NULL);
 }
+
 
 static	void	*smpData;
 static	int		wglErrors;
