@@ -963,13 +963,11 @@ Q3OBJ = \
 
 ifeq ($(ARCH),i386)
   Q3OBJ += \
-    $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
     $(B)/client/ftola.o
 endif
 ifeq ($(ARCH),x86)
   Q3OBJ += \
-    $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
     $(B)/client/ftola.o
 endif
@@ -1045,7 +1043,6 @@ $(B)/client/cl_ui.o : $(CDIR)/cl_ui.cpp; $(DO_CC)
 $(B)/client/cl_avi.o : $(CDIR)/cl_avi.cpp; $(DO_CC)
 $(B)/client/snd_dma.o : $(CDIR)/snd_dma.cpp; $(DO_CC)
 $(B)/client/snd_mem.o : $(CDIR)/snd_mem.cpp; $(DO_CC)
-$(B)/client/snd_mixa.o : $(UDIR)/snd_mixa.s; $(DO_AS)
 $(B)/client/snd_mix.o : $(CDIR)/snd_mix.cpp; $(DO_CC)
 
 $(B)/client/snd_main.o : $(CDIR)/snd_main.cpp; $(DO_CC)
