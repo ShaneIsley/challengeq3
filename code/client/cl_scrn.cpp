@@ -288,6 +288,11 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 {
 	re.BeginFrame( stereoFrame );
 
+	if ( !uivm ) {
+		Com_DPrintf( "draw screen without UI loaded\n" );
+		return;
+	}
+
 	// wide aspect ratio screens need to have the sides cleared
 	// unless they are displaying game renderings
 	if ( cls.state != CA_ACTIVE && cls.state != CA_CINEMATIC ) {
@@ -296,11 +301,6 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 			re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
 			re.SetColor( NULL );
 		}
-	}
-
-	if ( !uivm ) {
-		Com_DPrintf("draw screen without UI loaded\n");
-		return;
 	}
 
 	// if the menu is going to cover the entire screen, we
