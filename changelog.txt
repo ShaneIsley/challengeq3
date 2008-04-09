@@ -25,6 +25,8 @@ fixed some bugs in referencedpak list generation
 
 fixed roqs ignoring s_volume
 
+fixed widescreen modes crashing on listen servers
+
 
 18 Feb 08 - 1.41
 
