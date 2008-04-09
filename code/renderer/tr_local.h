@@ -1172,7 +1172,6 @@ void	GL_Cull( int cullType );
 void	RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
 void	RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
 
-void		RE_BeginFrame( stereoFrame_t stereoFrame );
 void		RE_BeginRegistration( glconfig_t *glconfig );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
@@ -1611,11 +1610,12 @@ void R_SyncRenderThread( void );
 
 void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 
-void RE_SetColor( const float *rgba );
-void RE_StretchPic ( float x, float y, float w, float h, 
-					  float s1, float t1, float s2, float t2, qhandle_t hShader );
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
+void RE_SetColor( const float* rgba );
+void RE_StretchPic( float x, float y, float w, float h,
+		float s1, float t1, float s2, float t2, qhandle_t hShader );
+
 void SaveJPG( const char* filename, int quality, int image_width, int image_height, unsigned char *image_buffer );
 int SaveJPGToBuffer( byte *buffer, int quality,
 		int image_width, int image_height,

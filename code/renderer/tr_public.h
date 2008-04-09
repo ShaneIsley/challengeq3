@@ -69,8 +69,8 @@ typedef struct {
 	void	(*AddAdditiveLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
 	void	(*RenderScene)( const refdef_t *fd );
 
-	void	(*SetColor)( const float *rgba );	// NULL = 1,1,1,1
-	void	(*DrawStretchPic) ( float x, float y, float w, float h,
+	void	(*SetColor)( const float* rgba );	// NULL = 1,1,1,1
+	void	(*DrawStretchPic)( float x, float y, float w, float h,
 					float s1, float t1, float s2, float t2, qhandle_t hShader );
 
 	// Draw images for cinematic rendering, pass as 32 bit rgba
