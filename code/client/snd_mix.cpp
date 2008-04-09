@@ -30,87 +30,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
 static int snd_vol;
 
-// bk001119 - these not static, required by unix/snd_mixa.s
-int*     snd_p;
-int      snd_linear_count;
-short*   snd_out;
+static int* snd_p;
+static int snd_linear_count;
+static short* snd_out;
 
-#if	!id386                                        // if configured not to use asm
 
-void S_WriteLinearBlastStereo16 (void)
+static void S_WriteLinearBlastStereo16()
 {
-	int		i;
-	int		val;
+	int v1, v2;
 
-	for (i=0 ; i<snd_linear_count ; i+=2)
+	for (int i = 0; i < snd_linear_count; i += 2)
 	{
-		val = snd_p[i]>>8;
-		if (val > 0x7fff)
-			snd_out[i] = 0x7fff;
-		else if (val < -32768)
-			snd_out[i] = -32768;
-		else
-			snd_out[i] = val;
+		v1 = snd_p[i] >> 8;
+		if (v1 > 32767)
+			v1 = 32767;
+		else if (v1 < -32768)
+			v1 = -32768;
 
-		val = snd_p[i+1]>>8;
-		if (val > 0x7fff)
-			snd_out[i+1] = 0x7fff;
-		else if (val < -32768)
-			snd_out[i+1] = -32768;
-		else
-			snd_out[i+1] = val;
+		v2 = snd_p[i+1] >> 8;
+		if (v2 > 32767)
+			v2 = 32767;
+		else if (v2 < -32768)
+			v2 = -32768;
+
+		*(uint32_t*)(&snd_out[i]) = (v2 << 16) | (v1 & 0xFFFF);
 	}
 }
-#elif defined(__GNUC__)
-// uses snd_mixa.s
-extern "C" void S_WriteLinearBlastStereo16(void);
-#else
-
-static __declspec( naked ) void S_WriteLinearBlastStereo16()
-{
-	__asm {
-
- push edi
- push ebx
- mov ecx,ds:dword ptr[snd_linear_count]
- mov ebx,ds:dword ptr[snd_p]
- mov edi,ds:dword ptr[snd_out]
-LWLBLoopTop:
- mov eax,ds:dword ptr[-8+ebx+ecx*4]
- sar eax,8
- cmp eax,07FFFh
- jg LClampHigh
- cmp eax,0FFFF8000h
- jnl LClampDone
- mov eax,0FFFF8000h
- jmp LClampDone
-LClampHigh:
- mov eax,07FFFh
-LClampDone:
- mov edx,ds:dword ptr[-4+ebx+ecx*4]
- sar edx,8
- cmp edx,07FFFh
- jg LClampHigh2
- cmp edx,0FFFF8000h
- jnl LClampDone2
- mov edx,0FFFF8000h
- jmp LClampDone2
-LClampHigh2:
- mov edx,07FFFh
-LClampDone2:
- shl edx,16
- and eax,0FFFFh
- or edx,eax
- mov ds:dword ptr[-4+edi+ecx*2],edx
- sub ecx,2
- jnz LWLBLoopTop
- pop ebx
- pop edi
- ret
-	}
-}
-
-#endif
 
 
 static void S_TransferStereo16( unsigned long* pbuf, int endtime )
