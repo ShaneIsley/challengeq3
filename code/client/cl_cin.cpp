@@ -19,17 +19,7 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-
-/*****************************************************************************
- * name:		cl_cin.c
- *
- * desc:		video and cinematic playback
- *
- * $Archive: /MissionPack/code/client/cl_cin.c $
- *
- * cl_glconfig.hwtype trtypes 3dfx/ragepro need 256x256
- *
- *****************************************************************************/
+// ROQ file playback
 
 #include "client.h"
 #include "snd_local.h"
@@ -1127,7 +1117,7 @@ redump:
 		case	ZA_SOUND_MONO:
 			if (!cinTable[currentHandle].silent) {
 				ssize = RllDecodeMonoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, (unsigned short)cinTable[currentHandle].roq_flags);
-                                S_RawSamples( ssize, 22050, 2, 1, (byte *)sbuf, 1.0f );
+				S_RawSamples( ssize, 22050, 2, 1, (byte *)sbuf, 1.0f );
 			}
 			break;
 		case	ZA_SOUND_STEREO:
@@ -1137,7 +1127,7 @@ redump:
 					s_rawend = s_soundtime;
 				}
 				ssize = RllDecodeStereoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, (unsigned short)cinTable[currentHandle].roq_flags);
-                                S_RawSamples( ssize, 22050, 2, 2, (byte *)sbuf, 1.0f );
+				S_RawSamples( ssize, 22050, 2, 2, (byte *)sbuf, 1.0f );
 			}
 			break;
 		case	ROQ_QUAD_INFO:
@@ -1309,20 +1299,13 @@ e_status CIN_StopCinematic(int handle) {
 	return FMV_EOF;
 }
 
-/*
-==================
-SCR_RunCinematic
 
-Fetch and decompress the pending frame
-==================
-*/
+// fetch and decompress the pending frame
 
-
-e_status CIN_RunCinematic (int handle)
+e_status CIN_RunCinematic( int handle )
 {
-	int thisTime = 0;
-
-	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return FMV_EOF;
+	if (handle < 0 || handle >= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF)
+		return FMV_EOF;
 
 	if (cin.currentHandle != handle) {
 		currentHandle = handle;
@@ -1349,22 +1332,21 @@ e_status CIN_RunCinematic (int handle)
 	}
 
 	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
-	thisTime = CL_ScaledMilliseconds()*com_timescale->value;
+	int thisTime = CL_ScaledMilliseconds()*com_timescale->value;
 	if (cinTable[currentHandle].shader && (abs(int(thisTime - cinTable[currentHandle].lastTime)))>100) {
 		cinTable[currentHandle].startTime += thisTime - cinTable[currentHandle].lastTime;
 	}
-	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
-	cinTable[currentHandle].tfps = ((((CL_ScaledMilliseconds()*com_timescale->value) - cinTable[currentHandle].startTime)*3)/100);
+	cinTable[currentHandle].tfps = (((thisTime - cinTable[currentHandle].startTime)*3)/100);
 
 	unsigned start = cinTable[currentHandle].startTime;
-	while(  (cinTable[currentHandle].tfps != cinTable[currentHandle].numQuads)
-		&& (cinTable[currentHandle].status == FMV_PLAY) ) 
+	while ( (cinTable[currentHandle].tfps != cinTable[currentHandle].numQuads)
+		&& (cinTable[currentHandle].status == FMV_PLAY) )
 	{
 		RoQInterrupt();
 		if (start != cinTable[currentHandle].startTime) {
 			// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
-		  cinTable[currentHandle].tfps = ((((CL_ScaledMilliseconds()*com_timescale->value)
-							  - cinTable[currentHandle].startTime)*3)/100);
+			cinTable[currentHandle].tfps = ((((CL_ScaledMilliseconds()*com_timescale->value)
+					- cinTable[currentHandle].startTime)*3)/100);
 			start = cinTable[currentHandle].startTime;
 		}
 	}
@@ -1376,15 +1358,16 @@ e_status CIN_RunCinematic (int handle)
 	}
 
 	if (cinTable[currentHandle].status == FMV_EOF) {
-	  if (cinTable[currentHandle].looping) {
-		RoQReset();
-	  } else {
-		RoQShutdown();
-	  }
+		if (cinTable[currentHandle].looping) {
+			RoQReset();
+		} else {
+			RoQShutdown();
+		}
 	}
 
 	return cinTable[currentHandle].status;
 }
+
 
 /*
 ==================
