@@ -693,8 +693,14 @@ void FS_SV_Rename( const char *from, const char *to ) {
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_Rename: %s --> %s\n", from_ospath, to_ospath );
 	}
-}
 
+	if (rename( from_ospath, to_ospath )) {
+		// Failed, try copying it and deleting the original
+		//FS_CopyFile( from_ospath, to_ospath );
+		//FS_Remove( from_ospath );
+		Com_Error( ERR_FATAL, "FS_SV_Rename: %s --> %s failed\n", from_ospath, to_ospath );
+	}
+}
 
 
 /*
@@ -3141,7 +3147,7 @@ int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode ) {
 		}
 		break;
 	default:
-		Com_Error( ERR_FATAL, "FSH_FOpenFile: bad mode" );
+		Com_Error( ERR_FATAL, "FS_FOpenFileByMode: bad mode" );
 		return -1;
 	}
 
