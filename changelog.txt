@@ -27,6 +27,8 @@ fixed roqs ignoring s_volume
 
 fixed widescreen modes crashing on listen servers
 
+fixed downloads not completing properly
+
 
 18 Feb 08 - 1.41
 
