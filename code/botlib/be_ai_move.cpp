@@ -3251,10 +3251,10 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			} //end if
 			//get a new reachability leading towards the goal
 			reachnum = BotGetReachabilityToGoal(ms->origin, ms->areanum,
-								ms->lastgoalareanum, ms->lastareanum,
-											ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries,
-														goal, travelflags, travelflags,
-																ms->avoidspots, ms->numavoidspots, &resultflags);
+					ms->lastgoalareanum, ms->lastareanum,
+					ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries,
+					goal, travelflags, travelflags,
+					ms->avoidspots, ms->numavoidspots, &resultflags);
 			//the area number the reachability starts in
 			ms->reachareanum = ms->areanum;
 			//reset some state variables
