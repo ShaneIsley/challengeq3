@@ -2708,49 +2708,49 @@ int BotReplyChat(int chatstate, char *message, int mcontext, int vcontext, char 
 	{
 		index = strlen(bestmatch.string);
 		if( var0 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var0);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var0);
 			bestmatch.variables[0].offset = index;
 			bestmatch.variables[0].length = strlen(var0);
 			index += bestmatch.variables[0].length;
 		}
 		if( var1 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var1);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var1);
 			bestmatch.variables[1].offset = index;
 			bestmatch.variables[1].length = strlen(var1);
 			index += bestmatch.variables[1].length;
 		}
 		if( var2 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var2);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var2);
 			bestmatch.variables[2].offset = index;
 			bestmatch.variables[2].length = strlen(var2);
 			index += bestmatch.variables[2].length;
 		}
 		if( var3 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var3);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var3);
 			bestmatch.variables[3].offset = index;
 			bestmatch.variables[3].length = strlen(var3);
 			index += bestmatch.variables[3].length;
 		}
 		if( var4 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var4);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var4);
 			bestmatch.variables[4].offset = index;
 			bestmatch.variables[4].length = strlen(var4);
 			index += bestmatch.variables[4].length;
 		}
 		if( var5 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var5);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var5);
 			bestmatch.variables[5].offset = index;
 			bestmatch.variables[5].length = strlen(var5);
 			index += bestmatch.variables[5].length;
 		}
 		if( var6 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var6);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var6);
 			bestmatch.variables[6].offset = index;
 			bestmatch.variables[6].length = strlen(var6);
 			index += bestmatch.variables[6].length;
 		}
 		if( var7 ) {
-			Q_strcat(bestmatch.string, sizeof(match.string), var7);
+			Q_strcat(bestmatch.string, sizeof(bestmatch.string), var7);
 			bestmatch.variables[7].offset = index;
 			bestmatch.variables[7].length = strlen(var7);
 			index += bestmatch.variables[7].length;
