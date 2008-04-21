@@ -177,7 +177,6 @@ void CL_CgameError( const char *string ) {
 	Com_Error( ERR_DROP, "%s", string );
 }
 
-extern const char* Cmd_ArgsFromSafe(int arg);
 
 static void CL_ConfigstringModified()
 {
@@ -190,7 +189,7 @@ static void CL_ConfigstringModified()
 		Com_Error( ERR_DROP, "configstring > MAX_CONFIGSTRINGS" );
 	}
 	// get everything after "cs <num>"
-	const char* s = Cmd_ArgsFromSafe(2);
+	const char* s = Cmd_ArgsFrom(2);
 
 	const char* old = cl.gameState.stringData + cl.gameState.stringOffsets[ index ];
 	if ( !strcmp( old, s ) ) {
