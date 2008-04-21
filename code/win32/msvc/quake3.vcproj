@@ -348,6 +348,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\client\cl_browser.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\client\cl_cgame.cpp"
 				>
 				<FileConfiguration

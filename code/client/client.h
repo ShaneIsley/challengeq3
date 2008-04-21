@@ -334,6 +334,7 @@ extern	cvar_t	*cl_shownet;
 extern	cvar_t	*cl_showSend;
 extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_showTimeDelta;
+extern	cvar_t	*cl_serverStatusResendTime;
 
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
@@ -344,9 +345,8 @@ extern	cvar_t	*cl_inGameVideo;
 
 //=================================================
 
-//
+
 // cl_main
-//
 
 void CL_Init();
 void CL_FlushMemory();
@@ -363,13 +363,20 @@ void CL_ReadDemoMessage( void );
 void CL_InitDownloads(void);
 void CL_NextDownload(void);
 
+qbool CL_CDKeyValidate( const char *key, const char *checksum );
+int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
+
+
+// cl_browser
+
+void CL_Ping_f();
+void CL_ServerStatus_f();
 void CL_GetPing( int n, char *buf, int buflen, int *pingtime );
 void CL_GetPingInfo( int n, char *buf, int buflen );
 void CL_ClearPing( int n );
 int CL_GetPingQueueCount( void );
-
-qbool CL_CDKeyValidate( const char *key, const char *checksum );
-int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
+void CL_ServersResponsePacket( const netadr_t& from, msg_t *msg );
+void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg );
 
 
 //
