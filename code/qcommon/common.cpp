@@ -21,10 +21,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // common.c -- misc functions used in client and server
 
-#define _CRT_SECURE_NO_WARNINGS
-#include <limits>
-#include <list>
-
 #include "q_shared.h"
 #include "qcommon.h"
 #include <setjmp.h>
@@ -33,6 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <netinet/in.h>
 #include <sys/stat.h> // umask
 #endif
+
 
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
@@ -174,10 +171,7 @@ void QDECL Com_Printf( const char *fmt, ... )
 		logfile = FS_FOpenFileWrite( "qconsole.log" );
 		if (logfile)
 		{
-			if (newtime)
-			if (const char* newtime_str = asctime( newtime ))
-				Com_Printf( "logfile opened on %s\n", newtime_str );
-
+			Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
 			if ( com_logfile->integer > 1 )
 			{
 				// force it to not buffer so we get valid
@@ -512,7 +506,7 @@ int Com_Filter( const char* filter, const char* name )
 				filter++;
 			}
 			buf[i] = '\0';
-			if (buf[0]) {
+			if (strlen(buf)) {
 				ptr = Com_StringContains(name, buf);
 				if (!ptr) return qfalse;
 				name = ptr + strlen(buf);
@@ -613,7 +607,8 @@ int Com_RealTime( qtime_t* qtime )
 	if (!qtime)
 		return t;
 
-	if (const struct tm* tms = localtime(&t)) {
+	const struct tm* tms = localtime(&t);
+	if (tms) {
 		qtime->tm_sec = tms->tm_sec;
 		qtime->tm_min = tms->tm_min;
 		qtime->tm_hour = tms->tm_hour;
@@ -1006,16 +1001,9 @@ char* CopyString( const char *in )
 			return ((char *)&numberstring[in[0]-'0']) + sizeof(memblock_t);
 		}
 	}
-	
-	size_t l = strlen(in);
-	if (char* out = (char*)S_Malloc(l+1))
-	{
-		strncpy( out, in, l );
-		out[l] = 0;
-		return out;
-	}
-
-	return NULL;
+	char* out = (char*)S_Malloc(strlen(in)+1);
+	strcpy(out, in);
+	return out;
 }
 
 /*
@@ -1646,96 +1634,10 @@ journaled file
 
 // FIXME TTimo blunt upping from 256 to 1024
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=5
-//#define MAX_PUSHED_EVENTS	1024
-//static sysEvent_t com_pushedEvents[MAX_PUSHED_EVENTS];
-//static int com_pushedEventsHead;
-//static int com_pushedEventsTail;
-
-template <class T>
-class q3allocator {
-public:
-	typedef size_t    size_type;
-	typedef ptrdiff_t difference_type;
-	typedef T*        pointer;
-	typedef const T*  const_pointer;
-	typedef T&        reference;
-	typedef const T&  const_reference;
-	typedef T         value_type;
-
-	template <class U>
-	struct rebind {
-		typedef q3allocator<U> other;
-	};
-
-	pointer address (reference value) const {
-		return &value;
-	}
-	const_pointer address (const_reference value) const {
-		return &value;
-	}
-
-	q3allocator() throw() {
-	}
-
-	q3allocator(const q3allocator&) throw() {
-	}
-
-	template <class U> q3allocator (const q3allocator<U>&) throw() {
-	}
-
-	~q3allocator() throw() {
-	}
-
-	size_type max_size () const throw() {
-		return std::numeric_limits<size_t>::max() / sizeof(T);
-	}
-
-	pointer allocate (size_type num, const_pointer hint = 0) {
-		return (pointer)(S_Malloc(num*sizeof(T)));
-	}
-
-	void construct (pointer p, const T& value) {
-		new((void*)p)T(value);
-	}
-
-	void destroy (pointer p) {
-		p->~T();
-	}
-
-	void deallocate (pointer p, size_type num) {
-		Z_Free((void*)p);
-	}
-
-};
-
-template<class T1, class T2>
-int operator==( const q3allocator<T1>&, const q3allocator<T2>& ) {
-	return 1;
-}
-
-template<class T1, class T2>
-int operator!=( const q3allocator<T1>&, const q3allocator<T2>& ) {
-	return 0;
-}
-
-typedef std::list<sysEvent_t, q3allocator<sysEvent_t> > comEvenets_t;
-static comEvenets_t& Com_PushedEvenets()
-{
-	static qbool called = qfalse;
-	static comEvenets_t* _instance = NULL;
-
-	if (!called)
-	{
-		called = qtrue;
-		{
-			static comEvenets_t _stack;
-			_instance = &_stack;
-		}
-	}
-
-	return *_instance;
-}
-
+#define MAX_PUSHED_EVENTS	1024
+static sysEvent_t com_pushedEvents[MAX_PUSHED_EVENTS];
+static int com_pushedEventsHead;
+static int com_pushedEventsTail;
 
 
 static void Com_InitJournaling()
@@ -1765,9 +1667,10 @@ static void Com_InitJournaling()
 }
 
 
-static void Com_GetRealEvent( sysEvent_t& ev )
+static sysEvent_t Com_GetRealEvent()
 {
 	int			r;
+	sysEvent_t	ev;
 
 	// get an event from either the system or the journal file
 	if ( com_journal->integer == 2 ) {
@@ -1783,7 +1686,6 @@ static void Com_GetRealEvent( sysEvent_t& ev )
 			}
 		}
 	} else {
-		ev.evType = SE_NONE;
 		ev = Sys_GetEvent();
 
 		// write the journal value out if needed
@@ -1801,23 +1703,44 @@ static void Com_GetRealEvent( sysEvent_t& ev )
 		}
 	}
 
+	return ev;
 }
 
 
-static void Com_PushEvent( const sysEvent_t& event )
+static void Com_PushEvent( const sysEvent_t* event )
 {
-	Com_PushedEvenets().push_back( event );
-}
+	static qbool printedWarning = qfalse;
 
+	sysEvent_t* ev = &com_pushedEvents[ com_pushedEventsHead & (MAX_PUSHED_EVENTS-1) ];
 
-static void Com_GetEvent( sysEvent_t& event )
-{
-	if( !Com_PushedEvenets().empty() ){
-		event = Com_PushedEvenets().front();
-		Com_PushedEvenets().pop_front();
+	if ( com_pushedEventsHead - com_pushedEventsTail >= MAX_PUSHED_EVENTS ) {
+
+		// don't print the warning constantly, or it can give time for more...
+		if ( !printedWarning ) {
+			printedWarning = qtrue;
+			Com_Printf( "WARNING: Com_PushEvent overflow\n" );
+		}
+
+		if ( ev->evPtr ) {
+			Z_Free( ev->evPtr );
+		}
+		com_pushedEventsTail++;
 	} else {
-		Com_GetRealEvent( event );
+		printedWarning = qfalse;
 	}
+
+	*ev = *event;
+	com_pushedEventsHead++;
+}
+
+
+static sysEvent_t Com_GetEvent()
+{
+	if ( com_pushedEventsHead > com_pushedEventsTail ) {
+		com_pushedEventsTail++;
+		return com_pushedEvents[ (com_pushedEventsTail-1) & (MAX_PUSHED_EVENTS-1) ];
+	}
+	return Com_GetRealEvent();
 }
 
 
@@ -1847,7 +1770,7 @@ int Com_EventLoop()
 
 	while ( 1 ) {
 		NET_FlushPacketQueue();
-		Com_GetEvent( ev );
+		ev = Com_GetEvent();
 
 		// if no more events are available
 		if ( ev.evType == SE_NONE ) {
@@ -1863,7 +1786,7 @@ int Com_EventLoop()
 				}
 			}
 
-			return Sys_Milliseconds();
+			return ev.evTime;
 		}
 
 
@@ -1938,13 +1861,13 @@ int Com_Milliseconds()
 
 	// get events and push them until we get a null event with the current time
 	do {
-		Com_GetRealEvent( ev );
+		ev = Com_GetRealEvent();
 		if ( ev.evType != SE_NONE ) {
-			Com_PushEvent( ev );
+			Com_PushEvent( &ev );
 		}
 	} while ( ev.evType != SE_NONE );
 
-	return Sys_Milliseconds();
+	return ev.evTime;
 }
 
 
@@ -2008,7 +1931,7 @@ void Com_ReadCDKey( const char *filename ) {
 	char			buffer[33];
 	char			fbuffer[MAX_OSPATH];
 
-	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
+	sprintf(fbuffer, "%s/q3key", filename);
 
 	FS_SV_FOpenFileRead( fbuffer, &f );
 	if ( !f ) {
@@ -2038,7 +1961,7 @@ void Com_AppendCDKey( const char *filename ) {
 	char			buffer[33];
 	char			fbuffer[MAX_OSPATH];
 
-	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
+	sprintf(fbuffer, "%s/q3key", filename);
 
 	FS_SV_FOpenFileRead( fbuffer, &f );
 	if (!f) {
@@ -2134,11 +2057,9 @@ void Com_Init( char *commandLine )
 		Sys_Error ("Error during initialization");
 	}
 
-	/*
 	memset( com_pushedEvents, 0, sizeof(com_pushedEvents) );
 	com_pushedEventsHead = 0;
 	com_pushedEventsTail = 0;
-	*/
 
 	Com_InitSmallZoneMemory();
 	Cvar_Init();
