@@ -374,7 +374,7 @@ void CL_ServerStatus_f();
 void CL_GetPing( int n, char *buf, int buflen, int *pingtime );
 void CL_GetPingInfo( int n, char *buf, int buflen );
 void CL_ClearPing( int n );
-int CL_GetPingQueueCount( void );
+int CL_GetPingQueueCount();
 void CL_ServersResponsePacket( const netadr_t& from, msg_t *msg );
 void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg );
 

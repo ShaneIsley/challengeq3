@@ -641,20 +641,6 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 	*pingtime = time;
 }
 
-/*
-==================
-CL_UpdateServerInfo
-==================
-*/
-void CL_UpdateServerInfo( int n )
-{
-	if (!cl_pinglist[n].adr.port)
-	{
-		return;
-	}
-
-	CL_SetServerInfoByAddress(cl_pinglist[n].adr, cl_pinglist[n].info, cl_pinglist[n].time );
-}
 
 /*
 ==================
@@ -687,27 +673,19 @@ void CL_ClearPing( int n )
 	cl_pinglist[n].adr.port = 0;
 }
 
-/*
-==================
-CL_GetPingQueueCount
-==================
-*/
-int CL_GetPingQueueCount( void )
+
+int CL_GetPingQueueCount()
 {
-	int		i;
-	int		count;
-	ping_t*	pingptr;
+	int count = 0;
+	const ping_t* pingptr = cl_pinglist;
 
-	count   = 0;
-	pingptr = cl_pinglist;
-
-	for (i=0; i<MAX_PINGREQUESTS; i++, pingptr++ ) {
+	for ( int i = 0; i < MAX_PINGREQUESTS; ++i, ++pingptr ) {
 		if (pingptr->adr.port) {
-			count++;
+			++count;
 		}
 	}
 
-	return (count);
+	return count;
 }
 
 
@@ -870,9 +848,6 @@ qbool CL_UpdateVisiblePings_f(int source) {
 
 	return status;
 }
-
-
-///////////////////////////////////////////////////////////////
 
 
 void CL_Ping_f()
