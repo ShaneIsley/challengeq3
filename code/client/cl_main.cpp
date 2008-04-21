@@ -187,6 +187,8 @@ static const char* CL_DemoFilename()
 
 static void CL_Record_f()
 {
+	char name[MAX_OSPATH];
+	int i;
 
 	if ( Cmd_Argc() > 2 ) {
 		Com_Printf ("record [demoname]\n");
@@ -206,8 +208,6 @@ static void CL_Record_f()
 	}
 
 	const char* s;
-	char name[MAX_OSPATH];
-	int i;
 	if ( Cmd_Argc() == 2 ) {
 		Com_sprintf( name, sizeof(name), "demos/%s.dm_%d", Cmd_Argv(1), PROTOCOL_VERSION );
 		s = name;
@@ -311,6 +311,10 @@ CL_ReadDemoMessage
 =================
 */
 void CL_ReadDemoMessage( void ) {
+	int			r;
+	msg_t		buf;
+	byte		bufData[ MAX_MSGLEN ];
+	int			s;
 
 	if ( !clc.demofile ) {
 		CL_DemoCompleted();
@@ -318,16 +322,13 @@ void CL_ReadDemoMessage( void ) {
 	}
 
 	// get the sequence number
-	int	s;
-	int r = FS_Read( &s, 4, clc.demofile);
+	r = FS_Read( &s, 4, clc.demofile);
 	if ( r != 4 ) {
 		CL_DemoCompleted();
 		return;
 	}
 	clc.serverMessageSequence = LittleLong( s );
 
-	msg_t		buf;
-	byte		bufData[ MAX_MSGLEN ];
 	// init the message
 	MSG_Init( &buf, bufData, sizeof( bufData ) );
 
@@ -381,6 +382,8 @@ static void CL_WalkDemoExt( const char* arg, char* name, fileHandle_t* fh )
 
 void CL_PlayDemo_f()
 {
+	char	name[MAX_OSPATH];
+	char	retry[MAX_OSPATH];
 
 	if (Cmd_Argc() != 2) {
 		Com_Printf ("demo <demoname>\n");
@@ -394,8 +397,6 @@ void CL_PlayDemo_f()
 
 	// open the demo file
 	const char* arg = Cmd_Argv(1);
-	char	name[MAX_OSPATH];
-	char	retry[MAX_OSPATH];
 
 	// check for an extension .dm_?? (?? is protocol)
 	const char* ext = arg + strlen(arg) - 6;
@@ -590,6 +591,10 @@ static void CL_RequestAuthorization()
 
 static void CL_CheckForResend()
 {
+	int		port, i;
+	char	info[MAX_INFO_STRING];
+	char	data[MAX_INFO_STRING];
+
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying ) {
 		return;
@@ -618,35 +623,31 @@ static void CL_CheckForResend()
 		break;
 
 	case CA_CHALLENGING:
-		{
-			char	info[MAX_INFO_STRING];
-			char	data[MAX_INFO_STRING];
+		// sending back the challenge
+		port = Cvar_VariableIntegerValue ("net_qport");
 
-			// sending back the challenge
-			int i, port = Cvar_VariableIntegerValue ("net_qport");
+		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
+		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
+		Info_SetValueForKey( info, "qport", va("%i", port ) );
+		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 
-			Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
-			Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
-			Info_SetValueForKey( info, "qport", va("%i", port ) );
-			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
+		strcpy(data, "connect ");
+		// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
+		//   (Com_TokenizeString tokenizes around spaces)
+		data[8] = '"';
 
-			strcpy(data, "connect ");
-			// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-			//   (Com_TokenizeString tokenizes around spaces)
-			data[8] = '"';
-
-			for(i=0;i<strlen(info);i++) {
-				data[9+i] = info[i];	// + (clc.challenge)&0x3;
-			}
-			data[9+i] = '"';
-			data[10+i] = 0;
-
-			NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], i+10 );
-			// the most current userinfo has been sent, so watch for any
-			// newer changes to userinfo variables
-			cvar_modifiedFlags &= ~CVAR_USERINFO;
-			break;
+		for(i=0;i<strlen(info);i++) {
+			data[9+i] = info[i];	// + (clc.challenge)&0x3;
 		}
+		data[9+i] = '"';
+		data[10+i] = 0;
+
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], i+10 );
+		// the most current userinfo has been sent, so watch for any
+		// newer changes to userinfo variables
+		cvar_modifiedFlags &= ~CVAR_USERINFO;
+		break;
+
 	default:
 		Com_Error( ERR_FATAL, "CL_CheckForResend: bad cls.state" );
 	}
@@ -828,6 +829,8 @@ void CL_ForwardCommandToServer( const char *string )
 
 static void CL_RequestMotd()
 {
+	char info[MAX_INFO_STRING];
+
 	if ( !cl_motd->integer ) {
 		return;
 	}
@@ -844,7 +847,6 @@ static void CL_RequestMotd()
 		cls.updateServer.ip[2], cls.updateServer.ip[3],
 		BigShort( cls.updateServer.port ) );
 
-	char info[MAX_INFO_STRING];
 	info[0] = 0;
 	// NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a qtrue randomization
 	// only srand I could catch before here is tr_noise.c l:26 srand(1001)
@@ -894,7 +896,7 @@ void CL_Disconnect_f( void )
 
 static void CL_Reconnect_f()
 {
-	if ( !cls.servername[0] || !strcmp( cls.servername, "localhost" ) ) {
+	if ( !strlen( cls.servername ) || !strcmp( cls.servername, "localhost" ) ) {
 		Com_Printf( "Can't reconnect to localhost.\n" );
 		return;
 	}
@@ -992,7 +994,7 @@ static void CL_Rcon_f( void )
 	if ( cls.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress;
 	} else {
-		if (!rconAddress->string[0]) {
+		if (!strlen(rconAddress->string)) {
 			Com_Printf ("You must either be connected,\n"
 						"or set the 'rconAddress' cvar\n"
 						"to issue rcon commands\n");
@@ -1484,7 +1486,9 @@ static void CL_ServersResponsePacket( const netadr_t& from, msg_t *msg )
 
 static void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg )
 {
+	char	info[MAX_INFO_STRING];
 	int		i, l, score, ping;
+	int		len;
 
 	serverStatus_t* serverStatus = NULL;
 	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
@@ -1499,8 +1503,8 @@ static void CL_ServerStatusResponse( const netadr_t& from, msg_t *msg )
 	}
 
 	const char* s = MSG_ReadStringLine( msg );
-	char	info[MAX_INFO_STRING];
-	int		len = 0;
+
+	len = 0;
 	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "%s", s);
 
 	if (serverStatus->print) {
@@ -1919,8 +1923,6 @@ static void CL_InitRenderer()
 	cls.whiteShader = re.RegisterShader( "white" );
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
 	g_consoleField.widthInChars = g_console_field_width;
-
-	//re.RegisterFont( "Vera", 8, &cls.fontConsole );
 }
 
 /*
@@ -2204,6 +2206,7 @@ CL_ServerInfoPacket
 */
 void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	int		i, type;
+	char	info[MAX_INFO_STRING];
 	char	*infoString;
 	int		prot;
 
@@ -2284,10 +2287,9 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].netType = from.type;
 	cls.localServers[i].punkbuster = 0;
 
-	char	info[MAX_INFO_STRING];
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
-	if (size_t len = strlen(info)) {
-		if (info[len-1] != '\n') {
+	if (strlen(info)) {
+		if (info[strlen(info)-1] != '\n') {
 			strncat(info, "\n", sizeof(info));
 		}
 		Com_Printf( "%s: %s", NET_AdrToString( from ), info );
@@ -2470,13 +2472,13 @@ void CL_GlobalServers_f( void ) {
 	to.type = NA_IP;
 	to.port = BigShort(PORT_MASTER);
 
-	Com_sprintf( command, sizeof(command), "getservers %s", Cmd_Argv(2) );
+	sprintf( command, "getservers %s", Cmd_Argv(2) );
 
 	// tack on keywords
 	buffptr = command + strlen( command );
 	count   = Cmd_Argc();
 	for (i=3; i<count; i++)
-		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) ); //TODO: check buffptr
+		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) );
 
 	NET_OutOfBandPrint( NS_SERVER, to, command );
 }
@@ -2679,6 +2681,7 @@ CL_UpdateVisiblePings_f
 */
 qbool CL_UpdateVisiblePings_f(int source) {
 	int			slots, i;
+	char		buff[MAX_STRING_CHARS];
 	int			pingTime;
 	int			max;
 	qbool status = qfalse;
@@ -2764,7 +2767,6 @@ qbool CL_UpdateVisiblePings_f(int source) {
 	if (slots) {
 		status = qtrue;
 	}
-	char		buff[MAX_STRING_CHARS];
 	for (i = 0; i < MAX_PINGREQUESTS; i++) {
 		if (!cl_pinglist[i].adr.port) {
 			continue;
