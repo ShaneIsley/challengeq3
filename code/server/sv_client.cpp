@@ -187,7 +187,7 @@ void SV_GetChallenge( netadr_t from ) {
 		strcpy(game, BASEGAME);
 		fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 		if (fs && fs->string[0] != 0) {
-			strcpy(game, fs->string);
+			Q_strncpyz(game, fs->string, sizeof(game));
 		}
 
 		// the 0 is for backwards compatibility with obsolete sv_allowanonymous flags

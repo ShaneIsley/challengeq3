@@ -2470,13 +2470,13 @@ void CL_GlobalServers_f( void ) {
 	to.type = NA_IP;
 	to.port = BigShort(PORT_MASTER);
 
-	sprintf( command, "getservers %s", Cmd_Argv(2) );
+	Com_sprintf( command, sizeof(command), "getservers %s", Cmd_Argv(2) );
 
 	// tack on keywords
 	buffptr = command + strlen( command );
 	count   = Cmd_Argc();
 	for (i=3; i<count; i++)
-		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) );
+		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) ); //TODO: check buffptr
 
 	NET_OutOfBandPrint( NS_SERVER, to, command );
 }

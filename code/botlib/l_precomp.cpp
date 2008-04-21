@@ -480,7 +480,7 @@ int PC_MergeTokens(token_t *t1, token_t *t2)
 	//merging of a name with a name or number
 	if (t1->type == TT_NAME && (t2->type == TT_NAME || t2->type == TT_NUMBER))
 	{
-		strcat(t1->string, t2->string);
+		Q_strcat(t1->string, sizeof(t1->string), t2->string);
 		return qtrue;
 	} //end if
 	//merging of two strings
@@ -489,7 +489,7 @@ int PC_MergeTokens(token_t *t1, token_t *t2)
 		//remove trailing double quote
 		t1->string[strlen(t1->string)-1] = '\0';
 		//concat without leading double quote
-		strcat(t1->string, &t2->string[1]);
+		Q_strcat(t1->string, sizeof(t1->string), &t2->string[1]);
 		return qtrue;
 	} //end if
 	//FIXME: merging of two number of the same sub type
@@ -722,7 +722,7 @@ int PC_ExpandBuiltinDefine(source_t *source, token_t *deftoken, define_t *define
 		} //end case
 		case BUILTIN_FILE:
 		{
-			strcpy(token->string, source->scriptstack->filename);
+			Q_strncpyz(token->string, source->scriptstack->filename, sizeof(token->string));
 			token->type = TT_NAME;
 			token->subtype = strlen(token->string);
 			*firsttoken = token;
@@ -990,14 +990,14 @@ int PC_Directive_include(source_t *source)
 		script = LoadScriptFile(token.string);
 		if (!script)
 		{
-			strcpy(path, source->includepath);
-			strcat(path, token.string);
+			Q_strncpyz(path, source->includepath, sizeof(path));
+			Q_strcat(path, sizeof(path), token.string);
 			script = LoadScriptFile(path);
 		} //end if
 	} //end if
 	else if (token.type == TT_PUNCTUATION && *token.string == '<')
 	{
-		strcpy(path, source->includepath);
+		Q_strncpyz(path, source->includepath, sizeof(path));
 		while(PC_ReadSourceToken(source, &token))
 		{
 			if (token.linescrossed > 0)
@@ -2956,7 +2956,7 @@ void PC_SetIncludePath(source_t *source, char *path)
 	if (source->includepath[strlen(source->includepath)-1] != '\\' &&
 		source->includepath[strlen(source->includepath)-1] != '/')
 	{
-		strcat(source->includepath, PATHSEPERATOR_STR);
+		Q_strcat(source->includepath, sizeof(source->includepath), PATHSEPERATOR_STR);
 	} //end if
 } //end of the function PC_SetIncludePath
 //============================================================================

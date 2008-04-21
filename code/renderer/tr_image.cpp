@@ -1415,7 +1415,7 @@ static void R_LoadImage( const char* name, byte** pic, int* w, int* h, GLenum* f
 #endif
 
 	char altname[MAX_QPATH];
-	strcpy( altname, name );
+	Q_strncpyz( altname, name, sizeof(altname) );
 	len = strlen( altname );
 	altname[len-3] = 'j';
 	altname[len-2] = 'p';
