@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // cmd.c -- Quake script command processing module
 
-#include <vector>
 #include "q_shared.h"
 #include "qcommon.h"
 
@@ -191,15 +190,15 @@ Cmd_Exec_f
 ===============
 */
 void Cmd_Exec_f( void ) {
+	char	*f;
+	int		len;
+	char	filename[MAX_QPATH];
 
 	if (Cmd_Argc () != 2) {
 		Com_Printf ("exec <filename> : execute a script file\n");
 		return;
 	}
 
-	char	*f;
-	int		len;
-	char	filename[MAX_QPATH];
 	Q_strncpyz( filename, Cmd_Argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" ); 
 	len = FS_ReadFile( filename, (void **)&f);
@@ -223,7 +222,7 @@ void Cmd_Vstr_f( void )
 		Com_Printf ("vstr <variablename> : execute a variable command\n");
 		return;
 	}
-	Cbuf_InsertText( va("%s\n", Cvar_VariableString( Cmd_Argv( 1 ) )) );
+	Cbuf_InsertText( Cvar_VariableString( Cmd_Argv( 1 ) ) );
 }
 
 
@@ -286,15 +285,13 @@ const char* Cmd_ArgsFrom( int arg )
 		Com_Error( ERR_FATAL, "Cmd_ArgsFrom: arg < 0" );
 
 	for (int i = arg; i < cmd_argc; ++i) {
-		
-		Q_strcat( cmd_args, MAX_STRING_CHARS, cmd_argv[i] );
-
+		strcat( cmd_args, cmd_argv[i] );
 		if (i != cmd_argc-1) {
-			Q_strcat( cmd_args, MAX_STRING_CHARS, " " );
+			strcat( cmd_args, " " );
 		}
 	}
 
-	return &cmd_args[0];
+	return cmd_args;
 }
 
 
@@ -612,26 +609,3 @@ void Cmd_Init()
 	Cmd_AddCommand( "wait", Cmd_Wait_f );
 }
 
-const char* Cmd_ArgsFromSafe( int arg )
-{
-	static std::vector<char> cmd_args( NULL, MAX_GAMESTATE_CHARS );
-
-	if (arg < 0)
-		Com_Error( ERR_FATAL, "Cmd_ArgsFrom: arg < 0" );
-
-	cmd_args.clear();
-
-	for (int i = arg; i < cmd_argc; ++i) {
-		if (!cmd_argv[i] || !cmd_argv[i][0])
-			continue;
-
-		for (int c=0; cmd_argv[i][c]; ++c)
-			cmd_args.push_back( cmd_argv[i][c] );
-
-		if (i != cmd_argc-1) {
-			cmd_args.push_back( ' ' );
-		}
-	}
-	cmd_args.push_back(0);
-	return &cmd_args[0];
-}
