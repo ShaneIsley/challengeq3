@@ -41,7 +41,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
 
-jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
+static jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
 static fileHandle_t logfile = 0;
@@ -85,7 +85,7 @@ int		com_frameNumber;
 qbool	com_errorEntered;
 qbool	com_fullyInitialized;
 
-char	com_errorMessage[MAXPRINTMSG];
+static char com_errorMessage[MAXPRINTMSG];
 
 static void Com_WriteConfig_f();
 extern void CIN_CloseAllVideos( void );
@@ -891,9 +891,9 @@ void *Z_TagMalloc( int size, int tag ) {
 		base->next = p;
 		base->size = size;
 	}
-	
+
 	base->tag = tag;			// no longer a free block
-	
+
 	zone->rover = base->next;	// next allocation will start looking here
 	zone->used += base->size;	//
 	
@@ -1064,7 +1064,6 @@ static	byte	*s_hunkData = NULL;
 static	int		s_hunkTotal = 0;
 
 static	int		s_zoneTotal = 0;
-static	int		s_smallZoneTotal = 0;
 
 #ifdef HUNK_DEBUG
 
@@ -1212,7 +1211,7 @@ void Com_TouchMemory()
 
 static void Com_InitSmallZoneMemory()
 {
-	s_smallZoneTotal = 512 * 1024;
+	const int s_smallZoneTotal = 512 * 1024;
 
 	smallzone = (memzone_t*)calloc( s_smallZoneTotal, 1 );
 	if ( !smallzone )
