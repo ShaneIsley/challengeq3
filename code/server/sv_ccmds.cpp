@@ -174,31 +174,17 @@ static void SV_Map_f( void )
 
 static void SV_DevMap_f( void )
 {
-/* the id code kicks all bots on a devmap for no good reason
-	for (int i = 0; i < sv_maxclients->integer; ++i) {
-		if (svs.clients[i].state >= CS_CONNECTED) {
-			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
-				SV_DropClient( &svs.clients[i], "was kicked" );
-			}
-		}
-	}
-*/
 	SV_ChangeMap( qtrue );
 }
 
 
 /*
-================
-SV_MapRestart_f
-
 Completely restarts a level, but doesn't send a new gamestate to the clients.
 This allows fair starts with variable load times.
-================
 */
-static void SV_MapRestart_f( void ) {
+static void SV_MapRestart_f( void )
+{
 	int			i;
-	client_t	*client;
-	qbool	isBot;
 	int			delay;
 
 	// make sure we aren't restarting twice in the same frame
@@ -222,22 +208,17 @@ static void SV_MapRestart_f( void ) {
 	else {
 		delay = 5;
 	}
-	if( delay && !Cvar_VariableValue("g_doWarmup") ) {
+	if ( delay ) {
 		sv.restartTime = sv.time + delay * 1000;
-		// !!! what the FUCK is the engine doing changing this?!  >:(
-		//SV_SetConfigstring( CS_WARMUP, va("%i", sv.restartTime) );
 		return;
 	}
 
 	// check for changes in variables that can't just be restarted
-	// check for maxclients change
 	if ( sv_maxclients->modified || sv_gametype->modified ) {
-		char	mapname[MAX_QPATH];
-
 		Com_Printf( "variable change -- restarting.\n" );
 		// restart the map the slow way
+		char mapname[MAX_QPATH];
 		Q_strncpyz( mapname, Cvar_VariableString( "mapname" ), sizeof( mapname ) );
-
 		SV_SpawnServer( mapname );
 		return;
 	}
@@ -246,8 +227,8 @@ static void SV_MapRestart_f( void ) {
 	// map_restart has happened
 	svs.snapFlagServerBit ^= SNAPFLAG_SERVERCOUNT;
 
-	// generate a new serverid	
-	// TTimo - don't update restartedserverId there, otherwise we won't deal correctly with multiple map_restart
+	// generate a new serverid
+	// TTimo - don't update restartedserverId here, otherwise we won't deal correctly with multiple map_restart
 	sv.serverId = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
@@ -262,7 +243,7 @@ static void SV_MapRestart_f( void ) {
 	// run a few frames to allow everything to settle
 	for (i = 0; i < 3; i++)
 	{
-		VM_Call (gvm, GAME_RUN_FRAME, sv.time);
+		VM_Call( gvm, GAME_RUN_FRAME, sv.time );
 		sv.time += 100;
 		svs.time += 100;
 	}
@@ -271,19 +252,15 @@ static void SV_MapRestart_f( void ) {
 	sv.restarting = qfalse;
 
 	// connect and begin all the clients
-	for (i=0 ; i<sv_maxclients->integer ; i++) {
-		client = &svs.clients[i];
+	for (i = 0; i < sv_maxclients->integer; ++i) {
+		client_t* client = &svs.clients[i];
 
 		// send the new gamestate to all connected clients
 		if ( client->state < CS_CONNECTED) {
 			continue;
 		}
 
-		if ( client->netchan.remoteAddress.type == NA_BOT ) {
-			isBot = qtrue;
-		} else {
-			isBot = qfalse;
-		}
+		qbool isBot = ( client->netchan.remoteAddress.type == NA_BOT );
 
 		// add the map_restart command
 		SV_AddServerCommand( client, "map_restart\n" );
@@ -294,20 +271,20 @@ static void SV_MapRestart_f( void ) {
 			// this generally shouldn't happen, because the client
 			// was connected before the level change
 			SV_DropClient( client, denied );
-			Com_Printf( "SV_MapRestart_f(%d): dropped client %i - denied!\n", delay, i ); // bk010125
+			Com_Printf( "SV_MapRestart_f(%d): dropped client %i - denied!\n", delay, i );
 			continue;
 		}
 
 		client->state = CS_ACTIVE;
-
 		SV_ClientEnterWorld( client, &client->lastUsercmd );
-	}	
+	}
 
 	// run another frame to allow things to look at all the players
-	VM_Call (gvm, GAME_RUN_FRAME, sv.time);
+	VM_Call( gvm, GAME_RUN_FRAME, sv.time );
 	sv.time += 100;
 	svs.time += 100;
 }
+
 
 //===============================================================
 
@@ -696,7 +673,7 @@ static void SV_KillServer_f( void ) {
 
 void SV_AddOperatorCommands()
 {
-	static qbool initialized;
+	static qbool initialized = qfalse;
 
 	if ( initialized )
 		return;
