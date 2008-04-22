@@ -121,7 +121,7 @@ typedef qbool qboolean;
 
 #define QDECL
 #define ID_INLINE
-#include "../game/bg_lib.h"
+#include "bg_lib.h"
 
 #define PASSFLOAT( x ) (*(const int*)&x)
 
