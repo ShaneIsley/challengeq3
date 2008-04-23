@@ -177,7 +177,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="2"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 					/>
@@ -202,7 +201,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="2"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 					/>
@@ -227,7 +225,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="2"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 					/>
@@ -256,7 +253,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="2"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 					/>
@@ -281,7 +277,6 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						Optimization="2"
 						AdditionalIncludeDirectories=""
 						PreprocessorDefinitions=""
 					/>
@@ -317,7 +312,6 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							Optimization="2"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
 						/>
@@ -342,7 +336,6 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							Optimization="2"
 							AdditionalIncludeDirectories=""
 							PreprocessorDefinitions=""
 						/>
