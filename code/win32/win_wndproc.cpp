@@ -45,7 +45,7 @@ static qbool s_alttab_disabled;
 
 #pragma warning(disable : 4702) // unreachable code
 
-static void WIN_DisableAltTab( void )
+static void WIN_DisableAltTab()
 {
 	//if ( s_alttab_disabled )
 		return;
@@ -63,7 +63,7 @@ static void WIN_DisableAltTab( void )
 	s_alttab_disabled = qtrue;
 }
 
-static void WIN_EnableAltTab( void )
+static void WIN_EnableAltTab()
 {
 	if ( s_alttab_disabled )
 	{
@@ -82,12 +82,8 @@ static void WIN_EnableAltTab( void )
 	}
 }
 
-/*
-==================
-VID_AppActivate
-==================
-*/
-static void VID_AppActivate(BOOL fActive, BOOL minimize)
+
+static void VID_AppActivate( BOOL fActive, BOOL minimize )
 {
 	if (r_fullscreen->integer)
 		SetWindowPos( g_wv.hWnd, fActive ? HWND_TOPMOST : HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
@@ -99,30 +95,17 @@ static void VID_AppActivate(BOOL fActive, BOOL minimize)
 	Key_ClearStates();	// FIXME!!!
 
 	// we don't want to act like we're active if we're minimized
-	if (fActive && !g_wv.isMinimized )
-	{
-		g_wv.activeApp = qtrue;
-	}
-	else
-	{
-		g_wv.activeApp = qfalse;
-	}
+	g_wv.activeApp = (fActive && !g_wv.isMinimized);
 
 	// minimize/restore mouse-capture on demand
-	if (!g_wv.activeApp )
-	{
-		IN_Activate (qfalse);
-	}
-	else
-	{
-		IN_Activate (qtrue);
-	}
+	IN_Activate( g_wv.activeApp );
 }
+
 
 //==========================================================================
 
-static byte s_scantokey[128] = 
-					{ 
+static byte s_scantokey[128] =
+{
 //  0           1       2       3       4       5       6       7 
 //  8           9       A       B       C       D       E       F 
 	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
@@ -352,25 +335,21 @@ LONG WINAPI MainWndProc (
 
 	case WM_MOVE:
 		{
-			int		xPos, yPos;
-			RECT r;
-			int		style;
-
 			if (!r_fullscreen->integer )
 			{
-				xPos = (short) LOWORD(lParam);    // horizontal position 
-				yPos = (short) HIWORD(lParam);    // vertical position 
+				int xPos = (short)LOWORD(lParam);    // horizontal position
+				int yPos = (short)HIWORD(lParam);    // vertical position
 
+				RECT r;
 				r.left   = 0;
 				r.top    = 0;
 				r.right  = 1;
 				r.bottom = 1;
 
-				style = GetWindowLong( hWnd, GWL_STYLE );
-				AdjustWindowRect( &r, style, FALSE );
+				AdjustWindowRect( &r, GetWindowLong( hWnd, GWL_STYLE ), FALSE );
 
-				Cvar_SetValue( "vid_xpos", xPos + r.left);
-				Cvar_SetValue( "vid_ypos", yPos + r.top);
+				Cvar_SetValue( "vid_xpos", xPos + r.left );
+				Cvar_SetValue( "vid_ypos", yPos + r.top );
 				vid_xpos->modified = qfalse;
 				vid_ypos->modified = qfalse;
 				if ( g_wv.activeApp )
@@ -391,26 +370,24 @@ LONG WINAPI MainWndProc (
 	case WM_MBUTTONUP:
 	case WM_MOUSEMOVE:
 		{
-			int	temp;
-
-			temp = 0;
+			int mask = 0;
 
 			if (wParam & MK_LBUTTON)
-				temp |= 1;
+				mask |= 1;
 
 			if (wParam & MK_RBUTTON)
-				temp |= 2;
+				mask |= 2;
 
 			if (wParam & MK_MBUTTON)
-				temp |= 4;
+				mask |= 4;
 
 			if (wParam & 0x0020)
-				temp |= 8;
+				mask |= 8;
 
 			if (wParam & 0x0040)
-				temp |= 16;
+				mask |= 16;
 
-			IN_MouseEvent (temp);
+			IN_MouseEvent( mask );
 		}
 		break;
 
@@ -442,8 +419,8 @@ LONG WINAPI MainWndProc (
 	case WM_CHAR:
 		Sys_QueEvent( g_wv.sysMsgTime, SE_CHAR, wParam, 0, 0, NULL );
 		break;
-   }
+	}
 
-    return DefWindowProc( hWnd, uMsg, wParam, lParam );
+	return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
 
