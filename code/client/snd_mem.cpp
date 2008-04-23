@@ -145,15 +145,12 @@ qbool S_LoadSound( sfx_t* sfx )
 		Com_DPrintf( S_COLOR_YELLOW "WARNING: %s is not a 22kHz wav file\n", sfx->soundName );
 	}
 
-	short* samples = (short*)Hunk_AllocateTempMemory( info.samples * sizeof(short) * 2 );
-
 	sfx->lastTimeUsed = Com_Milliseconds();
 
 	sfx->soundLength = info.samples;
 	sfx->soundData = NULL;
 	ResampleSfx( sfx, info.rate, info.width, data + info.dataofs );
 
-	Hunk_FreeTempMemory(samples);
 	Z_Free(data);
 
 	return qtrue;
