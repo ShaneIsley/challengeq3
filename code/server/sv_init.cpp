@@ -159,29 +159,18 @@ void SV_GetUserinfo( int index, char *buffer, int bufferSize ) {
 }
 
 
-/*
-================
-SV_CreateBaseline
+// entity baselines are used to compress non-delta messages to clients
+// only the fields that differ from the baseline will be transmitted
 
-Entity baselines are used to compress non-delta messages
-to the clients -- only the fields that differ from the
-baseline will be transmitted
-================
-*/
-void SV_CreateBaseline( void ) {
-	sharedEntity_t *svent;
-	int				entnum;
-
-	for ( entnum = 1; entnum < sv.num_entities ; entnum++ ) {
-		svent = SV_GentityNum(entnum);
+static void SV_CreateBaseline()
+{
+	for (int entnum = 1; entnum < sv.num_entities; ++entnum) {
+		sharedEntity_t* svent = SV_GentityNum(entnum);
 		if (!svent->r.linked) {
 			continue;
 		}
 		svent->s.number = entnum;
-
-		//
 		// take current state as baseline
-		//
 		sv.svEntities[entnum].baseline = svent->s;
 	}
 }

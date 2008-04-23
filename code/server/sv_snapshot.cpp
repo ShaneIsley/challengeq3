@@ -45,30 +45,17 @@ A normal server packet will look like:
 =============================================================================
 */
 
-/*
-=============
-SV_EmitPacketEntities
 
-Writes a delta update of an entityState_t list to the message.
-=============
-*/
-static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to, msg_t *msg ) {
-	entityState_t	*oldent, *newent;
-	int		oldindex, newindex;
-	int		oldnum, newnum;
-	int		from_num_entities;
+// write a delta update of an entityState_t list to the message
 
-	// generate the delta update
-	if ( !from ) {
-		from_num_entities = 0;
-	} else {
-		from_num_entities = from->num_entities;
-	}
+static void SV_EmitPacketEntities( const clientSnapshot_t* from, clientSnapshot_t* to, msg_t* msg )
+{
+	entityState_t* newent = NULL;
+	const entityState_t* oldent = NULL;
+	int newindex = 0, oldindex = 0;
+	int newnum, oldnum;
+	int from_num_entities = from ? from->num_entities : 0;
 
-	newent = NULL;
-	oldent = NULL;
-	newindex = 0;
-	oldindex = 0;
 	while ( newindex < to->num_entities || oldindex < from_num_entities ) {
 		if ( newindex >= to->num_entities ) {
 			newnum = 9999;
@@ -85,10 +72,9 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 		}
 
 		if ( newnum == oldnum ) {
-			// delta update from old position
-			// because the force parm is qfalse, this will not result
-			// in any bytes being emited if the entity has not changed at all
-			MSG_WriteDeltaEntity (msg, oldent, newent, qfalse );
+			// delta update from old position: because the force parm is false,
+			// no bytes will be emitted if the entity has not changed at all
+			MSG_WriteDeltaEntity( msg, oldent, newent, qfalse );
 			oldindex++;
 			newindex++;
 			continue;
@@ -96,14 +82,14 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 
 		if ( newnum < oldnum ) {
 			// this is a new entity, send it from the baseline
-			MSG_WriteDeltaEntity (msg, &sv.svEntities[newnum].baseline, newent, qtrue );
+			MSG_WriteDeltaEntity( msg, &sv.svEntities[newnum].baseline, newent, qtrue );
 			newindex++;
 			continue;
 		}
 
 		if ( newnum > oldnum ) {
 			// the old entity isn't present in the new message
-			MSG_WriteDeltaEntity (msg, oldent, NULL, qtrue );
+			MSG_WriteDeltaEntity( msg, oldent, NULL, qtrue );
 			oldindex++;
 			continue;
 		}
@@ -111,7 +97,6 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 
 	MSG_WriteBits( msg, (MAX_GENTITIES-1), GENTITYNUM_BITS );	// end of packetentities
 }
-
 
 
 /*
@@ -238,19 +223,14 @@ Build a client snapshot structure
 #define	MAX_SNAPSHOT_ENTITIES	1024
 typedef struct {
 	int		numSnapshotEntities;
-	int		snapshotEntities[MAX_SNAPSHOT_ENTITIES];	
+	int		snapshotEntities[MAX_SNAPSHOT_ENTITIES];
 } snapshotEntityNumbers_t;
 
-/*
-=======================
-SV_QsortEntityNumbers
-=======================
-*/
-static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
-	int	*ea, *eb;
 
-	ea = (int *)a;
-	eb = (int *)b;
+static int QDECL SV_QsortEntityNumbers( const void *a, const void *b )
+{
+	const int *ea = (const int *)a;
+	const int *eb = (const int *)b;
 
 	if ( *ea == *eb ) {
 		Com_Error( ERR_DROP, "SV_QsortEntityStates: duplicated entity" );
@@ -285,10 +265,7 @@ static void SV_AddEntToSnapshot( svEntity_t *svEnt, const sharedEntity_t *gEnt, 
 static void SV_AddEntitiesVisibleFromPoint( const vec3_t origin,
 		clientSnapshot_t *frame, snapshotEntityNumbers_t *eNums )
 {
-	int		e, i;
-	sharedEntity_t *ent;
-	svEntity_t	*svEnt;
-	int		l;
+	int i, l;
 
 	// during an error shutdown message we may need to transmit
 	// the shutdown message after the server has shutdown, so
@@ -305,8 +282,8 @@ static void SV_AddEntitiesVisibleFromPoint( const vec3_t origin,
 	// calculate the visible areas
 	frame->areabytes = CM_WriteAreaBits( frame->areabits, clientarea );
 
-	for ( e = 0 ; e < sv.num_entities ; e++ ) {
-		ent = SV_GentityNum(e);
+	for (int e = 0; e < sv.num_entities; ++e) {
+		const sharedEntity_t* ent = SV_GentityNum(e);
 
 		// never send entities that aren't linked in
 		if ( !ent->r.linked ) {
@@ -338,7 +315,7 @@ static void SV_AddEntitiesVisibleFromPoint( const vec3_t origin,
 				continue;
 		}
 
-		svEnt = SV_SvEntityForGentity( ent );
+		svEntity_t* svEnt = SV_SvEntityForGentity( ent );
 
 		// don't double add an entity through portals
 		if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
@@ -374,7 +351,7 @@ static void SV_AddEntitiesVisibleFromPoint( const vec3_t origin,
 		}
 
 		// if we haven't found it to be visible,
-		// check overflow clusters that coudln't be stored
+		// check overflow clusters that couldn't be stored
 		if ( i == svEnt->numClusters ) {
 			if ( svEnt->lastCluster ) {
 				for ( ; l <= svEnt->lastCluster ; l++ ) {
