@@ -293,11 +293,11 @@ void SV_AuthorizeIpPacket( netadr_t from );
 
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg );
 
-void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
+void SV_ClientEnterWorld( client_t* cl, const usercmd_t* cmd );
 void SV_DropClient( client_t *drop, const char *reason );
 
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qbool clientOK );
-void SV_ClientThink (client_t *cl, usercmd_t *cmd);
+void SV_ClientThink( client_t* cl, const usercmd_t* cmd );
 
 void SV_WriteDownloadToClient( client_t *cl , msg_t *msg );
 

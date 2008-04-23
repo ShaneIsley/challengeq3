@@ -643,31 +643,25 @@ void SV_SendClientGameState( client_t *client ) {
 }
 
 
-/*
-==================
-SV_ClientEnterWorld
-==================
-*/
-void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
-	int		clientNum;
-	sharedEntity_t *ent;
-
-	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
-	client->state = CS_ACTIVE;
+void SV_ClientEnterWorld( client_t* cl, const usercmd_t* cmd )
+{
+	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", cl->name );
+	cl->state = CS_ACTIVE;
 
 	// set up the entity for the client
-	clientNum = client - svs.clients;
-	ent = SV_GentityNum( clientNum );
+	int clientNum = cl - svs.clients;
+	sharedEntity_t* ent = SV_GentityNum( clientNum );
 	ent->s.number = clientNum;
-	client->gentity = ent;
+	cl->gentity = ent;
 
-	client->deltaMessage = -1;
-	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
-	client->lastUsercmd = *cmd;
+	cl->deltaMessage = -1;
+	cl->nextSnapshotTime = svs.time;	// generate a snapshot immediately
+	cl->lastUsercmd = *cmd;
 
-	// call the game begin function
-	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
+	// tell the game vm that the client is live
+	VM_Call( gvm, GAME_CLIENT_BEGIN, cl - svs.clients );
 }
+
 
 /*
 ============================================================
@@ -1235,14 +1229,10 @@ static qbool SV_ClientCommand( client_t *cl, msg_t *msg ) {
 //==================================================================================
 
 
-/*
-==================
-SV_ClientThink
+// can also be called indirectly by the vm (used for bots)
 
-Also called by bot code
-==================
-*/
-void SV_ClientThink (client_t *cl, usercmd_t *cmd) {
+void SV_ClientThink( client_t* cl, const usercmd_t* cmd )
+{
 	cl->lastUsercmd = *cmd;
 
 	if ( cl->state != CS_ACTIVE ) {
@@ -1251,6 +1241,7 @@ void SV_ClientThink (client_t *cl, usercmd_t *cmd) {
 
 	VM_Call( gvm, GAME_CLIENT_THINK, cl - svs.clients );
 }
+
 
 /*
 ==================
