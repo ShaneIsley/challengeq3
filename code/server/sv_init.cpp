@@ -291,15 +291,10 @@ void SV_ChangeMaxClients( void ) {
 	}
 }
 
-/*
-================
-SV_ClearServer
-================
-*/
-void SV_ClearServer(void) {
-	int i;
 
-	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
+static void SV_ClearServer()
+{
+	for (int i = 0; i < MAX_CONFIGSTRINGS; ++i) {
 		if ( sv.configstrings[i] ) {
 			Z_Free( sv.configstrings[i] );
 		}
@@ -307,19 +302,13 @@ void SV_ClearServer(void) {
 	Com_Memset (&sv, 0, sizeof(sv));
 }
 
-/*
-================
-SV_TouchCGame
 
-  touch the cgame.vm so that a pure client can load it if it's in a seperate pk3
-================
-*/
-void SV_TouchCGame(void) {
-	fileHandle_t	f;
-	char filename[MAX_QPATH];
+// touch the cgame.vm so that a pure client can load it if it's in a seperate pk3
 
-	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", "cgame" );
-	FS_FOpenFileRead( filename, &f, qfalse );
+static void SV_TouchCGame()
+{
+	fileHandle_t f;
+	FS_FOpenFileRead( "vm/cgame.qvm", &f, qfalse );
 	if ( f ) {
 		FS_FCloseFile( f );
 	}
