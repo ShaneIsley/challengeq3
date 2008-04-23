@@ -1334,12 +1334,9 @@ CONVENIENCE FUNCTIONS FOR ENTIRE FILES
 ======================================================================================
 */
 
-int	FS_FileIsInPAK(const char *filename, int *pChecksum ) {
-	searchpath_t	*search;
-	pack_t			*pak;
-	fileInPack_t	*pakFile;
-	long			hash = 0;
 
+qbool FS_FileIsInPAK( const char* filename, int* pChecksum )
+{
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization\n" );
 	}
@@ -1357,42 +1354,41 @@ int	FS_FileIsInPAK(const char *filename, int *pChecksum ) {
 	// The searchpaths do guarantee that something will always
 	// be prepended, so we don't need to worry about "c:" or "//limbo" 
 	if ( strstr( filename, ".." ) || strstr( filename, "::" ) ) {
-		return -1;
+		return qfalse;
 	}
 
-	//
 	// search through the path, one element at a time
-	//
 
-	for ( search = fs_searchpaths ; search ; search = search->next ) {
-		//
-		if (search->pack) {
-			hash = FS_HashFileName(filename, search->pack->hashSize);
-		}
+	for ( const searchpath_t* search = fs_searchpaths; search; search = search->next ) {
+		if ( !search->pack )
+			continue;
+
+		long hash = FS_HashFileName(filename, search->pack->hashSize);
 		// is the element a pak file?
-		if ( search->pack && search->pack->hashTable[hash] ) {
+		if ( search->pack->hashTable[hash] ) {
 			// disregard if it doesn't match one of the allowed pure pak files
 			if ( !FS_PakIsPure(search->pack) ) {
 				continue;
 			}
 
 			// look through all the pak file elements
-			pak = search->pack;
-			pakFile = pak->hashTable[hash];
+			const fileInPack_t* pakFile = search->pack->hashTable[hash];
 			do {
 				// case and separator insensitive comparisons
 				if ( !FS_FilenameCompare( pakFile->name, filename ) ) {
 					if (pChecksum) {
-						*pChecksum = pak->pure_checksum;
+						*pChecksum = search->pack->pure_checksum;
 					}
-					return 1;
+					return qtrue;
 				}
 				pakFile = pakFile->next;
-			} while(pakFile != NULL);
+			} while (pakFile);
 		}
 	}
-	return -1;
+
+	return qfalse;
 }
+
 
 /*
 ============
@@ -2279,7 +2275,6 @@ Sets fs_gamedir, adds the directory to the head of the path,
 then loads the zip headers
 ================
 */
-#define	MAX_PAKFILES	1024
 static void FS_AddGameDirectory( const char *path, const char *dir )
 {
 	searchpath_t	*sp;
