@@ -402,7 +402,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].punkbuster = 0;
 
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
-	if (strlen(info)) {
+	if (info[0]) {
 		if (info[strlen(info)-1] != '\n') {
 			strncat(info, "\n", sizeof(info));
 		}
