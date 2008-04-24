@@ -1,4 +1,11 @@
 
+May 08 - 1.43
+
+fixed sfx0 using a real sound and thus "hiding" it
+
+corrected sv_pure back to CVAR_ROM
+
+
 Mar 08 - 1.42
 
 bots are no longer kicked by devmap
@@ -190,4 +197,3 @@ pak list made fs_debug 1
 removed the TA cvars that were hacked into the engine
 
 reordered demo_protocols to reduce spew
-
