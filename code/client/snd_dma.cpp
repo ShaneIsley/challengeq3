@@ -271,9 +271,9 @@ static void S_Base_BeginRegistration()
 
 	s_numSfx = 0;
 	Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
-	Com_Memset( sfxHash, 0, sizeof(sfx_t *)*SFX_HASH_SIZE );
+	Com_Memset( sfxHash, 0, sizeof(sfx_t*) * SFX_HASH_SIZE );
 
-	S_Base_RegisterSound( "sound/world/buzzer.wav" );
+	S_FindName( "null" ); // fill sound 0's slot
 }
 
 
