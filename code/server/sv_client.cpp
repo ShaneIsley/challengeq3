@@ -1003,8 +1003,13 @@ If we are pure, disconnect the client if they do not meet the following conditio
 
 static void SV_VerifyPaks_f( client_t* cl )
 {
-	int i, j;
+	int i, j, checksum;
+	int nCurArg = 1; // we know arg0 is "cp"
 	const char* pArg;
+	const char* paks;
+	int nClientChkSum[MAX_PAKFILES];
+	int nServerChkSum[MAX_PAKFILES];
+	int nServerPaks;
 
 	if (!sv_pure->integer)
 		return;
@@ -1015,7 +1020,6 @@ static void SV_VerifyPaks_f( client_t* cl )
 		goto impure;
 	}
 
-	int nCurArg = 1; // we know arg0 is "cp"
 	pArg = Cmd_Argv(nCurArg++);
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
@@ -1030,8 +1034,6 @@ static void SV_VerifyPaks_f( client_t* cl )
 
 	// we "expect" the client to load certain things from certain pk3 files
 	// namely the ui and cgame that we think they should have
-
-	int checksum = 0;
 
 	pArg = Cmd_Argv(nCurArg++);
 	if ( !FS_FileIsInPAK("vm/cgame.qvm", &checksum) || !pArg || *pArg == '@' || atoi(pArg) != checksum )
@@ -1050,7 +1052,6 @@ static void SV_VerifyPaks_f( client_t* cl )
 	// so the client can't just send the same checksum 5 times
 	// KHB  note that this is incorrect, since there could be legit collisions
 	// which would make the server unusable, but...
-	int nClientChkSum[MAX_PAKFILES];
 	for (i = 0; i < nClientPaks; ++i) {
 		nClientChkSum[i] = atoi(Cmd_Argv(nCurArg++));
 		for (j = 0; j < i; ++j) {
@@ -1063,10 +1064,9 @@ static void SV_VerifyPaks_f( client_t* cl )
 	nClientChkSum[i] = atoi(Cmd_Argv(nCurArg++));
 
 	// get the pure checksums of the pk3 files loaded by the server
-	const char* paks = FS_LoadedPakPureChecksums();
+	paks = FS_LoadedPakPureChecksums();
 	Cmd_TokenizeString( paks );
-	int nServerChkSum[MAX_PAKFILES];
-	int nServerPaks = min( MAX_PAKFILES, Cmd_Argc() );
+	nServerPaks = min( MAX_PAKFILES, Cmd_Argc() );
 	for (i = 0; i < nServerPaks; ++i) {
 		nServerChkSum[i] = atoi(Cmd_Argv(i));
 	}
