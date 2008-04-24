@@ -1,9 +1,11 @@
 
-May 08 - 1.43
+Apr 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
 
 corrected sv_pure back to CVAR_ROM
+
+added the correct "fastsky!=0 == disable portals" test, ffs me  :P
 
 
 Mar 08 - 1.42

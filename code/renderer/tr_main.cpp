@@ -813,7 +813,8 @@ static qbool R_MirrorViewBySurface( drawSurf_t* drawSurf, int entityNum )
 		return qfalse;
 	}
 
-	if ( r_noportals->integer ) {
+	// r_fastsky's "mindless" blit over the entire screen will destroy portal views
+	if ( r_fastsky->integer || r_noportals->integer ) {
 		return qfalse;
 	}
 
