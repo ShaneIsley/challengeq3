@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #define MIN_DEDICATED_COMHUNKMEGS 8
-#define MIN_COMHUNKMEGS		54
+#define MIN_COMHUNKMEGS		56
 #define DEF_COMHUNKMEGS		64
 #define DEF_COMZONEMEGS		24
 #define XSTRING(x)			STRING(x)
