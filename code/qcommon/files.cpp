@@ -2573,6 +2573,13 @@ static void FS_Startup( const char *gameName )
 {
 	Com_Printf( "----- FS_Startup -----\n" );
 
+	//each map load increment 'fs_packFiles'!
+	//start cnq3: 30298 files in pk3 files
+	//next map: 60596 files in pk3 files
+	//next map: 90894 files in pk3 files
+	//etc
+	fs_packFiles = 0; 
+
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_Cwd(), CVAR_INIT );
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
