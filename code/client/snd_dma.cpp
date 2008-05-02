@@ -209,8 +209,8 @@ static sfx_t* S_FindName( const char *name )
 	}
 
 	sfx = &s_knownSfx[i];
-	Com_Memset (sfx, 0, sizeof(*sfx));
-	strcpy (sfx->soundName, name);
+	Com_Memset( sfx, 0, sizeof(*sfx) );
+	strcpy( sfx->soundName, name );
 
 	sfx->next = sfxHash[hash];
 	sfxHash[hash] = sfx;
@@ -273,7 +273,12 @@ static void S_Base_BeginRegistration()
 	Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
 	Com_Memset( sfxHash, 0, sizeof(sfx_t*) * SFX_HASH_SIZE );
 
-	S_FindName( "null" ); // fill sound 0's slot
+	// fill sound 0's slot or the first real sound registered will be lost forever
+	sfx_t* sfx = &s_knownSfx[0];
+	Com_Memset( sfx, 0, sizeof(*sfx) );
+	sfx->soundName[0] = 0;
+	sfx->next = 0;
+	sfxHash[0] = sfx;
 }
 
 
