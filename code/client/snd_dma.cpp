@@ -528,15 +528,17 @@ static void S_Base_ClearLoopingSounds()
 }
 
 
-static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, sfxHandle_t sfxHandle )
+// called during entity generation for a frame
+
+static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, sfxHandle_t sfxHandle )
 {
 	if ( !s_soundStarted || s_soundMuted || !sfxHandle ) {
-		return qfalse;
+		return;
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
 		Com_Printf( S_COLOR_YELLOW, "S_AddLoopingSound: handle %i out of range\n", sfxHandle );
-		return qfalse;
+		return;
 	}
 
 	sfx_t* sfx = &s_knownSfx[ sfxHandle ];
@@ -552,18 +554,6 @@ static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, sfxHan
 	VectorCopy( origin, loopSounds[entityNum].origin );
 	loopSounds[entityNum].sfx = sfx;
 	loopSounds[entityNum].active = qtrue;
-
-	return qtrue;
-}
-
-
-// called during entity generation for a frame
-
-static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle )
-{
-	if ( !S_Base_InitLoopingSound( entityNum, origin, sfxHandle ) )
-		return;
-
 	loopSounds[entityNum].framenum = cls.framecount;
 }
 

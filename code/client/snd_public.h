@@ -40,7 +40,7 @@ void S_StopAllSounds();
 
 // all continuous looping sounds must be added before calling S_Update
 void S_ClearLoopingSounds();
-void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
+void S_AddLoopingSound( int entityNum, const vec3_t origin, sfxHandle_t sfx );
 
 // recompute the volume levels of all active sounds
 // relative to the given entityNum / orientation
