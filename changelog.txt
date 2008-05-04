@@ -7,6 +7,16 @@ corrected sv_pure back to CVAR_ROM
 
 added the correct "fastsky!=0 == disable portals" test, ffs me  :P
 
+another MASSIVE overhaul of the sound code:
+
+removed s_doppler, it's "right", but it just sounds like shit
+
+removed s_mixprestep, a stupid hack to work around another stupid hack
+
+spatialisation is now correct, which has two huge impacts:
+  you can "place" sounds MUCH more accurately than before,
+  but as a result, distant sounds are MUCH quieter
+
 
 Mar 08 - 1.42
 

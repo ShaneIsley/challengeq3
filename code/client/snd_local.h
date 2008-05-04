@@ -62,17 +62,11 @@ typedef struct {
 
 #define START_SAMPLE_IMMEDIATE	0x7fffffff
 
-#define MAX_DOPPLER_SCALE 50.0f //arbitrary
-
 typedef struct loopSound_s {
 	vec3_t		origin;
-	vec3_t		velocity;
 	sfx_t		*sfx;
 	int			mergeFrame;
 	qbool		active;
-	qbool		doppler;
-	float		dopplerScale;
-	float		oldDopplerScale;
 	int			framenum;
 } loopSound_t;
 
@@ -88,9 +82,6 @@ typedef struct
 	vec3_t		origin;			// only use if fixed_origin is set
 	qbool		fixed_origin;	// use origin instead of fetching entnum's origin
 	const sfx_t* thesfx;		// sfx structure
-	qbool		doppler;
-	float		dopplerScale;
-	float		oldDopplerScale;
 } channel_t;
 
 
@@ -159,7 +150,6 @@ extern	portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
 
 extern cvar_t *s_volume;
 extern cvar_t *s_musicVolume;
-extern cvar_t *s_doppler;
 extern const cvar_t* s_testsound;
 
 qbool S_LoadSound( sfx_t* sfx );

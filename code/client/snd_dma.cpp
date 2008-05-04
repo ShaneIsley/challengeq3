@@ -42,13 +42,6 @@ static snd_stream_t* s_backgroundStream = NULL;
 static char s_backgroundLoop[MAX_QPATH];
 
 
-// =======================================================================
-// Internal sound data & structures
-// =======================================================================
-
-// only begin attenuating sound volumes when outside the FULLVOLUME range
-static const float SOUND_FULLVOLUME = 80;
-
 static const float SOUND_MAX_DIST = 1250;
 static const float SOUND_ATTENUATE = (1.0f / SOUND_MAX_DIST);
 
@@ -76,7 +69,6 @@ static sfx_t* sfxHash[SFX_HASH_SIZE];
 
 static cvar_t* s_show;
 static cvar_t* s_mixahead;
-static cvar_t* s_mixPreStep;
 const cvar_t* s_testsound;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
@@ -277,7 +269,7 @@ static void S_Base_BeginRegistration()
 
 // used for spatializing s_channels (duh, really?)
 
-static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int *left_vol, int *right_vol )
+static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_vol, int* right_vol )
 {
 	vec_t		dot;
 	vec_t		dist;
@@ -287,41 +279,33 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int *left_v
 
 	// calculate stereo seperation and distance attenuation
 	VectorSubtract( origin, listener_origin, source_vec );
+	dist = VectorNormalize( source_vec ) * SOUND_ATTENUATE;
 
-	dist = VectorNormalize( source_vec );
-	dist -= SOUND_FULLVOLUME;
-	if (dist < 0)
-		dist = 0;			// close enough to be at full volume
-	dist *= SOUND_ATTENUATE;		// different attenuation levels
+	// attentuate correctly even if we can't spatialise
+	if (dma.channels == 1) {
+		*left_vol = *right_vol = master_vol * dist;
+		return;
+	}
 
 	VectorRotate( source_vec, listener_axis, vec );
-
 	dot = -vec[1];
 
-	if (dma.channels == 1)
-	{ // no attenuation = no spatialization
-		rscale = 1.0;
-		lscale = 1.0;
+	rscale = 0.5 * (1.0 + dot);
+	lscale = 0.5 * (1.0 - dot);
+	if ( rscale < 0 ) {
+		rscale = 0;
 	}
-	else
-	{
-		rscale = 0.5 * (1.0 + dot);
-		lscale = 0.5 * (1.0 - dot);
-		if ( rscale < 0 ) {
-			rscale = 0;
-		}
-		if ( lscale < 0 ) {
-			lscale = 0;
-		}
+	if ( lscale < 0 ) {
+		lscale = 0;
 	}
 
 	// add in distance effect
-	scale = (1.0 - dist) * rscale;
+	scale = Square(1.0 - dist) * rscale;
 	*right_vol = (master_vol * scale);
 	if (*right_vol < 0)
 		*right_vol = 0;
 
-	scale = (1.0 - dist) * lscale;
+	scale = Square(1.0 - dist) * lscale;
 	*left_vol = (master_vol * scale);
 	if (*left_vol < 0)
 		*left_vol = 0;
@@ -464,7 +448,6 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 	ch->entchannel = entchannel;
 	ch->leftvol = ch->master_vol;		// these will get calced at next spatialize
 	ch->rightvol = ch->master_vol;		// unless the game isn't running
-	ch->doppler = qfalse;
 }
 
 
@@ -545,7 +528,7 @@ static void S_Base_ClearLoopingSounds()
 }
 
 
-static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle )
+static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, sfxHandle_t sfxHandle )
 {
 	if ( !s_soundStarted || s_soundMuted || !sfxHandle ) {
 		return qfalse;
@@ -567,46 +550,19 @@ static qbool S_Base_InitLoopingSound( int entityNum, const vec3_t origin, const 
 	}
 
 	VectorCopy( origin, loopSounds[entityNum].origin );
-	VectorCopy( velocity, loopSounds[entityNum].velocity );
 	loopSounds[entityNum].sfx = sfx;
 	loopSounds[entityNum].active = qtrue;
-	loopSounds[entityNum].doppler = qfalse;
 
 	return qtrue;
 }
 
 
 // called during entity generation for a frame
-// includes velocity for doppler
 
 static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle )
 {
-	if ( !S_Base_InitLoopingSound( entityNum, origin, velocity, sfxHandle ) )
+	if ( !S_Base_InitLoopingSound( entityNum, origin, sfxHandle ) )
 		return;
-
-	loopSounds[entityNum].oldDopplerScale = 1.0;
-	loopSounds[entityNum].dopplerScale = 1.0;
-
-	if (s_doppler->integer && VectorLengthSquared(velocity)>0.0) {
-		vec3_t	out;
-		float	lena, lenb;
-
-		loopSounds[entityNum].doppler = qtrue;
-		lena = DistanceSquared(loopSounds[listener_number].origin, loopSounds[entityNum].origin);
-		VectorAdd(loopSounds[entityNum].origin, loopSounds[entityNum].velocity, out);
-		lenb = DistanceSquared(loopSounds[listener_number].origin, out);
-		if ((loopSounds[entityNum].framenum+1) != cls.framecount) {
-			loopSounds[entityNum].oldDopplerScale = 1.0;
-		} else {
-			loopSounds[entityNum].oldDopplerScale = loopSounds[entityNum].dopplerScale;
-		}
-		loopSounds[entityNum].dopplerScale = lenb/(lena*100);
-		if (loopSounds[entityNum].dopplerScale<=1.0) {
-			loopSounds[entityNum].doppler = qfalse;			// don't bother doing the math
-		} else if (loopSounds[entityNum].dopplerScale>MAX_DOPPLER_SCALE) {
-			loopSounds[entityNum].dopplerScale = MAX_DOPPLER_SCALE;
-		}
-	}
 
 	loopSounds[entityNum].framenum = cls.framecount;
 }
@@ -627,13 +583,12 @@ static void S_AddLoopSounds()
 	loopSound_t	*loop, *loop2;
 	static int	loopFrame;
 
-
 	numLoopChannels = 0;
 
 	time = Com_Milliseconds();
 
 	loopFrame++;
-	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
+	for ( i = 0; (i < MAX_GENTITIES) && (numLoopChannels < MAX_CHANNELS); ++i) {
 		loop = &loopSounds[i];
 		if ( !loop->active || loop->mergeFrame == loopFrame ) {
 			continue;	// already merged into an earlier sound
@@ -645,7 +600,7 @@ static void S_AddLoopSounds()
 
 		for (j=(i+1); j< MAX_GENTITIES ; j++) {
 			loop2 = &loopSounds[j];
-			if ( !loop2->active || loop2->doppler || loop2->sfx != loop->sfx) {
+			if ( !loop2->active || (loop2->sfx != loop->sfx) ) {
 				continue;
 			}
 			loop2->mergeFrame = loopFrame;
@@ -674,13 +629,7 @@ static void S_AddLoopSounds()
 		ch->leftvol = left_total;
 		ch->rightvol = right_total;
 		ch->thesfx = loop->sfx;
-		ch->doppler = loop->doppler;
-		ch->dopplerScale = loop->dopplerScale;
-		ch->oldDopplerScale = loop->oldDopplerScale;
 		numLoopChannels++;
-		if (numLoopChannels == MAX_CHANNELS) {
-			return;
-		}
 	}
 }
 
@@ -929,7 +878,7 @@ static void S_GetSoundtime()
 		{	// time to chop things off to avoid 32 bit limits
 			buffers = 0;
 			s_paintedtime = fullsamples;
-			S_Base_StopAllSounds ();
+			S_Base_StopAllSounds();
 		}
 	}
 	oldsamplepos = samplepos;
@@ -946,7 +895,7 @@ static void S_GetSoundtime()
 #endif
 
 	if ( dma.submission_chunk < 256 ) {
-		s_paintedtime = s_soundtime + s_mixPreStep->value * dma.speed;
+		s_paintedtime = s_soundtime;
 	} else {
 		s_paintedtime = s_soundtime + dma.submission_chunk;
 	}
@@ -955,39 +904,36 @@ static void S_GetSoundtime()
 
 static void S_Update_DMA()
 {
+	static int prevTime = 0;
+	static int prevSoundtime = -1;
 	unsigned		endtime;
 	int				samps;
-	static			float	lastTime = 0.0f;
-	float			ma, op;
-	float			thisTime, sane;
-	static			int ot = -1;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
-	thisTime = Com_Milliseconds();
-
-	// Updates s_soundtime
 	S_GetSoundtime();
 
-	if (s_soundtime == ot) {
+	if (s_soundtime == prevSoundtime) {
 		return;
 	}
-	ot = s_soundtime;
+	prevSoundtime = s_soundtime;
 
 	// clear any sound effects that end before the current time,
 	// and start any new sounds
 	S_ScanChannelStarts();
 
-	sane = thisTime - lastTime;
-	if (sane<11) {
-		sane = 11;			// 85hz
-	}
+	int thisTime = Com_Milliseconds();
+	int ms = thisTime - prevTime;
+	prevTime = thisTime;
 
-	ma = s_mixahead->value * dma.speed;
-	op = s_mixPreStep->value + sane*dma.speed*0.01;
-
+	// op is the amount of mixahead you "need" for the current framerate
+	// it will ALWAYS be FAR less than (s_mixahead * dma.speed)
+	// unless you're running at a miserable framerate (50fps and below, for ma 0.2)
+	// so s_mixahead is, in reality, almost completely useless and ignored
+	float ma = s_mixahead->value * dma.speed;
+	float op = ms * dma.speed * 0.01;
 	if (op < ma) {
 		ma = op;
 	}
@@ -996,8 +942,7 @@ static void S_Update_DMA()
 	endtime = s_soundtime + ma;
 
 	// mix to an even submission block size
-	endtime = (endtime + dma.submission_chunk-1)
-		& ~(dma.submission_chunk-1);
+	endtime = (endtime + dma.submission_chunk-1) & ~(dma.submission_chunk-1);
 
 	// never mix more than the complete buffer
 	samps = dma.samples >> (dma.channels-1);
@@ -1009,8 +954,6 @@ static void S_Update_DMA()
 	S_PaintChannels( endtime );
 
 	SNDDMA_Submit();
-
-	lastTime = thisTime;
 }
 
 
@@ -1200,7 +1143,6 @@ qbool S_Base_Init( soundInterface_t *si )
 	Com_Memset( si, 0, sizeof(*si) );
 
 	s_mixahead = Cvar_Get( "s_mixahead", "0.2", CVAR_ARCHIVE );
-	s_mixPreStep = Cvar_Get( "s_mixPreStep", "0.05", CVAR_ARCHIVE );
 	s_show = Cvar_Get( "s_show", "0", CVAR_CHEAT );
 	s_testsound = Cvar_Get( "s_testsound", "0", CVAR_CHEAT );
 
