@@ -89,14 +89,6 @@ ifndef USE_SDL
 USE_SDL=1
 endif
 
-ifndef USE_OPENAL
-USE_OPENAL=0
-endif
-
-ifndef USE_OPENAL_DLOPEN
-USE_OPENAL_DLOPEN=0
-endif
-
 ifndef USE_CURL
 USE_CURL=0
 endif
@@ -111,10 +103,6 @@ endif
 
 ifndef USE_CODEC_VORBIS
 USE_CODEC_VORBIS=0
-endif
-
-ifndef USE_OPENAL_LOCALH
-USE_OPENAL_LOCALH=1
 endif
 
 #############################################################################
@@ -186,13 +174,6 @@ ifeq ($(PLATFORM),linux)
 	BASE_CFLAGS += $(shell freetype-config --cflags)
 	CLIENT_LDFLAGS += -lfreetype $(shell freetype-config --libs)
 
-  ifeq ($(USE_OPENAL),1)
-    BASE_CFLAGS += -DUSE_OPENAL=1
-    ifeq ($(USE_OPENAL_DLOPEN),1)
-      BASE_CFLAGS += -DUSE_OPENAL_DLOPEN=1
-    endif
-  endif
-
   ifeq ($(USE_CURL),1)
     BASE_CFLAGS += -DUSE_CURL=1
     ifeq ($(USE_CURL_DLOPEN),1)
@@ -259,12 +240,6 @@ ifeq ($(PLATFORM),linux)
     CLIENT_LDFLAGS += -L/usr/X11R6/$(LIB) -lX11 -lXext -lXxf86dga -lXxf86vm
   endif
 
-  ifeq ($(USE_OPENAL),1)
-    ifneq ($(USE_OPENAL_DLOPEN),1)
-      CLIENT_LDFLAGS += -lopenal
-    endif
-  endif
-  
   ifeq ($(USE_CURL),1)
     ifneq ($(USE_CURL_DLOPEN),1)
       CLIENT_LDFLAGS += -lcurl
@@ -299,13 +274,6 @@ ifeq ($(PLATFORM),darwin)
   # Always include debug symbols...you can strip the binary later...
   BASE_CFLAGS += -gfull
 
-  ifeq ($(USE_OPENAL),1)
-    BASE_CFLAGS += -DUSE_OPENAL=1
-    ifeq ($(USE_OPENAL_DLOPEN),1)
-      BASE_CFLAGS += -DUSE_OPENAL_DLOPEN=1
-    endif
-  endif
-  
   ifeq ($(USE_CURL),1)
     BASE_CFLAGS += -DUSE_CURL=1
     ifneq ($(USE_CURL_DLOPEN),1)
@@ -395,10 +363,6 @@ ifeq ($(PLATFORM),mingw32)
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes
 
-  ifeq ($(USE_OPENAL),1)
-    BASE_CFLAGS += -DUSE_OPENAL=1 -DUSE_OPENAL_DLOPEN=1
-  endif
-  
   ifeq ($(USE_CURL),1)
     BASE_CFLAGS += -DUSE_CURL=1
     ifneq ($(USE_CURL_DLOPEN),1)
@@ -702,10 +666,6 @@ ifdef DEFAULT_BASEDIR
   BASE_CFLAGS += -DDEFAULT_BASEDIR=\\\"$(DEFAULT_BASEDIR)\\\"
 endif
 
-ifeq ($(USE_OPENAL_LOCALH),1)
-  BASE_CFLAGS += -DUSE_OPENAL_LOCALH=1
-endif
-
 ifeq ($(GENERATE_DEPENDENCIES),1)
   ifeq ($(CC),gcc)
     DEPEND_CFLAGS=-MMD
@@ -813,9 +773,6 @@ Q3OBJ = \
   $(B)/client/snd_codec.o \
   $(B)/client/snd_codec_wav.o \
   $(B)/client/snd_codec_ogg.o \
-  \
-  $(B)/client/qal.o \
-  $(B)/client/snd_openal.o \
   \
   $(B)/client/cl_curl.o \
   \
@@ -1012,9 +969,6 @@ $(B)/client/snd_main.o : $(CDIR)/snd_main.cpp; $(DO_CC)
 $(B)/client/snd_codec.o : $(CDIR)/snd_codec.cpp; $(DO_CC)
 $(B)/client/snd_codec_wav.o : $(CDIR)/snd_codec_wav.cpp; $(DO_CC)
 $(B)/client/snd_codec_ogg.o : $(CDIR)/snd_codec_ogg.cpp; $(DO_CC)
-
-$(B)/client/qal.o : $(CDIR)/qal.cpp; $(DO_CC)
-$(B)/client/snd_openal.o : $(CDIR)/snd_openal.cpp; $(DO_CC)
 
 $(B)/client/cl_curl.o : $(CDIR)/cl_curl.cpp; $(DO_CC)
 
