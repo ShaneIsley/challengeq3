@@ -554,7 +554,6 @@ static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, sfxHandl
 	VectorCopy( origin, loopSounds[entityNum].origin );
 	loopSounds[entityNum].sfx = sfx;
 	loopSounds[entityNum].active = qtrue;
-	loopSounds[entityNum].framenum = cls.framecount;
 }
 
 
@@ -565,7 +564,8 @@ sum up the channel multipliers.
 */
 static void S_AddLoopSounds()
 {
-	const int AMBIENT_VOLUME = 96; // 25% quieter than normal sounds
+	//const int AMBIENT_VOLUME = 96; // 25% quieter than normal sounds
+	const int AMBIENT_VOLUME = 127;
 
 	int			i, j, time;
 	int			left_total, right_total, left, right;

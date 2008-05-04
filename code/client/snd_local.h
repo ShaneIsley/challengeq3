@@ -62,12 +62,11 @@ typedef struct {
 
 #define START_SAMPLE_IMMEDIATE	0x7fffffff
 
-typedef struct loopSound_s {
+typedef struct {
 	vec3_t		origin;
 	sfx_t		*sfx;
 	int			mergeFrame;
 	qbool		active;
-	int			framenum;
 } loopSound_t;
 
 typedef struct
