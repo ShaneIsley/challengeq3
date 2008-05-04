@@ -279,7 +279,14 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 
 	// calculate stereo seperation and distance attenuation
 	VectorSubtract( origin, listener_origin, source_vec );
-	dist = VectorNormalize( source_vec ) * SOUND_ATTENUATE;
+	dist = VectorNormalize( source_vec );
+
+	if (dist >= SOUND_MAX_DIST) {
+		*left_vol = *right_vol = 0;
+		return;
+	}
+
+	dist *= SOUND_ATTENUATE;
 
 	// attentuate correctly even if we can't spatialise
 	if (dma.channels == 1) {
@@ -744,23 +751,21 @@ static void S_Base_UpdateEntityPosition( int entityNum, const vec3_t origin )
 
 static void S_Base_Respatialize( int entityNum, const vec3_t head, const vec3_t axis[3], int inwater )
 {
-	int			i;
-	channel_t	*ch;
-	vec3_t		origin;
+	vec3_t origin;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
 	listener_number = entityNum;
-	VectorCopy(head, listener_origin);
-	VectorCopy(axis[0], listener_axis[0]);
-	VectorCopy(axis[1], listener_axis[1]);
-	VectorCopy(axis[2], listener_axis[2]);
+	VectorCopy( head, listener_origin );
+	VectorCopy( axis[0], listener_axis[0] );
+	VectorCopy( axis[1], listener_axis[1] );
+	VectorCopy( axis[2], listener_axis[2] );
 
 	// update spatialization for dynamic sounds
-	ch = s_channels;
-	for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
+	channel_t* ch = s_channels;
+	for (int i = 0; i < MAX_CHANNELS; ++i, ++ch) {
 		if ( !ch->thesfx ) {
 			continue;
 		}
@@ -827,11 +832,11 @@ static void S_Base_Update()
 		const channel_t* ch = s_channels;
 		for (int i = 0; i < MAX_CHANNELS; ++i, ++ch) {
 			if (ch->thesfx && (ch->leftvol || ch->rightvol) ) {
-				Com_Printf( "%f %f %s\n", ch->leftvol, ch->rightvol, ch->thesfx->soundName );
+				Com_Printf( "%3i %3i %s\n", ch->leftvol, ch->rightvol, ch->thesfx->soundName );
 				total++;
 			}
 		}
-		Com_Printf( "----(%i)---- painted: %i\n", total, s_paintedtime );
+		//Com_Printf( "----(%i)---- painted: %i\n", total, s_paintedtime );
 	}
 
 	// add raw data from streamed samples
