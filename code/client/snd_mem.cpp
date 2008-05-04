@@ -78,6 +78,15 @@ void SND_setup()
 }
 
 
+void S_DisplayFreeMemory()
+{
+	Com_Printf( "%d bytes sound buffer memory in use, %d free \n", sndmem_inuse, sndmem_avail );
+}
+
+
+///////////////////////////////////////////////////////////////
+
+
 // resample / decimate to the current source rate
 
 static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data )
@@ -154,10 +163,4 @@ qbool S_LoadSound( sfx_t* sfx )
 	Z_Free(data);
 
 	return qtrue;
-}
-
-
-void S_DisplayFreeMemory()
-{
-	Com_Printf( "%d bytes sound buffer memory in use, %d free \n", sndmem_inuse, sndmem_avail );
 }
