@@ -166,5 +166,3 @@ void S_Spatialize(channel_t *ch);
 void S_FreeOldestSound();
 
 qbool S_Base_Init( soundInterface_t *si );
-
-qbool S_AL_Init( soundInterface_t *si );
