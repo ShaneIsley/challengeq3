@@ -159,9 +159,6 @@ void		SND_setup();
 
 void S_PaintChannels(int endtime);
 
-// spatializes a channel
-void S_Spatialize(channel_t *ch);
-
 void S_FreeOldestSound();
 
 qbool S_Base_Init( soundInterface_t *si );
