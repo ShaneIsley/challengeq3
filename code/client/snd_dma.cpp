@@ -290,7 +290,7 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 
 	// attentuate correctly even if we can't spatialise
 	if (dma.channels == 1) {
-		*left_vol = *right_vol = master_vol * dist;
+		*left_vol = *right_vol = master_vol * (1.0 - dist);
 		return;
 	}
 
