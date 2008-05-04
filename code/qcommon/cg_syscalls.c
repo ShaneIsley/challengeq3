@@ -192,12 +192,12 @@ void	trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( CG_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
-void	trap_S_ClearLoopingSounds( qboolean ignored ) {
+void	shit_S_ClearLoopingSounds( qboolean ignored ) {
 	syscall( CG_S_CLEARLOOPINGSOUNDS, qtrue );
 }
 
-void	trap_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx ) {
-	syscall( CG_S_ADDLOOPINGSOUND, entityNum, origin, velocity, sfx );
+void	shit_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ignored, sfxHandle_t sfx ) {
+	syscall( CG_S_ADDLOOPINGSOUND, entityNum, origin, vec3_origin, sfx );
 }
 
 void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {

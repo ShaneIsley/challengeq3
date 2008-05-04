@@ -252,16 +252,14 @@ int			trap_CM_MarkFragments( int numPoints, const vec3_t *points,
 			int maxPoints, vec3_t pointBuffer,
 			int maxFragments, markFragment_t *fragmentBuffer );
 
+
 // normal sounds will have their volume dynamically changed as their entity
 // moves and the listener moves
 void		trap_S_StartSound( const vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfx );
-void		trap_S_StopLoopingSound(int entnum);
+void		trap_S_StopLoopingSound( int entnum );
 
 // a local sound is always played full volume
 void		trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum );
-void		trap_S_ClearLoopingSounds( qboolean ignored );
-void		trap_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
-void		trap_S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 
 // respatialize recalculates the volumes of sound as they should be heard by the
@@ -270,10 +268,17 @@ void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], i
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
 void		trap_S_StopBackgroundTrack( void );
 
+// we can't fix the signatures of shitty traps without losing idq3 compatibility
+// but we can at least stop them from "poisoning" mod code
+// make it impossible for mods to accidentally call them
 #if !defined(Q3_VM)
 sfxHandle_t	shit_S_RegisterSound( const char* sample, qboolean ignored );
+void		shit_S_ClearLoopingSounds( qboolean ignored );
+void		shit_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ignored, sfxHandle_t sfx );
 #endif
 #define		trap_S_RegisterSound( x ) shit_S_RegisterSound( x, qfalse )
+#define		trap_S_ClearLoopingSounds() shit_S_ClearLoopingSounds( qfalse );
+#define		trap_S_AddLoopingSound( n, o, s ) shit_S_AddLoopingSound( n, o, vec3_origin, s );
 
 
 void		trap_R_LoadWorldMap( const char *mapname );

@@ -30,8 +30,8 @@ equ	trap_CM_TransformedBoxTrace			-27
 equ	trap_CM_MarkFragments				-28
 equ	trap_S_StartSound					-29
 equ	trap_S_StartLocalSound				-30
-equ	trap_S_ClearLoopingSounds			-31
-equ	trap_S_AddLoopingSound				-32
+equ	shit_S_ClearLoopingSounds			-31
+equ	shit_S_AddLoopingSound				-32
 equ	trap_S_UpdateEntityPosition			-33
 equ	trap_S_Respatialize					-34
 equ	shit_S_RegisterSound				-35
