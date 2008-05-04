@@ -28,7 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t *s_volume;
 cvar_t *s_musicVolume;
-cvar_t *s_backend;
 
 static soundInterface_t si;
 
@@ -239,7 +238,6 @@ void S_Init()
 
 	s_volume = Cvar_Get( "s_volume", "0.8", CVAR_ARCHIVE );
 	s_musicVolume = Cvar_Get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
-	s_backend = Cvar_Get( "s_backend", "", CVAR_ROM );
 
 	const cvar_t* cv = Cvar_Get( "s_initsound", "1", 0 );
 	if ( !cv->integer ) {
@@ -255,20 +253,9 @@ void S_Init()
 		Cmd_AddCommand( "s_stop", S_StopAllSounds );
 		Cmd_AddCommand( "s_info", S_SoundInfo );
 
-#if defined(USE_OPEN_AL)
-		cv = Cvar_Get( "s_useOpenAL", "0", CVAR_ARCHIVE );
-		if( cv->integer ) {
-			started = S_AL_Init( &si );
-			Cvar_Set( "s_backend", "OpenAL" );
-		}
-#endif
+		started = S_Base_Init( &si );
 
-		if( !started ) {
-			started = S_Base_Init( &si );
-			Cvar_Set( "s_backend", "base" );
-		}
-
-		if( started ) {
+		if ( started ) {
 			if ( !S_ValidSoundInterface() ) {
 				Com_Error( ERR_FATAL, "Sound interface invalid." );
 			}

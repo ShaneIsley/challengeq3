@@ -371,13 +371,10 @@ qbool CL_OpenAVIForWriting( const char *fileName )
 
 	afd.audio = qfalse;
 	if ( Cvar_VariableIntegerValue( "s_initsound" ) ) {
-		if ( Q_stricmp( Cvar_VariableString( "s_backend" ), "OpenAL" ) ) {
-			afd.audio = ( afd.a.bits == 16 && afd.a.channels == 2 );
+		afd.audio = ( afd.a.bits == 16 && afd.a.channels == 2 );
+		if (!afd.audio) {
+			Com_Printf( S_COLOR_YELLOW "WARNING: Audio capture needs 16-bit stereo" );
 		}
-	}
-	if (!afd.audio) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: Audio capture is not supported with OpenAL."
-				"Set s_useOpenAL to 0 for audio capture\n" );
 	}
 
 	// this doesn't write a real header, but allocates the

@@ -1,5 +1,5 @@
 
-Apr 08 - 1.43
+May 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
 
@@ -16,6 +16,9 @@ removed s_mixprestep, a stupid hack to work around another stupid hack
 spatialisation is now correct, which has two huge impacts:
   you can "place" sounds MUCH more accurately than before,
   but as a result, distant sounds are MUCH quieter
+
+the defective OAL stuff we inherited has been nuked completely
+i'm never going to fix it, and i'm tired of it poisoning the codebase
 
 
 Mar 08 - 1.42
