@@ -67,8 +67,8 @@ static int s_numSfx;
 #define SFX_HASH_SIZE 128
 static sfx_t* sfxHash[SFX_HASH_SIZE];
 
-static cvar_t* s_show;
-static cvar_t* s_mixahead;
+static const cvar_t* s_show;
+static const cvar_t* s_mixahead;
 const cvar_t* s_testsound;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
@@ -849,12 +849,10 @@ static void S_Base_Update()
 
 static void S_GetSoundtime()
 {
-	int		samplepos;
-	static	int		buffers;
-	static	int		oldsamplepos;
-	int		fullsamples;
+	static int buffers;
+	static int oldsamplepos;
 
-	fullsamples = dma.samples / dma.channels;
+	int fullsamples = dma.samples / dma.channels;
 
 	if ( CL_VideoRecording() )
 	{
@@ -864,13 +862,12 @@ static void S_GetSoundtime()
 
 	// it is possible to miscount buffers if it has wrapped twice between
 	// calls to S_Update.  Oh well.
-	samplepos = SNDDMA_GetDMAPos();
+	int samplepos = SNDDMA_GetDMAPos();
 	if (samplepos < oldsamplepos)
 	{
-		buffers++;					// buffer wrapped
-
-		if (s_paintedtime > 0x40000000)
-		{	// time to chop things off to avoid 32 bit limits
+		buffers++;	// buffer wrapped
+		if (s_paintedtime > 0x40000000) {
+			// time to chop things off to avoid 32 bit limits
 			buffers = 0;
 			s_paintedtime = fullsamples;
 			S_Base_StopAllSounds();
@@ -901,8 +898,6 @@ static void S_Update_DMA()
 {
 	static int prevTime = 0;
 	static int prevSoundtime = -1;
-	unsigned		endtime;
-	int				samps;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
@@ -934,13 +929,13 @@ static void S_Update_DMA()
 	}
 
 	// mix ahead of current position
-	endtime = s_soundtime + ma;
+	unsigned endtime = s_soundtime + ma;
 
 	// mix to an even submission block size
 	endtime = (endtime + dma.submission_chunk-1) & ~(dma.submission_chunk-1);
 
 	// never mix more than the complete buffer
-	samps = dma.samples >> (dma.channels-1);
+	int samps = dma.samples >> (dma.channels-1);
 	if (endtime - s_soundtime > samps)
 		endtime = s_soundtime + samps;
 
@@ -950,7 +945,6 @@ static void S_Update_DMA()
 
 	SNDDMA_Submit();
 }
-
 
 
 /*
