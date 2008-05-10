@@ -119,8 +119,7 @@ static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data )
 		}
 		part  = (i&(SND_CHUNK_SIZE-1));
 		if (part == 0) {
-			sndBuffer	*newchunk;
-			newchunk = SND_malloc();
+			sndBuffer* newchunk = SND_malloc();
 			if (chunk == NULL) {
 				sfx->soundData = newchunk;
 			} else {
