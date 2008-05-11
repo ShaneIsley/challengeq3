@@ -31,7 +31,7 @@ typedef int socklen_t;
 #define EADDRNOTAVAIL	WSAEADDRNOTAVAIL
 #define EAFNOSUPPORT	WSAEAFNOSUPPORT
 #define ECONNRESET		WSAECONNRESET
-#define socketError		WSAGetLastError( )
+#define socketError		WSAGetLastError()
 
 static WSADATA	winsockdata;
 
@@ -96,57 +96,60 @@ static const char* NET_ErrorString()
 {
 #ifdef _WIN32
 	//FIXME: replace with FormatMessage?
+#define WSA_ERR2STR(x) case x: return #x;
 	switch ( socketError ) {
-		case WSAEINTR: return "WSAEINTR";
-		case WSAEBADF: return "WSAEBADF";
-		case WSAEACCES: return "WSAEACCES";
-		case WSAEDISCON: return "WSAEDISCON";
-		case WSAEFAULT: return "WSAEFAULT";
-		case WSAEINVAL: return "WSAEINVAL";
-		case WSAEMFILE: return "WSAEMFILE";
-		case WSAEWOULDBLOCK: return "WSAEWOULDBLOCK";
-		case WSAEINPROGRESS: return "WSAEINPROGRESS";
-		case WSAEALREADY: return "WSAEALREADY";
-		case WSAENOTSOCK: return "WSAENOTSOCK";
-		case WSAEDESTADDRREQ: return "WSAEDESTADDRREQ";
-		case WSAEMSGSIZE: return "WSAEMSGSIZE";
-		case WSAEPROTOTYPE: return "WSAEPROTOTYPE";
-		case WSAENOPROTOOPT: return "WSAENOPROTOOPT";
-		case WSAEPROTONOSUPPORT: return "WSAEPROTONOSUPPORT";
-		case WSAESOCKTNOSUPPORT: return "WSAESOCKTNOSUPPORT";
-		case WSAEOPNOTSUPP: return "WSAEOPNOTSUPP";
-		case WSAEPFNOSUPPORT: return "WSAEPFNOSUPPORT";
-		case WSAEAFNOSUPPORT: return "WSAEAFNOSUPPORT";
-		case WSAEADDRINUSE: return "WSAEADDRINUSE";
-		case WSAEADDRNOTAVAIL: return "WSAEADDRNOTAVAIL";
-		case WSAENETDOWN: return "WSAENETDOWN";
-		case WSAENETUNREACH: return "WSAENETUNREACH";
-		case WSAENETRESET: return "WSAENETRESET";
-		case WSAECONNABORTED: return "WSWSAECONNABORTEDAEINTR";
-		case WSAECONNRESET: return "WSAECONNRESET";
-		case WSAENOBUFS: return "WSAENOBUFS";
-		case WSAEISCONN: return "WSAEISCONN";
-		case WSAENOTCONN: return "WSAENOTCONN";
-		case WSAESHUTDOWN: return "WSAESHUTDOWN";
-		case WSAETOOMANYREFS: return "WSAETOOMANYREFS";
-		case WSAETIMEDOUT: return "WSAETIMEDOUT";
-		case WSAECONNREFUSED: return "WSAECONNREFUSED";
-		case WSAELOOP: return "WSAELOOP";
-		case WSAENAMETOOLONG: return "WSAENAMETOOLONG";
-		case WSAEHOSTDOWN: return "WSAEHOSTDOWN";
-		case WSASYSNOTREADY: return "WSASYSNOTREADY";
-		case WSAVERNOTSUPPORTED: return "WSAVERNOTSUPPORTED";
-		case WSANOTINITIALISED: return "WSANOTINITIALISED";
-		case WSAHOST_NOT_FOUND: return "WSAHOST_NOT_FOUND";
-		case WSATRY_AGAIN: return "WSATRY_AGAIN";
-		case WSANO_RECOVERY: return "WSANO_RECOVERY";
-		case WSANO_DATA: return "WSANO_DATA";
-		default: return "NO ERROR";
+		WSA_ERR2STR( WSAEINTR );
+		WSA_ERR2STR( WSAEBADF );
+		WSA_ERR2STR( WSAEACCES );
+		WSA_ERR2STR( WSAEDISCON );
+		WSA_ERR2STR( WSAEFAULT );
+		WSA_ERR2STR( WSAEINVAL );
+		WSA_ERR2STR( WSAEMFILE );
+		WSA_ERR2STR( WSAEWOULDBLOCK );
+		WSA_ERR2STR( WSAEINPROGRESS );
+		WSA_ERR2STR( WSAEALREADY );
+		WSA_ERR2STR( WSAENOTSOCK );
+		WSA_ERR2STR( WSAEDESTADDRREQ );
+		WSA_ERR2STR( WSAEMSGSIZE );
+		WSA_ERR2STR( WSAEPROTOTYPE );
+		WSA_ERR2STR( WSAENOPROTOOPT );
+		WSA_ERR2STR( WSAEPROTONOSUPPORT );
+		WSA_ERR2STR( WSAESOCKTNOSUPPORT );
+		WSA_ERR2STR( WSAEOPNOTSUPP );
+		WSA_ERR2STR( WSAEPFNOSUPPORT );
+		WSA_ERR2STR( WSAEAFNOSUPPORT );
+		WSA_ERR2STR( WSAEADDRINUSE );
+		WSA_ERR2STR( WSAEADDRNOTAVAIL );
+		WSA_ERR2STR( WSAENETDOWN );
+		WSA_ERR2STR( WSAENETUNREACH );
+		WSA_ERR2STR( WSAENETRESET );
+		WSA_ERR2STR( WSAECONNABORTED );
+		WSA_ERR2STR( WSAECONNRESET );
+		WSA_ERR2STR( WSAENOBUFS );
+		WSA_ERR2STR( WSAEISCONN );
+		WSA_ERR2STR( WSAENOTCONN );
+		WSA_ERR2STR( WSAESHUTDOWN );
+		WSA_ERR2STR( WSAETOOMANYREFS );
+		WSA_ERR2STR( WSAETIMEDOUT );
+		WSA_ERR2STR( WSAECONNREFUSED );
+		WSA_ERR2STR( WSAELOOP );
+		WSA_ERR2STR( WSAENAMETOOLONG );
+		WSA_ERR2STR( WSAEHOSTDOWN );
+		WSA_ERR2STR( WSASYSNOTREADY );
+		WSA_ERR2STR( WSAVERNOTSUPPORTED );
+		WSA_ERR2STR( WSANOTINITIALISED );
+		WSA_ERR2STR( WSAHOST_NOT_FOUND );
+		WSA_ERR2STR( WSATRY_AGAIN );
+		WSA_ERR2STR( WSANO_RECOVERY );
+		WSA_ERR2STR( WSANO_DATA );
+		default: return "UNKNOWN ERROR";
 	}
+#undef WSA_ERR2STR
 #else
-	return strerror (errno);
+	return strerror( errno );
 #endif
 }
+
 
 static void NetadrToSockadr( const netadr_t* a, struct sockaddr* s )
 {
@@ -394,7 +397,7 @@ void Sys_ShowIP()
 static SOCKET NET_IPSocket( const char* net_interface, int port )
 {
 	SOCKET newsocket;
-	struct sockaddr_in	address;
+	struct sockaddr_in address;
 
 	Com_Printf( "Opening IP socket: %s:%i\n", net_interface ? net_interface : "localhost", port );
 
@@ -805,15 +808,15 @@ static qboolean NET_GetCvars()
 		if (net_socksServer && net_socksServer->modified)
 			modified = qtrue;
 		net_socksServer = Cvar_Get( "net_socksServer", "", CVAR_LATCH | CVAR_ARCHIVE );
-	
+
 		if (net_socksPort && net_socksPort->modified)
 			modified = qtrue;
 		net_socksPort = Cvar_Get( "net_socksPort", "1080", CVAR_LATCH | CVAR_ARCHIVE );
-	
+
 		if (net_socksUsername && net_socksUsername->modified)
 			modified = qtrue;
 		net_socksUsername = Cvar_Get( "net_socksUsername", "", CVAR_LATCH | CVAR_ARCHIVE );
-	
+
 		if (net_socksPassword && net_socksPassword->modified)
 			modified = qtrue;
 		net_socksPassword = Cvar_Get( "net_socksPassword", "", CVAR_LATCH | CVAR_ARCHIVE );
