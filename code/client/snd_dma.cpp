@@ -290,7 +290,7 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 
 	// attentuate correctly even if we can't spatialise
 	if (dma.channels == 1) {
-		*left_vol = *right_vol = master_vol * (1.0 - dist);
+		*left_vol = *right_vol = master_vol * Square(1.0 - dist);
 		return;
 	}
 
@@ -306,14 +306,13 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 		lscale = 0;
 	}
 
-	// add in distance effect
-	scale = Square(1.0 - dist) * rscale;
-	*right_vol = (master_vol * scale);
+	scale = master_vol * Square(1.0 - dist);
+
+	*right_vol = scale * rscale;
 	if (*right_vol < 0)
 		*right_vol = 0;
 
-	scale = Square(1.0 - dist) * lscale;
-	*left_vol = (master_vol * scale);
+	*left_vol = scale * lscale;
 	if (*left_vol < 0)
 		*left_vol = 0;
 }
