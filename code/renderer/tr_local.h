@@ -1228,7 +1228,7 @@ IMPLEMENTATION SPECIFIC FUNCTIONS
 ====================================================================
 */
 
-void	GLimp_Init( void );
+void	GLimp_Init();
 void	GLimp_Shutdown( void );
 void	GLimp_EndFrame( void );
 

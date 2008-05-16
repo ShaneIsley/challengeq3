@@ -1153,29 +1153,20 @@ void GLimp_EndFrame (void)
 
 
 /*
-** GLimp_Init
-**
-** This is the platform specific OpenGL initialization function.
-** It is responsible for loading OpenGL, initializing it, setting
-** extensions, creating a window of the appropriate size, doing
-** fullscreen manipulations, etc.  Its overall responsibility is
-** to make sure that a functional OpenGL subsystem is operating
-** when it returns to the ref.
+This is the platform specific OpenGL initialization function.
+It is responsible for loading OpenGL, initializing it, setting
+extensions, creating a window of the appropriate size, doing
+fullscreen manipulations, etc.  Its overall responsibility is
+to make sure that a functional OpenGL subsystem is operating
+when it returns to the ref.
 */
-void GLimp_Init( void )
+void GLimp_Init()
 {
-	char	buf[1024];
-	cvar_t *lastValidRenderer = ri.Cvar_Get( "r_lastValidRenderer", "(uninitialized)", CVAR_ARCHIVE );
-
 	ri.Printf( PRINT_DEVELOPER, "Initializing OpenGL subsystem\n" );
 
-	//
 	// check OS version to see if we can do fullscreen display changes
-	//
 	if ( !GLW_CheckOSVersion() )
-	{
 		ri.Error( ERR_FATAL, "GLimp_Init() - incorrect operating system\n" );
-	}
 
 	// save off hInstance for the subsystems
 	const cvar_t* cv = ri.Cvar_Get( "win_hinstance", "", 0 );
@@ -1191,33 +1182,10 @@ void GLimp_Init( void )
 	Q_strncpyz( glConfig.version_string, (const char*)qglGetString (GL_VERSION), sizeof( glConfig.version_string ) );
 	Q_strncpyz( glConfig.extensions_string, (const char*)qglGetString (GL_EXTENSIONS), sizeof( glConfig.extensions_string ) );
 
-	//
-	// chipset specific configuration
-	//
-	Q_strncpyz( buf, glConfig.renderer_string, sizeof(buf) );
-	Q_strlwr( buf );
-
-	//
-	// NOTE: if changing cvars, do it within this block.  This allows them
-	// to be overridden when testing driver fixes, etc. but only sets
-	// them to their default state when the hardware is first installed/run.
-	//
-	if ( Q_stricmp( lastValidRenderer->string, glConfig.renderer_string ) )
-	{
-		ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
-		ri.Cvar_Set( "r_picmip", "1" );
-	}
-
-	//
-	// this is where hardware specific workarounds that should be
-	// detected/initialized every startup should go.
-	//
-
-	ri.Cvar_Set( "r_lastValidRenderer", glConfig.renderer_string );
-
 	GLW_InitExtensions();
 	WG_CheckHardwareGamma();
 }
+
 
 /*
 ** GLimp_Shutdown

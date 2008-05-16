@@ -7,6 +7,8 @@ corrected sv_pure back to CVAR_ROM
 
 added the correct "fastsky!=0 == disable portals" test, ffs me  :P
 
+removed long-obsoleted r_lastValidRenderer
+
 another MASSIVE overhaul of the sound code:
 
 removed s_doppler, it's "right", but it just sounds like shit
