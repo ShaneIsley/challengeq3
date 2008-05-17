@@ -720,7 +720,7 @@ typedef enum {
 	MOD_MESH,
 } modtype_t;
 
-typedef struct model_s {
+typedef struct {
 	char		name[MAX_QPATH];
 	modtype_t	type;
 	int			index;				// model = tr.models[model->index]

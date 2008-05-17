@@ -413,35 +413,28 @@ static const md3Tag_t* R_GetTag( const md3Header_t* mod, int frame, const char* 
 
 int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame, float frac, const char *tagName )
 {
-	const md3Tag_t *start, *end;
-	float frontLerp, backLerp;
-
 	const model_t* model = R_GetModelByHandle( handle );
-	if ( !model->md3[0] )
-	{
+	if ( !model->md3[0] ) {
 		AxisClear( tag->axis );
 		VectorClear( tag->origin );
 		return qfalse;
 	}
-	else
-	{
-		start = R_GetTag( model->md3[0], startFrame, tagName );
-		end = R_GetTag( model->md3[0], endFrame, tagName );
-		if ( !start || !end ) {
-			AxisClear( tag->axis );
-			VectorClear( tag->origin );
-			return qfalse;
-		}
+
+	const md3Tag_t* start = R_GetTag( model->md3[0], startFrame, tagName );
+	const md3Tag_t* end = R_GetTag( model->md3[0], endFrame, tagName );
+	if ( !start || !end ) {
+		AxisClear( tag->axis );
+		VectorClear( tag->origin );
+		return qfalse;
 	}
 
-	frontLerp = frac;
-	backLerp = 1.0f - frac;
+	float backLerp = 1.0f - frac;
 
 	for ( int i = 0; i < 3; ++i ) {
-		tag->origin[i] = start->origin[i] * backLerp +  end->origin[i] * frontLerp;
-		tag->axis[0][i] = start->axis[0][i] * backLerp +  end->axis[0][i] * frontLerp;
-		tag->axis[1][i] = start->axis[1][i] * backLerp +  end->axis[1][i] * frontLerp;
-		tag->axis[2][i] = start->axis[2][i] * backLerp +  end->axis[2][i] * frontLerp;
+		tag->origin[i] = start->origin[i] * backLerp +  end->origin[i] * frac;
+		tag->axis[0][i] = start->axis[0][i] * backLerp +  end->axis[0][i] * frac;
+		tag->axis[1][i] = start->axis[1][i] * backLerp +  end->axis[1][i] * frac;
+		tag->axis[2][i] = start->axis[2][i] * backLerp +  end->axis[2][i] * frac;
 	}
 
 	VectorNormalize( tag->axis[0] );
@@ -468,7 +461,7 @@ void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs )
 	}
 
 	const md3Header_t* header = model->md3[0];
-	const md3Frame_t* frame = (md3Frame_t *)( (byte *)header + header->ofsFrames );
+	const md3Frame_t* frame = (const md3Frame_t*)( (byte *)header + header->ofsFrames );
 
 	VectorCopy( frame->bounds[0], mins );
 	VectorCopy( frame->bounds[1], maxs );
