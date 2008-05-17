@@ -11,6 +11,8 @@ removed long-obsoleted r_lastValidRenderer
 
 removed r_rail* and marked the never-used RT_BEAM etc as such
 
+removed RAVENMD4 completely
+
 another MASSIVE overhaul of the sound code:
 
 removed s_doppler, it's "right", but it just sounds like shit

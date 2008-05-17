@@ -510,9 +510,6 @@ typedef enum {
 	SF_TRIANGLES,
 	SF_POLY,
 	SF_MD3,
-#ifdef RAVENMD4
-	SF_MDR,
-#endif
 	SF_FLARE,
 	SF_ENTITY,				// beams, rails, lightning, etc that can be determined by entity
 
@@ -721,9 +718,6 @@ typedef enum {
 	MOD_BAD,
 	MOD_BRUSH,
 	MOD_MESH,
-#ifdef RAVENMD4
-	MOD_MDR
-#endif
 } modtype_t;
 
 typedef struct model_s {
@@ -734,9 +728,6 @@ typedef struct model_s {
 	int			dataSize;			// just for listing purposes
 	bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
-#ifdef RAVENMD4
-	md4Header_t* md4;				// only if type == (MOD_MD4 | MOD_MDR)
-#endif
 	int			numLods;
 } model_t;
 
@@ -1395,27 +1386,6 @@ void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, fl
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
 
-#ifdef RAVENMD4
-/*
-=============================================================
-
-UNCOMPRESSING BONES
-
-=============================================================
-*/
-
-#define MC_BITS_X (16)
-#define MC_BITS_Y (16)
-#define MC_BITS_Z (16)
-#define MC_BITS_VECT (16)
-
-#define MC_SCALE_X (1.0f/64)
-#define MC_SCALE_Y (1.0f/64)
-#define MC_SCALE_Z (1.0f/64)
-
-void MC_UnCompress(float mat[3][4],const unsigned char * comp);
-#endif
-
 /*
 =============================================================
 
@@ -1424,15 +1394,6 @@ ANIMATED MODELS
 =============================================================
 */
 
-#ifdef RAVENMD4
-void R_MDRAddAnimSurfaces( trRefEntity_t *ent );
-void RB_MDRSurfaceAnim( md4Surface_t *surface );
-#endif
-
-/*
-=============================================================
-=============================================================
-*/
 void	R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
 							vec4_t eye, vec4_t dst );
 void	R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window );
