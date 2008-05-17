@@ -243,10 +243,6 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="..\..\renderer\ref_trin.def"
-				>
-			</File>
-			<File
 				RelativePath="..\..\renderer\tr_backend.cpp"
 				>
 				<FileConfiguration
