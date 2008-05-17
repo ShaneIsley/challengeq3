@@ -857,7 +857,6 @@ Q3OBJ = \
   $(B)/client/jmemnobs.o \
   $(B)/client/jutils.o \
   \
-  $(B)/client/tr_animation.o \
   $(B)/client/tr_backend.o \
   $(B)/client/tr_bsp.o \
   $(B)/client/tr_cmds.o \
@@ -1065,7 +1064,6 @@ $(B)/client/jmemnobs.o : $(JPDIR)/jmemnobs.c; $(DO_CC)  $(GL_CFLAGS) $(MINGW_CFL
 $(B)/client/jutils.o : $(JPDIR)/jutils.c; $(DO_CC)
 
 $(B)/client/tr_bsp.o : $(RDIR)/tr_bsp.cpp; $(DO_CC)  $(GL_CFLAGS)
-$(B)/client/tr_animation.o : $(RDIR)/tr_animation.cpp; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/tr_backend.o : $(RDIR)/tr_backend.cpp; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/tr_cmds.o : $(RDIR)/tr_cmds.cpp; $(DO_CC)  $(GL_CFLAGS)
 $(B)/client/tr_curve.o : $(RDIR)/tr_curve.cpp; $(DO_CC)  $(GL_CFLAGS)
