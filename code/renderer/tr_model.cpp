@@ -685,27 +685,6 @@ static qbool R_LoadMDR( model_t *mod, void *buffer, int filesize, const char *mo
 //=============================================================================
 
 
-void RE_BeginRegistration( glconfig_t *glconfigOut )
-{
-	R_Init();
-
-	*glconfigOut = glConfig;
-
-	R_SyncRenderThread();
-
-	tr.viewCluster = -1;		// force markleafs to regenerate
-	R_ClearFlares();
-	RE_ClearScene();
-
-	tr.registered = qtrue;
-
-	// NOTE: this sucks, for some reason the first stretch pic is never drawn
-	// without this we'd see a white flash on a level load because the very
-	// first time the level shot would not be drawn
-	RE_StretchPic(0, 0, 0, 0, 0, 0, 1, 1, 0);
-}
-
-
 void R_ModelInit()
 {
 	tr.numModels = 0;

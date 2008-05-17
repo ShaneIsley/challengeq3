@@ -1172,12 +1172,10 @@ void	GL_Cull( int cullType );
 void	RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
 void	RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int client, qbool dirty);
 
-void		RE_BeginRegistration( glconfig_t *glconfig );
 void		RE_LoadWorldMap( const char *mapname );
 void		RE_SetWorldVisData( const byte *vis );
 qhandle_t	RE_RegisterModel( const char *name );
 qhandle_t	RE_RegisterSkin( const char *name );
-void		RE_Shutdown( qbool destroyWindow );
 
 qbool	R_GetEntityToken( char *buffer, int size );
 
