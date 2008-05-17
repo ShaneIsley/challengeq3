@@ -238,27 +238,24 @@ static void R_BindAnimatedImage( const textureBundle_t* bundle )
 	GL_Bind( bundle->image[ index ] );
 }
 
-/*
-================
-DrawTris
 
-Draws triangle outlines for debugging
-================
-*/
-static void DrawTris (shaderCommands_t *input) {
+// draw triangle outlines for debugging
+
+static void DrawTris( const shaderCommands_t* input )
+{
 	GL_Bind( tr.whiteImage );
-	qglColor3f (1,1,1);
+	qglColor3f( 1, 1, 1 );
 
 	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
 	qglDepthRange( 0, 0 );
 
-	qglDisableClientState (GL_COLOR_ARRAY);
-	qglDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	qglDisableClientState( GL_COLOR_ARRAY );
+	qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 
-	qglVertexPointer (3, GL_FLOAT, 16, input->xyz);	// padded for SIMD
+	qglVertexPointer( 3, GL_FLOAT, 16, input->xyz );	// padded for SIMD
 
 	if (qglLockArraysEXT) {
-		qglLockArraysEXT(0, input->numVertexes);
+		qglLockArraysEXT( 0, input->numVertexes );
 		GLimp_LogComment( "glLockArraysEXT\n" );
 	}
 
@@ -268,36 +265,33 @@ static void DrawTris (shaderCommands_t *input) {
 		qglUnlockArraysEXT();
 		GLimp_LogComment( "glUnlockArraysEXT\n" );
 	}
+
 	qglDepthRange( 0, 1 );
 }
 
 
-/*
-================
-DrawNormals
+// draw vertex normals for debugging
 
-Draws vertex normals for debugging
-================
-*/
-static void DrawNormals (shaderCommands_t *input) {
-	int		i;
-	vec3_t	temp;
-
+static void DrawNormals( const shaderCommands_t* input )
+{
 	GL_Bind( tr.whiteImage );
-	qglColor3f (1,1,1);
-	qglDepthRange( 0, 0 );	// never occluded
-	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
+	qglColor3f( 1, 1, 1 );
 
-	qglBegin (GL_LINES);
-	for (i = 0 ; i < input->numVertexes ; i++) {
-		qglVertex3fv (input->xyz[i]);
-		VectorMA (input->xyz[i], 2, input->normal[i], temp);
-		qglVertex3fv (temp);
+	GL_State( GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE );
+	qglDepthRange( 0, 0 );
+
+	qglBegin( GL_LINES );
+	for (int i = 0; i < input->numVertexes; ++i) {
+		vec3_t temp;
+		qglVertex3fv( input->xyz[i] );
+		VectorMA( input->xyz[i], 2, input->normal[i], temp );
+		qglVertex3fv( temp );
 	}
-	qglEnd ();
+	qglEnd();
 
 	qglDepthRange( 0, 1 );
 }
+
 
 /*
 ==============
@@ -723,27 +717,20 @@ static void ProjectDlightTexture( void ) {
 }
 
 
-/*
-===================
-RB_FogPass
+// blend a fog texture on top of everything else
 
-Blends a fog texture on top of everything else
-===================
-*/
-static void RB_FogPass( void ) {
-	fog_t		*fog;
-	int			i;
-
+static void RB_FogPass()
+{
 	qglEnableClientState( GL_COLOR_ARRAY );
 	qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, tess.svars.colors );
 
 	qglEnableClientState( GL_TEXTURE_COORD_ARRAY);
 	qglTexCoordPointer( 2, GL_FLOAT, 0, tess.svars.texcoords[0] );
 
-	fog = tr.world->fogs + tess.fogNum;
+	const fog_t* fog = tr.world->fogs + tess.fogNum;
 
-	for ( i = 0; i < tess.numVertexes; i++ ) {
-		* ( int * )&tess.svars.colors[i] = fog->colorInt;
+	for (int i = 0; i < tess.numVertexes; ++i ) {
+		*(int*)&tess.svars.colors[i] = fog->colorInt;
 	}
 
 	RB_CalcFogTexCoords( ( float * ) tess.svars.texcoords[0] );
@@ -982,38 +969,38 @@ static void ComputeTexCoords( const shaderStage_t* pStage )
 				break;
 
 			case TMOD_TURBULENT:
-				RB_CalcTurbulentTexCoords( &pStage->bundle[b].texMods[tm].wave, 
-						                 ( float * ) tess.svars.texcoords[b] );
+				RB_CalcTurbulentTexCoords( &pStage->bundle[b].texMods[tm].wave,
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			case TMOD_ENTITY_TRANSLATE:
 				RB_CalcScrollTexCoords( backEnd.currentEntity->e.shaderTexCoord,
-									 ( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			case TMOD_SCROLL:
 				RB_CalcScrollTexCoords( pStage->bundle[b].texMods[tm].scroll,
-										 ( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			case TMOD_SCALE:
 				RB_CalcScaleTexCoords( pStage->bundle[b].texMods[tm].scale,
-									 ( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 			
 			case TMOD_STRETCH:
 				RB_CalcStretchTexCoords( &pStage->bundle[b].texMods[tm].wave, 
-						               ( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			case TMOD_TRANSFORM:
 				RB_CalcTransformTexCoords( &pStage->bundle[b].texMods[tm],
-						                 ( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			case TMOD_ROTATE:
 				RB_CalcRotateTexCoords( pStage->bundle[b].texMods[tm].rotateSpeed,
-										( float * ) tess.svars.texcoords[b] );
+						( float * ) tess.svars.texcoords[b] );
 				break;
 
 			default:
