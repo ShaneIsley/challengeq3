@@ -36,10 +36,6 @@ cvar_t	*r_flareSize;
 cvar_t	*r_flareFade;
 cvar_t	*r_flareCoeff;
 
-cvar_t	*r_railWidth;
-cvar_t	*r_railCoreWidth;
-cvar_t	*r_railSegmentLength;
-
 cvar_t	*r_ignoreFastPath;
 
 cvar_t	*r_verbose;
@@ -142,10 +138,11 @@ cvar_t	*r_debugLight;
 cvar_t	*r_debugSort;
 cvar_t	*r_printShaders;
 
-cvar_t	*r_maxpolys;
-int		max_polys;
-cvar_t	*r_maxpolyverts;
-int		max_polyverts;
+static cvar_t* r_maxpolys;
+static cvar_t* r_maxpolyverts;
+int max_polys;
+int max_polyverts;
+
 
 static void AssertCvarRange( cvar_t *cv, float minVal, float maxVal, qbool shouldBeIntegral )
 {
@@ -664,11 +661,6 @@ static void R_Register()
 	r_swapInterval = ri.Cvar_Get( "r_swapInterval", "0", CVAR_ARCHIVE );
 	r_gamma = ri.Cvar_Get( "r_gamma", "1", CVAR_ARCHIVE );
 	r_facePlaneCull = ri.Cvar_Get ("r_facePlaneCull", "1", CVAR_ARCHIVE );
-
-	r_railWidth = ri.Cvar_Get( "r_railWidth", "16", CVAR_ARCHIVE );
-	r_railCoreWidth = ri.Cvar_Get( "r_railCoreWidth", "6", CVAR_ARCHIVE );
-	r_railSegmentLength = ri.Cvar_Get( "r_railSegmentLength", "32", CVAR_ARCHIVE );
-
 	r_primitives = ri.Cvar_Get( "r_primitives", "0", CVAR_ARCHIVE );
 
 	r_ambientScale = ri.Cvar_Get( "r_ambientScale", "0.6", CVAR_CHEAT );
@@ -720,8 +712,8 @@ static void R_Register()
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0 );
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0 );
 
-	// make sure all the commands added here are also
-	// removed in R_Shutdown
+	// make sure all the commands added here are also removed in R_Shutdown
+	ri.Cmd_AddCommand( "gfxinfo", GfxInfo_f );
 	ri.Cmd_AddCommand( "imagelist", R_ImageList_f );
 	ri.Cmd_AddCommand( "shaderlist", R_ShaderList_f );
 	ri.Cmd_AddCommand( "skinlist", R_SkinList_f );
@@ -729,7 +721,6 @@ static void R_Register()
 	ri.Cmd_AddCommand( "modelist", R_ModeList_f );
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShotTGA_f );
 	ri.Cmd_AddCommand( "screenshotJPEG", R_ScreenShotJPG_f );
-	ri.Cmd_AddCommand( "gfxinfo", GfxInfo_f );
 }
 
 
@@ -815,15 +806,14 @@ static void RE_Shutdown( qbool destroyWindow )
 {
 	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
 
-	ri.Cmd_RemoveCommand ("modellist");
-	ri.Cmd_RemoveCommand ("screenshotJPEG");
-	ri.Cmd_RemoveCommand ("screenshot");
-	ri.Cmd_RemoveCommand ("imagelist");
-	ri.Cmd_RemoveCommand ("shaderlist");
-	ri.Cmd_RemoveCommand ("skinlist");
-	ri.Cmd_RemoveCommand ("gfxinfo");
+	ri.Cmd_RemoveCommand( "gfxinfo" );
+	ri.Cmd_RemoveCommand( "imagelist" );
+	ri.Cmd_RemoveCommand( "shaderlist" );
+	ri.Cmd_RemoveCommand( "skinlist" );
+	ri.Cmd_RemoveCommand( "modellist" );
 	ri.Cmd_RemoveCommand( "modelist" );
-	ri.Cmd_RemoveCommand( "shaderstate" );
+	ri.Cmd_RemoveCommand( "screenshot" );
+	ri.Cmd_RemoveCommand( "screenshotJPEG" );
 
 	if ( tr.registered ) {
 		R_SyncRenderThread();
