@@ -277,8 +277,8 @@ void		shit_S_ClearLoopingSounds( qboolean ignored );
 void		shit_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ignored, sfxHandle_t sfx );
 #endif
 #define		trap_S_RegisterSound( x ) shit_S_RegisterSound( x, qfalse )
-#define		trap_S_ClearLoopingSounds() shit_S_ClearLoopingSounds( qfalse );
-#define		trap_S_AddLoopingSound( n, o, s ) shit_S_AddLoopingSound( n, o, vec3_origin, s );
+#define		trap_S_ClearLoopingSounds() shit_S_ClearLoopingSounds( qfalse )
+#define		trap_S_AddLoopingSound( n, o, s ) shit_S_AddLoopingSound( n, o, vec3_origin, s )
 
 
 void		trap_R_LoadWorldMap( const char *mapname );
