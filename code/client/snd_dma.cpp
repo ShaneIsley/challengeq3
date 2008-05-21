@@ -464,7 +464,7 @@ static void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum )
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW, "S_StartLocalSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "S_StartLocalSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -543,7 +543,7 @@ static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, sfxHandl
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW, "S_AddLoopingSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "S_AddLoopingSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
