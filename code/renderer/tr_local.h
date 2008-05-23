@@ -956,12 +956,6 @@ extern backEndState_t	backEnd;
 extern trGlobals_t	tr;
 extern glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
 
-// These two variables should live inside glConfig but can't because of compatibility issues to the original ID vms.
-// If you release a stand-alone game and your mod uses tr_types.h from this build you can safely move them to
-// the glconfig_t struct.
-extern qbool	textureFilterAnisotropic;
-extern int		maxAnisotropy;
-//extern qbool fEXT_GL_SGIS_generate_mipmap;
 
 //
 // cvars

@@ -13,6 +13,10 @@ removed r_rail* and marked the never-used RT_BEAM etc as such
 
 removed RAVENMD4 completely
 
+fixed distance culling on dlit patch seams
+
+changed r_ext_max_anisotropy default to 16
+
 another MASSIVE overhaul of the sound code:
 
 removed s_doppler, it's "right", but it just sounds like shit

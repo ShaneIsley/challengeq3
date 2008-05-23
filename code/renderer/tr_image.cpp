@@ -371,24 +371,6 @@ static void R_MipMap2( unsigned *in, int inWidth, int inHeight )
 }
 
 
-/* KHB 060708  bleh - dark as hell unless we call GammaCorrect, and still marginal even then  :(
-static qbool R_MipMapSGI( byte* tex, int w, int h, GLenum internalFormat )
-{
-	if (!fEXT_GL_SGIS_generate_mipmap || r_simpleMipMaps->integer)
-		return qfalse;
-
-	R_GammaCorrect( tex, w * h * 4 );
-	qglHint( GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST );
-	qglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );
-	qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-	qglTexImage2D( GL_TEXTURE_2D, 0, internalFormat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex );
-	qglTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE );
-
-	return qtrue;
-}
-*/
-
-
 // operates in place, quartering the size of the texture
 
 static void R_MipMap( byte* in, int width, int height)
@@ -583,10 +565,6 @@ static void Upload32( unsigned int* data,
 		}
 		Com_Memcpy( pScaled, data, width * height * 4 );
 	}
-	/* KHB  if the card can take care of mipmaps for us, we can skip all this  :)
-	if (R_MipMapSGI( (byte *)data, width, height, internalFormat )) {
-		goto done;
-	}*/
 	else
 	{
 		// use the normal mip-mapping function to go down from here
@@ -625,18 +603,16 @@ static void Upload32( unsigned int* data,
 
 done:
 
+	if (r_ext_max_anisotropy->integer > 1)
+		qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, r_ext_max_anisotropy->integer );
+
 	if (mipmap)
 	{
-		if ( textureFilterAnisotropic )
-			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-					(GLint)Com_Clamp( 1, maxAnisotropy, r_ext_max_anisotropy->integer ) );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max );
 	}
 	else
 	{
-		if ( textureFilterAnisotropic )
-			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1 );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	}

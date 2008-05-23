@@ -1041,10 +1041,10 @@ static void GLW_InitExtensions( void )
 		ri.Printf( PRINT_DEVELOPER, "...GL_EXT_compiled_vertex_array not found\n" );
 	}
 
-	textureFilterAnisotropic = qfalse;
+	int maxAnisotropy = 0;
 	if ( strstr( glConfig.extensions_string, "GL_EXT_texture_filter_anisotropic" ) )
 	{
-		if (r_ext_max_anisotropy->integer >= 1) {
+		if (r_ext_max_anisotropy->integer > 1) {
 			qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy );
 			if ( maxAnisotropy <= 0 ) {
 				ri.Printf( PRINT_DEVELOPER, "...GL_EXT_texture_filter_anisotropic not properly supported!\n" );
@@ -1053,7 +1053,6 @@ static void GLW_InitExtensions( void )
 			else
 			{
 				ri.Printf( PRINT_DEVELOPER, "...using GL_EXT_texture_filter_anisotropic (max: %i)\n", maxAnisotropy );
-				textureFilterAnisotropic = qtrue;
 			}
 		}
 		else
@@ -1065,12 +1064,8 @@ static void GLW_InitExtensions( void )
 	{
 		ri.Printf( PRINT_DEVELOPER, "...GL_EXT_texture_filter_anisotropic not found\n" );
 	}
+	Cvar_Set( "r_ext_max_anisotropy", va("%i", maxAnisotropy) );
 
-	/*fEXT_GL_SGIS_generate_mipmap = qfalse;
-	if (strstr(glConfig.extensions_string, "GL_SGIS_generate_mipmap")) {
-		fEXT_GL_SGIS_generate_mipmap = qtrue;
-		ri.Printf( PRINT_DEVELOPER, "...found GL_SGIS_generate_mipmap\n" );
-	}*/
 }
 
 
