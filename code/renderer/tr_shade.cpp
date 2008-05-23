@@ -329,27 +329,18 @@ t0 = most upstream according to spec
 t1 = most downstream according to spec
 ===================
 */
-static void DrawMultitextured( shaderCommands_t *input, int stage )
+static void DrawMultitextured( const shaderCommands_t* input, int stage )
 {
 	const shaderStage_t* pStage = tess.xstages[stage];
 
 	GL_State( pStage->stateBits );
-/*
-	// this is an ugly hack to work around a GeForce driver
-	// bug with multitexture and clip planes
-	if ( backEnd.viewParms.isPortal ) {
-		qglPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	}
-*/
 
 	// base
-	//
 	GL_SelectTexture( 0 );
 	qglTexCoordPointer( 2, GL_FLOAT, 0, input->svars.texcoords[0] );
 	R_BindAnimatedImage( &pStage->bundle[0] );
 
 	// lightmap/secondary pass
-	//
 	GL_SelectTexture( 1 );
 	qglEnable( GL_TEXTURE_2D );
 	qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
@@ -366,9 +357,6 @@ static void DrawMultitextured( shaderCommands_t *input, int stage )
 
 	R_DrawElements( input->numIndexes, input->indexes );
 
-	//
-	// disable texturing on TEXTURE1, then select TEXTURE0
-	//
 	//qglDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	qglDisable( GL_TEXTURE_2D );
 
@@ -376,176 +364,7 @@ static void DrawMultitextured( shaderCommands_t *input, int stage )
 }
 
 
-
-/*
-===================
-ProjectDlightTexture
-
-Perform dynamic lighting with another rendering pass
-===================
-*/
-#if idppc_altivec
-static void ProjectDlightTexture_altivec( void ) {
-	int		i, l;
-	vec_t	origin0, origin1, origin2;
-	float   texCoords0, texCoords1;
-	vector float floatColorVec0, floatColorVec1;
-	vector float modulateVec, colorVec, zero;
-	vector short colorShort;
-	vector signed int colorInt;
-	vector unsigned char floatColorVecPerm, modulatePerm, colorChar;
-	vector unsigned char vSel = VECCONST_UINT8(0x00, 0x00, 0x00, 0xff,
-                                               0x00, 0x00, 0x00, 0xff,
-                                               0x00, 0x00, 0x00, 0xff,
-                                               0x00, 0x00, 0x00, 0xff);
-	float	*texCoords;
-	byte	*colors;
-	byte	clipBits[SHADER_MAX_VERTEXES];
-	float	texCoordsArray[SHADER_MAX_VERTEXES][2];
-	byte	colorArray[SHADER_MAX_VERTEXES][4];
-	unsigned	hitIndexes[SHADER_MAX_INDEXES];
-	int		numIndexes;
-	float	scale;
-	float	radius;
-	vec3_t	floatColor;
-	float	modulate = 0.0f;
-
-	if ( !backEnd.refdef.num_dlights ) {
-		return;
-	}
-
-	// There has to be a better way to do this so that floatColor
-	// and/or modulate are already 16-byte aligned.
-	floatColorVecPerm = vec_lvsl(0,(float *)floatColor);
-	modulatePerm = vec_lvsl(0,(float *)&modulate);
-	modulatePerm = (vector unsigned char)vec_splat((vector unsigned int)modulatePerm,0);
-	zero = (vector float)vec_splat_s8(0);
-
-	for ( l = 0 ; l < backEnd.refdef.num_dlights ; l++ ) {
-		dlight_t	*dl;
-
-		if ( !( tess.dlightBits & ( 1 << l ) ) ) {
-			continue;	// this surface definately doesn't have any of this light
-		}
-		texCoords = texCoordsArray[0];
-		colors = colorArray[0];
-
-		dl = &backEnd.refdef.dlights[l];
-		origin0 = dl->transformed[0];
-		origin1 = dl->transformed[1];
-		origin2 = dl->transformed[2];
-		radius = dl->radius;
-		scale = 1.0f / radius;
-
-		floatColor[0] = dl->color[0] * 255.0f;
-		floatColor[1] = dl->color[1] * 255.0f;
-		floatColor[2] = dl->color[2] * 255.0f;
-		floatColorVec0 = vec_ld(0, floatColor);
-		floatColorVec1 = vec_ld(11, floatColor);
-		floatColorVec0 = vec_perm(floatColorVec0,floatColorVec0,floatColorVecPerm);
-		for ( i = 0 ; i < tess.numVertexes ; i++, texCoords += 2, colors += 4 ) {
-			int		clip = 0;
-			vec_t dist0, dist1, dist2;
-			
-			dist0 = origin0 - tess.xyz[i][0];
-			dist1 = origin1 - tess.xyz[i][1];
-			dist2 = origin2 - tess.xyz[i][2];
-
-			backEnd.pc.c_dlightVertexes++;
-
-			texCoords0 = 0.5f + dist0 * scale;
-			texCoords1 = 0.5f + dist1 * scale;
-
-			if( !r_dlightBacks->integer &&
-					// dist . tess.normal[i]
-					( dist0 * tess.normal[i][0] +
-					dist1 * tess.normal[i][1] +
-					dist2 * tess.normal[i][2] ) < 0.0f ) {
-				clip = 63;
-			} else {
-				if ( texCoords0 < 0.0f ) {
-					clip |= 1;
-				} else if ( texCoords0 > 1.0f ) {
-					clip |= 2;
-				}
-				if ( texCoords1 < 0.0f ) {
-					clip |= 4;
-				} else if ( texCoords1 > 1.0f ) {
-					clip |= 8;
-				}
-				texCoords[0] = texCoords0;
-				texCoords[1] = texCoords1;
-
-				// modulate the strength based on the height and color
-				if ( dist2 > radius ) {
-					clip |= 16;
-					modulate = 0.0f;
-				} else if ( dist2 < -radius ) {
-					clip |= 32;
-					modulate = 0.0f;
-				} else {
-					dist2 = Q_fabs(dist2);
-					if ( dist2 < radius * 0.5f ) {
-						modulate = 1.0f;
-					} else {
-						modulate = 2.0f * (radius - dist2) * scale;
-					}
-				}
-			}
-			clipBits[i] = clip;
-
-			modulateVec = vec_ld(0,(float *)&modulate);
-			modulateVec = vec_perm(modulateVec,modulateVec,modulatePerm);
-			colorVec = vec_madd(floatColorVec0,modulateVec,zero);
-			colorInt = vec_cts(colorVec,0);	// RGBx
-			colorShort = vec_pack(colorInt,colorInt);		// RGBxRGBx
-			colorChar = vec_packsu(colorShort,colorShort);	// RGBxRGBxRGBxRGBx
-			colorChar = vec_sel(colorChar,vSel,vSel);		// RGBARGBARGBARGBA replace alpha with 255
-			vec_ste((vector unsigned int)colorChar,0,(unsigned int *)colors);	// store color
-		}
-
-		// build a list of triangles that need light
-		numIndexes = 0;
-		for ( i = 0 ; i < tess.numIndexes ; i += 3 ) {
-			int		a, b, c;
-
-			a = tess.indexes[i];
-			b = tess.indexes[i+1];
-			c = tess.indexes[i+2];
-			if ( clipBits[a] & clipBits[b] & clipBits[c] ) {
-				continue;	// not lighted
-			}
-			hitIndexes[numIndexes] = a;
-			hitIndexes[numIndexes+1] = b;
-			hitIndexes[numIndexes+2] = c;
-			numIndexes += 3;
-		}
-
-		if ( !numIndexes ) {
-			continue;
-		}
-
-		qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
-		qglTexCoordPointer( 2, GL_FLOAT, 0, texCoordsArray[0] );
-
-		qglEnableClientState( GL_COLOR_ARRAY );
-		qglColorPointer( 4, GL_UNSIGNED_BYTE, 0, colorArray );
-
-		GL_Bind( tr.dlightImage );
-		// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light
-		// where they aren't rendered
-		if ( dl->additive ) {
-			GL_State( GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
-		}
-		else {
-			GL_State( GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
-		}
-		R_DrawElements( numIndexes, hitIndexes );
-		backEnd.pc.c_totalIndexes += numIndexes;
-		backEnd.pc.c_dlightIndexes += numIndexes;
-	}
-}
-#endif
+///////////////////////////////////////////////////////////////
 
 
 static const vec3_t axes[3] = {
@@ -592,23 +411,18 @@ static void __inline ProjectOntoPlane( const vec3_t vPoint, const vec3_t vPlaneP
 {
 	vec3_t v;
 	VectorSubtract( vPoint, vPlaneP, v );
-	VectorMA( vPoint, -DotProduct( vPlaneN, v ) / DotProduct( vPlaneN, vPlaneN ), vPlaneN, vProjected );
+	VectorMA( vPoint, -DotProduct( vPlaneN, v ), vPlaneN, vProjected );
 }
 
 
-static void ProjectDlightTexture_scalar()
+static void ProjectDlightTexture()
 {
 	int		i, l;
-	vec3_t	origin;
 	float	*texCoords;
 	byte	*colors;
-	byte	afIsLit[SHADER_MAX_VERTEXES];
+	byte	clipBits[SHADER_MAX_VERTEXES];
 	float	texCoordsArray[SHADER_MAX_VERTEXES][2];
 	byte	colorArray[SHADER_MAX_VERTEXES][4];
-	unsigned	hitIndexes[SHADER_MAX_INDEXES];
-	int		numIndexes;
-	float	r2;
-	vec3_t	floatColor;
 
 	if ( !backEnd.refdef.num_dlights ) {
 		return;
@@ -618,63 +432,79 @@ static void ProjectDlightTexture_scalar()
 		const dlight_t* dl;
 
 		if ( !( tess.dlightBits & ( 1 << l ) ) ) {
-			continue;	// this surface definately doesn't have any of this light
+			continue;	// this surface definitely doesn't have any of this light
 		}
 		texCoords = texCoordsArray[0];
 		colors = colorArray[0];
 
 		dl = &backEnd.refdef.dlights[l];
-		VectorCopy( dl->transformed, origin );
-		r2 = Square(dl->radius);
 
 		// dlights are given to us at full intensity, and since they're additive they can saturate VERY quickly
 		// so scale them down as if the surface was only 25% reflective
-		floatColor[0] = dl->color[0] * 64.0f;
-		floatColor[1] = dl->color[1] * 64.0f;
-		floatColor[2] = dl->color[2] * 64.0f;
+		vec3_t color;
+		VectorScale( dl->color, 64.0f, color );
 
 		for (i = 0; i < tess.numVertexes; i++, texCoords += 2, colors += 4) {
 			vec3_t dist;
-			VectorSubtract( origin, tess.xyz[i], dist );
+			VectorSubtract( dl->transformed, tess.xyz[i], dist );
 
-			afIsLit[i] = qfalse;
-
-			if (DotProduct( dist, tess.normal[i] ) > 0.0f) {
-				float dL2;
-				vec3_t v, vS, vT, vL, nearpt;
-
-				ProjectOntoPlane( origin, tess.xyz[i], tess.normal[i], nearpt );
-				VectorSubtract( origin, nearpt, vL );
-				dL2 = VectorLengthSquared(vL);
-
-				if (dL2 < r2) {
-					float d = sqrt(dL2);
-					float scale = 1.0f / ((2 * dl->radius) - d);
-					float modulate = 1.0f - (d / dl->radius);
-
-					CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
-					VectorSubtract( tess.xyz[i], nearpt, v );
-					texCoords[0] = DotProduct(v, vS) * scale + 0.5f;
-					texCoords[1] = DotProduct(v, vT) * scale + 0.5f;
-
-					colors[0] = myftol(floatColor[0] * modulate);
-					colors[1] = myftol(floatColor[1] * modulate);
-					colors[2] = myftol(floatColor[2] * modulate);
-					colors[3] = 255;
-
-					afIsLit[i] = qtrue;
-					backEnd.pc.c_dlightVertexes++;
-				}
+			if ( DotProduct( dist, tess.normal[i] ) <= 0 ) {
+				clipBits[i] = (byte)-1;
+				continue;
 			}
+
+			vec3_t nearpt;
+			ProjectOntoPlane( dl->transformed, tess.xyz[i], tess.normal[i], nearpt );
+			float d = Distance( dl->transformed, nearpt );
+
+			if ( d > dl->radius ) {
+				clipBits[i] = (byte)-1;
+				continue;
+			}
+
+			float scale = 1.0f / ((2 * dl->radius) - d);
+			float modulate = 1.0f - (d / dl->radius);
+
+			vec3_t v, vS, vT;
+			CalcRU( tess.normal[i], vS, vT );	// !!! this should be done at map load time
+			VectorSubtract( tess.xyz[i], nearpt, v );
+			texCoords[0] = DotProduct(v, vS) * scale + 0.5f;
+			texCoords[1] = DotProduct(v, vT) * scale + 0.5f;
+
+			int clip = 0;
+			if ( dist[0] > dl->radius ) {
+				clip |= 1;
+			} else if ( dist[0] < -dl->radius ) {
+				clip |= 2;
+			}
+			if ( dist[1] > dl->radius ) {
+				clip |= 4;
+			} else if ( dist[1] < -dl->radius ) {
+				clip |= 8;
+			}
+			if ( dist[2] > dl->radius ) {
+				clip |= 16;
+			} else if ( dist[2] < -dl->radius ) {
+				clip |= 32;
+			}
+			clipBits[i] = clip;
+
+			colors[0] = color[0] * modulate;
+			colors[1] = color[1] * modulate;
+			colors[2] = color[2] * modulate;
+			colors[3] = 255;
+
+			backEnd.pc.c_dlightVertexes++;
 		}
 
 		// build a list of triangles that need light
-		numIndexes = 0;
+		int numIndexes = 0;
+		unsigned hitIndexes[SHADER_MAX_INDEXES];
 		for (i = 0; i < tess.numIndexes; i += 3) {
 			int a = tess.indexes[i];
 			int b = tess.indexes[i+1];
 			int c = tess.indexes[i+2];
-			if (afIsLit[a] && afIsLit[b] && afIsLit[c]) {
+			if ( !(clipBits[a] & clipBits[b] & clipBits[c]) ) {
 				hitIndexes[numIndexes] = a;
 				hitIndexes[numIndexes+1] = b;
 				hitIndexes[numIndexes+2] = c;
@@ -696,7 +526,7 @@ static void ProjectDlightTexture_scalar()
 
 		// KHB 060701  bleh, multiplicative blending for dlights is just SO wrong, but so's additive  :(
 		// include GLS_DEPTHFUNC_EQUAL so alpha tested surfaces don't add light where they aren't rendered
-		GL_State( (dl->additive ? GLS_SRCBLEND_ONE :GLS_SRCBLEND_DST_COLOR) | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
+		GL_State( (dl->additive ? GLS_SRCBLEND_ONE : GLS_SRCBLEND_DST_COLOR) | GLS_DSTBLEND_ONE | GLS_DEPTHFUNC_EQUAL );
 
 		R_DrawElements( numIndexes, hitIndexes );
 		backEnd.pc.c_totalIndexes += numIndexes;
@@ -705,16 +535,7 @@ static void ProjectDlightTexture_scalar()
 }
 
 
-static void ProjectDlightTexture( void ) {
-#if idppc_altivec
-	if (com_altivec->integer) {
-		// must be in a seperate function or G3 systems will crash.
-		ProjectDlightTexture_altivec();
-		return;
-	}
-#endif
-	ProjectDlightTexture_scalar();
-}
+///////////////////////////////////////////////////////////////
 
 
 // blend a fog texture on top of everything else
