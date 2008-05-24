@@ -88,9 +88,9 @@ const /* vec4_t */ float* ColorFromChar( char ccode )
 	if ( ccode >= '0' && ccode <= '9' ) {
 		ccode -= '0';
 	} else if ( ccode >= 'a' && ccode <= 'y' ) {
-		ccode -= 'a' + 10;
+		ccode -= 'a' - 10;
 	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
-		ccode -= 'A' + 10;
+		ccode -= 'A' - 10;
 	} else {
 		return colorWhite;
 	}
