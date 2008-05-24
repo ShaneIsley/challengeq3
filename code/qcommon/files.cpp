@@ -2485,7 +2485,6 @@ void FS_Shutdown( qbool closemfp ) {
 	Cmd_RemoveCommand( "path" );
 	Cmd_RemoveCommand( "dir" );
 	Cmd_RemoveCommand( "fdir" );
-	Cmd_RemoveCommand( "touchFile" );
 
 #ifdef FS_MISSING
 	if (closemfp) {
