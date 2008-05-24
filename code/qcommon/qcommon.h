@@ -494,7 +494,7 @@ int Q_FileHash( const char* s, int tablesize );
 
 #define	MAX_FILE_HANDLES	64
 
-qbool FS_Initialized( void );
+qbool FS_Initialized();
 
 void	FS_InitFilesystem ( void );
 void	FS_Shutdown( qbool closemfp );
@@ -514,7 +514,7 @@ qbool FS_FileExists( const char *file );
 
 char* FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 
-int		FS_LoadStack( void );
+int		FS_LoadStack();
 
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );

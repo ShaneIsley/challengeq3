@@ -299,15 +299,17 @@ int Q_FileHash( const char* s, int tablesize )
 }
 
 
-/*
-==============
-FS_Initialized
-==============
-*/
-
-qbool FS_Initialized( void ) {
+qbool FS_Initialized()
+{
 	return (fs_searchpaths != NULL);
 }
+
+
+int FS_LoadStack()
+{
+	return fs_loadStack;
+}
+
 
 /*
 =================
@@ -331,42 +333,6 @@ qbool FS_PakIsPure( pack_t *pack ) {
 	return qtrue;
 }
 
-
-/*
-=================
-FS_LoadStack
-return load stack
-=================
-*/
-int FS_LoadStack( void )
-{
-	return fs_loadStack;
-}
-                      
-/*
-================
-return a hash value for the filename
-================
-*/
-static long FS_HashFileName( const char *fname, int hashSize ) {
-	int		i;
-	long	hash;
-	char	letter;
-
-	hash = 0;
-	i = 0;
-	while (fname[i] != '\0') {
-		letter = tolower(fname[i]);
-		if (letter =='.') break;				// don't include extension
-		if (letter =='\\') letter = '/';		// damn path names
-		if (letter == PATH_SEP) letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
-		i++;
-	}
-	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
-	hash &= (hashSize-1);
-	return hash;
-}
 
 static fileHandle_t	FS_HandleForFile(void) {
 	int		i;
@@ -916,7 +882,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 		for ( search = fs_searchpaths ; search ; search = search->next ) {
 			//
 			if ( search->pack ) {
-				hash = FS_HashFileName(filename, search->pack->hashSize);
+				hash = Q_FileHash( filename, search->pack->hashSize );
 			}
 			// is the element a pak file?
 			if ( search->pack && search->pack->hashTable[hash] ) {
@@ -980,7 +946,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qbool uniqueFILE
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		//
 		if ( search->pack ) {
-			hash = FS_HashFileName(filename, search->pack->hashSize);
+			hash = Q_FileHash( filename, search->pack->hashSize );
 		}
 		// is the element a pak file?
 		if ( search->pack && search->pack->hashTable[hash] ) {
@@ -1363,7 +1329,7 @@ qbool FS_FileIsInPAK( const char* filename, int* pChecksum )
 		if ( !search->pack )
 			continue;
 
-		long hash = FS_HashFileName(filename, search->pack->hashSize);
+		long hash = Q_FileHash( filename, search->pack->hashSize );
 		// is the element a pak file?
 		if ( search->pack->hashTable[hash] ) {
 			// disregard if it doesn't match one of the allowed pure pak files
@@ -1651,7 +1617,7 @@ static pack_t *FS_LoadZipFile( char *zipfile, const char *basename )
 			fs_headerLongs[fs_numHeaderLongs++] = LittleLong(file_info.crc);
 		}
 		Q_strlwr( filename_inzip );
-		hash = FS_HashFileName(filename_inzip, pack->hashSize);
+		hash = Q_FileHash( filename_inzip, pack->hashSize );
 		buildBuffer[i].name = namePtr;
 		strcpy( buildBuffer[i].name, filename_inzip );
 		namePtr += strlen(filename_inzip) + 1;
