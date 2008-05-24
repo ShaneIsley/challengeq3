@@ -307,9 +307,7 @@ extern const vec4_t colorWhite;
 #define Q_COLOR_ESCAPE	'^'
 #define Q_IsColorString(p)	( p && *(p) == Q_COLOR_ESCAPE && *((p)+1) && *((p)+1) != Q_COLOR_ESCAPE )
 
-#define MAX_CCODES	(10 + 25) // id's 0-7, OSP's 8+9, CPMA's a-y
-extern const vec4_t g_color_table[MAX_CCODES];
-int ColorIndex( char ccode );
+const /* vec4_t */ float* ColorFromChar( char ccode );
 
 #define COLOR_BLACK		'0'
 #define COLOR_RED		'1'

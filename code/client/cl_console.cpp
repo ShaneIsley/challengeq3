@@ -144,7 +144,7 @@ static void Con_Clear_f( void )
 	int		i;
 
 	for ( i = 0 ; i < CON_TEXTSIZE ; i++ ) {
-		con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
+		con.text[i] = (COLOR_WHITE << 8) | ' ';
 	}
 
 	Con_Bottom();		// go to end
@@ -237,7 +237,7 @@ static void Con_CheckResize()
 		con.linewidth = width;
 		con.totallines = CON_TEXTSIZE / con.linewidth;
 		for(i=0; i<CON_TEXTSIZE; i++)
-			con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
+			con.text[i] = (COLOR_WHITE << 8) | ' ';
 	}
 	else
 	{
@@ -257,7 +257,7 @@ static void Con_CheckResize()
 
 		Com_Memcpy (tbuf, con.text, CON_TEXTSIZE * sizeof(short));
 		for(i=0; i<CON_TEXTSIZE; i++)
-			con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
+			con.text[i] = (COLOR_WHITE << 8) | ' ';
 
 		for (i=0 ; i<numlines ; i++)
 		{
@@ -316,7 +316,7 @@ static void Con_Linefeed()
 	con.current++;
 
 	for ( int i = 0; i < con.linewidth; ++i ) {
-		con.text[(con.current%con.totallines)*con.linewidth+i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
+		con.text[(con.current%con.totallines)*con.linewidth+i] = (COLOR_WHITE << 8) | ' ';
 	}
 }
 
@@ -330,7 +330,6 @@ void CL_ConsolePrint( const char* s )
 {
 	int		y;
 	int		c, w;
-	int		color;
 
 	// cl_noprint disables ALL console functionality
 	// use con_notifytime 0 to log the text without the annoying overlay
@@ -344,11 +343,11 @@ void CL_ConsolePrint( const char* s )
 		con.initialized = qtrue;
 	}
 
-	color = ColorIndex(COLOR_WHITE);
+	char color = COLOR_WHITE;
 
 	while ( c = *s ) {
 		if ( Q_IsColorString( s ) ) {
-			color = ColorIndex( *(s+1) );
+			color = s[1];
 			s += 2;
 			continue;
 		}
@@ -433,8 +432,8 @@ static void Con_DrawNotify()
 	int		time;
 	int		skip;
 
-	int currentColor = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
-	re.SetColor( g_color_table[currentColor] );
+	char color = COLOR_WHITE;
+	re.SetColor( ColorFromChar( color ) );
 
 	v = 0;
 	for (i= con.current-CON_NOTIFYLINES+1 ; i<=con.current ; i++)
@@ -457,9 +456,9 @@ static void Con_DrawNotify()
 			if ( ( text[x] & 0xff ) == ' ' ) {
 				continue;
 			}
-			if ( (text[x]>>8) != currentColor ) {
-				currentColor = (text[x]>>8);
-				re.SetColor( g_color_table[currentColor] );
+			if ( (text[x] >> 8) != color ) {
+				color = (text[x] >> 8);
+				re.SetColor( ColorFromChar( color ) );
 			}
 			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
 		}
@@ -504,7 +503,7 @@ static void Con_DrawSolidConsole( float frac )
 	int		i, x, y;
 	int		rows;
 	int		row;
-	vec4_t	color;
+	vec4_t	fill;
 
 	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
 	if (scanlines <= 0)
@@ -521,12 +520,12 @@ static void Con_DrawSolidConsole( float frac )
 		y = 0;
 	}
 	else {
-		MAKERGBA( color, 0.44f, 0.44f, 0.44f, 1.0 );
-		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, color );
+		MAKERGBA( fill, 0.44f, 0.44f, 0.44f, 1.0 );
+		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, fill );
 	}
 
-	MAKERGBA( color, 0.33f, 0.33f, 0.33f, 1.0 );
-	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
+	MAKERGBA( fill, 0.33f, 0.33f, 0.33f, 1.0 );
+	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, fill );
 
 	i = sizeof( Q3_VERSION )/sizeof(char) - 1;
 	x = cls.glconfig.vidWidth;
@@ -556,8 +555,8 @@ static void Con_DrawSolidConsole( float frac )
 		row--;
 	}
 
-	int colorCode = 7; // *not* COLOR_WHITE: that's an *ASCII* 7
-	re.SetColor( g_color_table[colorCode] );
+	char color = COLOR_WHITE;
+	re.SetColor( ColorFromChar( color ) );
 
 	for (i = 0; i < rows; ++i, --row, y -= SMALLCHAR_HEIGHT )
 	{
@@ -577,9 +576,9 @@ static void Con_DrawSolidConsole( float frac )
 
 		re.SetColor( colorWhite );
 		for (int i = 0; i < con.linewidth; ++i) {
-			if ((text[i] >> 8) != colorCode) {
-				colorCode = (text[i] >> 8);
-				re.SetColor( g_color_table[colorCode] );
+			if ((text[i] >> 8) != color) {
+				color = (text[i] >> 8);
+				re.SetColor( ColorFromChar( color ) );
 			}
 			SCR_DrawSmallChar( con.xadjust + i * SMALLCHAR_WIDTH, y, (text[i] & 0xFF) );
 		}

@@ -373,21 +373,6 @@ void SkipRestOfLine( const char** data )
 }
 
 
-// returns the index in g_color_table[] corresponding to the colour code; white on failure
-int ColorIndex( char ccode )
-{
-	if ( ccode >= '0' && ccode <= '9' ) {
-		return (ccode - '0');
-	} else if ( ccode >= 'a' && ccode <= 'y' ) {
-		return ((ccode - 'a') + 10);
-	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
-		return ((ccode - 'A') + 10);
-	}
-
-	return 7;
-}
-
-
 /*
 ============================================================================
 

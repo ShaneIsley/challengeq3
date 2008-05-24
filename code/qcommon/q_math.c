@@ -42,7 +42,7 @@ const vec4_t colorPink   = { 1, 0, 1, 1 };
 const vec4_t colorCyan   = { 0, 1, 1, 1 };
 const vec4_t colorWhite  = { 1, 1, 1, 1 };
 
-const vec4_t g_color_table[MAX_CCODES] =
+static const vec4_t colorTable[] =
 {
 	{ 0, 0, 0, 1 },
 	{ 1, 0, 0, 1 },
@@ -82,6 +82,25 @@ const vec4_t g_color_table[MAX_CCODES] =
 	{1.00000f, 0.00000f, 0.26795f, 1.00000f},	// x
 	{ 1, 1, 1, 1 }, // y, white, duped so all colors can be expressed with this palette
 };
+
+const /* vec4_t */ float* ColorFromChar( char ccode )
+{
+	if ( ccode >= '0' && ccode <= '9' ) {
+		ccode -= '0';
+	} else if ( ccode >= 'a' && ccode <= 'y' ) {
+		ccode -= 'a' + 10;
+	} else if ( ccode >= 'A' && ccode <= 'Y' ) {
+		ccode -= 'A' + 10;
+	} else {
+		return colorWhite;
+	}
+
+	return colorTable[ccode];
+}
+
+
+///////////////////////////////////////////////////////////////
+
 
 const vec3_t bytedirs[NUMVERTEXNORMALS] =
 {

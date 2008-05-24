@@ -136,7 +136,7 @@ static void SCR_DrawStringExt( float x, float y, float cw, float ch, const char*
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
 			if ( allowColor ) {
-				re.SetColor( g_color_table[ColorIndex(*(s+1))] );
+				re.SetColor( ColorFromChar( s[1] ) );
 			}
 			s += 2;
 			continue;
@@ -175,7 +175,7 @@ void SCR_DrawSmallString( int x, int y, const char* s )
 
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
-			re.SetColor( g_color_table[ColorIndex(*(s+1))] );
+			re.SetColor( ColorFromChar( s[1] ) );
 			s += 2;
 			continue;
 		}
@@ -245,7 +245,7 @@ static void SCR_DrawDebugGraph()
 	w = cls.glconfig.vidWidth;
 	x = 0;
 	y = cls.glconfig.vidHeight;
-	re.SetColor( g_color_table[0] );
+	re.SetColor( colorBlack );
 	re.DrawStretchPic(x, y - cl_graphheight->integer, 
 		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
 	re.SetColor( NULL );
@@ -295,7 +295,7 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 	// unless they are displaying game renderings
 	if ( cls.state != CA_ACTIVE && cls.state != CA_CINEMATIC ) {
 		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
-			re.SetColor( g_color_table[0] );
+			re.SetColor( colorBlack );
 			re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
 			re.SetColor( NULL );
 		}
