@@ -3025,7 +3025,6 @@ void FS_InitFilesystem( void ) {
 	Com_StartupVariable( "fs_basepath" );
 	Com_StartupVariable( "fs_homepath" );
 	Com_StartupVariable( "fs_game" );
-	Com_StartupVariable( "fs_copyfiles" );
 
 	// try to start up normally
 	FS_Startup( BASEGAME );
