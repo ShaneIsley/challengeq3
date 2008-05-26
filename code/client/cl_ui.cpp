@@ -675,6 +675,12 @@ void Key_SetCatcher( int catcher ) {
 }
 
 
+static qbool UI_usesUniqueCDKey()
+{
+	return (uivm && VM_Call( uivm, UI_HASUNIQUECDKEY ));
+}
+
+
 /*
 ====================
 CLUI_GetCDKey
@@ -1115,12 +1121,6 @@ void CL_InitUI( void )
 
 	// init for this gamestate
 	VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
-}
-
-
-qbool UI_usesUniqueCDKey()
-{
-	return (uivm && VM_Call( uivm, UI_HASUNIQUECDKEY ));
 }
 
 
