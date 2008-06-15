@@ -65,60 +65,18 @@ void FreeWinding (winding_t *w)
 	Z_Free (w);
 }
 
-/*
-============
-RemoveColinearPoints
-============
-*/
-int	c_removed;
 
-void	RemoveColinearPoints (winding_t *w)
+void WindingPlane( const winding_t* w, vec3_t normal, vec_t* dist )
 {
-	int		i, j, k;
-	vec3_t	v1, v2;
-	int		nump;
-	vec3_t	p[MAX_POINTS_ON_WINDING];
+	vec3_t v1, v2;
 
-	nump = 0;
-	for (i=0 ; i<w->numpoints ; i++)
-	{
-		j = (i+1)%w->numpoints;
-		k = (i+w->numpoints-1)%w->numpoints;
-		VectorSubtract (w->p[j], w->p[i], v1);
-		VectorSubtract (w->p[i], w->p[k], v2);
-		VectorNormalize2(v1,v1);
-		VectorNormalize2(v2,v2);
-		if (DotProduct(v1, v2) < 0.999)
-		{
-			VectorCopy (w->p[i], p[nump]);
-			nump++;
-		}
-	}
-
-	if (nump == w->numpoints)
-		return;
-
-	c_removed += w->numpoints - nump;
-	w->numpoints = nump;
-	Com_Memcpy (w->p, p, nump*sizeof(p[0]));
+	VectorSubtract( w->p[1], w->p[0], v1 );
+	VectorSubtract( w->p[2], w->p[0], v2 );
+	CrossProduct( v2, v1, normal );
+	VectorNormalize( normal );
+	*dist = DotProduct( w->p[0], normal );
 }
 
-/*
-============
-WindingPlane
-============
-*/
-void WindingPlane (winding_t *w, vec3_t normal, vec_t *dist)
-{
-	vec3_t	v1, v2;
-
-	VectorSubtract (w->p[1], w->p[0], v1);
-	VectorSubtract (w->p[2], w->p[0], v2);
-	CrossProduct (v2, v1, normal);
-	VectorNormalize2(normal, normal);
-	*dist = DotProduct (w->p[0], normal);
-
-}
 
 /*
 =============
