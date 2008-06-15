@@ -155,7 +155,7 @@ Returns qtrue if the given quadratic curve is not flat enough for our
 collision detection purposes
 =================
 */
-static qbool	CM_NeedsSubdivision( vec3_t a, vec3_t b, vec3_t c ) {
+static qbool CM_NeedsSubdivision( vec3_t a, vec3_t b, vec3_t c ) {
 	vec3_t		cmid;
 	vec3_t		lmid;
 	vec3_t		delta;
@@ -424,7 +424,7 @@ static	facet_t			facets[MAX_PATCH_PLANES]; //maybe MAX_FACETS ??
 #define	DIST_EPSILON	0.02
 
 
-static int CM_PlaneEqual( const patchPlane_t* p, float plane[4], qbool* flipped )
+static qbool CM_PlaneEqual( const patchPlane_t* p, float plane[4], qbool* flipped )
 {
 	if (
 	   fabs(p->plane[0] - plane[0]) < NORMAL_EPSILON
@@ -578,7 +578,7 @@ static int CM_PointOnPlaneSide( float *p, int planeNum ) {
 CM_GridPlane
 ==================
 */
-static int	CM_GridPlane( int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], int i, int j, int tri ) {
+static int CM_GridPlane( int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], int i, int j, int tri ) {
 	int		p;
 
 	p = gridPlanes[i][j][tri];
@@ -769,7 +769,7 @@ static qbool CM_ValidateFacet( facet_t *facet ) {
 	// see if the facet is unreasonably large
 	WindingBounds( w, bounds[0], bounds[1] );
 	FreeWinding( w );
-	
+
 	for ( j = 0 ; j < 3 ; j++ ) {
 		if ( bounds[1][j] - bounds[0][j] > MAX_MAP_BOUNDS ) {
 			return qfalse;		// we must be missing a plane
@@ -789,7 +789,7 @@ static qbool CM_ValidateFacet( facet_t *facet ) {
 CM_AddFacetBevels
 ==================
 */
-void CM_AddFacetBevels( facet_t *facet ) {
+static void CM_AddFacetBevels( facet_t *facet ) {
 
 	int i, j, k, l;
 	int axis, dir, order;
@@ -841,7 +841,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 			if ( i == facet->numBorders ) {
 				if (facet->numBorders > 4 + 6 + 16) Com_Printf("ERROR: too many bevels\n");
 				facet->borderPlanes[facet->numBorders] = CM_FindPlane2(plane, &flipped);
-				facet->borderNoAdjust[facet->numBorders] = 0;
+				facet->borderNoAdjust[facet->numBorders] = qfalse;
 				facet->borderInward[facet->numBorders] = flipped;
 				facet->numBorders++;
 			}
@@ -909,16 +909,16 @@ void CM_AddFacetBevels( facet_t *facet ) {
 							facet->borderPlanes[k]) Com_Printf("WARNING: bevel plane already used\n");
 					}
 
-					facet->borderNoAdjust[facet->numBorders] = 0;
+					facet->borderNoAdjust[facet->numBorders] = qfalse;
 					facet->borderInward[facet->numBorders] = flipped;
-					//
+
 					w2 = CopyWinding(w);
 					Vector4Copy(planes[facet->borderPlanes[facet->numBorders]].plane, newplane);
 					if (!facet->borderInward[facet->numBorders])
 					{
 						VectorNegate(newplane, newplane);
 						newplane[3] = -newplane[3];
-					} //end if
+					}
 					ChopWindingInPlace( &w2, newplane, newplane[3], 0.1f );
 					if (!w2) {
 						Com_DPrintf("WARNING: CM_AddFacetBevels... invalid bevel\n");
@@ -927,7 +927,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 					else {
 						FreeWinding(w2);
 					}
-					//
+
 					facet->numBorders++;
 					//already got a bevel
 //					break;
@@ -940,7 +940,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 #ifndef BSPC
 	//add opposite plane
 	facet->borderPlanes[facet->numBorders] = facet->surfacePlane;
-	facet->borderNoAdjust[facet->numBorders] = 0;
+	facet->borderNoAdjust[facet->numBorders] = qfalse;
 	facet->borderInward[facet->numBorders] = qtrue;
 	facet->numBorders++;
 #endif //BSPC
@@ -1210,7 +1210,7 @@ CM_TracePointThroughPatchCollide
   special case for point traces because the patch collide "brushes" have no volume
 ====================
 */
-void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
+static void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc ) {
 	qbool	frontFacing[MAX_PATCH_PLANES];
 	float		intersection[MAX_PATCH_PLANES];
 	float		intersect;
@@ -1310,7 +1310,7 @@ void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patchCollid
 CM_CheckFacetPlane
 ====================
 */
-int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit) {
+static int CM_CheckFacetPlane(float *plane, vec3_t start, vec3_t end, float *enterFrac, float *leaveFrac, int *hit) {
 	float d1, d2, f;
 
 	*hit = qfalse;
@@ -1506,7 +1506,7 @@ qbool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_
 	if (tw->isPoint) {
 		return qfalse;
 	}
-	//
+
 	facet = pc->facets;
 	for ( i = 0 ; i < pc->numFacets ; i++, facet++ ) {
 		planes = &pc->planes[ facet->surfacePlane ];
