@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static const cvar_t* con_noprint;
 static const cvar_t* con_notifytime;
-static const cvar_t* con_offset;
 static const cvar_t* con_scale;
 static const cvar_t* con_speed;
 
@@ -271,7 +270,6 @@ void CL_ConInit()
 
 	con_noprint = Cvar_Get( "con_noprint", "0", 0 );
 	con_notifytime = Cvar_Get( "con_notifytime", "3", CVAR_ARCHIVE );
-	con_offset = Cvar_Get( "con_offset", "0", CVAR_ARCHIVE );
 	con_scale = Cvar_Get( "con_scale", "1", CVAR_ARCHIVE );
 	con_speed = Cvar_Get( "con_speed", "3", CVAR_ARCHIVE );
 
@@ -443,7 +441,7 @@ static void Con_DrawNotify()
 				color = (text[x] >> 8);
 				re.SetColor( ColorFromChar( color ) );
 			}
-			SCR_DrawChar( con_offset->integer + con.xadjust + (x+1)*con.cw, y, con.cw, con.ch, text[x] & 0xff );
+			SCR_DrawChar( con.xadjust + x * con.cw, y, con.cw, con.ch, text[x] & 0xff );
 		}
 
 		y += con.ch;
@@ -520,7 +518,7 @@ static void Con_DrawSolidConsole( float frac )
 		// draw arrows to show the buffer is backscrolled
 		re.SetColor( colorBlack );
 		for (x = 0; x < con.linewidth; x += 4)
-			SCR_DrawChar( con.xadjust + (x * con.cw), y, con.cw, con.ch, '^' );
+			SCR_DrawChar( con.xadjust + x * con.cw, y, con.cw, con.ch, '^' );
 		y -= con.ch;
 		--rows;
 	}

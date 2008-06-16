@@ -24,9 +24,9 @@ added con_scale for console font scaling
 
 straightened out the con cvar mess:
 cl_noprint -> con_noprint
-cl_conXOffset -> con_offset and correctly CVAR_ARCHIVE
 scr_conspeed -> con_speed and correctly CVAR_ARCHIVE
 con_notifytime correctly CVAR_ARCHIVE
+removed cl_conXOffset since it basically doesn't work
 
 another MASSIVE overhaul of the sound code:
 
