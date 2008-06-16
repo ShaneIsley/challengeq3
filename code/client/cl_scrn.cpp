@@ -44,8 +44,8 @@ void SCR_AdjustFrom640( float *x, float *y, float *w, float *h )
 #endif
 
 	// scale for screen sizes
-	float xscale = cls.glconfig.vidWidth / 640.0;
-	float yscale = cls.glconfig.vidHeight / 480.0;
+	float xscale = cls.glconfig.vidWidth / SCREEN_WIDTH;
+	float yscale = cls.glconfig.vidHeight / SCREEN_HEIGHT;
 
 	if ( x ) {
 		*x *= xscale;
