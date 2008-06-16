@@ -34,7 +34,7 @@ static const cvar_t* cl_conXOffset;
 
 #define CON_TEXTSIZE	32768
 
-typedef struct {
+struct console_t {
 	qbool	initialized;
 
 	short	text[CON_TEXTSIZE];
@@ -46,7 +46,7 @@ typedef struct {
 	float	cw, ch;
 	float	xadjust;		// supposedly for wide aspect screens, but never actually set properly
 
-	int 	linewidth;		// characters across screen
+	int		linewidth;		// characters across screen
 	int		totallines;		// total lines in console scrollback
 
 	float	displayFrac;	// aproaches finalFrac at scr_conspeed
@@ -54,7 +54,7 @@ typedef struct {
 
 	int		times[CON_NOTIFYLINES];	// cls.realtime time the line was generated
 								// for transparent notify lines
-} console_t;
+};
 
 static console_t con;
 
@@ -394,10 +394,13 @@ static void Con_DrawInput()
 static void Con_DrawNotify()
 {
 	int		x;
-	short	*text;
 	int		i;
 	int		time;
 	int		skip;
+
+	if (cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME)) {
+		return;
+	}
 
 	char color = COLOR_WHITE;
 	re.SetColor( ColorFromChar( color ) );
@@ -413,11 +416,8 @@ static void Con_DrawNotify()
 		time = cls.realtime - time;
 		if (time >= con_notifytime->value*1000)
 			continue;
-		text = con.text + (i % con.totallines)*con.linewidth;
 
-		if ( cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
-			continue;
-		}
+		const short* text = con.text + (i % con.totallines)*con.linewidth;
 
 		for (x = 0 ; x < con.linewidth ; x++) {
 			if ( ( text[x] & 0xff ) == ' ' ) {
@@ -434,10 +434,6 @@ static void Con_DrawNotify()
 	}
 
 	re.SetColor( NULL );
-
-	if (cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME)) {
-		return;
-	}
 
 	// draw the chat line - this shit has NO business being in the engine >:(
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
