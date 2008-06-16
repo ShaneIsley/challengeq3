@@ -44,10 +44,10 @@ typedef struct {
 	int		display;		// bottom of console displays this line
 
 	float	cw, ch;
+	float	xadjust;		// supposedly for wide aspect screens, but never actually set properly
+
 	int 	linewidth;		// characters across screen
 	int		totallines;		// total lines in console scrollback
-
-	float	xadjust;		// for wide aspect screens
 
 	float	displayFrac;	// aproaches finalFrac at scr_conspeed
 	float	finalFrac;		// 0.0 to 1.0 lines of console to display
@@ -58,7 +58,9 @@ typedef struct {
 
 static console_t con;
 
-#define CONSOLE_WIDTH 78
+#define CONCHAR_WIDTH	8
+#define CONCHAR_HEIGHT	12
+#define CONSOLE_WIDTH	78
 int g_console_field_width = CONSOLE_WIDTH;
 
 
@@ -141,13 +143,13 @@ void Con_MessageMode4_f (void) {
 
 static void Con_Clear_f( void )
 {
-	int		i;
+	int i;
 
 	for ( i = 0 ; i < CON_TEXTSIZE ; i++ ) {
 		con.text[i] = (COLOR_WHITE << 8) | ' ';
 	}
 
-	Con_Bottom();		// go to end
+	Con_Bottom();
 }
 
 
@@ -230,19 +232,20 @@ static void Con_Init()
 	con.current = con.totallines - 1;
 	Con_Clear_f();
 
-	//con.cw = SMALLCHAR_WIDTH * 2;
-	//con.ch = SMALLCHAR_HEIGHT * 1.5;
-	con.cw = SMALLCHAR_WIDTH;
-	con.ch = SMALLCHAR_HEIGHT;
+	con.cw = CONCHAR_WIDTH;
+	con.ch = CONCHAR_HEIGHT;
 }
 
 
-static void Con_CheckResize()
+static void Con_ResizeFont()
 {
 	if (!cls.rendererStarted)
 		return;
 
-	// if the screen res has changed, update con.cw and con.ch
+	con.cw = CONCHAR_WIDTH;
+	con.ch = CONCHAR_HEIGHT;
+	SCR_AdjustFrom640( &con.cw, &con.ch, NULL, NULL );
+	con.xadjust = con.cw;
 }
 
 
@@ -375,7 +378,7 @@ static void Con_DrawInput()
 		return;
 	}
 
-	float y = con.y - (con.ch * 2);
+	float y = con.y - (con.ch * 1.5);
 
 	re.SetColor( colorBlack );
 	SCR_DrawChar( con.xadjust + 1, y + 1, con.cw, con.ch, ']' );
@@ -427,12 +430,12 @@ static void Con_DrawNotify()
 			SCR_DrawChar( cl_conXOffset->integer + con.xadjust + (x+1)*con.cw, y, con.cw, con.ch, text[x] & 0xff );
 		}
 
-		y += SMALLCHAR_HEIGHT;
+		y += con.ch;
 	}
 
 	re.SetColor( NULL );
 
-	if (cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
+	if (cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME)) {
 		return;
 	}
 
@@ -479,11 +482,6 @@ static void Con_DrawSolidConsole( float frac )
 	int scanlines = Com_Clamp( 0, cls.glconfig.vidHeight, cls.glconfig.vidHeight * frac );
 	if (scanlines <= 0)
 		return;
-
-	// center the text on wide screens
-	con.xadjust = 0;
-	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
-	con.xadjust += con.cw;
 
 	// draw the background
 	y = frac * SCREEN_HEIGHT - 2;
@@ -550,7 +548,6 @@ static void Con_DrawSolidConsole( float frac )
 		}
 	}
 
-	// draw the input prompt, user text, and cursor if desired
 	Con_DrawInput();
 
 	re.SetColor( NULL );
@@ -563,7 +560,7 @@ static void Con_DrawSolidConsole( float frac )
 void Con_DrawConsole()
 {
 	// check for console width changes from a vid mode change
-	Con_CheckResize();
+	Con_ResizeFont();
 
 	// if disconnected, render console full screen
 	if ( cls.state == CA_DISCONNECTED ) {
