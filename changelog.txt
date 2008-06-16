@@ -1,5 +1,5 @@
 
-May 08 - 1.43
+Jun 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
 
@@ -16,6 +16,8 @@ removed RAVENMD4 completely
 fixed distance culling on dlit patch seams
 
 changed r_ext_max_anisotropy default to 16
+
+made the console font scale properly
 
 another MASSIVE overhaul of the sound code:
 

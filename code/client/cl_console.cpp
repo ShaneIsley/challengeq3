@@ -245,6 +245,12 @@ static void Con_ResizeFont()
 	con.cw = CONCHAR_WIDTH;
 	con.ch = CONCHAR_HEIGHT;
 	SCR_AdjustFrom640( &con.cw, &con.ch, NULL, NULL );
+
+	if ( cls.glconfig.vidWidth * SCREEN_WIDTH > cls.glconfig.vidHeight * SCREEN_HEIGHT ) {
+		// the console distorts horribly on widescreens
+		con.cw = con.ch * SCREEN_HEIGHT / SCREEN_WIDTH;
+	}
+
 	con.xadjust = con.cw;
 }
 
