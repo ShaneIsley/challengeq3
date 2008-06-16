@@ -191,6 +191,7 @@ static const keyname_t keynames[] =
 	{NULL,0}
 };
 
+
 /*
 =============================================================================
 
@@ -201,9 +202,9 @@ EDIT FIELDS
 
 
 // handles horizontal scrolling and cursor blinking
-// x, y, and width are in pixels
+// position and char sizes are in pixels
 
-static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, qbool showCursor )
+void Field_Draw( field_t* edit, int x, int y, int cw, int ch )
 {
 	int		len;
 	int		drawLen;
@@ -248,18 +249,7 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 	Com_Memcpy( str, edit->buffer + prestep, drawLen );
 	str[ drawLen ] = 0;
 
-	// draw it
-	if ( size == SMALLCHAR_WIDTH ) {
-		SCR_DrawSmallString( x, y, str );
-	} else {
-		// draw big string with drop shadow
-		SCR_DrawBigString( x, y, str );
-	}
-
-	// draw the cursor
-	if ( !showCursor ) {
-		return;
-	}
+	SCR_DrawString( x, y, cw, ch, str, qtrue );
 
 	if ( (int)( cls.realtime >> 8 ) & 1 ) {
 		return;		// off blink
@@ -272,25 +262,7 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 	}
 
 	i = drawLen - ( Q_PrintStrlen( str ) + 1 );
-
-	if ( size == SMALLCHAR_WIDTH ) {
-		SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
-	} else {
-		str[0] = cursorChar;
-		str[1] = 0;
-		SCR_DrawBigString( x + ( edit->cursor - prestep - i ) * size, y, str );
-
-	}
-}
-
-void Field_Draw( field_t *edit, int x, int y, int width, qbool showCursor ) 
-{
-	Field_VariableSizeDraw( edit, x, y, width, SMALLCHAR_WIDTH, showCursor );
-}
-
-void Field_BigDraw( field_t *edit, int x, int y, int width, qbool showCursor ) 
-{
-	Field_VariableSizeDraw( edit, x, y, width, BIGCHAR_WIDTH, showCursor );
+	SCR_DrawChar( x + ( edit->cursor - prestep - i ) * cw, y, cw, ch, cursorChar );
 }
 
 

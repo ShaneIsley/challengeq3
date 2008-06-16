@@ -62,23 +62,10 @@ void SCR_AdjustFrom640( float *x, float *y, float *w, float *h )
 }
 
 
-// coordinates are 640*480 virtual values
-
-void SCR_FillRect( float x, float y, float width, float height, const float *color )
-{
-	re.SetColor( color );
-
-	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
-
-	re.SetColor( NULL );
-}
+// SCR_ functions operate  at native resolution, NOT the virtual 640x480 screen
 
 
-// chars are drawn at native resolution, NOT the 640*480 virtual screen
-// the caller should have already preadjusted the position and size
-
-static void SCR_DrawChar( float x, float y, float cw, float ch, int c )
+void SCR_DrawChar( float x, float y, float cw, float ch, int c )
 {
 	const float CELL_TCSIZE = 0.0625;
 
@@ -99,14 +86,11 @@ static void SCR_DrawChar( float x, float y, float cw, float ch, int c )
 
 
 // draws a string with a drop shadow, optionally with colorcodes
-// position and size are at 640*480 virtual resolution
 
-static void SCR_DrawStringExt( float x, float y, float cw, float ch, const char* string, qbool allowColor )
+void SCR_DrawString( float x, float y, float cw, float ch, const char* string, qbool allowColor )
 {
 	float xx;
 	const char* s;
-
-	SCR_AdjustFrom640( &x, &y, &cw, &ch );
 
 	// don't bother if nothing will be visible
 	if ( y < -ch ) {
@@ -122,7 +106,7 @@ static void SCR_DrawStringExt( float x, float y, float cw, float ch, const char*
 			s += 2;
 			continue;
 		}
-		SCR_DrawChar( xx+2, y+2, cw, ch, *s );
+		SCR_DrawChar( xx+1, y+1, cw, ch, *s );
 		xx += cw;
 		s++;
 	}
@@ -148,12 +132,6 @@ static void SCR_DrawStringExt( float x, float y, float cw, float ch, const char*
 }
 
 
-void SCR_DrawBigString( int x, int y, const char* s )
-{
-	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, s, qtrue );
-}
-
-
 // small chars are drawn at native screen resolution
 // which sucks ass if you run at "too" high or low a rez  :(
 // used exclusively by the console
@@ -161,28 +139,6 @@ void SCR_DrawBigString( int x, int y, const char* s )
 void SCR_DrawSmallChar( int x, int y, int ch )
 {
 	SCR_DrawChar( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, ch );
-}
-
-
-// draws a multi-colored string withOUT a drop shadow and NOT adjusted for screen rez
-// currently used exclusively by the console entry line
-
-void SCR_DrawSmallString( int x, int y, const char* s )
-{
-	re.SetColor( NULL );
-
-	while ( *s ) {
-		if ( Q_IsColorString( s ) ) {
-			re.SetColor( ColorFromChar( s[1] ) );
-			s += 2;
-			continue;
-		}
-		SCR_DrawSmallChar( x, y, *s );
-		x += SMALLCHAR_WIDTH;
-		s++;
-	}
-
-	re.SetColor( NULL );
 }
 
 
@@ -197,7 +153,7 @@ static void SCR_DrawDemoRecording()
 	int pos = FS_FTell( clc.demofile );
 	const char* s = va( "RECORDING %s: %ik", clc.demoName, pos / 1024 );
 
-	SCR_DrawStringExt( 320 - strlen(s) * 4, 20, 8, 8, s, qfalse );
+	SCR_DrawString( 320 - strlen(s) * 4, 20, 8, 8, s, qfalse );
 }
 
 

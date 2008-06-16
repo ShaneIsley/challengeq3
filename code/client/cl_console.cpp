@@ -40,6 +40,7 @@ typedef struct {
 	short	text[CON_TEXTSIZE];
 	int		current;		// line where next message will be printed
 	int		x;				// offset in current line for next print
+	int		y;				// virtual screen coordinate of bottom of console
 	int		display;		// bottom of console displays this line
 
 	float	cw, ch;
@@ -50,8 +51,6 @@ typedef struct {
 
 	float	displayFrac;	// aproaches finalFrac at scr_conspeed
 	float	finalFrac;		// 0.0 to 1.0 lines of console to display
-
-	int		vislines;		// in scanlines
 
 	int		times[CON_NOTIFYLINES];	// cls.realtime time the line was generated
 								// for transparent notify lines
@@ -231,6 +230,8 @@ static void Con_Init()
 	con.current = con.totallines - 1;
 	Con_Clear_f();
 
+	//con.cw = SMALLCHAR_WIDTH * 2;
+	//con.ch = SMALLCHAR_HEIGHT * 1.5;
 	con.cw = SMALLCHAR_WIDTH;
 	con.ch = SMALLCHAR_HEIGHT;
 }
@@ -241,61 +242,7 @@ static void Con_CheckResize()
 	if (!cls.rendererStarted)
 		return;
 
-#if 0
-	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
-	short	tbuf[CON_TEXTSIZE];
-
-	width = (SCREEN_WIDTH / SMALLCHAR_WIDTH) - 2;
-
-	if (width == con.linewidth)
-		return;
-
-	if (width < 1)			// video hasn't been initialized yet
-	{
-		/* never happens
-		width = CONSOLE_WIDTH;
-		con.linewidth = width;
-		con.totallines = CON_TEXTSIZE / con.linewidth;
-		for(i=0; i<CON_TEXTSIZE; i++)
-			con.text[i] = (COLOR_WHITE << 8) | ' ';
-		*/
-	}
-	else
-	{
-		oldwidth = con.linewidth;
-		con.linewidth = width;
-		oldtotallines = con.totallines;
-		con.totallines = CON_TEXTSIZE / con.linewidth;
-		numlines = oldtotallines;
-
-		if (con.totallines < numlines)
-			numlines = con.totallines;
-
-		numchars = oldwidth;
-	
-		if (con.linewidth < numchars)
-			numchars = con.linewidth;
-
-		Com_Memcpy (tbuf, con.text, CON_TEXTSIZE * sizeof(short));
-		for(i=0; i<CON_TEXTSIZE; i++)
-			con.text[i] = (COLOR_WHITE << 8) | ' ';
-
-		for (i=0 ; i<numlines ; i++)
-		{
-			for (j=0 ; j<numchars ; j++)
-			{
-				con.text[(con.totallines - 1 - i) * con.linewidth + j] =
-						tbuf[((con.current - i + oldtotallines) %
-							  oldtotallines) * oldwidth + j];
-			}
-		}
-
-		Con_ClearNotify();
-	}
-
-	con.current = con.totallines - 1;
-	con.display = con.current;
-#endif
+	// if the screen res has changed, update con.cw and con.ch
 }
 
 
@@ -424,21 +371,18 @@ DRAWING
 
 static void Con_DrawInput()
 {
-	int y;
-
 	if ( cls.state != CA_DISCONNECTED && !(cls.keyCatchers & KEYCATCH_CONSOLE ) ) {
 		return;
 	}
 
-	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
+	float y = con.y - (con.ch * 2);
 
 	re.SetColor( colorBlack );
-	SCR_DrawSmallChar( con.xadjust + 1, y + 1, ']' );
+	SCR_DrawChar( con.xadjust + 1, y + 1, con.cw, con.ch, ']' );
 	re.SetColor( colorWhite );
-	SCR_DrawSmallChar( con.xadjust, y, ']' );
+	SCR_DrawChar( con.xadjust, y, con.cw, con.ch, ']' );
 
-	Field_Draw( &g_consoleField, con.xadjust + SMALLCHAR_WIDTH, y,
-		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
+	Field_Draw( &g_consoleField, con.xadjust + con.cw, y, con.cw, con.ch );
 }
 
 
@@ -446,7 +390,7 @@ static void Con_DrawInput()
 
 static void Con_DrawNotify()
 {
-	int		x, v;
+	int		x;
 	short	*text;
 	int		i;
 	int		time;
@@ -455,8 +399,8 @@ static void Con_DrawNotify()
 	char color = COLOR_WHITE;
 	re.SetColor( ColorFromChar( color ) );
 
-	v = 0;
-	for (i= con.current-CON_NOTIFYLINES+1 ; i<=con.current ; i++)
+	int y = 0;
+	for (i = con.current-CON_NOTIFYLINES+1 ; i <= con.current ; i++)
 	{
 		if (i < 0)
 			continue;
@@ -480,10 +424,10 @@ static void Con_DrawNotify()
 				color = (text[x] >> 8);
 				re.SetColor( ColorFromChar( color ) );
 			}
-			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
+			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
 		}
 
-		v += SMALLCHAR_HEIGHT;
+		y += SMALLCHAR_HEIGHT;
 	}
 
 	re.SetColor( NULL );
@@ -492,30 +436,37 @@ static void Con_DrawNotify()
 		return;
 	}
 
-	// draw the chat line
+	// draw the chat line - this shit has NO business being in the engine >:(
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
 	{
 		if (chat_team)
 		{
-			SCR_DrawBigString (8, v, "say_team:" );
+			SCR_DrawString( 8, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "say_team:", qtrue );
 			skip = 10;
 		}
 		else
 		{
-			SCR_DrawBigString (8, v, "say:" );
+			SCR_DrawString( 8, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "say:", qtrue );
 			skip = 5;
 		}
 
-		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
-			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue );
-
-		v += BIGCHAR_HEIGHT;
+		Field_Draw( &chatField, skip * BIGCHAR_WIDTH, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT );
+		y += BIGCHAR_HEIGHT;
 	}
 
 }
 
 
 ///////////////////////////////////////////////////////////////
+
+
+static void Con_FillRect( float x, float y, float w, float h, const vec4_t color )
+{
+	re.SetColor( color );
+	SCR_AdjustFrom640( &x, &y, &w, &h );
+	re.DrawStretchPic( x, y, w, h, 0, 0, 0, 0, cls.whiteShader );
+	re.SetColor( NULL );
+}
 
 
 static void Con_DrawSolidConsole( float frac )
@@ -529,23 +480,18 @@ static void Con_DrawSolidConsole( float frac )
 	if (scanlines <= 0)
 		return;
 
-	// on wide screens, we will center the text
+	// center the text on wide screens
 	con.xadjust = 0;
 	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
-	con.xadjust += SMALLCHAR_WIDTH;
+	con.xadjust += con.cw;
 
 	// draw the background
 	y = frac * SCREEN_HEIGHT - 2;
-	if ( y < 1 ) {
-		y = 0;
-	}
-	else {
-		MAKERGBA( fill, 0.44f, 0.44f, 0.44f, 1.0 );
-		SCR_FillRect( 0, 0, SCREEN_WIDTH, y, fill );
-	}
+	MAKERGBA( fill, 0.44f, 0.44f, 0.44f, 1.0 );
+	Con_FillRect( 0, 0, SCREEN_WIDTH, y, fill );
 
 	MAKERGBA( fill, 0.33f, 0.33f, 0.33f, 1.0 );
-	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, fill );
+	Con_FillRect( 0, y, SCREEN_WIDTH, 2, fill );
 
 	i = sizeof( Q3_VERSION )/sizeof(char) - 1;
 	x = cls.glconfig.vidWidth;
@@ -555,9 +501,10 @@ static void Con_DrawSolidConsole( float frac )
 	}
 
 	re.SetColor( NULL );
-	con.vislines = scanlines;
-	rows = (scanlines - SMALLCHAR_HEIGHT) / SMALLCHAR_HEIGHT;
-	y = scanlines - (SMALLCHAR_HEIGHT * 3);
+	rows = (scanlines - con.ch) / con.ch;
+	con.y = scanlines;
+
+	y = scanlines - (con.ch * 3);
 
 	// draw the console text from the bottom up
 	if (con.display != con.current)
@@ -566,7 +513,7 @@ static void Con_DrawSolidConsole( float frac )
 		re.SetColor( colorBlack );
 		for (x = 0; x < con.linewidth; x += 4)
 			SCR_DrawSmallChar( con.xadjust + (x * SMALLCHAR_WIDTH), y, '^' );
-		y -= SMALLCHAR_HEIGHT;
+		y -= con.ch;
 		--rows;
 	}
 
@@ -578,7 +525,7 @@ static void Con_DrawSolidConsole( float frac )
 	char color = COLOR_WHITE;
 	re.SetColor( ColorFromChar( color ) );
 
-	for (i = 0; i < rows; ++i, --row, y -= SMALLCHAR_HEIGHT )
+	for (i = 0; i < rows; ++i, --row, y -= con.ch )
 	{
 		if (row < 0)
 			break;
@@ -591,7 +538,7 @@ static void Con_DrawSolidConsole( float frac )
 
 		re.SetColor( colorBlack );
 		for (int i = 0; i < con.linewidth; ++i) {
-			SCR_DrawSmallChar( 1 + con.xadjust + i * SMALLCHAR_WIDTH, 1 + y, (text[i] & 0xFF) );
+			SCR_DrawChar( 1 + con.xadjust + i * con.cw, 1 + y, con.cw, con.ch, (text[i] & 0xFF) );
 		}
 
 		re.SetColor( colorWhite );
@@ -600,7 +547,7 @@ static void Con_DrawSolidConsole( float frac )
 				color = (text[i] >> 8);
 				re.SetColor( ColorFromChar( color ) );
 			}
-			SCR_DrawSmallChar( con.xadjust + i * SMALLCHAR_WIDTH, y, (text[i] & 0xFF) );
+			SCR_DrawChar( con.xadjust + i * con.cw, y, con.cw, con.ch, (text[i] & 0xFF) );
 		}
 	}
 
@@ -649,7 +596,7 @@ void Con_RunConsole()
 	if ( cls.keyCatchers & KEYCATCH_CONSOLE )
 		con.finalFrac = 0.5;		// half screen
 	else
-		con.finalFrac = 0;				// none visible
+		con.finalFrac = 0;			// none visible
 
 	// scroll towards the destination height
 	if (con.finalFrac < con.displayFrac)

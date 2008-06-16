@@ -22,11 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "keycodes.h"
 
 
-// NOTE TTimo the declaration of field_t and Field_Clear is now in qcommon/qcommon.h
-void Field_Draw( field_t *edit, int x, int y, int width, qbool showCursor );
-void Field_BigDraw( field_t *edit, int x, int y, int width, qbool showCursor );
+void Field_Draw( field_t* edit, int x, int y, int cw, int ch );
 
-#define		COMMAND_HISTORY		32
+#define COMMAND_HISTORY		32
 extern	field_t	historyEditLines[COMMAND_HISTORY];
 
 extern	field_t	g_consoleField;
