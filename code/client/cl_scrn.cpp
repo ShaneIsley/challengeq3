@@ -100,13 +100,13 @@ void SCR_DrawString( float x, float y, float cw, float ch, const char* string, q
 	// draw the drop shadow
 	re.SetColor( colorBlack );
 	s = string;
-	xx = x;
+	xx = x + 1;
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
 			s += 2;
 			continue;
 		}
-		SCR_DrawChar( xx+1, y+1, cw, ch, *s );
+		SCR_DrawChar( xx, y+1, cw, ch, *s );
 		xx += cw;
 		s++;
 	}
