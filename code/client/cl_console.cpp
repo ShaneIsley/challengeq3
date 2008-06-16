@@ -462,7 +462,6 @@ static void Con_DrawNotify()
 static void Con_FillRect( float x, float y, float w, float h, const vec4_t color )
 {
 	re.SetColor( color );
-	SCR_AdjustFrom640( &x, &y, &w, &h );
 	re.DrawStretchPic( x, y, w, h, 0, 0, 0, 0, cls.whiteShader );
 	re.SetColor( NULL );
 }
@@ -480,12 +479,12 @@ static void Con_DrawSolidConsole( float frac )
 		return;
 
 	// draw the background
-	y = frac * SCREEN_HEIGHT - 2;
+	y = scanlines - 2;
 	MAKERGBA( fill, 0.44f, 0.44f, 0.44f, 1.0 );
-	Con_FillRect( 0, 0, SCREEN_WIDTH, y, fill );
+	Con_FillRect( 0, 0, cls.glconfig.vidWidth, y, fill );
 
 	MAKERGBA( fill, 0.33f, 0.33f, 0.33f, 1.0 );
-	Con_FillRect( 0, y, SCREEN_WIDTH, 2, fill );
+	Con_FillRect( 0, y, cls.glconfig.vidWidth, 2, fill );
 
 	i = sizeof( Q3_VERSION )/sizeof(char) - 1;
 	x = cls.glconfig.vidWidth;
