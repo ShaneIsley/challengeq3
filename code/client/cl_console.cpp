@@ -24,10 +24,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 
 
-static const cvar_t* con_conspeed;
+static const cvar_t* con_noprint;
 static const cvar_t* con_notifytime;
-static const cvar_t* cl_noprint;
-static const cvar_t* cl_conXOffset;
+static const cvar_t* con_offset;
+static const cvar_t* con_scale;
+static const cvar_t* con_speed;
 
 
 #define CON_NOTIFYLINES	4
@@ -43,13 +44,13 @@ struct console_t {
 	int		y;				// virtual screen coordinate of bottom of console
 	int		display;		// bottom of console displays this line
 
-	float	cw, ch;
+	float	cw, ch;			// actual font size in pixels
 	float	xadjust;		// supposedly for wide aspect screens, but never actually set properly
 
 	int		linewidth;		// characters across screen
 	int		totallines;		// total lines in console scrollback
 
-	float	displayFrac;	// aproaches finalFrac at scr_conspeed
+	float	displayFrac;	// approaches finalFrac at con_speed
 	float	finalFrac;		// 0.0 to 1.0 lines of console to display
 
 	int		times[CON_NOTIFYLINES];	// cls.realtime time the line was generated
@@ -58,8 +59,10 @@ struct console_t {
 
 static console_t con;
 
+// base font size, optionally scaled by screen resolution and con_scale
 #define CONCHAR_WIDTH	8
 #define CONCHAR_HEIGHT	12
+
 #define CONSOLE_WIDTH	78
 int g_console_field_width = CONSOLE_WIDTH;
 
@@ -244,7 +247,14 @@ static void Con_ResizeFont()
 
 	con.cw = CONCHAR_WIDTH;
 	con.ch = CONCHAR_HEIGHT;
+	con.xadjust = CONCHAR_WIDTH;
+
+	if (!con_scale || !con_scale->value)
+		return;
+
 	SCR_AdjustFrom640( &con.cw, &con.ch, NULL, NULL );
+	con.cw *= con_scale->value;
+	con.ch *= con_scale->value;
 
 	if ( cls.glconfig.vidWidth * SCREEN_WIDTH > cls.glconfig.vidHeight * SCREEN_HEIGHT ) {
 		// the console distorts horribly on widescreens
@@ -259,10 +269,11 @@ void CL_ConInit()
 {
 	int i;
 
-	con_notifytime = Cvar_Get( "con_notifytime", "3", 0 );
-	con_conspeed = Cvar_Get( "scr_conspeed", "3", 0 );
-	cl_noprint = Cvar_Get( "cl_noprint", "0", 0 );
-	cl_conXOffset = Cvar_Get( "cl_conXOffset", "0", 0 );
+	con_noprint = Cvar_Get( "con_noprint", "0", 0 );
+	con_notifytime = Cvar_Get( "con_notifytime", "3", CVAR_ARCHIVE );
+	con_offset = Cvar_Get( "con_offset", "0", CVAR_ARCHIVE );
+	con_scale = Cvar_Get( "con_scale", "1", CVAR_ARCHIVE );
+	con_speed = Cvar_Get( "con_speed", "3", CVAR_ARCHIVE );
 
 	Field_Clear( &g_consoleField );
 	g_consoleField.widthInChars = g_console_field_width;
@@ -307,12 +318,11 @@ If no console is visible, the text will appear at the top of the game window
 */
 void CL_ConsolePrint( const char* s )
 {
-	int		y;
-	int		c, w;
+	int c, w, y;
 
-	// cl_noprint disables ALL console functionality
+	// con_noprint disables ALL console functionality
 	// use con_notifytime 0 to log the text without the annoying overlay
-	if ( cl_noprint && cl_noprint->integer ) {
+	if ( con_noprint && con_noprint->integer ) {
 		return;
 	}
 
@@ -433,7 +443,7 @@ static void Con_DrawNotify()
 				color = (text[x] >> 8);
 				re.SetColor( ColorFromChar( color ) );
 			}
-			SCR_DrawChar( cl_conXOffset->integer + con.xadjust + (x+1)*con.cw, y, con.cw, con.ch, text[x] & 0xff );
+			SCR_DrawChar( con_offset->integer + con.xadjust + (x+1)*con.cw, y, con.cw, con.ch, text[x] & 0xff );
 		}
 
 		y += con.ch;
@@ -598,13 +608,13 @@ void Con_RunConsole()
 	// scroll towards the destination height
 	if (con.finalFrac < con.displayFrac)
 	{
-		con.displayFrac -= con_conspeed->value*cls.realFrametime*0.001;
+		con.displayFrac -= con_speed->value * cls.realFrametime * 0.001;
 		if (con.finalFrac > con.displayFrac)
 			con.displayFrac = con.finalFrac;
 	}
 	else if (con.finalFrac > con.displayFrac)
 	{
-		con.displayFrac += con_conspeed->value*cls.realFrametime*0.001;
+		con.displayFrac += con_speed->value * cls.realFrametime * 0.001;
 		if (con.finalFrac < con.displayFrac)
 			con.displayFrac = con.finalFrac;
 	}

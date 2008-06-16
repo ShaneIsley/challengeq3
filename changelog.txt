@@ -17,7 +17,16 @@ fixed distance culling on dlit patch seams
 
 changed r_ext_max_anisotropy default to 16
 
-made the console font scale properly
+added con_scale for console font scaling
+0 = Q3 style, always 8x12 pixels regardless of screen rez
+1 = Q4 style, scales with screen rez
+!0 = scale with screen rez and a custom multiplier
+
+straightened out the con cvar mess:
+cl_noprint -> con_noprint
+cl_conXOffset -> con_offset and correctly CVAR_ARCHIVE
+scr_conspeed -> con_speed and correctly CVAR_ARCHIVE
+con_notifytime correctly CVAR_ARCHIVE
 
 another MASSIVE overhaul of the sound code:
 
