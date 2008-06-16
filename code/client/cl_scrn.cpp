@@ -36,19 +36,17 @@ static cvar_t* cl_graphshift;
 
 void SCR_AdjustFrom640( float *x, float *y, float *w, float *h )
 {
-	float	xscale;
-	float	yscale;
-
 #if 0
-		// adjust for wide screens
-		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
-			*x += 0.5 * ( cls.glconfig.vidWidth - ( cls.glconfig.vidHeight * 640 / 480 ) );
-		}
+	// adjust for wide screens
+	if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
+		*x += 0.5 * ( cls.glconfig.vidWidth - ( cls.glconfig.vidHeight * 640 / 480 ) );
+	}
 #endif
 
 	// scale for screen sizes
-	xscale = cls.glconfig.vidWidth / 640.0;
-	yscale = cls.glconfig.vidHeight / 480.0;
+	float xscale = cls.glconfig.vidWidth / 640.0;
+	float yscale = cls.glconfig.vidHeight / 480.0;
+
 	if ( x ) {
 		*x *= xscale;
 	}
@@ -188,7 +186,7 @@ void SCR_DrawSmallString( int x, int y, const char* s )
 }
 
 
-//===============================================================================
+///////////////////////////////////////////////////////////////
 
 
 static void SCR_DrawDemoRecording()
@@ -203,13 +201,8 @@ static void SCR_DrawDemoRecording()
 }
 
 
-/*
-===============================================================================
+///////////////////////////////////////////////////////////////
 
-DEBUG GRAPH
-
-===============================================================================
-*/
 
 typedef struct
 {
@@ -220,12 +213,8 @@ typedef struct
 static	int			current;
 static	graphsamp_t	values[1024];
 
-/*
-==============
-SCR_DebugGraph
-==============
-*/
-void SCR_DebugGraph (float value, int color)
+
+void SCR_DebugGraph( float value, int color )
 {
 	values[current&1023].value = value;
 	values[current&1023].color = color;
@@ -239,9 +228,6 @@ static void SCR_DrawDebugGraph()
 	float	v;
 	int		color;
 
-	//
-	// draw the graph
-	//
 	w = cls.glconfig.vidWidth;
 	x = 0;
 	y = cls.glconfig.vidHeight;
@@ -265,21 +251,21 @@ static void SCR_DrawDebugGraph()
 }
 
 
-//=============================================================================
+///////////////////////////////////////////////////////////////
 
 
 void SCR_Init()
 {
-	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
-	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
-	cl_graphscale = Cvar_Get ("graphscale", "1", CVAR_CHEAT);
-	cl_graphshift = Cvar_Get ("graphshift", "0", CVAR_CHEAT);
+	cl_timegraph = Cvar_Get( "timegraph", "0", CVAR_CHEAT );
+	cl_graphheight = Cvar_Get( "graphheight", "32", CVAR_CHEAT );
+	cl_graphscale = Cvar_Get( "graphscale", "1", CVAR_CHEAT );
+	cl_graphshift = Cvar_Get( "graphshift", "0", CVAR_CHEAT );
 
 	scr_initialized = qtrue;
 }
 
 
-//=======================================================
+///////////////////////////////////////////////////////////////
 
 
 // this will be called twice if rendering in stereo mode
