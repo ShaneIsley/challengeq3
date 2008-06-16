@@ -431,12 +431,10 @@ void SCR_UpdateScreen();
 void SCR_AdjustFrom640( float *x, float *y, float *w, float *h );
 // SCR_ functions operate at native resolution, NOT the virtual 640x480 screen
 
-void SCR_DrawSmallChar( int x, int y, int ch );
-
 void SCR_DrawChar( float x, float y, float cw, float ch, int c );
 void SCR_DrawString( float x, float y, float cw, float ch, const char* s, qbool allowColor );
 
-void SCR_DebugGraph (float value, int color);
+void SCR_DebugGraph( float value, int color );
 
 
 //

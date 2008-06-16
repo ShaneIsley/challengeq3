@@ -424,7 +424,7 @@ static void Con_DrawNotify()
 				color = (text[x] >> 8);
 				re.SetColor( ColorFromChar( color ) );
 			}
-			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
+			SCR_DrawChar( cl_conXOffset->integer + con.xadjust + (x+1)*con.cw, y, con.cw, con.ch, text[x] & 0xff );
 		}
 
 		y += SMALLCHAR_HEIGHT;
@@ -497,7 +497,7 @@ static void Con_DrawSolidConsole( float frac )
 	x = cls.glconfig.vidWidth;
 	while (--i >= 0) {
 		x -= SMALLCHAR_WIDTH;
-		SCR_DrawSmallChar( x, scanlines - (SMALLCHAR_HEIGHT * 1.5), Q3_VERSION[i] );
+		SCR_DrawChar( x, scanlines - (SMALLCHAR_HEIGHT * 1.5), SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, Q3_VERSION[i] );
 	}
 
 	re.SetColor( NULL );
@@ -507,12 +507,11 @@ static void Con_DrawSolidConsole( float frac )
 	y = scanlines - (con.ch * 3);
 
 	// draw the console text from the bottom up
-	if (con.display != con.current)
-	{
+	if (con.display != con.current) {
 		// draw arrows to show the buffer is backscrolled
 		re.SetColor( colorBlack );
 		for (x = 0; x < con.linewidth; x += 4)
-			SCR_DrawSmallChar( con.xadjust + (x * SMALLCHAR_WIDTH), y, '^' );
+			SCR_DrawChar( con.xadjust + (x * con.cw), y, con.cw, con.ch, '^' );
 		y -= con.ch;
 		--rows;
 	}

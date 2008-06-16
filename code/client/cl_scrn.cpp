@@ -132,16 +132,6 @@ void SCR_DrawString( float x, float y, float cw, float ch, const char* string, q
 }
 
 
-// small chars are drawn at native screen resolution
-// which sucks ass if you run at "too" high or low a rez  :(
-// used exclusively by the console
-
-void SCR_DrawSmallChar( int x, int y, int ch )
-{
-	SCR_DrawChar( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, ch );
-}
-
-
 ///////////////////////////////////////////////////////////////
 
 
