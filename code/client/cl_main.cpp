@@ -1979,7 +1979,7 @@ void CL_Init()
 {
 	//Com_Printf( "----- Client Initialization -----\n" );
 
-	Con_Init();
+	CL_ConInit();
 
 	CL_ClearState();
 

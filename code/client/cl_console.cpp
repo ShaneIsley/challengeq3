@@ -42,6 +42,7 @@ typedef struct {
 	int		x;				// offset in current line for next print
 	int		display;		// bottom of console displays this line
 
+	float	cw, ch;
 	int 	linewidth;		// characters across screen
 	int		totallines;		// total lines in console scrollback
 
@@ -58,8 +59,8 @@ typedef struct {
 
 static console_t con;
 
-#define DEFAULT_CONSOLE_WIDTH 78
-int g_console_field_width = DEFAULT_CONSOLE_WIDTH;
+#define CONSOLE_WIDTH 78
+int g_console_field_width = CONSOLE_WIDTH;
 
 
 void Con_ToggleConsole_f( void )
@@ -218,11 +219,29 @@ void Con_ClearNotify()
 }
 
 
-// if the line width has changed, reformat the buffer
-// KHB !!!  this is pointless other than at init, and the comment is a lie - the console is ALWAYS 78 chars wide
+// called on demand by the first CL_ConsolePrint
+// before the client subsystem is actually up and running properly
+
+static void Con_Init()
+{
+	con.initialized = qtrue;
+
+	con.linewidth = CONSOLE_WIDTH;
+	con.totallines = CON_TEXTSIZE / con.linewidth;
+	con.current = con.totallines - 1;
+	Con_Clear_f();
+
+	con.cw = SMALLCHAR_WIDTH;
+	con.ch = SMALLCHAR_HEIGHT;
+}
+
 
 static void Con_CheckResize()
 {
+	if (!cls.rendererStarted)
+		return;
+
+#if 0
 	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
 	short	tbuf[CON_TEXTSIZE];
 
@@ -233,11 +252,13 @@ static void Con_CheckResize()
 
 	if (width < 1)			// video hasn't been initialized yet
 	{
-		width = DEFAULT_CONSOLE_WIDTH;
+		/* never happens
+		width = CONSOLE_WIDTH;
 		con.linewidth = width;
 		con.totallines = CON_TEXTSIZE / con.linewidth;
 		for(i=0; i<CON_TEXTSIZE; i++)
 			con.text[i] = (COLOR_WHITE << 8) | ' ';
+		*/
 	}
 	else
 	{
@@ -274,12 +295,13 @@ static void Con_CheckResize()
 
 	con.current = con.totallines - 1;
 	con.display = con.current;
+#endif
 }
 
 
-void Con_Init()
+void CL_ConInit()
 {
-	int		i;
+	int i;
 
 	con_notifytime = Cvar_Get( "con_notifytime", "3", 0 );
 	con_conspeed = Cvar_Get( "scr_conspeed", "3", 0 );
@@ -292,6 +314,7 @@ void Con_Init()
 		Field_Clear( &historyEditLines[i] );
 		historyEditLines[i].widthInChars = g_console_field_width;
 	}
+	Con_ClearNotify();
 
 	Cmd_AddCommand( "toggleconsole", Con_ToggleConsole_f );
 	Cmd_AddCommand( "messagemode", Con_MessageMode_f );
@@ -337,11 +360,8 @@ void CL_ConsolePrint( const char* s )
 		return;
 	}
 
-	if (!con.initialized) {
-		con.linewidth = -1;
-		Con_CheckResize();
-		con.initialized = qtrue;
-	}
+	if (!con.initialized)
+		Con_Init();
 
 	char color = COLOR_WHITE;
 

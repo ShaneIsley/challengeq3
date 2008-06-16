@@ -410,7 +410,7 @@ qbool	CL_UpdateVisiblePings_f( int source );
 //
 // console
 //
-void Con_Init();
+void CL_ConInit();
 void Con_ToggleConsole_f( void );
 void Con_ClearNotify();
 void Con_RunConsole();
