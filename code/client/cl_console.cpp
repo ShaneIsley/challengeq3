@@ -452,19 +452,22 @@ static void Con_DrawNotify()
 	// draw the chat line - this shit has NO business being in the engine >:(
 	if ( cls.keyCatchers & KEYCATCH_MESSAGE )
 	{
+		float cw = 12, ch = 16;
+		SCR_AdjustFrom640( &cw, &ch, NULL, NULL );
+
 		if (chat_team)
 		{
-			SCR_DrawString( 8, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "say_team:", qtrue );
+			SCR_DrawString( 8, y, cw, ch, "say_team:", qtrue );
 			skip = 10;
 		}
 		else
 		{
-			SCR_DrawString( 8, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "say:", qtrue );
+			SCR_DrawString( 8, y, cw, ch, "say:", qtrue );
 			skip = 5;
 		}
 
-		Field_Draw( &chatField, skip * BIGCHAR_WIDTH, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT );
-		y += BIGCHAR_HEIGHT;
+		Field_Draw( &chatField, skip * cw, y, cw, ch );
+		y += ch;
 	}
 
 }
