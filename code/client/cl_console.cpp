@@ -255,7 +255,7 @@ static void Con_ResizeFont()
 	con.cw *= con_scale->value;
 	con.ch *= con_scale->value;
 
-	if ( cls.glconfig.vidWidth * SCREEN_WIDTH > cls.glconfig.vidHeight * SCREEN_HEIGHT ) {
+	if ( cls.glconfig.vidWidth * SCREEN_HEIGHT > cls.glconfig.vidHeight * SCREEN_WIDTH ) {
 		// the console distorts horribly on widescreens
 		con.cw = con.ch * SCREEN_HEIGHT / SCREEN_WIDTH;
 	}
