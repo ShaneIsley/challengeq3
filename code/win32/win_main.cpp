@@ -830,10 +830,7 @@ void Sys_Init()
 	Cvar_Get( "sys_cpustring", "detect", 0 );
 	if ( !Q_stricmp( Cvar_VariableString( "sys_cpustring"), "detect" ) )
 	{
-		Com_Printf( "CPU: " );
-
 		int cpuid = Sys_GetProcessorId();
-
 		switch ( cpuid )
 		{
 		case CPUID_GENERIC:
@@ -849,9 +846,9 @@ void Sys_Init()
 			break;
 		}
 	}
-	Com_Printf( "%s\n", Cvar_VariableString( "sys_cpustring" ) );
+	Com_Printf( "CPU: %s\n", Cvar_VariableString( "sys_cpustring" ) );
 
-	Cvar_Set( "username", Sys_GetCurrentUser() );
+	//Cvar_Set( "username", Sys_GetCurrentUser() );
 
 	IN_Init();		// FIXME: not in dedicated?
 }
