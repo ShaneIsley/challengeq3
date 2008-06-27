@@ -889,11 +889,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	NET_Init();
 
 	char cwd[MAX_OSPATH];
-	_getcwd (cwd, sizeof(cwd));
-	Com_Printf("Working directory: %s\n", cwd);
+	_getcwd( cwd, sizeof(cwd) );
+	Com_Printf( "Working directory: %s\n", cwd );
 
 	// hide the early console since we've reached the point where we
-	// have a working graphics subsystems
+	// have a working graphics subsystem
 	if ( !com_dedicated->integer && !com_viewlog->integer ) {
 		Sys_ShowConsole( 0, qfalse );
 	}
@@ -902,8 +902,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	// main game loop
 	while (qtrue) {
-		// if not running as a game client, sleep a bit
-		if ( g_wv.isMinimized || ( com_dedicated && com_dedicated->integer ) )
+		// if running as a client but not focused, sleep a bit
+		// (servers have their own sleep path)
+		if ( !g_wv.activeApp && com_dedicated && !com_dedicated->integer )
 			Sleep( 5 );
 
 		int startTime = Sys_Milliseconds();

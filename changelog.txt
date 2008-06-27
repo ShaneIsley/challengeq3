@@ -28,6 +28,9 @@ scr_conspeed -> con_speed and correctly CVAR_ARCHIVE
 con_notifytime correctly CVAR_ARCHIVE
 removed cl_conXOffset since it basically doesn't work
 
+sleep correctly if an unfocused client (win32-only)
+don't sleep INcorrectly if a dedicated server (win32-only)
+
 another MASSIVE overhaul of the sound code:
 
 removed s_doppler, it's "right", but it just sounds like shit
