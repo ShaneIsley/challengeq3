@@ -57,29 +57,29 @@ static void WIN_DisableAltTab()
 	else
 	{
 		BOOL old;
-
 		SystemParametersInfo( SPI_SCREENSAVERRUNNING, 1, &old, 0 );
 	}
+
 	s_alttab_disabled = qtrue;
 }
 
+
 static void WIN_EnableAltTab()
 {
-	if ( s_alttab_disabled )
+	if ( !s_alttab_disabled )
+		return;
+
+	if ( !Q_stricmp( Cvar_VariableString( "arch" ), "winnt" ) )
 	{
-		if ( !Q_stricmp( Cvar_VariableString( "arch" ), "winnt" ) )
-		{
-			UnregisterHotKey( 0, 0 );
-		}
-		else
-		{
-			BOOL old;
-
-			SystemParametersInfo( SPI_SCREENSAVERRUNNING, 0, &old, 0 );
-		}
-
-		s_alttab_disabled = qfalse;
+		UnregisterHotKey( 0, 0 );
 	}
+	else
+	{
+		BOOL old;
+		SystemParametersInfo( SPI_SCREENSAVERRUNNING, 0, &old, 0 );
+	}
+
+	s_alttab_disabled = qfalse;
 }
 
 
@@ -102,7 +102,8 @@ static void VID_AppActivate( BOOL fActive, BOOL minimize )
 }
 
 
-//==========================================================================
+///////////////////////////////////////////////////////////////
+
 
 static byte s_scantokey[128] =
 {
@@ -124,7 +125,7 @@ static byte s_scantokey[128] =
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
 	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-}; 
+};
 
 /*
 =======
@@ -279,9 +280,9 @@ LONG WINAPI MainWndProc (
 
 		g_wv.hWnd = hWnd;
 
-		vid_xpos = Cvar_Get ("vid_xpos", "3", CVAR_ARCHIVE);
-		vid_ypos = Cvar_Get ("vid_ypos", "22", CVAR_ARCHIVE);
-		r_fullscreen = Cvar_Get ("r_fullscreen", "1", CVAR_ARCHIVE | CVAR_LATCH );
+		vid_xpos = Cvar_Get( "vid_xpos", "3", CVAR_ARCHIVE );
+		vid_ypos = Cvar_Get( "vid_ypos", "22", CVAR_ARCHIVE );
+		r_fullscreen = Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE | CVAR_LATCH );
 
 		MSH_MOUSEWHEEL = RegisterWindowMessage("MSWHEEL_ROLLMSG"); 
 		if ( r_fullscreen->integer )
