@@ -826,10 +826,10 @@ static void GLW_InitExtensions( void )
     ri.Printf( PRINT_ALL, "...GL_EXT_compiled_vertex_array not found\n" );
   }
 
-  textureFilterAnisotropic = qfalse;
+  int maxAnisotropy = 0;
   if ( strstr( glConfig.extensions_string, "GL_EXT_texture_filter_anisotropic" ) )
   {
-    if ( r_ext_max_anisotropy->integer >= 1 ) {
+    if ( r_ext_max_anisotropy->integer > 1 ) {
       qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy );
       if ( maxAnisotropy <= 0 ) {
         ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not properly supported!\n" );
@@ -838,7 +838,6 @@ static void GLW_InitExtensions( void )
       else
       {
         ri.Printf( PRINT_ALL, "...using GL_EXT_texture_filter_anisotropic (max: %i)\n", maxAnisotropy );
-        textureFilterAnisotropic = qtrue;
       }
     }
     else
@@ -850,6 +849,7 @@ static void GLW_InitExtensions( void )
   {
     ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not found\n" );
   }
+  Cvar_Set( "r_ext_max_anisotropy", va("%i", maxAnisotropy) );
 }
 
 static void GLW_InitGamma( void )
@@ -914,12 +914,9 @@ static qboolean GLW_LoadOpenGL( const char *name )
 ** This routine is responsible for initializing the OS specific portions
 ** of OpenGL.  
 */
-void GLimp_Init( void )
+void GLimp_Init()
 {
-  char  buf[1024];
-  cvar_t *lastValidRenderer = ri.Cvar_Get( "r_lastValidRenderer", "(uninitialized)", CVAR_ARCHIVE );
-
-  r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
+  //r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
 
   InitSig();
 
@@ -940,51 +937,6 @@ void GLimp_Init( void )
     glConfig.renderer_string[strlen(glConfig.renderer_string) - 1] = 0;
   Q_strncpyz( glConfig.version_string, (char *) qglGetString (GL_VERSION), sizeof( glConfig.version_string ) );
   Q_strncpyz( glConfig.extensions_string, (char *) qglGetString (GL_EXTENSIONS), sizeof( glConfig.extensions_string ) );
-
-  //
-  // chipset specific configuration
-  //
-  strcpy( buf, glConfig.renderer_string );
-  strlwr( buf );
-
-  //
-  // NOTE: if changing cvars, do it within this block.  This allows them
-  // to be overridden when testing driver fixes, etc. but only sets
-  // them to their default state when the hardware is first installed/run.
-  //
-  if ( Q_stricmp( lastValidRenderer->string, glConfig.renderer_string ) )
-  {
-    glConfig.hardwareType = GLHW_GENERIC;
-
-    ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
-
-    // VOODOO GRAPHICS w/ 2MB
-    if ( Q_stristr( buf, "voodoo graphics/1 tmu/2 mb" ) )
-    {
-      ri.Cvar_Set( "r_picmip", "2" );
-      ri.Cvar_Get( "r_picmip", "1", CVAR_ARCHIVE | CVAR_LATCH );
-    } else
-    {
-      ri.Cvar_Set( "r_picmip", "1" );
-
-      if ( Q_stristr( buf, "rage 128" ) || Q_stristr( buf, "rage128" ) )
-      {
-        ri.Cvar_Set( "r_finish", "0" );
-      }
-      // Savage3D and Savage4 should always have trilinear enabled
-      else if ( Q_stristr( buf, "savage3d" ) || Q_stristr( buf, "s3 savage4" ) )
-      {
-        ri.Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
-      }
-    }
-  }
-
-  //
-  // this is where hardware specific workarounds that should be
-  // detected/initialized every startup should go.
-  //
-
-  ri.Cvar_Set( "r_lastValidRenderer", glConfig.renderer_string );
 
   // initialize extensions
   GLW_InitExtensions();
