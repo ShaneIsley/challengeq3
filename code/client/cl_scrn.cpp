@@ -143,7 +143,9 @@ static void SCR_DrawDemoRecording()
 	int pos = FS_FTell( clc.demofile );
 	const char* s = va( "RECORDING %s: %ik", clc.demoName, pos / 1024 );
 
-	SCR_DrawString( 320 - strlen(s) * 4, 20, 8, 8, s, qfalse );
+	float x = 320, y = 20, cw = 8, ch = 8;
+	SCR_AdjustFrom640( &x, &y, &cw, &ch );
+	SCR_DrawString( x - strlen(s) * cw * 0.5, y, cw, ch, s, qfalse );
 }
 
 
