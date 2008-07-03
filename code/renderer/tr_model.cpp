@@ -357,21 +357,14 @@ void R_ModelInit()
 }
 
 
-/*
-================
-R_Modellist_f
-================
-*/
-void R_Modellist_f( void ) {
-	int		i, j;
-	model_t	*mod;
-	int		total;
-	int		lods;
+void R_Modellist_f( void )
+{
+	int i, j;
+	int total = 0;
 
-	total = 0;
 	for ( i = 1 ; i < tr.numModels; i++ ) {
-		mod = tr.models[i];
-		lods = 1;
+		const model_t* mod = tr.models[i];
+		int lods = 1;
 		for ( j = 1 ; j < MD3_MAX_LODS ; j++ ) {
 			if ( mod->md3[j] && mod->md3[j] != mod->md3[j-1] ) {
 				lods++;
@@ -380,11 +373,11 @@ void R_Modellist_f( void ) {
 		ri.Printf( PRINT_ALL, "%8i : (%i) %s\n", mod->dataSize, lods, mod->name );
 		total += mod->dataSize;
 	}
-	ri.Printf( PRINT_ALL, "%8i : Total models\n", total );
+	ri.Printf( PRINT_ALL, "%8i : %i models\n", total, tr.numModels - 1 );
 
-#if	0		// not working right with new hunk
+#if 0	// not working right with new hunk
 	if ( tr.world ) {
-		ri.Printf( PRINT_ALL, "\n%8i : %s\n", tr.world->dataSize, tr.world->name );
+		ri.Printf( PRINT_ALL, "%8i : %s\n", tr.world->dataSize, tr.world->name );
 	}
 #endif
 }
