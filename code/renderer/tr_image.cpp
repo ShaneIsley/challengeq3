@@ -151,16 +151,15 @@ void R_ImageList_f( void )
 	static const char* yesno[] = { "no ", "yes" };
 
 	int i, texels = 0;
-	const image_t* image;
 
-	ri.Printf (PRINT_ALL, "\n      wide high mip TMU -fmt- wrap --name--\n");
+	ri.Printf (PRINT_ALL, "\nwide high mip TMU -fmt- wrap --name--\n");
 
-	for ( i = 0 ; i < tr.numImages ; i++ ) {
-		image = tr.images[ i ];
+	for ( i = 0; i < tr.numImages; ++i ) {
+		const image_t* image = tr.images[i];
 
 		texels += image->uploadWidth*image->uploadHeight;
-		ri.Printf (PRINT_ALL, "%4i: %4i %4i %s  %d  ",
-			i, image->uploadWidth, image->uploadHeight, yesno[image->mipmap], image->TMU );
+		ri.Printf( PRINT_ALL, "%4i %4i %s  %d  ",
+			image->uploadWidth, image->uploadHeight, yesno[image->mipmap], image->TMU );
 
 		switch ( image->internalFormat ) {
 		case 1:
@@ -212,12 +211,13 @@ void R_ImageList_f( void )
 		ri.Printf( PRINT_ALL, "%s\n", image->imgName );
 	}
 
-	ri.Printf (PRINT_ALL, " ---------\n");
-	ri.Printf (PRINT_ALL, " %i total texels (not including mipmaps)\n", texels);
-	ri.Printf (PRINT_ALL, " %i total images\n\n", tr.numImages );
+	ri.Printf( PRINT_ALL, "---------\n" );
+	ri.Printf( PRINT_ALL, "%i total texels (not including mipmaps)\n", texels );
+	ri.Printf( PRINT_ALL, "%i total images\n\n", tr.numImages );
 }
 
-//=======================================================================
+
+///////////////////////////////////////////////////////////////
 
 /*
 ================
