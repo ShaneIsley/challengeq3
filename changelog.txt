@@ -11,6 +11,8 @@ removed long-obsoleted r_lastValidRenderer
 
 removed long-obsoleted r_ext_gamma_control
 
+removed pointless cl_forceavidemo
+
 removed r_rail* and marked the never-used RT_BEAM etc as such
 
 removed RAVENMD4 completely

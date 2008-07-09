@@ -41,7 +41,6 @@ cvar_t* cl_showSend;
 cvar_t	*cl_timedemo;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
-cvar_t	*cl_forceavidemo;
 
 static cvar_t* cl_motd;
 static cvar_t* cl_motdString;
@@ -1577,10 +1576,10 @@ void CL_Frame( int msec )
 	}
 
 	// if recording an avi, lock to a fixed fps
-	if ( CL_VideoRecording( ) && cl_aviFrameRate->integer && msec) {
+	if ( CL_VideoRecording() && cl_aviFrameRate->integer && msec ) {
 		// save the current screen
-		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
-			CL_TakeVideoFrame( );
+		if ( cls.state == CA_ACTIVE ) {
+			CL_TakeVideoFrame();
 			// fixed time for next frame
 			msec = (int)ceil( (1000.0f / cl_aviFrameRate->value) * com_timescale->value );
 			if (msec == 0) {
@@ -2002,7 +2001,6 @@ void CL_Init()
 	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
 	cl_aviFrameRate = Cvar_Get ("cl_aviFrameRate", "25", CVAR_ARCHIVE);
 	cl_aviMotionJpeg = Cvar_Get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
-	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
