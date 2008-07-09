@@ -17,6 +17,8 @@ removed r_rail* and marked the never-used RT_BEAM etc as such
 
 removed RAVENMD4 completely
 
+fixed another bug in \video (hopefully)
+
 fixed distance culling on dlit patch seams
 
 changed r_ext_max_anisotropy default to 16

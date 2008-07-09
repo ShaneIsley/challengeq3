@@ -1578,13 +1578,11 @@ void CL_Frame( int msec )
 	// if recording an avi, lock to a fixed fps
 	if ( CL_VideoRecording() && cl_aviFrameRate->integer && msec ) {
 		// save the current screen
-		if ( cls.state == CA_ACTIVE ) {
-			CL_TakeVideoFrame();
-			// fixed time for next frame
-			msec = (int)ceil( (1000.0f / cl_aviFrameRate->value) * com_timescale->value );
-			if (msec == 0) {
-				msec = 1;
-			}
+		CL_TakeVideoFrame();
+		// fixed time for next frame
+		msec = (int)ceil( (1000.0f / cl_aviFrameRate->value) * com_timescale->value );
+		if (msec == 0) {
+			msec = 1;
 		}
 	}
 

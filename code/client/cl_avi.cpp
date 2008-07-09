@@ -319,9 +319,9 @@ void CL_WriteAVIHeader( void )
 }
 
 
-// creates an AVI file and get it into a state where writing the actual data can begin
+// creates an AVI file and gets it into a state where writing the actual data can begin
 
-qbool CL_OpenAVIForWriting( const char *fileName )
+qbool CL_OpenAVIForWriting( const char* fileName )
 {
 	if ( afd.fileOpen )
 		return qfalse;
@@ -463,7 +463,7 @@ void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size )
   // Index
   bufIndex = 0;
   WRITE_STRING( "00dc" );           //dwIdentifier
-  WRITE_4BYTES( 0 );                //dwFlags
+  WRITE_4BYTES( 0x00000010 );       //dwFlags (all frames are KeyFrames)
   WRITE_4BYTES( chunkOffset );      //dwOffset
   WRITE_4BYTES( size );             //dwLength
   SafeFS_Write( buffer, 16, afd.idxF );
