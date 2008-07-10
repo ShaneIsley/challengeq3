@@ -252,8 +252,13 @@ static void Con_ResizeFont()
 		return;
 
 	SCR_AdjustFrom640( &con.cw, &con.ch, NULL, NULL );
-	con.cw *= con_scale->value;
-	con.ch *= con_scale->value;
+
+	// bugs in the renderer's overflow handling will cause crashes
+	// if the console has too many polys/verts because of too small a font
+	// this is a fairly arbitrary lower bound, but better than nothing
+	float scale = max( 0.25f, con_scale->value );
+	con.cw *= scale;
+	con.ch *= scale;
 
 	if ( cls.glconfig.vidWidth * SCREEN_HEIGHT > cls.glconfig.vidHeight * SCREEN_WIDTH ) {
 		// the console distorts horribly on widescreens
