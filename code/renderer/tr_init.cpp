@@ -134,6 +134,10 @@ cvar_t	*r_debugLight;
 cvar_t	*r_debugSort;
 cvar_t	*r_printShaders;
 
+// these limits apply to the sum of all scenes in a frame:
+// the main view, all the 3D icons, and even the console etc
+#define DEFAULT_MAX_POLYS		8192
+#define DEFAULT_MAX_POLYVERTS	32768
 static cvar_t* r_maxpolys;
 static cvar_t* r_maxpolyverts;
 int max_polys;
@@ -705,8 +709,8 @@ static void R_Register()
 	r_drawBuffer = ri.Cvar_Get( "r_drawBuffer", "GL_BACK", CVAR_CHEAT );
 	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
 
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0 );
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0 );
+	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", DEFAULT_MAX_POLYS), 0 );
+	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", DEFAULT_MAX_POLYVERTS), 0 );
 
 	// make sure all the commands added here are also removed in R_Shutdown
 	ri.Cmd_AddCommand( "gfxinfo", GfxInfo_f );
@@ -760,8 +764,8 @@ void R_Init()
 
 	R_Register();
 
-	max_polys = max( r_maxpolys->integer, MAX_POLYS );
-	max_polyverts = max( r_maxpolyverts->integer, MAX_POLYVERTS );
+	max_polys = max( r_maxpolys->integer, DEFAULT_MAX_POLYS );
+	max_polyverts = max( r_maxpolyverts->integer, DEFAULT_MAX_POLYVERTS );
 
 	byte* ptr = (byte*)ri.Hunk_Alloc( sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low );
 	backEndData[0] = (backEndData_t*)ptr;
