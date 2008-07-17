@@ -142,7 +142,7 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 //	Com_DPrintf( "Cvar_Set2: %s %s\n", var_name, value );
 
 	if ( !Cvar_ValidateString( var_name ) ) {
-		Com_Printf("invalid cvar name string: %s\n", var_name );
+		Com_Printf( "invalid cvar name string: %s\n", var_name );
 		var_name = "BADNAME";
 	}
 
@@ -168,13 +168,19 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 	{
 		if (var->flags & CVAR_ROM)
 		{
-			Com_Printf ("%s is read only.\n", var_name);
+			Com_Printf( "%s is read only.\n", var_name );
 			return var;
 		}
 
 		if (var->flags & CVAR_INIT)
 		{
-			Com_Printf ("%s is write protected.\n", var_name);
+			Com_Printf( "%s is write protected.\n", var_name );
+			return var;
+		}
+
+		if ( (var->flags & CVAR_CHEAT) && !cvar_cheats->integer )
+		{
+			Com_Printf( "%s is cheat protected.\n", var_name );
 			return var;
 		}
 
@@ -184,7 +190,7 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 			{
 				if (strcmp(value, var->latchedString) == 0)
 					return var;
-				Z_Free (var->latchedString);
+				Z_Free( var->latchedString );
 			}
 			else
 			{
@@ -192,16 +198,10 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 					return var;
 			}
 
-			Com_Printf ("%s will be changed upon restarting.\n", var_name);
+			Com_Printf( "%s will be changed upon restarting.\n", var_name );
 			var->latchedString = CopyString(value);
 			var->modified = qtrue;
 			var->modificationCount++;
-			return var;
-		}
-
-		if ( (var->flags & CVAR_CHEAT) && !cvar_cheats->integer )
-		{
-			Com_Printf ("%s is cheat protected.\n", var_name);
 			return var;
 		}
 
@@ -210,7 +210,7 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 	{
 		if (var->latchedString)
 		{
-			Z_Free (var->latchedString);
+			Z_Free( var->latchedString );
 			var->latchedString = NULL;
 		}
 	}
@@ -221,11 +221,11 @@ static cvar_t* Cvar_Set2( const char *var_name, const char *value, qbool force )
 	var->modified = qtrue;
 	var->modificationCount++;
 
-	Z_Free (var->string);	// free the old value string
+	Z_Free( var->string );	// free the old value string
 
 	var->string = CopyString(value);
-	var->value = atof (var->string);
-	var->integer = atoi (var->string);
+	var->value = atof( var->string );
+	var->integer = atoi( var->string );
 
 	return var;
 }

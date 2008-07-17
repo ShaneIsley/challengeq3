@@ -17,6 +17,10 @@ removed r_rail* and marked the never-used RT_BEAM etc as such
 
 removed RAVENMD4 completely
 
+r_fullbright is not a cheat var
+
+fixed a bug with CVAR_CHEAT
+
 fixed another bug in \video (hopefully)
 
 fixed distance culling on dlit patch seams
