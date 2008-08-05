@@ -3279,6 +3279,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				botimport.Print(PRT_MESSAGE, "goal not reachable\n");
 				Com_Memset(&reach, 0, sizeof(aas_reachability_t)); //make compiler happy
 			} //end else
+			/*
 			if (bot_developer)
 			{
 				//if still going for the same goal
@@ -3290,6 +3291,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					} //end if
 				} //end if
 			} //end if
+			*/
 #endif //DEBUG
 		} //end else
 		//

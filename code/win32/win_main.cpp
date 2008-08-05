@@ -900,6 +900,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 	int totalMsec = 0, countMsec = 0;
 
+	BOOL (WINAPI *cnq3_setProcessWorkingSetSize)(HANDLE,SIZE_T,SIZE_T);
+	cnq3_setProcessWorkingSetSize = (BOOL (WINAPI*)(HANDLE,SIZE_T,SIZE_T))GetProcAddress(GetModuleHandle("kernel32"),"SetProcessWorkingSetSize");
+	if (cnq3_setProcessWorkingSetSize)
+		cnq3_setProcessWorkingSetSize(GetCurrentProcess(),-1,-1);
+
 	// main game loop
 	while (qtrue) {
 		// if running as a client but not focused, sleep a bit
