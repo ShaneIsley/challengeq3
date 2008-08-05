@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
-
+#include <malloc.h>
 
 #define MEM_THRESHOLD 96*1024*1024
 
@@ -868,6 +868,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	// should never get a previous instance in Win32
 	if ( hPrevInstance )
 		return 0;
+
+	_set_sbh_threshold( 1016 );
 
 	g_wv.hInstance = hInstance;
 
