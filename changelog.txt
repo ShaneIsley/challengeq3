@@ -41,18 +41,20 @@ removed cl_conXOffset since it basically doesn't work
 sleep correctly if an unfocused client (win32-only)
 don't sleep INcorrectly if a dedicated server (win32-only)
 
+fixed a (huge) memory leak in the vm
+
 another MASSIVE overhaul of the sound code:
-
-removed s_doppler, it's "right", but it just sounds like shit
-
-removed s_mixprestep, a stupid hack to work around another stupid hack
 
 spatialisation is now correct, which has two huge impacts:
   you can "place" sounds MUCH more accurately than before,
   but as a result, distant sounds are MUCH quieter
 
-the defective OAL stuff we inherited has been nuked completely
-i'm never going to fix it, and i'm tired of it poisoning the codebase
+removed s_doppler, it's almost right but it just sounds like shit
+
+removed s_mixprestep, a stupid hack to work around another stupid hack
+
+OAL support has been dropped completely and indefinitely
+  it's crap and i'm tired of it poisoning the codebase
 
 
 Mar 08 - 1.42
