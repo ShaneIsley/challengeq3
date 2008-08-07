@@ -1,5 +1,5 @@
 
-Jun 08 - 1.43
+Aug 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
 
@@ -43,7 +43,7 @@ don't sleep INcorrectly if a dedicated server (win32-only)
 
 fixed a (huge) memory leak in the vm
 
-another MASSIVE overhaul of the sound code:
+another massive overhaul of the sound code:
 
 spatialisation is now correct, which has two huge impacts:
   you can "place" sounds MUCH more accurately than before,
