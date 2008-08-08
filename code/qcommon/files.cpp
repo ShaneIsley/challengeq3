@@ -19,15 +19,6 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-/*****************************************************************************
- * name:		files.c
- *
- * desc:		handle based filesystem for Quake III Arena 
- *
- * $Archive: /MissionPack/code/qcommon/files.c $
- *
- *****************************************************************************/
-
 
 #include "q_shared.h"
 #include "qcommon.h"
@@ -38,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 QUAKE3 FILESYSTEM
 
-All of Quake's data access is through a hierarchical file system, but the contents of 
+All of Quake's data access is through a hierarchical file system, but the contents of
 the file system can be transparently merged from several sources.
 
 A "qpath" is a reference to game file data.  MAX_ZPATH is 256 characters, which must include
@@ -191,7 +182,7 @@ or configs will never get loaded from disk!
 typedef struct fileInPack_s {
 	char					*name;		// name of the file
 	unsigned long			pos;		// file info position in zip
-	struct	fileInPack_s*	next;		// next file in the hash
+	struct fileInPack_s*	next;		// next file in the hash
 } fileInPack_t;
 
 typedef struct {
@@ -215,51 +206,51 @@ typedef struct {
 
 typedef struct searchpath_s {
 	struct searchpath_s *next;
-
-	pack_t		*pack;		// only one of pack / dir will be non NULL
+	pack_t		*pack;		// only one of pack / dir will be non-NULL
 	directory_t	*dir;
 } searchpath_t;
 
-static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
-static	cvar_t		*fs_debug;
-static	cvar_t		*fs_homepath;
-static	cvar_t		*fs_basepath;
-static	cvar_t		*fs_basegame;
-static	cvar_t		*fs_gamedirvar;
-static	searchpath_t	*fs_searchpaths;
-static	int			fs_readCount;			// total bytes read
-static	int			fs_loadCount;			// total files read
-static	int			fs_loadStack;			// total files in memory
-static	int			fs_packFiles;			// total number of files in packs
+static char fs_gamedir[MAX_OSPATH]; // this will be a single file name with no separators
+static cvar_t* fs_debug;
+static cvar_t* fs_homepath;
+static cvar_t* fs_basepath;
+static cvar_t* fs_basegame;
+static cvar_t* fs_gamedirvar;
+static searchpath_t* fs_searchpaths;
+
+static int fs_readCount;	// total bytes read
+static int fs_loadCount;	// total files read
+static int fs_loadStack;	// total files in memory
+static int fs_packFiles;	// total number of files in packs
 
 static int fs_fakeChkSum;
 static int fs_checksumFeed;
 
-typedef union qfile_gus {
+typedef union {
 	FILE*		o;
 	unzFile		z;
 } qfile_gut;
 
-typedef struct qfile_us {
+typedef struct {
 	qfile_gut	file;
-	qbool	unique;
+	qbool		unique;
 } qfile_ut;
 
 typedef struct {
 	qfile_ut	handleFiles;
-	qbool	handleSync;
+	qbool		handleSync;
 	int			baseOffset;
 	int			fileSize;
 	int			zipFilePos;
-	qbool	zipFile;
-	qbool	streamed;
+	qbool		zipFile;
+	qbool		streamed;
 	char		name[MAX_ZPATH];
 } fileHandleData_t;
 
-static fileHandleData_t	fsh[MAX_FILE_HANDLES];
+static fileHandleData_t fsh[MAX_FILE_HANDLES];
 
 // TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
-// wether we did a reorder on the current search path when joining the server
+// whether we did a reorder on the current search path when joining the server
 static qbool fs_reordered;
 
 // never load anything from pk3 files that are not present at the server when pure
@@ -278,7 +269,7 @@ static char lastValidBase[MAX_OSPATH];
 static char lastValidGame[MAX_OSPATH];
 
 #ifdef FS_MISSING
-FILE*		missingFiles = NULL;
+static FILE* missingFiles = NULL;
 #endif
 
 
@@ -311,42 +302,39 @@ int FS_LoadStack()
 }
 
 
-/*
-=================
-FS_PakIsPure
-=================
-*/
-qbool FS_PakIsPure( pack_t *pack ) {
-	int i;
+static qbool FS_PakIsPure( const pack_t* pack )
+{
+	if (!fs_numServerPaks)
+		return qtrue;
 
-	if ( fs_numServerPaks ) {
-		for ( i = 0 ; i < fs_numServerPaks ; i++ ) {
-			// FIXME: also use hashed file names
-			// NOTE TTimo: a pk3 with same checksum but different name would be validated too
-			//   I don't see this as allowing for any exploit, it would only happen if the client does manips of it's file names 'not a bug'
-			if ( pack->checksum == fs_serverPaks[i] ) {
-				return qtrue;		// on the aproved list
-			}
+	for ( int i = 0; i < fs_numServerPaks; ++i ) {
+		// FIXME: also use hashed file names
+		// NOTE TTimo: a pk3 with same checksum but different name would be validated too
+		//   I don't see this as allowing for any exploit, it would only happen if the client does manips of it's file names 'not a bug'
+		if ( pack->checksum == fs_serverPaks[i] ) {
+			return qtrue;		// on the approved list
 		}
-		return qfalse;	// not on the pure server pak list
 	}
-	return qtrue;
+
+	return qfalse;	// not on the pure server pak list
 }
 
 
-static fileHandle_t	FS_HandleForFile(void) {
-	int		i;
-
-	for ( i = 1 ; i < MAX_FILE_HANDLES ; i++ ) {
+static fileHandle_t FS_HandleForFile()
+{
+	for ( int i = 1; i < MAX_FILE_HANDLES; ++i ) {
 		if ( fsh[i].handleFiles.file.o == NULL ) {
 			return i;
 		}
 	}
+
 	Com_Error( ERR_DROP, "FS_HandleForFile: none free" );
 	return 0;
 }
 
-static FILE	*FS_FileForHandle( fileHandle_t f ) {
+
+static FILE* FS_FileForHandle( fileHandle_t f )
+{
 	if ( f < 0 || f > MAX_FILE_HANDLES ) {
 		Com_Error( ERR_DROP, "FS_FileForHandle: out of reange" );
 	}
@@ -356,16 +344,17 @@ static FILE	*FS_FileForHandle( fileHandle_t f ) {
 	if ( ! fsh[f].handleFiles.file.o ) {
 		Com_Error( ERR_DROP, "FS_FileForHandle: NULL" );
 	}
-	
+
 	return fsh[f].handleFiles.file.o;
 }
 
-void	FS_ForceFlush( fileHandle_t f ) {
-	FILE *file;
 
-	file = FS_FileForHandle(f);
+void FS_ForceFlush( fileHandle_t f )
+{
+	FILE* file = FS_FileForHandle(f);
 	setvbuf( file, NULL, _IONBF, 0 );
 }
+
 
 /*
 ================
