@@ -522,29 +522,19 @@ static void Console_Key( int key )
 		return;
 	}
 
-	// console scrolling
-	if ( key == K_PGUP ) {
+	// console scrolling (faster if +CTRL)
+	if ((key == K_PGUP) || (key == K_MWHEELUP)) {
 		Con_PageUp();
-		return;
-	}
-
-	if ( key == K_PGDN) {
-		Con_PageDown();
-		return;
-	}
-
-	if ( key == K_MWHEELUP) {	//----(SA)	added some mousewheel functionality to the console
-		Con_PageUp();
-		if(keys[K_CTRL].down) {	// hold <ctrl> to accelerate scrolling
+		if (keys[K_CTRL].down) {
 			Con_PageUp();
 			Con_PageUp();
 		}
 		return;
 	}
 
-	if ( key == K_MWHEELDOWN) {	//----(SA)	added some mousewheel functionality to the console
+	if ((key == K_PGDN) || (key == K_MWHEELDOWN)) {
 		Con_PageDown();
-		if(keys[K_CTRL].down) {	// hold <ctrl> to accelerate scrolling
+		if (keys[K_CTRL].down) {
 			Con_PageDown();
 			Con_PageDown();
 		}
@@ -970,7 +960,7 @@ void CL_KeyEvent( int key, qbool down, unsigned time )
 		if (!down) {
 			return;
 		}
-		Con_ToggleConsole_f ();
+		Con_ToggleConsole_f();
 		return;
 	}
 
@@ -1046,8 +1036,7 @@ void CL_KeyEvent( int key, qbool down, unsigned time )
 		kb = keys[key].binding;
 		if ( !kb ) {
 			if (key >= 200) {
-				Com_Printf ("%s is unbound, use controls menu to set.\n"
-					, Key_KeynumToString( key ) );
+				Com_Printf( "%s is unbound, use controls menu to set.\n", Key_KeynumToString( key ) );
 			}
 		} else if (kb[0] == '+') {
 			int i;
