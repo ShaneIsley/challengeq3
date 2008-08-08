@@ -484,12 +484,12 @@ void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out )
 	out[2] = DotProduct( in, matrix[2] );
 }
 
-//============================================================================
+
+///////////////////////////////////////////////////////////////
+
 
 #if !idppc
-/*
-** float q_rsqrt( float number )
-*/
+
 float Q_rsqrt( float number )
 {
 	union {
@@ -510,14 +510,17 @@ float Q_rsqrt( float number )
 	return y;
 }
 
-float Q_fabs( float f ) {
+float Q_fabs( float f )
+{
 	int tmp = * ( int * ) &f;
 	tmp &= 0x7FFFFFFF;
 	return * ( float * ) &tmp;
 }
+
 #endif
 
-//============================================================
+
+///////////////////////////////////////////////////////////////
 
 
 float LerpAngle( float from, float to, float frac )
@@ -532,41 +535,38 @@ float LerpAngle( float from, float to, float frac )
 }
 
 
-/*
-=================
-AngleSubtract
+// always returns a value from -180 to 180
 
-Always returns a value from -180 to 180
-=================
-*/
-float	AngleSubtract( float a1, float a2 ) {
-	float	a;
+float AngleSubtract( float a1, float a2 )
+{
+	float a = a1 - a2;
 
-	a = a1 - a2;
 	while ( a > 180 ) {
 		a -= 360;
 	}
 	while ( a < -180 ) {
 		a += 360;
 	}
+
 	return a;
 }
 
 
-void AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 ) {
-	v3[0] = AngleSubtract( v1[0], v2[0] );
-	v3[1] = AngleSubtract( v1[1], v2[1] );
-	v3[2] = AngleSubtract( v1[2], v2[2] );
+void AnglesSubtract( const vec3_t v1, const vec3_t v2, vec3_t out )
+{
+	out[0] = AngleSubtract( v1[0], v2[0] );
+	out[1] = AngleSubtract( v1[1], v2[1] );
+	out[2] = AngleSubtract( v1[2], v2[2] );
 }
 
 
-float	AngleMod(float a) {
-	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);
-	return a;
+float AngleMod( float a )
+{
+	return ((360.0/65536) * ((int)(a*(65536/360.0)) & 65535));
 }
 
 
-//============================================================
+///////////////////////////////////////////////////////////////
 
 
 /*
@@ -932,32 +932,35 @@ Lerror:
 
 #endif
 
-/*
-=================
-RadiusFromBounds
-=================
-*/
-float RadiusFromBounds( const vec3_t mins, const vec3_t maxs ) {
+
+///////////////////////////////////////////////////////////////
+
+
+float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
+{
 	int		i;
 	vec3_t	corner;
 	float	a, b;
 
-	for (i=0 ; i<3 ; i++) {
+	for ( i = 0; i < 3; ++i ) {
 		a = fabs( mins[i] );
 		b = fabs( maxs[i] );
 		corner[i] = a > b ? a : b;
 	}
 
-	return VectorLength (corner);
+	return VectorLength( corner );
 }
 
 
-void ClearBounds( vec3_t mins, vec3_t maxs ) {
+void ClearBounds( vec3_t mins, vec3_t maxs )
+{
 	mins[0] = mins[1] = mins[2] = 99999;
 	maxs[0] = maxs[1] = maxs[2] = -99999;
 }
 
-void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs ) {
+
+void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs )
+{
 	if ( v[0] < mins[0] ) {
 		mins[0] = v[0];
 	}
@@ -979,6 +982,9 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs ) {
 		maxs[2] = v[2];
 	}
 }
+
+
+///////////////////////////////////////////////////////////////
 
 
 // KHB  although our version of q3asm CAN handle "static inline" correctly (I RULE :P)
@@ -1003,16 +1009,16 @@ vec_t VectorLengthSquared( const vec3_t v )
 
 vec_t Distance( const vec3_t p1, const vec3_t p2 )
 {
-	vec3_t	v;
-	VectorSubtract (p2, p1, v);
+	vec3_t v;
+	VectorSubtract( p2, p1, v );
 	return VectorLength( v );
 }
 
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 )
 {
-	vec3_t	v;
-	VectorSubtract (p2, p1, v);
-	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+	vec3_t v;
+	VectorSubtract( p2, p1, v );
+	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
 void VectorNormalizeFast( vec3_t v )
@@ -1040,85 +1046,92 @@ void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross )
 #endif // defined( Q3_VM )
 
 
-vec_t VectorNormalize( vec3_t v ) {
-	// NOTE: TTimo - Apple G4 altivec source uses double?
-	float	length, ilength;
+vec_t VectorNormalize( vec3_t v )
+{
+	float length;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
+	length = sqrt( length );
 
 	if ( length ) {
-		ilength = 1/length;
+		float ilength = 1.0f / length;
 		v[0] *= ilength;
 		v[1] *= ilength;
 		v[2] *= ilength;
 	}
-		
+
 	return length;
 }
 
-vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
-	float	length, ilength;
+
+vec_t VectorNormalize2( const vec3_t v, vec3_t out )
+{
+	float length;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
+	length = sqrt( length );
 
-	if (length)
-	{
-#ifndef Q3_VM // bk0101022 - FPE related
-//	  assert( ((Q_fabs(v[0])!=0.0f) || (Q_fabs(v[1])!=0.0f) || (Q_fabs(v[2])!=0.0f)) );
-#endif
-		ilength = 1/length;
+	if (length) {
+		float ilength = 1.0f / length;
 		out[0] = v[0]*ilength;
 		out[1] = v[1]*ilength;
 		out[2] = v[2]*ilength;
 	} else {
-#ifndef Q3_VM // bk0101022 - FPE related
-//	  assert( ((Q_fabs(v[0])==0.0f) && (Q_fabs(v[1])==0.0f) && (Q_fabs(v[2])==0.0f)) );
-#endif
 		VectorClear( out );
 	}
-		
-	return length;
 
+	return length;
 }
 
-void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc) {
+
+void _VectorMA( const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc )
+{
 	vecc[0] = veca[0] + scale*vecb[0];
 	vecc[1] = veca[1] + scale*vecb[1];
 	vecc[2] = veca[2] + scale*vecb[2];
 }
 
 
-vec_t _DotProduct( const vec3_t v1, const vec3_t v2 ) {
+vec_t _DotProduct( const vec3_t v1, const vec3_t v2 )
+{
 	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
 
-void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
+
+void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out )
+{
 	out[0] = veca[0]-vecb[0];
 	out[1] = veca[1]-vecb[1];
 	out[2] = veca[2]-vecb[2];
 }
 
-void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out ) {
+
+void _VectorAdd( const vec3_t veca, const vec3_t vecb, vec3_t out )
+{
 	out[0] = veca[0]+vecb[0];
 	out[1] = veca[1]+vecb[1];
 	out[2] = veca[2]+vecb[2];
 }
 
-void _VectorCopy( const vec3_t in, vec3_t out ) {
+
+void _VectorCopy( const vec3_t in, vec3_t out )
+{
 	out[0] = in[0];
 	out[1] = in[1];
 	out[2] = in[2];
 }
 
-void _VectorScale( const vec3_t in, vec_t scale, vec3_t out ) {
+
+void _VectorScale( const vec3_t in, vec_t scale, vec3_t out )
+{
 	out[0] = in[0]*scale;
 	out[1] = in[1]*scale;
 	out[2] = in[2]*scale;
 }
 
-void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
+
+void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out )
+{
 	out[0] = in[0]*scale;
 	out[1] = in[1]*scale;
 	out[2] = in[2]*scale;
@@ -1126,23 +1139,11 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
 }
 
 
-int Q_log2( int val ) {
-	int answer;
-
-	answer = 0;
-	while ( ( val>>=1 ) != 0 ) {
-		answer++;
-	}
-	return answer;
-}
+///////////////////////////////////////////////////////////////
 
 
-/*
-================
-MatrixMultiply
-================
-*/
-void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]) {
+void MatrixMultiply( float in1[3][3], float in2[3][3], float out[3][3] )
+{
 	out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
 				in1[0][2] * in2[2][0];
 	out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
@@ -1164,10 +1165,9 @@ void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]) {
 }
 
 
-void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up) {
-	float		angle;
-	static float		sr, sp, sy, cr, cp, cy;
-	// static to help MS compiler fp bugs
+void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
+{
+	float angle, sr, sp, sy, cr, cp, cy;
 
 	angle = angles[YAW] * (M_PI*2 / 360);
 	sy = sin(angle);
@@ -1199,38 +1199,28 @@ void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 	}
 }
 
-/*
-** assumes "src" is normalized
-*/
+
+// assumes "src" is normalized
+
 void PerpendicularVector( vec3_t dst, const vec3_t src )
 {
-	int	pos;
+	int pos;
 	int i;
-	float minelem = 1.0F;
+	float minelem = 1.0f;
 	vec3_t tempvec;
 
-	/*
-	** find the smallest magnitude axially aligned vector
-	*/
-	for ( pos = 0, i = 0; i < 3; i++ )
-	{
-		if ( fabs( src[i] ) < minelem )
-		{
+	// find the smallest magnitude axially aligned vector
+	for ( pos = 0, i = 0; i < 3; ++i ) {
+		if ( fabs( src[i] ) < minelem ) {
 			pos = i;
 			minelem = fabs( src[i] );
 		}
 	}
-	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;
-	tempvec[pos] = 1.0F;
+	tempvec[0] = tempvec[1] = tempvec[2] = 0.0f;
+	tempvec[pos] = 1.0f;
 
-	/*
-	** project the point onto the plane defined by src
-	*/
+	// project the point onto the plane defined by src
 	ProjectPointOnPlane( dst, tempvec, src );
-
-	/*
-	** normalize the result
-	*/
 	VectorNormalize( dst );
 }
 
