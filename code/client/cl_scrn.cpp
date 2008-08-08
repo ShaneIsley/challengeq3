@@ -180,8 +180,7 @@ static void SCR_DrawDebugGraph()
 	x = 0;
 	y = cls.glconfig.vidHeight;
 	re.SetColor( colorBlack );
-	re.DrawStretchPic(x, y - cl_graphheight->integer, 
-		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
+	re.DrawStretchPic( x, y - cl_graphheight->integer, w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
 	re.SetColor( NULL );
 
 	for (a=0 ; a<w ; a++)
@@ -240,10 +239,9 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 		return;
 	}
 
-	// if the menu is going to cover the entire screen, we
-	// don't need to render anything under it
-	if ( !VM_Call( uivm, UI_IS_FULLSCREEN )) {
-		switch( cls.state ) {
+	// if the menu is going to cover the entire screen, we don't need to render anything under it
+	if ( !VM_Call( uivm, UI_IS_FULLSCREEN ) ) {
+		switch ( cls.state ) {
 		default:
 			Com_Error( ERR_FATAL, "SCR_DrawScreenField: bad cls.state" );
 			break;
@@ -290,7 +288,7 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 
 	// debug graphs can be drawn on top of anything
 	if ( cl_timegraph->integer || cl_debugMove->integer ) {
-		SCR_DrawDebugGraph ();
+		SCR_DrawDebugGraph();
 	}
 }
 
@@ -301,9 +299,8 @@ void SCR_UpdateScreen()
 {
 	static int recursive = 0;
 
-	if ( !scr_initialized ) {
-		return;				// not initialized yet
-	}
+	if ( !scr_initialized )
+		return;
 
 	// there are several cases where this IS called twice in one frame
 	// easiest example is: conn to a server, kill the server
