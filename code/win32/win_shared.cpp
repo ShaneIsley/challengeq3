@@ -61,7 +61,7 @@ static void CPUID( int func, unsigned regs[4] )
 	regs[3] = regEDX;
 }
 
-static int IsPentium()
+static qbool IsPentium()
 {
 	__asm
 	{
