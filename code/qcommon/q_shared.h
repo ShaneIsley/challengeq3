@@ -281,8 +281,6 @@ extern const vec3_t vec3_origin;
 #define M_PI 3.14159265358979323846f // matches value in gcc v2 math.h
 #endif
 
-#define NUMVERTEXNORMALS 162
-extern const vec3_t bytedirs[NUMVERTEXNORMALS];
 
 // all drawing is done to a 640*480 virtual screen size
 // and will be automatically scaled to the real resolution
@@ -365,8 +363,7 @@ float Q_rsqrt( float f );		// reciprocal square root
 
 #define Square(x) ((x)*(x))
 
-// this isn't a real cheap function to call!
-int DirToByte( vec3_t dir );
+int DirToByte( const vec3_t dir );	// this isn't a real cheap function to call!
 void ByteToDir( int b, vec3_t dir );
 
 #define DotProduct(x,y)			((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
@@ -471,7 +468,6 @@ vec_t VectorNormalize( vec3_t v );		// returns vector length
 vec_t VectorNormalize2( const vec3_t v, vec3_t out );
 void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
-int Q_log2(int val);
 
 float Q_acos(float c);
 
@@ -503,10 +499,10 @@ int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const struct cplane_
 extern "C" int BoxOnPlaneSide( const vec3_t emins, const vec3_t emaxs, const struct cplane_s* p );
 #endif
 
-float	AngleMod( float a );
-float	LerpAngle( float from, float to, float frac );
-float	AngleSubtract( float a1, float a2 );
-void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
+float AngleMod( float a );
+float LerpAngle( float from, float to, float frac );
+float AngleSubtract( float a1, float a2 );
+void AnglesSubtract( const vec3_t v1, const vec3_t v2, vec3_t out );
 
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
@@ -515,8 +511,8 @@ void RotateAroundDirection( vec3_t axis[3], float yaw );
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 // perpendicular vector could be replaced by this
 
-void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
-void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
+void MatrixMultiply( float in1[3][3], float in2[3][3], float out[3][3] );
+void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up );
 void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 
