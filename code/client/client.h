@@ -457,11 +457,10 @@ void CIN_CloseAllVideos(void);
 //
 // cl_cgame.c
 //
-void CL_InitCGame( void );
-void CL_ShutdownCGame( void );
-qbool CL_GameCommand( void );
+void CL_InitCGame();
+void CL_ShutdownCGame();
 void CL_CGameRendering( stereoFrame_t stereo );
-void CL_SetCGameTime( void );
+void CL_SetCGameTime();
 
 //
 // cl_ui.c

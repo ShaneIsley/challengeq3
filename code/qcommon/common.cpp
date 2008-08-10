@@ -1403,7 +1403,7 @@ qbool Hunk_CheckMark()
 
 void Hunk_Clear()
 {
-	extern void CL_ShutdownCGame( void );
+	extern void CL_ShutdownCGame();
 	extern void CL_ShutdownUI( void );
 	extern void SV_ShutdownGameProgs( void );
 
@@ -1438,6 +1438,7 @@ void Hunk_Clear()
 	hunkblocks = NULL;
 #endif
 }
+
 
 static void Hunk_SwapBanks()
 {
