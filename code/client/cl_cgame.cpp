@@ -180,11 +180,7 @@ void CL_CgameError( const char *string ) {
 
 static void CL_ConfigstringModified()
 {
-	int			i, index;
-	gameState_t	oldGs;
-	int			len;
-
-	index = atoi( Cmd_Argv(1) );
+	int index = atoi( Cmd_Argv(1) );
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
 		Com_Error( ERR_DROP, "configstring > MAX_CONFIGSTRINGS" );
 	}
@@ -197,7 +193,7 @@ static void CL_ConfigstringModified()
 	}
 
 	// build the new gameState_t
-	oldGs = cl.gameState;
+	gameState_t oldGs = cl.gameState;
 
 	Com_Memset( &cl.gameState, 0, sizeof( cl.gameState ) );
 
@@ -205,7 +201,7 @@ static void CL_ConfigstringModified()
 	cl.gameState.dataCount = 1;
 
 	const char* dup;
-	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
+	for ( int i = 0; i < MAX_CONFIGSTRINGS; ++i ) {
 		if ( i == index ) {
 			dup = s;
 		} else {
@@ -215,8 +211,7 @@ static void CL_ConfigstringModified()
 			continue;		// leave with the default empty string
 		}
 
-		len = strlen( dup );
-
+		int len = strlen( dup );
 		if ( len + 1 + cl.gameState.dataCount > MAX_GAMESTATE_CHARS ) {
 			Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 		}
@@ -231,7 +226,6 @@ static void CL_ConfigstringModified()
 		// parse serverId and other cvars
 		CL_SystemInfoChanged();
 	}
-
 }
 
 
