@@ -1,5 +1,5 @@
 
-Aug 08 - 1.43
+08 Aug 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
 
@@ -42,6 +42,8 @@ sleep correctly if an unfocused client (win32-only)
 don't sleep INcorrectly if a dedicated server (win32-only)
 
 fixed a (huge) memory leak in the vm
+
+fixed sv_pure 1 problems on listen servers (i hope)
 
 another massive overhaul of the sound code:
 
