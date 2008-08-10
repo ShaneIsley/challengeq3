@@ -648,7 +648,7 @@ const char* Info_ValueForKey( const char *s, const char *key )
 											// work without stomping on each other
 	static	int	valueindex = 0;
 	char	*o;
-	
+
 	if ( !s || !key ) {
 		return "";
 	}
@@ -680,7 +680,7 @@ const char* Info_ValueForKey( const char *s, const char *key )
 		}
 		*o = 0;
 
-		if (!Q_stricmp (key, pkey) )
+		if (!Q_stricmp(key, pkey))
 			return value[valueindex];
 
 		if (!*s)

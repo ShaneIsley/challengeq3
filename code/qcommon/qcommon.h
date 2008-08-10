@@ -312,7 +312,7 @@ files can be execed.
 void Cbuf_Init();
 // allocates an initial text buffer that will grow as needed
 
-void Cbuf_AddText( const char *text );
+void Cbuf_AddText( const char* text );
 // Adds command text at the end of the buffer, does NOT add a final \n
 
 void Cbuf_Execute();
