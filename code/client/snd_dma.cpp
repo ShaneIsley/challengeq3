@@ -19,15 +19,8 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-
-/*****************************************************************************
- * name:		snd_dma.c
- *
- * desc:		main control for any streaming sound output device
- *
- * $Archive: /MissionPack/code/client/snd_dma.c $
- *
- *****************************************************************************/
+//
+// main control for any streaming sound output device
 
 #include "snd_local.h"
 #include "snd_codec.h"
@@ -45,20 +38,22 @@ static char s_backgroundLoop[MAX_QPATH];
 static const float SOUND_MAX_DIST = 1250;
 static const float SOUND_ATTENUATE = (1.0f / SOUND_MAX_DIST);
 
-channel_t	s_channels[MAX_CHANNELS];
-channel_t	loop_channels[MAX_CHANNELS];
-int			numLoopChannels;
+static const int MASTER_VOL = 127;
 
-static qbool	s_soundStarted;
-static qbool	s_soundMuted;
+channel_t s_channels[MAX_CHANNELS];
+channel_t loop_channels[MAX_CHANNELS];
+int numLoopChannels;
 
-static int			listener_number;
-static vec3_t		listener_origin;
-static vec3_t		listener_axis[3];
+static qbool s_soundStarted;
+static qbool s_soundMuted;
 
-dma_t		dma;
-int			s_soundtime;
-int			s_paintedtime;
+static int listener_number;
+static vec3_t listener_origin;
+static vec3_t listener_axis[3];
+
+dma_t dma;
+int s_soundtime;
+int s_paintedtime;
 
 #define MAX_SFX 4096
 static sfx_t s_knownSfx[MAX_SFX];
@@ -98,7 +93,7 @@ static void S_Base_SoundInfo()
 		}
 	}
 
-	Com_Printf("----------------------\n" );
+	Com_Printf( "----------------------\n" );
 }
 
 
@@ -106,7 +101,7 @@ static void S_Base_SoundList()
 {
 	const sfx_t* sfx = &s_knownSfx[1];
 	for ( int i = 1; i < s_numSfx; ++i, ++sfx ) {
-		Com_Printf("%6i [%s] : %s\n", sfx->soundLength, sfx->inMemory ? "MEM" : "PGD", sfx->soundName );
+		Com_Printf( "%6i [%s] : %s\n", sfx->soundLength, sfx->inMemory ? "MEM" : "PGD", sfx->soundName );
 	}
 	Com_Printf( "%d sounds loaded\n", s_numSfx - 1 );
 
@@ -161,15 +156,15 @@ static sfx_t* S_FindName( const char *name )
 	int i;
 
 	if (!name) {
-		Com_Error( ERR_FATAL, "S_FindName: NULL\n" );
+		Com_Error( ERR_FATAL, "S_FindName: NULL" );
 	}
 
 	if (!name[0]) {
-		Com_Error( ERR_FATAL, "S_FindName: empty name\n" );
+		Com_Error( ERR_FATAL, "S_FindName: empty name" );
 	}
 
 	if (strlen(name) >= MAX_QPATH) {
-		Com_Error( ERR_FATAL, "Sound name too long: %s", name );
+		Com_Error( ERR_FATAL, "S_FindName: name too long: %s", name );
 	}
 
 	int hash = Q_FileHash( name, SFX_HASH_SIZE );
@@ -288,7 +283,7 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 
 	dist *= SOUND_ATTENUATE;
 
-	// attentuate correctly even if we can't spatialise
+	// attenuate correctly even if we can't spatialise
 	if (dma.channels == 1) {
 		*left_vol = *right_vol = master_vol * Square(1.0 - dist);
 		return;
@@ -320,7 +315,7 @@ static void S_SpatializeOrigin( const vec3_t origin, int master_vol, int* left_v
 
 /*
 validate the parms and queue the sound up
-if pos is NULL, the sound will be dynamically sourced from the entity
+if origin is NULL, the sound will be dynamically sourced from the entity
 
 in theory, entchannel 0 (CHAN_AUTO) will not override a playing sound
 unless it has to, and other channels will automatically override
@@ -447,7 +442,7 @@ static void S_Base_StartSound( const vec3_t origin, int entityNum, int entchanne
 		ch->fixed_origin = qfalse;
 	}
 
-	ch->master_vol = 127;
+	ch->master_vol = MASTER_VOL;
 	ch->entnum = entityNum;
 	ch->thesfx = sfx;
 	ch->startSample = START_SAMPLE_IMMEDIATE;
@@ -570,9 +565,6 @@ sum up the channel multipliers.
 */
 static void S_AddLoopSounds()
 {
-	//const int AMBIENT_VOLUME = 96; // 25% quieter than normal sounds
-	const int AMBIENT_VOLUME = 127;
-
 	int			i, j, time;
 	int			left_total, right_total, left, right;
 	channel_t	*ch;
@@ -590,7 +582,7 @@ static void S_AddLoopSounds()
 			continue;	// already merged into an earlier sound
 		}
 
-		S_SpatializeOrigin( loop->origin, AMBIENT_VOLUME, &left_total, &right_total );
+		S_SpatializeOrigin( loop->origin, MASTER_VOL, &left_total, &right_total );
 
 		loop->sfx->lastTimeUsed = time;
 
@@ -601,7 +593,7 @@ static void S_AddLoopSounds()
 			}
 			loop2->mergeFrame = loopFrame;
 
-			S_SpatializeOrigin( loop2->origin, AMBIENT_VOLUME, &left, &right );
+			S_SpatializeOrigin( loop2->origin, MASTER_VOL, &left, &right );
 
 			loop2->sfx->lastTimeUsed = time;
 			left_total += left;
@@ -621,7 +613,7 @@ static void S_AddLoopSounds()
 			right_total = 255;
 		}
 
-		ch->master_vol = 127;
+		ch->master_vol = MASTER_VOL;
 		ch->leftvol = left_total;
 		ch->rightvol = right_total;
 		ch->thesfx = loop->sfx;
@@ -853,8 +845,7 @@ static void S_GetSoundtime()
 
 	int fullsamples = dma.samples / dma.channels;
 
-	if ( CL_VideoRecording() )
-	{
+	if ( CL_VideoRecording() ) {
 		s_soundtime += (int)ceil( dma.speed / cl_aviFrameRate->value );
 		return;
 	}
@@ -862,8 +853,7 @@ static void S_GetSoundtime()
 	// it is possible to miscount buffers if it has wrapped twice between
 	// calls to S_Update.  Oh well.
 	int samplepos = SNDDMA_GetDMAPos();
-	if (samplepos < oldsamplepos)
-	{
+	if (samplepos < oldsamplepos) {
 		buffers++;	// buffer wrapped
 		if (s_paintedtime > 0x40000000) {
 			// time to chop things off to avoid 32 bit limits
@@ -987,8 +977,7 @@ static void S_Base_StartBackgroundTrack( const char *intro, const char *loop )
 
 	// close the background track, but DON'T reset s_rawend
 	// if restarting the same background track
-	if (s_backgroundStream)
-	{
+	if (s_backgroundStream) {
 		S_CodecCloseStream(s_backgroundStream);
 		s_backgroundStream = NULL;
 	}
@@ -1008,19 +997,20 @@ static void S_Base_StartBackgroundTrack( const char *intro, const char *loop )
 
 static void S_UpdateBackgroundTrack()
 {
+	static float musicVolume = 0;
+
 	int		bufferSamples;
 	int		fileSamples;
 	byte	raw[30000];		// just enough to fit in a mac stack frame
 	int		fileBytes;
 	int		r;
-	static	float	musicVolume = 0.5f;
 
-	if(!s_backgroundStream) {
+	if (!s_backgroundStream) {
 		return;
 	}
 
-	// graeme see if this is OK
-	musicVolume = (musicVolume + (s_musicVolume->value * 2))/4.0f;
+	// fade music in or out if the volume changes (mainly for to/from 0)
+	musicVolume = (musicVolume + (s_musicVolume->value * 2)) / 4.0f;
 
 	// don't bother playing anything if musicvolume is 0
 	if ( musicVolume <= 0 ) {
@@ -1045,10 +1035,8 @@ static void S_UpdateBackgroundTrack()
 			fileSamples = fileBytes / (s_backgroundStream->info.width * s_backgroundStream->info.channels);
 		}
 
-		// Read
-		r = S_CodecReadStream(s_backgroundStream, fileBytes, raw);
-		if(r < fileBytes)
-		{
+		r = S_CodecReadStream( s_backgroundStream, fileBytes, raw );
+		if (r < fileBytes) {
 			fileBytes = r;
 			fileSamples = r / (s_backgroundStream->info.width * s_backgroundStream->info.channels);
 		}
@@ -1084,19 +1072,18 @@ static void S_UpdateBackgroundTrack()
 void S_FreeOldestSound()
 {
 	sfx_t* sfx;
-
 	int oldest = Com_Milliseconds();
-	int used = 0;
+	int slot = 0;
 
 	for (int i = 1; i < s_numSfx; ++i) {
 		sfx = &s_knownSfx[i];
 		if (sfx->inMemory && sfx->lastTimeUsed < oldest) {
-			used = i;
+			slot = i;
 			oldest = sfx->lastTimeUsed;
 		}
 	}
 
-	sfx = &s_knownSfx[used];
+	sfx = &s_knownSfx[slot];
 
 	Com_DPrintf( "S_FreeOldestSound: freeing sound %s\n", sfx->soundName );
 
