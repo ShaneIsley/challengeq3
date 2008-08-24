@@ -64,6 +64,7 @@ static sfx_t* sfxHash[SFX_HASH_SIZE];
 
 static const cvar_t* s_show;
 static const cvar_t* s_mixahead;
+static const cvar_t* s_mixPreStep;
 const cvar_t* s_testsound;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
@@ -867,16 +868,24 @@ static void S_GetSoundtime()
 	s_soundtime = buffers*fullsamples + samplepos/dma.channels;
 
 #if 0
-// check to make sure that we haven't overshot
-	if (s_paintedtime < s_soundtime)
-	{
-		Com_DPrintf ("S_GetSoundtime : overflow\n");
+	// check to make sure that we haven't overshot
+	if (s_paintedtime < s_soundtime) {
+		Com_DPrintf( "S_GetSoundtime : overflow\n" );
 		s_paintedtime = s_soundtime;
 	}
 #endif
 
 	if ( dma.submission_chunk < 256 ) {
-		s_paintedtime = s_soundtime;
+		/* NOTE: this is SO wrong - it SHOULD just be s_soundtime
+		because this is essentially lying and saying it's filled a piece of the DMA
+		that it absolutely hasn't, so that piece is only valid because of mixahead
+		but for some insane reason, NOT doing this causes garbled sound on SOME machines
+		(even though the buffer data is still valid because of the previous frame's overfill)
+		so i'm at a loss to explain how this could possibly be required, other than
+		"something ELSE in the sound code is fucked up in a complementary way", or it's
+		a driver problem. either way, i can't repro it so we're just stuck with the hack
+		*/
+		s_paintedtime = s_soundtime + s_mixPreStep->value * dma.speed;
 	} else {
 		s_paintedtime = s_soundtime + dma.submission_chunk;
 	}
@@ -885,7 +894,6 @@ static void S_GetSoundtime()
 
 static void S_Update_DMA()
 {
-	static int prevTime = 0;
 	static int prevSoundtime = -1;
 
 	if ( !s_soundStarted || s_soundMuted ) {
@@ -903,22 +911,8 @@ static void S_Update_DMA()
 	// and start any new sounds
 	S_ScanChannelStarts();
 
-	int thisTime = Com_Milliseconds();
-	int ms = thisTime - prevTime;
-	prevTime = thisTime;
-
-	// op is the amount of mixahead you "need" for the current framerate
-	// it will ALWAYS be FAR less than (s_mixahead * dma.speed)
-	// unless you're running at a miserable framerate (50fps and below, for ma 0.2)
-	// so s_mixahead is, in reality, almost completely useless and ignored
-	float ma = s_mixahead->value * dma.speed;
-	float op = ms * dma.speed * 0.01;
-	if (op < ma) {
-		ma = op;
-	}
-
 	// mix ahead of current position
-	unsigned endtime = s_soundtime + ma;
+	unsigned endtime = s_soundtime + s_mixahead->value * dma.speed;
 
 	// mix to an even submission block size
 	endtime = (endtime + dma.submission_chunk-1) & ~(dma.submission_chunk-1);
@@ -1118,6 +1112,7 @@ qbool S_Base_Init( soundInterface_t *si )
 	Com_Memset( si, 0, sizeof(*si) );
 
 	s_mixahead = Cvar_Get( "s_mixahead", "0.2", CVAR_ARCHIVE );
+	s_mixPreStep = Cvar_Get( "s_mixPreStep", "0.05", CVAR_ARCHIVE );
 	s_show = Cvar_Get( "s_show", "0", CVAR_CHEAT );
 	s_testsound = Cvar_Get( "s_testsound", "0", CVAR_CHEAT );
 
