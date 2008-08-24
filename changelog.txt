@@ -43,9 +43,9 @@ don't sleep INcorrectly if a dedicated server (win32-only)
 
 fixed a (huge) memory leak in the vm
 
-fixed sv_pure 1 problems on listen servers (i hope)
+fixed sv_pure 1 problems on listen servers
 
-another massive overhaul of the sound code:
+another overhaul of the sound code:
 
 spatialisation is now correct, which has two huge impacts:
   you can "place" sounds MUCH more accurately than before,
@@ -53,7 +53,8 @@ spatialisation is now correct, which has two huge impacts:
 
 removed s_doppler, it's almost right but it just sounds like shit
 
-removed s_mixprestep, a stupid hack to work around another stupid hack
+most of the s_mixprestep hackery has been removed, and you can
+probably set it to 0 if your sound drivers work properly
 
 OAL support has been dropped completely and indefinitely
   it's crap and i'm tired of it poisoning the codebase
