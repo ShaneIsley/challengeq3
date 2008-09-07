@@ -163,12 +163,12 @@ static qbool IN_InitDIMouse()
 		DX_MOUSE_BUFFER_SIZE,           // dwData
 	};
 
-	Com_Printf( "Initializing DirectInput...\n");
+	Com_Printf( "Initializing DirectInput...\n" );
 
 	if (!hInstDI) {
 		hInstDI = LoadLibrary("dinput.dll");
 		if (hInstDI == NULL) {
-			Com_Printf ("Couldn't load dinput.dll\n");
+			Com_Printf( "Couldn't load dinput.dll\n" );
 			return qfalse;
 		}
 	}
@@ -178,7 +178,7 @@ static qbool IN_InitDIMouse()
 			GetProcAddress(hInstDI,"DirectInputCreateA");
 
 		if (!pDirectInputCreate) {
-			Com_Printf ("Couldn't get DI proc addr\n");
+			Com_Printf( "Couldn't get DI proc addr\n" );
 			return qfalse;
 		}
 	}
@@ -187,7 +187,7 @@ static qbool IN_InitDIMouse()
 	hr = DirectInput8Create( g_wv.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&g_pdi, NULL );
 
 	if (FAILED(hr)) {
-		Com_Printf ("iDirectInputCreate failed\n");
+		Com_Printf( "iDirectInputCreate failed\n" );
 		return qfalse;
 	}
 
@@ -195,37 +195,33 @@ static qbool IN_InitDIMouse()
 	hr = IDirectInput_CreateDevice( g_pdi, GUID_SysMouse, &g_pMouse, NULL );
 
 	if (FAILED(hr)) {
-		Com_Printf ("Couldn't open DI mouse device\n");
+		Com_Printf( "Couldn't open DI mouse device\n" );
 		return qfalse;
 	}
 
-	// set the data format to "mouse format".
-	//dwl: as Ttimo say - would be easier using c_dfDIMouse or c_dfDIMouse2
-	//dwl: DIMOUSESTATE2(8 mouse buttons) structure to IDirectInputDevice::GetDeviceState.
-	hr = IDirectInputDevice_SetDataFormat(g_pMouse, &c_dfDIMouse2 );
+	// set the data format to DIv8 mice (8 buttons)
+	hr = IDirectInputDevice_SetDataFormat( g_pMouse, &c_dfDIMouse2 );
 
 	if (FAILED(hr)) {
-		Com_Printf ("Couldn't set DI mouse format\n");
+		Com_Printf( "Couldn't set DI mouse format\n" );
 		return qfalse;
 	}
 
 	// set the cooperativity level.
-	hr = IDirectInputDevice_SetCooperativeLevel(g_pMouse, g_wv.hWnd,
-			DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+	hr = IDirectInputDevice_SetCooperativeLevel( g_pMouse, g_wv.hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
 	if (FAILED(hr)) {
-		Com_Printf ("Couldn't set DI coop level\n");
+		Com_Printf( "Couldn't set DI coop level\n" );
 		return qfalse;
 	}
 
-
 	// set the buffer size to DINPUT_BUFFERSIZE elements.
 	// the buffer size is a DWORD property associated with the device
-	hr = IDirectInputDevice_SetProperty(g_pMouse, DIPROP_BUFFERSIZE, &dipdw.diph);
+	hr = IDirectInputDevice_SetProperty( g_pMouse, DIPROP_BUFFERSIZE, &dipdw.diph );
 
 	if (FAILED(hr)) {
-		Com_Printf ("Couldn't set DI buffersize\n");
+		Com_Printf( "Couldn't set DI buffersize\n" );
 		return qfalse;
 	}
 
@@ -234,7 +230,7 @@ static qbool IN_InitDIMouse()
 	IN_DIMouse( &x, &y );
 	IN_DIMouse( &x, &y );
 
-	Com_Printf( "DirectInput initialized.\n");
+	Com_Printf( "DirectInput initialized.\n" );
 	return qtrue;
 }
 
@@ -263,7 +259,7 @@ static void IN_ActivateDIMouse()
 	HRESULT hr = IDirectInputDevice_Acquire( g_pMouse );
 	if (FAILED(hr)) {
 		if ( !IN_InitDIMouse() ) {
-			Com_Printf ("Falling back to Win32 mouse support...\n");
+			Com_Printf( "Falling back to Win32 mouse support...\n" );
 			Cvar_Set( "in_mouse", "-1" );
 		}
 	}
@@ -415,7 +411,7 @@ static void IN_StartupMouse()
 	s_wmv.mouseStartupDelayed = qfalse;
 
 	if ( in_mouse->integer == 0 ) {
-		Com_Printf ("Mouse control not active.\n");
+		Com_Printf( "Mouse control not active.\n" );
 		return;
 	}
 
@@ -423,16 +419,15 @@ static void IN_StartupMouse()
 	if ( ( g_wv.osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ) &&
 		 ( g_wv.osversion.dwMajorVersion == 4 ) )
 	{
-		Com_Printf ("Disallowing DirectInput on NT 4.0\n");
+		Com_Printf( "Disallowing DirectInput on NT 4.0\n" );
 		Cvar_Set( "in_mouse", "-1" );
 	}
 
 	if ( in_mouse->integer == -1 ) {
-		Com_Printf ("Skipping check for DirectInput\n");
+		Com_Printf( "Skipping check for DirectInput\n" );
 	} else {
-		if (!g_wv.hWnd)
-		{
-			Com_Printf ("No window for DirectInput mouse init, delaying\n");
+		if (!g_wv.hWnd) {
+			Com_Printf( "No window for DirectInput mouse init, delaying\n" );
 			s_wmv.mouseStartupDelayed = qtrue;
 			return;
 		}
@@ -440,7 +435,7 @@ static void IN_StartupMouse()
 			s_wmv.mouseInitialized = qtrue;
 			return;
 		}
-		Com_Printf ("Falling back to Win32 mouse support...\n");
+		Com_Printf( "Falling back to Win32 mouse support...\n" );
 	}
 
 	s_wmv.mouseInitialized = qtrue;
@@ -552,9 +547,8 @@ void IN_Frame()
 	IN_JoyMove();
 
 	if ( !s_wmv.mouseInitialized ) {
-		if (s_wmv.mouseStartupDelayed && g_wv.hWnd)
-		{
-			Com_Printf("Proceeding with delayed mouse init\n");
+		if (s_wmv.mouseStartupDelayed && g_wv.hWnd) {
+			Com_Printf( "Proceeding with delayed mouse init\n" );
 			IN_StartupMouse();
 			s_wmv.mouseStartupDelayed = qfalse;
 		}
@@ -615,7 +609,7 @@ static void IN_StartupJoystick()
 	joy.avail = qfalse;
 
 	if ( !in_joystick->integer ) {
-		Com_Printf ("Joystick is not active.\n");
+		Com_Printf( "Joystick is not active.\n" );
 		return;
 	}
 
@@ -623,7 +617,7 @@ static void IN_StartupJoystick()
 	int numdevs;
 	if ((numdevs = joyGetNumDevs()) == 0)
 	{
-		Com_Printf ("joystick not found -- driver not present\n");
+		Com_Printf( "joystick not found -- driver not present\n" );
 		return;
 	}
 
@@ -642,7 +636,7 @@ static void IN_StartupJoystick()
 	// abort startup if we didn't find a valid joystick
 	if (mmr != JOYERR_NOERROR)
 	{
-		Com_Printf ("joystick not found -- no valid joysticks (%x)\n", mmr);
+		Com_Printf( "joystick not found -- no valid joysticks (%x)\n", mmr );
 		return;
 	}
 
@@ -651,7 +645,7 @@ static void IN_StartupJoystick()
 	Com_Memset (&joy.jc, 0, sizeof(joy.jc));
 	if ((mmr = joyGetDevCaps (joy.id, &joy.jc, sizeof(joy.jc))) != JOYERR_NOERROR)
 	{
-		Com_Printf ("joystick not found -- invalid joystick capabilities (%x)\n", mmr); 
+		Com_Printf( "joystick not found -- invalid joystick capabilities (%x)\n", mmr );
 		return;
 	}
 
@@ -969,10 +963,9 @@ static void IN_StartupMIDI()
 static void IN_ShutdownMIDI()
 {
 	if ( s_midiInfo.hMidiIn )
-	{
 		midiInClose( s_midiInfo.hMidiIn );
-	}
+
 	Com_Memset( &s_midiInfo, 0, sizeof( s_midiInfo ) );
-	Cmd_RemoveCommand("midiinfo" );
+	Cmd_RemoveCommand( "midiinfo" );
 }
 
