@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 // win_input.c -- win32 mouse and joystick code
-// 02/21/97 JCB Added extended DirectInput code to support external controllers.
 
 #include "../client/client.h"
 #include "win_local.h"
@@ -29,19 +28,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <dinput.h>
 
-//dwl: buffered input - for big dpi mouses
-#define	DX_MOUSE_BUFFER_SIZE	64
-#define MAX_MOUSE_BUTTONS 8
-
-#ifndef DIMOFS_BUTTON4
-#define DIMOFS_BUTTON4 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 4)
-#define DIMOFS_BUTTON5 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 5)
-#define DIMOFS_BUTTON6 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 6)
-#define DIMOFS_BUTTON7 (FIELD_OFFSET(DIMOUSESTATE2, rgbButtons) + 7)
-#endif
-
 #pragma comment( lib, "dinput8" )
 #pragma comment( lib, "dxguid" )
+
+//dwl: buffered input - for big dpi mouses
+#define DX_MOUSE_BUFFER_SIZE 64
+#define MAX_MOUSE_BUTTONS 8
 
 
 typedef struct {
@@ -53,7 +45,7 @@ typedef struct {
 
 static WinMouseVars_t s_wmv;
 
-static int	window_center_x, window_center_y;
+static int window_center_x, window_center_y;
 
 
 static void IN_StartupMIDI();
@@ -138,8 +130,6 @@ DIRECT INPUT MOUSE CONTROL
 ============================================================
 */
 
-#define iDirectInputCreate(a,b,c,d)	pDirectInputCreate(a,b,c,d)
-
 HRESULT (WINAPI *pDirectInputCreate)(HINSTANCE hinst, DWORD dwVersion,
 	LPDIRECTINPUT* lplpDirectInput, LPUNKNOWN punkOuter);
 
@@ -175,7 +165,7 @@ static qbool IN_InitDIMouse()
 
 	if (!pDirectInputCreate) {
 		pDirectInputCreate = (HRESULT (WINAPI *)(HINSTANCE, DWORD, LPDIRECTINPUT *, LPUNKNOWN))
-			GetProcAddress(hInstDI,"DirectInputCreateA");
+			GetProcAddress(hInstDI, "DirectInputCreateA");
 
 		if (!pDirectInputCreate) {
 			Com_Printf( "Couldn't get DI proc addr\n" );
@@ -187,7 +177,7 @@ static qbool IN_InitDIMouse()
 	hr = DirectInput8Create( g_wv.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&g_pdi, NULL );
 
 	if (FAILED(hr)) {
-		Com_Printf( "iDirectInputCreate failed\n" );
+		Com_Printf( "DI8Create failed\n" );
 		return qfalse;
 	}
 
@@ -296,12 +286,8 @@ static void IN_DIMouse( int *mx, int *my )
 			return;
 		}
 
-		/* Unable to read data or no data available */
-		if ( FAILED(hr) ) {
-			break;
-		}
-
-		if ( dwElements == 0 ) {
+		// unable to read data or no data available
+		if ( FAILED(hr) || !dwElements ) {
 			break;
 		}
 
