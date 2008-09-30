@@ -119,7 +119,7 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 	OSVERSIONINFO vinfo;
 	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
 	GetVersionEx( &vinfo );
-	if ( vinfo.dwMajorVersion == 5 && vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT ) {
+	if ( vinfo.dwMajorVersion >= 5 && vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT ) {
 		Com_DPrintf( "performing W2K gamma clamp.\n" );
 		for ( j = 0 ; j < 3 ; j++ ) {
 			for ( i = 0 ; i < 128 ; i++ ) {
