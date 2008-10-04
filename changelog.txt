@@ -1,4 +1,9 @@
 
+xx xxx 08 - 1.44
+
+add: hw gamma should work on Vista now
+
+
 08 Aug 08 - 1.43
 
 fixed sfx0 using a real sound and thus "hiding" it
